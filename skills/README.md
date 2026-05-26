@@ -40,3 +40,21 @@ have one hypothesis to test; bring in the others as the project grows.
 4. **Reference the canonical infra paths abstractly.** Use phrases
    like "the project's runner module" not
    `src/nature_inspired_networks/runner.py` — so the skill ports.
+
+## Two cross-cutting disciplines every skill assumes
+
+Every workflow above is wrapped in two project-wide disciplines that
+the SKILL.md files reference but don't redefine each time:
+
+- **Periodic GitHub checkpoint.** Commit + push on every milestone
+  (file edit, test green, run-folder created, dashboard refresh),
+  before AND after every background task launch, every ~15 min of
+  active editing. Many small commits beat one big commit. Power
+  outage must never lose progress. See
+  `skills/autoresearch-checkpoint/SKILL.md` for the trigger table.
+- **Test discipline.** Every new module/class/function ships with a
+  unit test exercising shape, every Boolean-flag combination, and
+  the bug class it was written to fix. Tests must pass before any
+  training-loop background task launches. See
+  `skills/autoresearch-modular-block/SKILL.md` for the mandatory
+  smoke-test contract.

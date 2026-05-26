@@ -101,6 +101,19 @@ The following are **non-negotiable** unless the user explicitly waives:
 10. **Skills under `skills/` are content-agnostic.** A skill that
     mentions sacred-geometry-specifics is leaking domain detail and
     must be rewritten.
+11. **Periodic GitHub checkpoint is mandatory.** Commit + push to
+    `dlmastery/nature_inspired_networks` on **every** milestone:
+    code edit, test green, ledger update, run-folder created, dashboard
+    refreshed. Default cadence ≤ 15 min during active work; before AND
+    after every background training task. Many small commits beat one
+    big commit. The checkpoint is the deliverable — a power outage
+    must never lose progress. (See
+    `memory/feedback_checkpoint_discipline.md` for the trigger table.)
+12. **Test discipline.** Every new module/class/function ships with a
+    unit test in `tests/test_<module>.py` exercising shape, branches,
+    and the bug class it was added to fix. Tests must pass before
+    any training-loop background task is launched. (See
+    `memory/feedback_test_discipline.md`.)
 
 ---
 
