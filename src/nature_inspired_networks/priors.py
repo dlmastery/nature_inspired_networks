@@ -152,8 +152,21 @@ def cymatic_init_(conv: nn.Conv2d, n_modes: int | None = None) -> None:
 class GroupConv2d(nn.Module):
     """Cohen-Welling style group convolution over C4 (4 rotations) or D4
     (4 rotations + flips). Weight-shared across group, output channels =
-    `out_channels`. Aggregation across the group orbit is max-pool, which
-    is invariant; this is a *light* Platonic prior cheap enough for ablations.
+    `out_channels`. This is a *light* Platonic prior cheap enough for ablations.
+
+    The ``reduce`` parameter selects the orbit aggregation:
+      - ``"max"`` — per-position soft-argmax over the 4 (or 8) rotated copies.
+      - ``"mean"`` — average over the orbit (the H58 hypothesised "fix").
+
+    **Empirical verdict (CIFAR-10, 12 epochs, seed 0):** ``max`` is *better*
+    than ``mean`` by 4-6 pp top-1. The original intuition "max throws away
+    75 % of the signal" was wrong; max acts as a soft argmax over
+    orientations, preserving the strongest response at every spatial
+    location, while mean dilutes discriminative features. See
+    ``FINDINGS.md`` "H58 follow-up — the avg-pool fix DISCARDED" for the
+    full per-row table. The correct cure for H24 is *data*, not the
+    reduction operator — test on rotated CIFAR-10 / IcoMNIST where the
+    equivariance prior is data-aligned.
     """
 
     def __init__(
