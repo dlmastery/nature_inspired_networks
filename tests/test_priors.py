@@ -1,4 +1,4 @@
-"""Unit tests for the sacred-geometry primitives."""
+﻿"""Unit tests for the nature-inspired primitives."""
 from __future__ import annotations
 
 import math
@@ -9,7 +9,7 @@ import torch
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 
-from sacgeo.priors import (  # noqa: E402
+from nature_inspired_networks.priors import (  # noqa: E402
     PHI,
     GroupConv2d,
     HexConv2d,

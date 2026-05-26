@@ -1,4 +1,4 @@
-"""SacredGeoBlock — composable, ablation-friendly drop-in residual block.
+﻿"""NaturePriorBlock — composable, ablation-friendly drop-in residual block.
 
 Toggle priors with constructor flags. Output shape matches a standard
 ResNet basic block so it can replace BasicBlock in CIFAR-ResNet stacks.
@@ -21,7 +21,7 @@ from .priors import (
 
 
 @dataclass
-class SacredFlags:
+class NaturePriorFlags:
     """Boolean toggles for ablation studies."""
 
     hex: bool = True
@@ -44,7 +44,7 @@ class _GenericConv(nn.Module):
         c_in: int,
         c_out: int,
         stride: int,
-        flags: SacredFlags,
+        flags: NaturePriorFlags,
     ) -> None:
         super().__init__()
         if flags.group:
@@ -87,7 +87,7 @@ class _FractalPath(nn.Module):
     """
 
     def __init__(self, c_in: int, c_out: int, stride: int,
-                 depth: int, flags: SacredFlags) -> None:
+                 depth: int, flags: NaturePriorFlags) -> None:
         super().__init__()
         self.depth = depth
         self.flags = flags
@@ -108,12 +108,12 @@ class _FractalPath(nn.Module):
         return 0.5 * (a + b)
 
 
-class SacredGeoBlock(nn.Module):
-    """Drop-in residual block with toggleable sacred-geometry priors.
+class NaturePriorBlock(nn.Module):
+    """Drop-in residual block with toggleable nature-inspired priors.
 
     Architecture (residual form):
-        x → conv1 (sacred priors) → ReLU
-          → fractal-or-conv2 (sacred priors)
+        x → conv1 (nature-inspired priors) → ReLU
+          → fractal-or-conv2 (nature-inspired priors)
           → optional golden-angle channel modulation
           → + residual(x) → ReLU
     """
@@ -123,11 +123,11 @@ class SacredGeoBlock(nn.Module):
         c_in: int,
         c_out: int,
         stride: int = 1,
-        flags: SacredFlags | None = None,
+        flags: NaturePriorFlags | None = None,
         fractal_depth: int = 2,
     ) -> None:
         super().__init__()
-        flags = flags or SacredFlags()
+        flags = flags or NaturePriorFlags()
         self.flags = flags
         self.conv1 = _GenericConv(c_in, c_out, stride, flags)
         if flags.fractal:

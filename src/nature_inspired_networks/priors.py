@@ -1,6 +1,6 @@
-"""Sacred-geometry priors as small, composable PyTorch utilities.
+﻿"""nature-inspired priors as small, composable PyTorch utilities.
 
-Each function/class implements ONE sacred prior so the SacredGeoBlock
+Each function/class implements ONE nature-inspired prior so the NaturePriorBlock
 can ablate them independently. References to the literature are inline.
 """
 from __future__ import annotations

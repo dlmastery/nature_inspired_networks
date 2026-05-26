@@ -1,4 +1,4 @@
-"""Tests for the autoresearch reasoning gates."""
+﻿"""Tests for the autoresearch reasoning gates."""
 from __future__ import annotations
 
 import sys
@@ -6,14 +6,14 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 
-from sacgeo.reasoning import ReasoningEntry, validate_entry  # noqa: E402
+from nature_inspired_networks.reasoning import ReasoningEntry, validate_entry  # noqa: E402
 
 
 def _good_entry(**over):
     base = dict(
         experiment_id="exp01",
         title="t",
-        diagnosis=("Establishing the literature anchor against which every sacred "
+        diagnosis=("Establishing the literature anchor against which every Nature-Inspired "
                    "geometry variant in this campaign will be measured; this is the "
                    "very first experiment with no prior runs to diagnose. We need to "
                    "verify the training loop, FLOP counter, GPU latency timer, and "
@@ -30,11 +30,11 @@ def _good_entry(**over):
              "the target asymptote for our 12-epoch quick budget.")
         ],
         hypothesis=("Because the model is the canonical 0.27 M-parameter ResNet-20 "
-                    "with no sacred priors switched on, mechanism-wise it is just "
+                    "with no nature-inspired priors switched on, mechanism-wise it is just "
                     "stacked 3 by 3 conv plus BN plus ReLU residual blocks with the "
                     "He 2015 widths 16 32 64; we expect a 12-epoch top-1 in the low "
                     "to mid 80s on CIFAR-10 per the He 2015 recipe, which is enough "
-                    "head-room to detect sacred-prior deltas of one to three points."),
+                    "head-room to detect nature-prior deltas of one to three points."),
         prediction=("composite in the range 0.78 to 0.83; top-1 in the range 0.80 "
                     "to 0.85 after 12 epochs; parameter count exactly 272474; GPU "
                     "batch-1 latency in the 5 to 12 ms band; rotation equivariance "

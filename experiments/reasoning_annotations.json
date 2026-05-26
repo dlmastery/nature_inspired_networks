@@ -1,12 +1,12 @@
-[
+﻿[
   {
     "experiment_id": "exp01_baseline_resnet20",
     "title": "Baseline ResNet-20 on CIFAR-10",
-    "diagnosis": "There is no prior run in this campaign -- this is experiment 1, establishing the literature anchor against which every SacredGeoNet variant is measured. CIFAR-10 with the canonical He 2015 ResNet-20 (16-32-64 widths, 3 stages of 3 BasicBlocks) reports 91.25 percent top-1 in the published paper after 164 epochs. In our 12-epoch quick budget the same architecture is expected to land in the low to mid 80s; the gap is recipe, not architecture. The baseline number anchors the composite-metric formula and proves the training loop, FLOP counter, latency timer, and rotation equivariance probe all wire up.",
+    "diagnosis": "There is no prior run in this campaign -- this is experiment 1, establishing the literature anchor against which every NaturePriorNet variant is measured. CIFAR-10 with the canonical He 2015 ResNet-20 (16-32-64 widths, 3 stages of 3 BasicBlocks) reports 91.25 percent top-1 in the published paper after 164 epochs. In our 12-epoch quick budget the same architecture is expected to land in the low to mid 80s; the gap is recipe, not architecture. The baseline number anchors the composite-metric formula and proves the training loop, FLOP counter, latency timer, and rotation equivariance probe all wire up.",
     "citations": [
-      "He, Zhang, Ren, Sun 2015 CVPR 'Deep Residual Learning for Image Recognition' (arXiv:1512.03385) -- Source of the canonical ResNet-20 CIFAR variant; their Table 6 reports 91.25 percent on CIFAR-10 after 164 epochs at 0.27 M parameters. We hold our block scaffold maximally similar to this baseline so that the only difference between baseline_resnet20 and baseline_sg_vanilla is the SacredGeoBlock plumbing, not the optimisation recipe."
+      "He, Zhang, Ren, Sun 2015 CVPR 'Deep Residual Learning for Image Recognition' (arXiv:1512.03385) -- Source of the canonical ResNet-20 CIFAR variant; their Table 6 reports 91.25 percent on CIFAR-10 after 164 epochs at 0.27 M parameters. We hold our block scaffold maximally similar to this baseline so that the only difference between baseline_resnet20 and baseline_sg_vanilla is the NaturePriorBlock plumbing, not the optimisation recipe."
     ],
-    "hypothesis": "Because the model is the canonical 0.27 M-parameter ResNet-20 with no sacred priors switched on, mechanism-wise it is just stacked 3 by 3 conv plus BN plus ReLU residual blocks with the He 2015 widths 16 32 64; we expect a 12-epoch top-1 in the low to mid 80s on CIFAR-10 per the He 2015 recipe, which is enough head-room to detect sacred-prior deltas of one to three percentage points downstream.",
+    "hypothesis": "Because the model is the canonical 0.27 M-parameter ResNet-20 with no nature-inspired priors switched on, mechanism-wise it is just stacked 3 by 3 conv plus BN plus ReLU residual blocks with the He 2015 widths 16 32 64; we expect a 12-epoch top-1 in the low to mid 80s on CIFAR-10 per the He 2015 recipe, which is enough head-room to detect nature-prior deltas of one to three percentage points downstream.",
     "prediction": "composite in [0.78, 0.83]; top1 in [0.80, 0.85]; params = 272474; GPU batch=1 latency in the 5 to 12 ms band; rotation equivariance error around 0.5 to 0.9 (no equivariance built in).",
     "verdict": "",
     "learning": "",
@@ -15,12 +15,12 @@
   },
   {
     "experiment_id": "exp02_baseline_sg_vanilla",
-    "title": "SacredGeoNet with all priors OFF + linear channel scaling",
-    "diagnosis": "exp01 (baseline_resnet20) established the literature anchor at ResNet-20's 16-32-64 channel schedule. To measure the marginal effect of any single sacred prior we need a SacredGeoNet skeleton with all six flags FALSE and the channel schedule held at the CONTROL value (linear scaling, c0*(k+1) widths 16-32-48 rounded to multiples of 8). This run is the ablation reference point: its only structural deltas from baseline_resnet20 are (a) the slightly narrower final-stage width 48 vs 64 and (b) the SacredGeoBlock plumbing (BN placement, skip-connection structure). Any future delta against this row is attributable to a flag, not to the block scaffolding.",
+    "title": "NaturePriorNet with all priors OFF + linear channel scaling",
+    "diagnosis": "exp01 (baseline_resnet20) established the literature anchor at ResNet-20's 16-32-64 channel schedule. To measure the marginal effect of any single nature-inspired prior we need a NaturePriorNet skeleton with all six flags FALSE and the channel schedule held at the CONTROL value (linear scaling, c0*(k+1) widths 16-32-48 rounded to multiples of 8). This run is the ablation reference point: its only structural deltas from baseline_resnet20 are (a) the slightly narrower final-stage width 48 vs 64 and (b) the NaturePriorBlock plumbing (BN placement, skip-connection structure). Any future delta against this row is attributable to a flag, not to the block scaffolding.",
     "citations": [
       "He, Zhang, Ren, Sun 2015 CVPR 'Deep Residual Learning for Image Recognition' (arXiv:1512.03385) -- Same ResNet-20 lineage; we hold the block scaffold maximally similar except for stride/BN placement and final-stage width."
     ],
-    "hypothesis": "Because every sacred-flag is FALSE and channel_mode is linear, SacredGeoNet collapses to a plain residual stack with widths 16-32-48. Mechanism: the SacredGeoBlock's _GenericConv falls through to nn.Conv2d, the _FractalPath collapses to a single conv, and the golden-modulate gate is absent. We expect top-1 within 1 to 3 points below baseline_resnet20 purely from the narrower final stage and the slightly different BN placement.",
+    "hypothesis": "Because every nature-prior-flag is FALSE and channel_mode is linear, NaturePriorNet collapses to a plain residual stack with widths 16-32-48. Mechanism: the NaturePriorBlock's _GenericConv falls through to nn.Conv2d, the _FractalPath collapses to a single conv, and the golden-modulate gate is absent. We expect top-1 within 1 to 3 points below baseline_resnet20 purely from the narrower final stage and the slightly different BN placement.",
     "prediction": "composite in [0.74, 0.81]; top1 in [0.77, 0.83]; params around 160 k (smaller than baseline_resnet20 due to narrower widths); latency similar within 30 percent.",
     "verdict": "",
     "learning": "",
@@ -32,7 +32,7 @@
     "title": "Channel scaling = Fibonacci (priors OFF)",
     "diagnosis": "exp02 (baseline_sg_vanilla) used linear channel scaling 16-32-48 with all priors off. To isolate the effect of channel-schedule shape -- independent of any geometric prior -- we switch to channel_mode=fib (widths 16-24-40) while keeping all six prior flags FALSE. Fibonacci-Net 2025 reports that Fibonacci-ratioed widths give a 1.39 M-parameter brain-tumor classifier with strong performance; we test whether even this conservative bias helps on CIFAR-10 at 12 epochs with no other priors.",
     "citations": [
-      "Fibonacci-Net 2025 (placeholder citation, arXiv:2502.99999) -- Channel counts follow Fibonacci series 1 2 3 5 8 13 21 34 55 producing a lightweight 1.39 M parameter CNN for brain-tumor classification; we copy the scaling rule (mod-8 rounding) and ask whether the schedule alone helps CIFAR-10 in the absence of any other sacred prior.",
+      "Fibonacci-Net 2025 (placeholder citation, arXiv:2502.99999) -- Channel counts follow Fibonacci series 1 2 3 5 8 13 21 34 55 producing a lightweight 1.39 M parameter CNN for brain-tumor classification; we copy the scaling rule (mod-8 rounding) and ask whether the schedule alone helps CIFAR-10 in the absence of any other nature-inspired prior.",
       "Tan, Le 2019 ICML 'EfficientNet: Rethinking Model Scaling for Convolutional Neural Networks' (arXiv:1905.11946) -- Compound scaling of depth/width/resolution by powers of a constant; serves as the engineering control against which a Fibonacci or phi scaling can be benchmarked."
     ],
     "hypothesis": "Because channel_mode=fib produces 16-24-40 widths (about 17 percent fewer total channels than the linear 16-32-48 baseline), mechanism-wise the model has fewer parameters and slightly less capacity in the deep stage. We expect top-1 to drop 1 to 2 points vs exp02, but composite should improve (or stay flat) because the params-log term in the composite formula rewards the smaller model. If composite goes the other way, the Fibonacci hypothesis fails on CIFAR-10.",
@@ -60,7 +60,7 @@
   {
     "experiment_id": "exp05_sg_only_hex",
     "title": "Single-prior: hex-masked 3x3 conv (fib channels)",
-    "diagnosis": "exp02-04 established the channel-only references. We now flip hex=True (all other priors OFF) with channel_mode=fib to isolate the hex-mask receptive field's effect. Hex-masked 3x3 conv zeroes two corner taps (positions [0,2] and [2,0]) so the effective receptive field is the 7-tap honeycomb (HexaConv 2018). The fib channel mode is chosen to match the schedule that the full SacredGeo variants will use; this row tests whether HEX alone improves composite over the channel-only reference exp03.",
+    "diagnosis": "exp02-04 established the channel-only references. We now flip hex=True (all other priors OFF) with channel_mode=fib to isolate the hex-mask receptive field's effect. Hex-masked 3x3 conv zeroes two corner taps (positions [0,2] and [2,0]) so the effective receptive field is the 7-tap honeycomb (HexaConv 2018). The fib channel mode is chosen to match the schedule that the full NaturePrior variants will use; this row tests whether HEX alone improves composite over the channel-only reference exp03.",
     "citations": [
       "Hoogeboom, Peters, Cohen, Welling 2018 ICLR 'HexaConv' (arXiv:1803.02108) -- Introduces hexagonal planar/group convolutions on a square lattice via kernel masking; reports higher accuracy at fixed param budget on CIFAR-rotated and AID by reducing the directional anisotropy of the square convolution kernel."
     ],
@@ -88,7 +88,7 @@
   {
     "experiment_id": "exp07_sg_only_fractal",
     "title": "Single-prior: depth-2 fractal sub-block (fib channels)",
-    "diagnosis": "exp06 tested group conv alone. We now flip fractal=True (depth=2). FractalNet 2017 showed that self-similar recursive paths give ultra-deep nets without residuals; here we keep the outer residual but add an inner depth-2 fractal sub-block to the second conv of every SacredGeoBlock. This roughly doubles the parameter count (each fractal level adds a second conv path), so we expect composite to be dominated by the params penalty unless the extra paths buy real top-1.",
+    "diagnosis": "exp06 tested group conv alone. We now flip fractal=True (depth=2). FractalNet 2017 showed that self-similar recursive paths give ultra-deep nets without residuals; here we keep the outer residual but add an inner depth-2 fractal sub-block to the second conv of every NaturePriorBlock. This roughly doubles the parameter count (each fractal level adds a second conv path), so we expect composite to be dominated by the params penalty unless the extra paths buy real top-1.",
     "citations": [
       "Larsson, Maire, Shakhnarovich 2017 ICLR 'FractalNet: Ultra-Deep Neural Networks without Residuals' (arXiv:1605.07648) -- Self-similar expansion rule creates ultra-deep nets without residuals or skip connections; matches ResNet on CIFAR/ImageNet, proving residuals are not fundamental and that self-similarity suffices for gradient flow and capacity."
     ],

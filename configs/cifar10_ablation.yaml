@@ -1,4 +1,4 @@
-# CIFAR-10 ablation sweep config.
+﻿# CIFAR-10 ablation sweep config.
 # One file = one DATASET/EPOCHS/HYPERPARAM choice; tags/flags come from the sweep script.
 
 dataset: cifar10
@@ -15,7 +15,7 @@ target_top1: 0.85
 use_bf16: true
 
 # Model (overridden by sweep)
-model: sacredgeo
+model: NaturePrior
 channel_mode: fib  # 'fib' | 'phi' | 'linear'
 flags:
   hex: true

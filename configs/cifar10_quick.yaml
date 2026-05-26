@@ -1,4 +1,4 @@
-# Quick run config: 15 epochs, ~5–8 min per run on RTX 4090 Laptop.
+﻿# Quick run config: 15 epochs, ~5–8 min per run on RTX 4090 Laptop.
 dataset: cifar10
 data_root: ./data
 batch_size: 256
@@ -9,7 +9,7 @@ weight_decay: 5.0e-4
 label_smoothing: 0.1
 target_top1: 0.85
 use_bf16: true
-model: sacredgeo
+model: NaturePrior
 channel_mode: fib
 flags:
   hex: true

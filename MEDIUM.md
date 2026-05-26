@@ -1,6 +1,6 @@
-# Sacred Geometry as Engineering Inductive Bias
+﻿# nature-inspired-geometry as Engineering Inductive Bias
 
-> Building `SacredGeoBlock` — a single drop-in residual block that puts
+> Building `NaturePriorBlock` — a single drop-in residual block that puts
 > hex lattices, Platonic equivariance, fractal recursion, toroidal padding,
 > golden-ratio scaling, and Chladni-mode init under one ablation surface —
 > on a 16 GB laptop GPU, in an autoresearch protocol with refusal-to-launch
@@ -12,7 +12,7 @@
 
 The Geometric and Topological Deep Learning literature has, over the last
 decade, quietly built every component of what an esoterically-minded
-reader might call "Sacred Geometry as inductive bias":
+reader might call "nature-inspired-geometry as inductive bias":
 
 - **Hexagonal lattices** — HexaConv (Hoogeboom 2018) reports 25–42 %
   memory/time savings for isotropic data.
@@ -29,19 +29,19 @@ No prior repo combines all five (plus a novel Chladni-eigenmode filter
 init) into a single drop-in residual block and ablates them
 independently. This one does. The code, the autoresearch protocol, the
 sortable HTML dashboard, and a 30-minute reproduction recipe are all
-in `dlmastery/sacgeometry`.
+in `dlmastery/nature_inspired_networks`.
 
 ---
 
 ## Why this is not woo
 
 The framing matters. The source PDF that motivated the project leans
-into "Sacred Geometry" as a research aesthetic — Chladni plates,
+into "nature-inspired-geometry" as a research aesthetic — Chladni plates,
 Platonic solids, golden spirals, Metatron's Cube. But each named
 prior maps **exactly** to a peer-reviewed GDL/TDL paper with an
 arXiv ID:
 
-| sacred name | engineering object | arXiv |
+| Nature-Inspired name | engineering object | arXiv |
 |---|---|---|
 | Flower-of-Life | hex / hexagonal lattice | 1803.02108 (HexaConv) |
 | Platonic solid (icosa) | rotation-group equivariance | 1902.04615 (IcosaCNN) |
@@ -65,7 +65,7 @@ the trainer is allowed to launch.
 
 1. **Citation Rigor.** Every motivation must be backed by an
    `Author1, Author2, … YEAR VENUE 'Title' (arXiv:XXXX.XXXXX) —
-   relevance` line. The regex (in `src/sacgeo/reasoning.py`) rejects
+   relevance` line. The regex (in `src/nature_inspired_networks/reasoning.py`) rejects
    `(He2016)` style parentheticals.
 2. **Reasoning Blob Completeness.** Word-count floors per field:
    diagnosis ≥ 60, hypothesis ≥ 50, prediction ≥ 25, verdict ≥ 30,
@@ -85,7 +85,7 @@ bugs in this campaign were caught by the gates (see `AUTORESEARCH_PROCESS.md`).
 ## The block — six flags, three channel modes
 
 ```python
-class SacredFlags:
+class NaturePriorFlags:
     hex: bool             # 3x3 hex-masked 7-tap conv (HexaConv 2018)
     group: bool           # C4 group conv, 4-orbit max-pool (Cohen 2016)
     fractal: bool         # depth-2 recursive sub-block (Larsson 2017)
@@ -110,10 +110,10 @@ dashboard with Pareto fronts, ablation bars, training curves,
 
 ## What the dashboard shows
 
-Live at https://dlmastery.github.io/sacgeometry/dashboard/dashboard.html
+Live at https://dlmastery.github.io/nature_inspired_networks/dashboard/dashboard.html
 
 - **Pareto fronts** — top-1 vs. {params, FLOPs, batch=1 GPU latency},
-  baselines as blue stars, SacredGeo variants as orange dots. A variant
+  baselines as blue stars, NaturePrior variants as orange dots. A variant
   dominates if it's up-and-left.
 - **Ablation matrix** — each row a tag, bars showing top-1 with
   seed-std error bars (when `--seeds 0 1 2`), label = params.
@@ -145,7 +145,7 @@ The full source PDF lists 50 hypotheses across multiple datasets
 ImageNet-1k). This repo is the Tier-1 foundation: a working block,
 a reproducible CIFAR-10 ablation, a dashboard the next Claude or
 contributor can pick up cold. Tier-2 MedMNIST is wired in
-`src/sacgeo/data.py`; the ablation matrix simply needs to be re-run
+`src/nature_inspired_networks/data.py`; the ablation matrix simply needs to be re-run
 with `dataset: medmnist:pathmnist`.
 
 The geometry is the code.

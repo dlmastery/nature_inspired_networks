@@ -1,4 +1,4 @@
-"""Smoke tests for SacredGeoBlock and SacredGeoNet."""
+﻿"""Smoke tests for NaturePriorBlock and NaturePriorNet."""
 from __future__ import annotations
 
 import sys
@@ -8,24 +8,24 @@ import torch
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 
-from sacgeo.blocks import SacredFlags, SacredGeoBlock  # noqa: E402
-from sacgeo.models import ResNet20, SacredGeoConfig, SacredGeoNet  # noqa: E402
+from nature_inspired_networks.blocks import NaturePriorFlags, NaturePriorBlock  # noqa: E402
+from nature_inspired_networks.models import ResNet20, NaturePriorConfig, NaturePriorNet  # noqa: E402
 
 
 def _all_flag_combos():
     """Each of the 6 priors on alone + all-on + all-off."""
-    yield SacredFlags(False, False, False, False, False, False)
+    yield NaturePriorFlags(False, False, False, False, False, False)
     for name in ("hex", "group", "fractal", "toroidal", "cymatic_init",
                  "golden_modulate"):
-        f = SacredFlags(False, False, False, False, False, False)
+        f = NaturePriorFlags(False, False, False, False, False, False)
         setattr(f, name, True)
         yield f
-    yield SacredFlags(True, True, True, True, True, True)
+    yield NaturePriorFlags(True, True, True, True, True, True)
 
 
 def test_block_forward_shape_keeps_h_w():
     for f in _all_flag_combos():
-        blk = SacredGeoBlock(16, 16, stride=1, flags=f)
+        blk = NaturePriorBlock(16, 16, stride=1, flags=f)
         x = torch.randn(2, 16, 8, 8)
         y = blk(x)
         assert y.shape == (2, 16, 8, 8), (f.tag(), y.shape)
@@ -33,7 +33,7 @@ def test_block_forward_shape_keeps_h_w():
 
 def test_block_forward_shape_downsamples_on_stride2():
     for f in _all_flag_combos():
-        blk = SacredGeoBlock(16, 32, stride=2, flags=f)
+        blk = NaturePriorBlock(16, 32, stride=2, flags=f)
         x = torch.randn(2, 16, 8, 8)
         y = blk(x)
         assert y.shape == (2, 32, 4, 4), (f.tag(), y.shape)
@@ -45,18 +45,18 @@ def test_resnet20_forward():
     assert y.shape == (2, 10)
 
 
-def test_sacredgeonet_forward_each_channel_mode():
+def test_NaturePriorNet_forward_each_channel_mode():
     for mode in ("fib", "phi", "linear"):
-        cfg = SacredGeoConfig(num_classes=10, channel_mode=mode,
-                              flags=SacredFlags())
-        m = SacredGeoNet(cfg)
+        cfg = NaturePriorConfig(num_classes=10, channel_mode=mode,
+                              flags=NaturePriorFlags())
+        m = NaturePriorNet(cfg)
         y = m(torch.randn(2, 3, 32, 32))
         assert y.shape == (2, 10), mode
 
 
-def test_sacredgeonet_stagewise_features_has_4_stages():
-    cfg = SacredGeoConfig(num_classes=10)
-    m = SacredGeoNet(cfg)
+def test_NaturePriorNet_stagewise_features_has_4_stages():
+    cfg = NaturePriorConfig(num_classes=10)
+    m = NaturePriorNet(cfg)
     feats = m.stagewise_features(torch.randn(2, 3, 32, 32))
     assert len(feats) == 4  # stem + 3 stages
 

@@ -1,4 +1,4 @@
-# sota_catalog.yaml — prior-art table for sacred-geometry-priored backbones.
+﻿# sota_catalog.yaml — prior-art table for nature-inspired-priored backbones.
 # Used by SOTA_COMPARISON.md as the single source of truth.
 
 # ---------------------------------------------------------------------------
@@ -68,7 +68,7 @@ fractal:
     venue: "ICLR"
     arxiv: "1605.07648"
     claim: "Self-similar expansion rule; ultra-deep net with no residuals; matches ResNet on CIFAR/ImageNet."
-    relevance: "Precedent for our _FractalPath; we add residual + sacred-prior-flagged sub-blocks."
+    relevance: "Precedent for our _FractalPath; we add residual + nature-prior-flagged sub-blocks."
 
 # ---------------------------------------------------------------------------
 toroidal:

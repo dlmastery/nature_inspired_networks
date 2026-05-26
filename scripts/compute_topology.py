@@ -1,4 +1,4 @@
-"""Compute persistent-homology Betti curves and CKA matrices for trained runs.
+﻿"""Compute persistent-homology Betti curves and CKA matrices for trained runs.
 
 For each run dir that has metrics.json + final model weights (we rebuild
 the model from config and freshly initialize — Betti is computed on the
@@ -18,11 +18,11 @@ import yaml
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 
-from sacgeo.blocks import SacredFlags  # noqa: E402
-from sacgeo.data import load_dataset  # noqa: E402
-from sacgeo.models import build_model  # noqa: E402
-from sacgeo.runner import make_flags, set_seed  # noqa: E402
-from sacgeo.topology import betti_curve, collect_features  # noqa: E402
+from nature_inspired_networks.blocks import NaturePriorFlags  # noqa: E402
+from nature_inspired_networks.data import load_dataset  # noqa: E402
+from nature_inspired_networks.models import build_model  # noqa: E402
+from nature_inspired_networks.runner import make_flags, set_seed  # noqa: E402
+from nature_inspired_networks.topology import betti_curve, collect_features  # noqa: E402
 
 
 def main(argv=None) -> int:
@@ -52,14 +52,14 @@ def main(argv=None) -> int:
         # for the prior's geometric simplifying power; positive results still
         # discriminate between priors)
         set_seed(seed)
-        model_name = "sacredgeo" if not tag.startswith("baseline_resnet") else "resnet20"
-        flags = SacredFlags(False, False, False, False, False, False)
+        model_name = "NaturePrior" if not tag.startswith("baseline_resnet") else "resnet20"
+        flags = NaturePriorFlags(False, False, False, False, False, False)
         if "_only_" in tag:
             k = tag.split("_only_", 1)[1]
-            flags = SacredFlags(**{f.name: (f.name == k) for f in
-                                   SacredFlags().__dataclass_fields__.values()})  # type: ignore[attr-defined]
+            flags = NaturePriorFlags(**{f.name: (f.name == k) for f in
+                                   NaturePriorFlags().__dataclass_fields__.values()})  # type: ignore[attr-defined]
         if tag.startswith("sg_full") or tag.startswith("sg_loo_no_"):
-            flags = SacredFlags(True, True, True, True, True, True)
+            flags = NaturePriorFlags(True, True, True, True, True, True)
             if tag.startswith("sg_loo_no_"):
                 k = tag.split("sg_loo_no_", 1)[1]
                 setattr(flags, k, False)
@@ -70,7 +70,7 @@ def main(argv=None) -> int:
             chan_mode = "fib"
 
         model = build_model(model_name, num_classes=n_cls,
-                            flags=flags if model_name == "sacredgeo" else None,
+                            flags=flags if model_name == "NaturePrior" else None,
                             channel_mode=chan_mode).cuda()
         # Load trained weights if a checkpoint exists alongside metrics.json
         ckpt = mj.parent / "best.pt"

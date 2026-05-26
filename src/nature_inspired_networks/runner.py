@@ -1,7 +1,7 @@
-"""Experiment runner — one ablation = one experiment.
+﻿"""Experiment runner — one ablation = one experiment.
 
 CLI:
-    python -m sacgeo.runner --config configs/cifar10_ablation.yaml --tag sg_full --seed 0
+    python -m nature_inspired_networks.runner --config configs/cifar10_ablation.yaml --tag sg_full --seed 0
 
 Outputs go under experiments/<dataset>/<tag>_seed<S>/.
 Writes per-run metrics.json + history.json and appends to experiment_log.jsonl.
@@ -21,7 +21,7 @@ import numpy as np
 import torch
 import yaml
 
-from .blocks import SacredFlags
+from .blocks import NaturePriorFlags
 from .data import load_dataset
 from .eval import COMPOSITE_FINGERPRINT, COMPOSITE_FORMULA
 from .models import build_model
@@ -34,8 +34,8 @@ def set_seed(seed: int) -> None:
     torch.backends.cudnn.benchmark = True
 
 
-def make_flags(d: dict) -> SacredFlags:
-    return SacredFlags(
+def make_flags(d: dict) -> NaturePriorFlags:
+    return NaturePriorFlags(
         hex=bool(d.get("hex", True)),
         group=bool(d.get("group", True)),
         fractal=bool(d.get("fractal", True)),
@@ -58,7 +58,7 @@ def run_one(cfg: dict, tag: str, seed: int, root: str = "experiments") -> Path:
 
     model_name = cfg["model"]
     channel_mode = cfg.get("channel_mode", "fib")
-    if model_name == "sacredgeo":
+    if model_name == "NaturePrior":
         flags = make_flags(cfg.get("flags", {}))
     else:
         flags = None

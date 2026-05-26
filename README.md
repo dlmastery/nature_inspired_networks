@@ -1,6 +1,6 @@
-# sacgeometry — SacredGeoBlock
+﻿# nature_inspired_networks — NaturePriorBlock
 
-> **An autoresearch-style ablation study of sacred-geometry priors as
+> **An autoresearch-style ablation study of nature-inspired priors as
 > drop-in residual blocks for image classification.**
 > The block embeds φ/Fibonacci channel scaling, C4 group-equivariant
 > convolution (Platonic proxy), hexagonal-masked kernels, fractal
@@ -10,7 +10,7 @@
 
 ## Live links
 
-- **Dashboard:** [dlmastery.github.io/sacgeometry/dashboard/dashboard.html](https://dlmastery.github.io/sacgeometry/dashboard/dashboard.html)
+- **Dashboard:** [dlmastery.github.io/nature_inspired_networks/dashboard/dashboard.html](https://dlmastery.github.io/nature_inspired_networks/dashboard/dashboard.html)
 - **Findings (campaign verdict):** [`FINDINGS.md`](FINDINGS.md)
 - **Per-experiment narrative:** [`RESULTS.md`](RESULTS.md)
 - **Paper sketch:** [`PAPER.md`](PAPER.md)
@@ -30,8 +30,8 @@
 | 10 | `sg_only_group` | 69.84 % | 127 k | 0.6937 |
 | 11 | `sg_full_fib` | 73.24 % | 259 k | **0.6966 (worst)** |
 
-**At this scale and budget the sacred-geometry priors do NOT compound.**
-The full hybrid is the worst SacredGeo variant in the sweep; the C4
+**At this scale and budget the nature-inspired priors do NOT compound.**
+The full hybrid is the worst NaturePrior variant in the sweep; the C4
 group prior accounts for most of the damage (max-pool over the
 4-rotation orbit throws away 75 % of the signal). Fractal is the only
 single prior that lifts top-1. See [`FINDINGS.md`](FINDINGS.md) for the
@@ -65,10 +65,10 @@ and is the methodological deliverable, even on the small scale we run.
 
 | | |
 |---|---|
-| **Repo** | https://github.com/dlmastery/sacgeometry |
+| **Repo** | https://github.com/dlmastery/nature_inspired_networks |
 | **Dataset(s)** | CIFAR-10 (always) + optionally MedMNIST PathMNIST |
 | **Baseline** | ResNet-20 (272 k params, He 2015 CIFAR variant) |
-| **Block** | `SacredGeoBlock(c_in, c_out, stride, flags)` — see `src/sacgeo/blocks.py` |
+| **Block** | `NaturePriorBlock(c_in, c_out, stride, flags)` — see `src/nature_inspired_networks/blocks.py` |
 | **Priors** | hex, group (C4), fractal, toroidal, cymatic-init, golden-modulate |
 | **Channel modes** | `fib` (Fibonacci) / `phi` (golden) / `linear` (control) |
 | **Compute** | 1× RTX 4090 Laptop (16 GB), Windows 11, bf16 AMP |
@@ -80,7 +80,7 @@ and is the methodological deliverable, even on the small scale we run.
 1. [What this is](#what-this-is)
 2. [Why these priors?](#why-these-priors)
 3. [Quickstart](#quickstart)
-4. [SacredGeoBlock — anatomy](#sacredgeoblock--anatomy)
+4. [NaturePriorBlock — anatomy](#NaturePriorBlock--anatomy)
 5. [The autoresearch protocol](#the-autoresearch-protocol)
 6. [Goodhart-fingerprinted composite](#goodhart-fingerprinted-composite)
 7. [Repo layout](#repo-layout)
@@ -96,9 +96,9 @@ and is the methodological deliverable, even on the small scale we run.
 
 ## What this is
 
-`sacgeometry` is a small, self-contained PyTorch project that implements
-the **SacredGeoBlock** — a drop-in CIFAR-scale residual block whose
-six "sacred-geometry" priors can be individually switched on or off:
+`nature_inspired_networks` is a small, self-contained PyTorch project that implements
+the **NaturePriorBlock** — a drop-in CIFAR-scale residual block whose
+six "nature-inspired" priors can be individually switched on or off:
 
 | Prior | Library precedent | Why we include it |
 |---|---|---|
@@ -119,8 +119,8 @@ Citation Rigor + Reasoning Blob Completeness validators.
 
 ## Why these priors?
 
-The source PDF (`sacred geometry and neural networks.pdf`) lays out a
-research program in which Sacred Geometry is treated **as engineering
+The source PDF (`nature-inspired-geometry and neural networks.pdf`) lays out a
+research program in which nature-inspired-geometry is treated **as engineering
 inductive bias**, not mysticism — each of the priors above has a
 peer-reviewed precedent in Geometric/Topological Deep Learning:
 
@@ -146,8 +146,8 @@ Laptop (16 GB).
 
 ```powershell
 # 1. Install
-git clone https://github.com/dlmastery/sacgeometry.git
-cd sacgeometry
+git clone https://github.com/dlmastery/nature_inspired_networks.git
+cd nature_inspired_networks
 python -m venv .venv
 .\.venv\Scripts\python -m pip install --upgrade pip
 .\.venv\Scripts\python -m pip install --index-url https://download.pytorch.org/whl/cu124 torch torchvision
@@ -155,7 +155,7 @@ python -m venv .venv
 
 # 2. Smoke test (3 epochs, ~2 min)
 $env:SSL_CERT_FILE = ".\.venv\Lib\site-packages\certifi\cacert.pem"
-.\.venv\Scripts\python -m sacgeo.runner `
+.\.venv\Scripts\python -m nature_inspired_networks.runner `
   --config configs\cifar10_smoke.yaml --tag smoke --seed 0
 
 # 3. Curated 11-row ablation matrix (~60 min on 4090 Laptop)
@@ -170,7 +170,7 @@ $env:SSL_CERT_FILE = ".\.venv\Lib\site-packages\certifi\cacert.pem"
 # → dashboard/dashboard.html + docs/dashboard/dashboard.html
 ```
 
-## SacredGeoBlock — anatomy
+## NaturePriorBlock — anatomy
 
 ```
    x ───────────────────────────────────────────────►── skip(x) ──┐
@@ -209,7 +209,7 @@ from `autoresearchimage`:
 7. Checkpoint ←─ experiment_log.jsonl + research_journal.md
 ```
 
-Word-count floors per field (`src/sacgeo/reasoning.py`):
+Word-count floors per field (`src/nature_inspired_networks/reasoning.py`):
 
 | field | floor |
 |---|---|
@@ -233,14 +233,14 @@ composite = top1 − 0.05·log₁₀(params_M) − 0.05·log₁₀(latency_ms)
 ```
 
 The formula string is SHA-256 hashed
-(`COMPOSITE_FINGERPRINT` in `src/sacgeo/eval.py`); every run records
+(`COMPOSITE_FINGERPRINT` in `src/nature_inspired_networks/eval.py`); every run records
 the fingerprint so any mid-project edit makes the next experiment fail
 loudly.
 
 ## Repo layout
 
 ```
-sacgeometry/
+nature_inspired_networks/
 ├── README.md                   ← this file
 ├── ARCHITECTURE.md             ← module/data-flow diagram
 ├── AUTORESEARCH_PROCESS.md     ← 7-step ritual, gates, dashboard mandate
@@ -251,10 +251,10 @@ sacgeometry/
 ├── sota_catalog.yaml           ← prior-art table consumed by SOTA_COMPARISON.md
 ├── pyproject.toml
 ├── configs/                    ← YAML configs (smoke / quick / ablation)
-├── src/sacgeo/
+├── src/nature_inspired_networks/
 │   ├── priors.py               ← φ-channels, hex mask, Chladni modes, group conv
-│   ├── blocks.py               ← SacredGeoBlock + _FractalPath + _GenericConv
-│   ├── models.py               ← ResNet-20 baseline + SacredGeoNet
+│   ├── blocks.py               ← NaturePriorBlock + _FractalPath + _GenericConv
+│   ├── models.py               ← ResNet-20 baseline + NaturePriorNet
 │   ├── data.py                 ← CIFAR + MedMNIST loaders
 │   ├── train.py                ← Trainer + bf16 AMP + cosine LR
 │   ├── eval.py                 ← params/FLOPs/latency/CKA/composite
@@ -281,16 +281,16 @@ Curated 11-row matrix (run by `scripts/run_sweep.py`, no flags):
 | # | tag | model | channels | priors on |
 |---|---|---|---|---|
 | 1 | `baseline_resnet20` | ResNet-20 | 16-32-64 | n/a |
-| 2 | `baseline_sg_vanilla` | SacredGeoNet | linear | none |
-| 3 | `sg_chan_fib` | SacredGeoNet | fib | none |
-| 4 | `sg_chan_phi` | SacredGeoNet | phi | none |
-| 5 | `sg_only_hex` | SacredGeoNet | fib | hex |
-| 6 | `sg_only_group` | SacredGeoNet | fib | C4 group |
-| 7 | `sg_only_fractal` | SacredGeoNet | fib | fractal |
-| 8 | `sg_only_toroidal` | SacredGeoNet | fib | toroidal |
-| 9 | `sg_only_cymatic_init` | SacredGeoNet | fib | cymatic |
-| 10 | `sg_only_golden_modulate` | SacredGeoNet | fib | golden-angle |
-| 11 | `sg_full_fib` | SacredGeoNet | fib | all six |
+| 2 | `baseline_sg_vanilla` | NaturePriorNet | linear | none |
+| 3 | `sg_chan_fib` | NaturePriorNet | fib | none |
+| 4 | `sg_chan_phi` | NaturePriorNet | phi | none |
+| 5 | `sg_only_hex` | NaturePriorNet | fib | hex |
+| 6 | `sg_only_group` | NaturePriorNet | fib | C4 group |
+| 7 | `sg_only_fractal` | NaturePriorNet | fib | fractal |
+| 8 | `sg_only_toroidal` | NaturePriorNet | fib | toroidal |
+| 9 | `sg_only_cymatic_init` | NaturePriorNet | fib | cymatic |
+| 10 | `sg_only_golden_modulate` | NaturePriorNet | fib | golden-angle |
+| 11 | `sg_full_fib` | NaturePriorNet | fib | all six |
 
 The full sweep (`--full`) adds `sg_full_phi` and six `sg_loo_no_*`
 leave-one-out runs.
@@ -299,7 +299,7 @@ leave-one-out runs.
 
 `scripts/compute_topology.py` produces `experiments/betti.json` with
 β₀ / β₁ collapse curves per stage. The dashboard plots them. CKA between
-trained variants is available via `sacgeo.topology.cka_matrix` (called by
+trained variants is available via `nature_inspired_networks.topology.cka_matrix` (called by
 the dashboard's optional CKA panel).
 
 ## Reproduce in 30 minutes
@@ -361,13 +361,13 @@ start dashboard\dashboard.html
 
 ## Citations
 
-Authoritative arXiv IDs cited inline in `src/sacgeo/priors.py` and
-`src/sacgeo/blocks.py`. Full list in `sota_catalog.yaml`.
+Authoritative arXiv IDs cited inline in `src/nature_inspired_networks/priors.py` and
+`src/nature_inspired_networks/blocks.py`. Full list in `sota_catalog.yaml`.
 
 ## License & credits
 
 MIT. Author: dlmastery. Inherits the autoresearch protocol from
 [`dlmastery/autoresearchimage`](https://github.com/dlmastery/autoresearchimage)
 and [`dlmastery/autoresearch`](https://github.com/dlmastery/autoresearch).
-The "sacred geometry as inductive bias" framing is the user-provided
+The "nature-inspired-geometry as inductive bias" framing is the user-provided
 PDF; this repo is the engineering implementation + ablation.

@@ -1,8 +1,8 @@
-# FINDINGS — sacgeometry curated CIFAR-10 sweep (seed 0, 12 epochs)
+﻿# FINDINGS — nature_inspired_networks curated CIFAR-10 sweep (seed 0, 12 epochs)
 
 > **The headline:** at the 12-epoch / 127–272 k-parameter scale on
-> CIFAR-10, **the sacred-geometry priors do *not* compound**. The full
-> hybrid (`sg_full_fib`, all six flags on) is the **worst** SacredGeo
+> CIFAR-10, **the nature-inspired priors do *not* compound**. The full
+> hybrid (`sg_full_fib`, all six flags on) is the **worst** NaturePrior
 > variant in the sweep, not the best. This contradicts the source PDF's
 > "literature-compound" prediction (20–50 % efficiency gains).
 > The autoresearch protocol delivered exactly what it is supposed to:
@@ -71,10 +71,10 @@ multiplies into 5× total latency.
    it is the one prior that materially helps representation
    quality at this scale.
 
-4. **`baseline_sg_vanilla` (the SacredGeoBlock scaffold with all
+4. **`baseline_sg_vanilla` (the NaturePriorBlock scaffold with all
    priors OFF and linear channels) is competitive.** It sits at
    82.16 % top-1 with 186 k params vs ResNet-20's 272 k — i.e.,
-   the SacredGeoBlock scaffold itself (BN placement, skip-connection
+   the NaturePriorBlock scaffold itself (BN placement, skip-connection
    structure) is fine. The priors do most of the harm.
 
 ## Open axes for a follow-up campaign
@@ -95,7 +95,7 @@ multiplies into 5× total latency.
       `compute_topology.py` for **trained-feature** Betti curves;
       the current β-curves are on fresh-init features.
 - [ ] Scale to MedMNIST PathMNIST (data loader already in
-      `src/sacgeo/data.py`).
+      `src/nature_inspired_networks/data.py`).
 
 ## Reproduce
 

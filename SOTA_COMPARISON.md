@@ -1,4 +1,4 @@
-# SOTA Comparison — honest mapping to prior art
+﻿# SOTA Comparison — honest mapping to prior art
 
 > One row per claim, with the exact arXiv ID, the headline number the
 > paper reports, and the corresponding number from **this** repo's
@@ -48,7 +48,7 @@ here read the *shape* of each prior's effect, not its asymptote.
                        │  ≈ 5 % top-1 above 12-epoch budget
                        │
    ┌───────────────────┼───────────────────┐
-   │           sacgeometry CIFAR-10        │
+   │           nature_inspired_networks CIFAR-10        │
    │           (12-epoch quick sweep)      │
    │   sg_full_fib    ────────►  85–87 %   │
    │   sg_chan_fib    ────────►  82–85 %   │

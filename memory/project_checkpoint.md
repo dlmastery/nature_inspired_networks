@@ -1,21 +1,21 @@
-# Project checkpoint — sacgeometry
+﻿# Project checkpoint — nature_inspired_networks
 
 Last updated: 2026-05-25 (auto-bumped by scripts/build_dashboard.py once it's wired).
 
 ## Status
 
 - Project skeleton mirrors `dlmastery/autoresearchimage` layout.
-- `SacredGeoBlock` implementation with six toggleable priors + three channel modes.
-- Baseline ResNet-20 + SacredGeoNet stacks.
+- `NaturePriorBlock` implementation with six toggleable priors + three channel modes.
+- Baseline ResNet-20 + NaturePriorNet stacks.
 - Training pipeline (bf16 AMP, cosine LR, label smoothing, target-acc tracking).
 - Metrics: top-1/5, params, FLOPs (fvcore), batch=1 GPU latency, rotation-equivariance error.
 - Composite metric with SHA-256 Goodhart fingerprint.
-- Citation Rigor + Reasoning Blob Completeness gates (`src/sacgeo/reasoning.py`).
+- Citation Rigor + Reasoning Blob Completeness gates (`src/nature_inspired_networks/reasoning.py`).
 - Sortable HTML dashboard generator with Pareto + ablation + curve + Betti plots.
 - Persistent-homology Betti curve + linear CKA utilities.
 - **Curated 11-row CIFAR-10 ablation COMPLETE** (seed 0, 12 epochs, 64 min wall-clock).
 - `RESULTS.md` + `FINDINGS.md` auto-generated; pushed to GitHub.
-- Pages live at https://dlmastery.github.io/sacgeometry/dashboard/dashboard.html
+- Pages live at https://dlmastery.github.io/nature_inspired_networks/dashboard/dashboard.html
 - Next-campaign axes:
   - 3-seed re-sweep for error bars
   - leave-one-out from full hybrid (`scripts/run_sweep.py --full`)
@@ -34,7 +34,7 @@ Last updated: 2026-05-25 (auto-bumped by scripts/build_dashboard.py once it's wi
 | 10 | `sg_only_group` | 69.84 % | 127 k | 0.6937 |
 | 11 | `sg_full_fib` | 73.24 % | 259 k | 0.6966 |
 
-The full hybrid is the **worst** SacredGeo variant — the priors
+The full hybrid is the **worst** NaturePrior variant — the priors
 conflict at this scale. The C4 group prior accounts for most of
 the damage; max-pool over the 4-rotation orbit throws away 75 %
 of the signal. Fractal is the only single prior that lifts top-1.
@@ -51,10 +51,10 @@ of the signal. Fractal is the only single prior that lifts top-1.
 
 ## Key files (line-of-truth)
 
-- `src/sacgeo/priors.py` — sacred-geometry primitives
-- `src/sacgeo/blocks.py` — `SacredGeoBlock`
-- `src/sacgeo/models.py` — `SacredGeoNet`, `ResNet20`
-- `src/sacgeo/runner.py` — single-experiment runner
+- `src/nature_inspired_networks/priors.py` — nature-inspired primitives
+- `src/nature_inspired_networks/blocks.py` — `NaturePriorBlock`
+- `src/nature_inspired_networks/models.py` — `NaturePriorNet`, `ResNet20`
+- `src/nature_inspired_networks/runner.py` — single-experiment runner
 - `scripts/run_sweep.py` — ablation matrix driver
 - `experiments/experiment_log.jsonl` — append-only run log
 - `experiments/reasoning_annotations.json` — citation-gated reasoning entries

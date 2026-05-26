@@ -1,4 +1,4 @@
-# CLAUDE.md — normative rules for the sacgeometry project
+﻿# CLAUDE.md — normative rules for the nature_inspired_networks project
 
 > This file tells future Claude/operator how to **safely** add an
 > experiment, what may never change, and how the gates compose. It is
@@ -20,7 +20,7 @@
 
 4. **Citations follow the strict format.** Author list, year, venue,
    single-quoted title, arXiv/bioRxiv ID, relevance note. The validator
-   in `src/sacgeo/reasoning.py` rejects everything else.
+   in `src/nature_inspired_networks/reasoning.py` rejects everything else.
 
 5. **No silent randomness.** `set_seed(seed)` is called at the top of
    `run_one()`. `torch.backends.cudnn.benchmark = True` is intentional

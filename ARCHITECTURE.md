@@ -1,13 +1,13 @@
-# ARCHITECTURE
+﻿# ARCHITECTURE
 
 > Module-level diagram, shape tables, and forward-pass flow for the
-> SacredGeoBlock and the SacredGeoNet stack it builds.
+> NaturePriorBlock and the NaturePriorNet stack it builds.
 
 ## Module diagram
 
 ```
                   ┌─────────────────────────────────────────┐
-                  │             SacredGeoNet                │
+                  │             NaturePriorNet                │
                   └──────────────────┬──────────────────────┘
                                      │
    x ∈ ℝ^{B×3×32×32}                 │
@@ -56,7 +56,7 @@
 | `phi` | 16, 24, 40 | 127 k / 259 k (φ²≈2.6, similar to fib) |
 | `linear` | 16, 32, 48 | 159 k / 311 k |
 
-## SacredGeoBlock — forward pass
+## NaturePriorBlock — forward pass
 
 ```
             x  ∈ ℝ^{B×c_in×H×W}                    skip(x) ∈ ℝ^{B×c_out×H'×W'}
@@ -116,7 +116,7 @@ is `GroupConv2d`, where the orbit-aware init is left as future work.
 | 3 | SGBlock(40→40) ×2 | (128, 40, 8, 8) |
 | head | avgpool + fc(40 → 10) | (128, 10) |
 
-## Sacred priors — code map
+## nature-inspired priors — code map
 
 | prior | symbol | file | line-of-truth |
 |---|---|---|---|
@@ -127,7 +127,7 @@ is `GroupConv2d`, where the orbit-aware init is left as future work.
 | Toroidal pad | `toroidal_pad(x, pad)` | `priors.py` | `F.pad(..., mode='circular')` |
 | C4 group conv | `GroupConv2d` | `priors.py` | weight rotated 4× + max-pool orbit |
 | Hex conv | `HexConv2d` | `priors.py` | masked conv with optional toroidal pad |
-| Golden-angle gate | inside `SacredGeoBlock` | `blocks.py` | `cos(2π·k/φ + α)` per channel |
+| Golden-angle gate | inside `NaturePriorBlock` | `blocks.py` | `cos(2π·k/φ + α)` per channel |
 
 ## What the runner writes
 

@@ -1,4 +1,4 @@
-"""SacredGeoNet (CIFAR-scale) + a strict ResNet-20 baseline.
+﻿"""NaturePriorNet (CIFAR-scale) + a strict ResNet-20 baseline.
 
 Both models share the same head/stem so flop and param counts are
 directly comparable — the only difference is the block.
@@ -12,7 +12,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from .blocks import SacredFlags, SacredGeoBlock
+from .blocks import NaturePriorFlags, NaturePriorBlock
 from .priors import fibonacci_channels
 
 
@@ -83,10 +83,10 @@ class ResNet20(nn.Module):
 
 
 # ---------------------------------------------------------------------------
-# SacredGeoNet — same depth/width schedule but blocks = SacredGeoBlock
+# NaturePriorNet — same depth/width schedule but blocks = NaturePriorBlock
 # ---------------------------------------------------------------------------
 @dataclass
-class SacredGeoConfig:
+class NaturePriorConfig:
     num_classes: int = 10
     # Channel schedule mode for the three stages
     channel_mode: str = "fib"     # 'fib' | 'phi' | 'linear'
@@ -94,14 +94,14 @@ class SacredGeoConfig:
     n_stages: int = 3
     blocks_per_stage: int = 3
     fractal_depth: int = 2
-    flags: SacredFlags = None       # type: ignore[assignment]
+    flags: NaturePriorFlags = None       # type: ignore[assignment]
 
 
-class SacredGeoNet(nn.Module):
-    def __init__(self, cfg: SacredGeoConfig | None = None) -> None:
+class NaturePriorNet(nn.Module):
+    def __init__(self, cfg: NaturePriorConfig | None = None) -> None:
         super().__init__()
-        cfg = cfg or SacredGeoConfig()
-        cfg.flags = cfg.flags or SacredFlags()
+        cfg = cfg or NaturePriorConfig()
+        cfg.flags = cfg.flags or NaturePriorFlags()
         self.cfg = cfg
 
         widths = fibonacci_channels(
@@ -120,11 +120,11 @@ class SacredGeoNet(nn.Module):
         for i, c_out in enumerate(widths):
             stride = 1 if i == 0 else 2
             blocks: list[nn.Module] = [
-                SacredGeoBlock(c_in, c_out, stride=stride,
+                NaturePriorBlock(c_in, c_out, stride=stride,
                                flags=cfg.flags, fractal_depth=cfg.fractal_depth)
             ]
             for _ in range(cfg.blocks_per_stage - 1):
-                blocks.append(SacredGeoBlock(c_out, c_out, stride=1,
+                blocks.append(NaturePriorBlock(c_out, c_out, stride=1,
                                              flags=cfg.flags,
                                              fractal_depth=cfg.fractal_depth))
             stages.append(nn.Sequential(*blocks))
@@ -149,13 +149,13 @@ class SacredGeoNet(nn.Module):
         return feats
 
 
-def build_model(name: str, num_classes: int, flags: SacredFlags | None = None,
+def build_model(name: str, num_classes: int, flags: NaturePriorFlags | None = None,
                 channel_mode: str = "fib") -> nn.Module:
     name = name.lower()
     if name == "resnet20":
         return ResNet20(num_classes=num_classes)
-    if name == "sacredgeo":
-        cfg = SacredGeoConfig(num_classes=num_classes, channel_mode=channel_mode,
+    if name == "NaturePrior":
+        cfg = NaturePriorConfig(num_classes=num_classes, channel_mode=channel_mode,
                               flags=flags)
-        return SacredGeoNet(cfg)
+        return NaturePriorNet(cfg)
     raise ValueError(f"unknown model '{name}'")

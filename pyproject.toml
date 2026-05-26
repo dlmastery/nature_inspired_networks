@@ -1,11 +1,11 @@
-[build-system]
+﻿[build-system]
 requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "sacgeo"
+name = "nature_inspired_networks"
 version = "0.1.0"
-description = "SacredGeoBlock — sacred-geometry-priored neural backbones (autoresearch-style ablations)"
+description = "NaturePriorBlock — nature-inspired-priored neural backbones (autoresearch-style ablations)"
 readme = "README.md"
 requires-python = ">=3.10"
 authors = [{ name = "dlmastery", email = "eranti@gmail.com" }]

@@ -1,4 +1,4 @@
-# SacredGeoBlock: An Ablation Surface for Sacred-Geometry Priors in Image Classification (DRAFT)
+﻿# NaturePriorBlock: An Ablation Surface for nature-inspired Priors in Image Classification (DRAFT)
 
 > Draft paper. Numbers updated by `scripts/build_dashboard.py` after every
 > sweep. This is the operator-readable version; the final paper PDF
@@ -22,7 +22,7 @@ ResNet without residuals via self-similar paths. Toroidal embeddings
 No prior work synthesises **all** of these into a single
 toggle-driven residual block to expose the ablation surface.
 
-The user-provided PDF "*Sacred Geometry and Neural Networks*" makes the
+The user-provided PDF "*nature-inspired-geometry and Neural Networks*" makes the
 case that these GDL/TDL priors are precisely what ancient and natural
 geometry has been pointing at all along — hexagonal Chladni nodes,
 Platonic solids as the unique fully-symmetric polyhedra, φ-governed
@@ -32,8 +32,8 @@ block exists to *test* whether they compound.
 
 This repo's contribution is mechanical, not theoretical:
 
-1. **`SacredGeoBlock`** — a single drop-in residual block whose six
-   sacred priors and three channel-scaling modes can be ablated
+1. **`NaturePriorBlock`** — a single drop-in residual block whose six
+   nature-inspired priors and three channel-scaling modes can be ablated
    independently with one flag flip per experiment.
 2. **The autoresearch protocol** (inherited verbatim from
    `dlmastery/autoresearchimage`) wrapped around the block: citation
@@ -42,7 +42,7 @@ This repo's contribution is mechanical, not theoretical:
    ≲ 90 min on a single RTX 4090 Laptop, with a sortable HTML
    dashboard, Pareto plots, β-collapse curves and CKA.
 
-## 2. SacredGeoBlock — Definition
+## 2. NaturePriorBlock — Definition
 
 The block (§ARCHITECTURE) takes input $x \in \mathbb{R}^{B \times C_\text{in} \times H \times W}$
 and produces $y \in \mathbb{R}^{B \times C_\text{out} \times H' \times W'}$:
@@ -70,7 +70,7 @@ $$
 
 with $\alpha \in \mathbb{R}$ learnable and $\varphi = (1+\sqrt{5})/2$.
 
-The block composes into SacredGeoNet by stacking three stages of three
+The block composes into NaturePriorNet by stacking three stages of three
 blocks each with channel widths from
 $c_k = \text{round}_8\!\big(c_0 \cdot \tfrac{F_{k+1}}{F_1}\big)$ (mode `fib`),
 $c_0\varphi^k$ (`phi`), or $c_0(k+1)$ (`linear` control).
@@ -100,7 +100,7 @@ below is regenerated.*
 ### 4.1 Pareto fronts
 
 See `dashboard/plot_pareto.png`. Three panels — top-1 vs. params,
-FLOPs, and batch=1 GPU latency. Baselines are blue stars; SacredGeo
+FLOPs, and batch=1 GPU latency. Baselines are blue stars; NaturePrior
 variants are orange dots. A variant dominates if it is up-and-left.
 
 ### 4.2 Ablation matrix
@@ -113,7 +113,7 @@ toggled), sorted by composite. Error bars are seed-std when
 
 See `dashboard/plot_betti.png`. β₀ should drop monotonically across
 stages as the net simplifies its data topology (TDL prediction);
-β₁ tracks 1-D holes. Sacred priors are hypothesised to *accelerate* the
+β₁ tracks 1-D holes. nature-inspired priors are hypothesised to *accelerate* the
 β₀ collapse without sacrificing top-1.
 
 ## 5. Limitations
@@ -127,5 +127,5 @@ See `README.md → Open axes for the next campaign`.
 
 ## 7. Citations
 
-Inline arXiv IDs in `src/sacgeo/priors.py`, `src/sacgeo/blocks.py`,
+Inline arXiv IDs in `src/nature_inspired_networks/priors.py`, `src/nature_inspired_networks/blocks.py`,
 and the canonical `sota_catalog.yaml`.

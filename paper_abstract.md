@@ -1,7 +1,7 @@
-# Abstract — SacredGeoBlock: an ablation surface for sacred-geometry priors
+﻿# Abstract — NaturePriorBlock: an ablation surface for nature-inspired priors
 
-We introduce **SacredGeoBlock**, a CIFAR-scale residual block whose six
-"sacred-geometry" inductive biases — hexagonal-masked convolution
+We introduce **NaturePriorBlock**, a CIFAR-scale residual block whose six
+"nature-inspired" inductive biases — hexagonal-masked convolution
 (HexaConv 2018), C4 group-equivariant convolution as a Platonic proxy
 (Cohen & Welling 2016), fractal recursive sub-paths (FractalNet 2017),
 toroidal (circular) padding (Pittorino 2022), Chladni-eigenmode
@@ -27,11 +27,11 @@ seed-std error bars, training curves, persistent-homology Betti-collapse
 curves on stage features, and a linear-CKA matrix between variants.
 
 This work does **not** claim ImageNet-scale SOTA. It claims (1) the
-sacred-geometry priors can be cleanly compositionally ablated in one
+nature-inspired priors can be cleanly compositionally ablated in one
 block; (2) every individual prior runs to convergence on a consumer
 GPU; (3) the autoresearch protocol's gates (Citation Rigor, Reasoning
 Blob Completeness, Goodhart fingerprint) fire against engineering bugs
 before they corrupt published numbers. The open repo,
-[`dlmastery/sacgeometry`](https://github.com/dlmastery/sacgeometry),
+[`dlmastery/nature_inspired_networks`](https://github.com/dlmastery/nature_inspired_networks),
 ships the block, the runner, the dashboard, and a step-by-step
 30-minute reproduction recipe.

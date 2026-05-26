@@ -1,4 +1,4 @@
-"""Run the CIFAR-10 ablation matrix.
+﻿"""Run the CIFAR-10 ablation matrix.
 
 Each row in the matrix is (model, channel_mode, flags-dict, tag). Seeds are
 swept inside the runner. Outputs go under experiments/cifar10/<tag>_seed<S>/.
@@ -16,7 +16,7 @@ import yaml
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 
-from sacgeo.runner import run_one  # noqa: E402
+from nature_inspired_networks.runner import run_one  # noqa: E402
 
 
 def build_matrix(curated: bool = True) -> list[dict]:
@@ -35,39 +35,39 @@ def build_matrix(curated: bool = True) -> list[dict]:
     rows.append(dict(tag="baseline_resnet20",
                      overrides=dict(model="resnet20")))
     rows.append(dict(tag="baseline_sg_vanilla",
-                     overrides=dict(model="sacredgeo",
+                     overrides=dict(model="NaturePrior",
                                     channel_mode="linear",
                                     flags=base_flags.copy())))
 
     # Channel scaling ablation (priors all off; only channel schedule changes)
     for mode in ("fib", "phi"):
         rows.append(dict(tag=f"sg_chan_{mode}",
-                         overrides=dict(model="sacredgeo",
+                         overrides=dict(model="NaturePrior",
                                         channel_mode=mode,
                                         flags=base_flags.copy())))
 
-    # Single-prior on (each sacred prior switched on alone, fib channels)
+    # Single-prior on (each nature-inspired prior switched on alone, fib channels)
     for k in ("hex", "group", "fractal", "toroidal", "cymatic_init",
               "golden_modulate"):
         f = base_flags.copy(); f[k] = True
         rows.append(dict(tag=f"sg_only_{k}",
-                         overrides=dict(model="sacredgeo",
+                         overrides=dict(model="NaturePrior",
                                         channel_mode="fib", flags=f)))
 
-    # Full SacredGeo with each channel mode
+    # Full NaturePrior with each channel mode
     rows.append(dict(tag="sg_full_fib",
-                     overrides=dict(model="sacredgeo",
+                     overrides=dict(model="NaturePrior",
                                     channel_mode="fib", flags=full.copy())))
     if not curated:
         rows.append(dict(tag="sg_full_phi",
-                         overrides=dict(model="sacredgeo",
+                         overrides=dict(model="NaturePrior",
                                         channel_mode="phi", flags=full.copy())))
         # Leave-one-out from full (only in full sweep)
         for k in ("hex", "group", "fractal", "toroidal", "cymatic_init",
                   "golden_modulate"):
             f = full.copy(); f[k] = False
             rows.append(dict(tag=f"sg_loo_no_{k}",
-                             overrides=dict(model="sacredgeo",
+                             overrides=dict(model="NaturePrior",
                                             channel_mode="fib", flags=f)))
     return rows
 

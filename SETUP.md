@@ -1,6 +1,6 @@
-# SETUP
+﻿# SETUP
 
-> Step-by-step environment bring-up for `dlmastery/sacgeometry` on a
+> Step-by-step environment bring-up for `dlmastery/nature_inspired_networks` on a
 > Windows 11 + RTX 4090 Laptop (16 GB) machine. Linux / WSL works too
 > (skip the SSL workaround).
 
@@ -15,8 +15,8 @@
 ## 1. Clone
 
 ```powershell
-git clone https://github.com/dlmastery/sacgeometry.git
-cd sacgeometry
+git clone https://github.com/dlmastery/nature_inspired_networks.git
+cd nature_inspired_networks
 ```
 
 ## 2. Create venv + install CUDA torch
@@ -73,7 +73,7 @@ PathMNIST(split='train', download=True, root='./data/medmnist')"
 
 ```powershell
 $env:SSL_CERT_FILE = ".\.venv\Lib\site-packages\certifi\cacert.pem"
-.\.venv\Scripts\python -m sacgeo.runner `
+.\.venv\Scripts\python -m nature_inspired_networks.runner `
    --config configs\cifar10_smoke.yaml --tag smoke --seed 0
 ```
 

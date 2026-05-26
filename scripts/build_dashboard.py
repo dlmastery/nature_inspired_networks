@@ -1,4 +1,4 @@
-"""Aggregate experiments/* into the autoresearch-style HTML dashboard.
+﻿"""Aggregate experiments/* into the autoresearch-style HTML dashboard.
 
 Usage:
     python scripts/build_dashboard.py [--root experiments] [--out dashboard]
@@ -12,13 +12,13 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 
-from sacgeo.dashboard import render_dashboard  # noqa: E402
+from nature_inspired_networks.dashboard import render_dashboard  # noqa: E402
 
 
 def _summary_md(results_dir: Path) -> str:
     """Build a small Markdown summary of best per dataset (rendered to HTML)."""
     import pandas as pd
-    from sacgeo.dashboard import load_runs
+    from nature_inspired_networks.dashboard import load_runs
     df = load_runs(results_dir)
     if df.empty:
         return "<i>No runs yet.</i>"
@@ -59,10 +59,10 @@ def main(argv=None) -> int:
     # Tiny docs/index.html landing
     (Path("docs") / "index.html").write_text(
         """<!doctype html><meta charset='utf-8'>
-<title>sacgeometry — autoresearch dashboard</title>
+<title>nature_inspired_networks — autoresearch dashboard</title>
 <body style='font-family:sans-serif;margin:40px'>
-<h1>sacgeometry</h1>
-<p>Sacred-geometry-priored neural backbones; autoresearch-style ablations.</p>
+<h1>nature_inspired_networks</h1>
+<p>nature-inspired-priored neural backbones; autoresearch-style ablations.</p>
 <p>→ <a href='dashboard/dashboard.html'>Open the live dashboard</a></p>
 </body>""",
         encoding="utf-8",

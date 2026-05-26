@@ -1,8 +1,8 @@
-# AUTORESEARCH_PROCESS
+﻿# AUTORESEARCH_PROCESS
 
 > The 7-step research-loop ritual every experiment in this project follows.
 > Inherited from `dlmastery/autoresearchimage` and adapted from medical-OOD
-> classification to **ablation studies of sacred-geometry priors**.
+> classification to **ablation studies of nature-inspired priors**.
 
 This document explains the **process**. The full normative rules live in
 [`CLAUDE.md`](CLAUDE.md). This is the operator-facing summary.
@@ -55,7 +55,7 @@ Author1, Author2, Author3 YEAR VENUE 'Paper Title'
 (arXiv:XXXX.XXXXX) — one-sentence note on why we cite it here.
 ```
 
-The Citation Rigor validator (`src/sacgeo/reasoning.py::validate_entry`)
+The Citation Rigor validator (`src/nature_inspired_networks/reasoning.py::validate_entry`)
 rejects:
 
 - `(He2016)` — parenthetical-only tag
@@ -95,7 +95,7 @@ The runner enforces this by tag convention:
 - `sg_full_<mode>` — all priors on with chosen channel mode
 
 The runner also writes the Goodhart-fingerprint check (`COMPOSITE_FINGERPRINT`
-in `src/sacgeo/eval.py`) to each `metrics.json` and refuses to publish
+in `src/nature_inspired_networks/eval.py`) to each `metrics.json` and refuses to publish
 if the running fingerprint differs from the first-run fingerprint.
 
 ### Step 6 — Analyze
@@ -182,7 +182,7 @@ composite = top1 − 0.05·log₁₀(params_M) − 0.05·log₁₀(latency_ms)
 - `latency_ms = max(0.01, gpu_latency_ms)` (batch=1)
 
 The string above is SHA-256 hashed at import (`COMPOSITE_FINGERPRINT`
-in `src/sacgeo/eval.py`). Every `metrics.json` records that hash; any
+in `src/nature_inspired_networks/eval.py`). Every `metrics.json` records that hash; any
 mid-project edit raises a runtime error on the next sweep.
 
 Rationale: ablation studies are uniquely vulnerable to composite-metric
@@ -243,7 +243,7 @@ Each line is one experiment. Schema:
   "train_seconds":     410.3,
   "train_top1":        0.9012,
   "generalization_gap":0.0369,
-  "model":             "sacredgeo",
+  "model":             "NaturePrior",
   "channel_mode":      "fib",
   "flags": {"hex": true, "group": true, ...},
   "composite_formula": "composite = top1 - 0.05 * log10(params_M) - 0.05 * log10(latency_ms)"
