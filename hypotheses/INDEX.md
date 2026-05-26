@@ -1,137 +1,165 @@
 # hypotheses/ — INDEX
 
-> One detailed `H<NN>_<short>.md` file per row in `IDEA_TABLE.md`.
-> Each follows the contract in `_TEMPLATE.md` and is committee-grade.
-> File names use 2-digit zero-padded IDs.
+> 75 committee-grade hypothesis design documents organized into 7
+> thematic groups matching `../IDEA_TABLE.md`. Each file follows
+> `_TEMPLATE.md`. Every group has its own subdirectory so the flat
+> 75-file directory is no longer overwhelming.
 
-## Group G1 — Scaling & Growth (H01–H10)
+## File-naming convention
 
-| ID | File | Idea |
-|---|---|---|
-| H01 | `H01_phi_compound_scaling.md` | φ-compound scaling (EfficientNet replacement) |
-| H02 | `H02_fibonacci_depth_progression.md` | Fib depth progression per stage |
-| H03 | `H03_golden_spiral_resolution_scaling.md` | Golden-angle + φ-multiple resolution |
-| H04 | `H04_phi_self_similar_width.md` | φ-scaled channel widths (rounded to Fib) |
-| H05 | `H05_fractal_phi_recursion.md` | Recursive sub-block at 1/φ scale |
-| H06 | `H06_golden_ratio_bottleneck.md` | Vesica-Piscis-style 1/φ bottleneck |
-| H07 | `H07_phi_modulated_multi_scale.md` | φ-spaced FPN levels |
-| H08 | `H08_dynamic_phi_growth.md` | Adaptive Fib layer addition during training |
-| H09 | `H09_golden_proportion_param_budget.md` | 1:φ:φ² param allocation across stages |
-| H10 | `H10_phi_decay_lr_scheduler.md` | φ^{-k} LR / momentum scheduler |
+`g<N>_<group_name>/H<NN>_<short>.md` where:
+- `g<N>` is the group ID 1-7
+- `H<NN>` is the zero-padded hypothesis ID
+- `<short>` is a kebab-case short name
 
-## Group G2 — Layer / Channel / Neuron (H11–H20)
+The full design space + status per hypothesis is in `../IDEA_TABLE.md`.
+The master experiment list is in `../EXPERIMENT_LOG.md`.
 
-| ID | File | Idea |
-|---|---|---|
-| H11 | `H11_pure_fibonacci_mlp.md` | Fib-sized MLP hidden states |
-| H12 | `H12_fib_channel_cnn.md` | Fib filter counts + φ kernel sizes |
-| H13 | `H13_golden_neuron_connectivity.md` | φ-pruned sparse intra-layer wiring |
-| H14 | `H14_fibonacci_recurrent.md` | Fib-sized RNN/GRU + φ-gated updates |
-| H15 | `H15_phi_initialized_embedding.md` | Golden-spiral embedding init |
-| H16 | `H16_fibonacci_head_diversity.md` | Fib head counts + Fib dilations |
-| H17 | `H17_golden_ratio_skip_connections.md` | φ-scaled residual skips |
-| H18 | `H18_fib_stage_transition.md` | Fib alternating downsample factors |
-| H19 | `H19_phi_neuron_activation_threshold.md` | Per-neuron φ-tuned thresholds |
-| H20 | `H20_fibonacci_ensemble.md` | Fib-weighted ensemble averaging |
+## Group G1 — Scaling & Growth (`g1_scaling_growth/`)
 
-## Group G3 — Topologies & Graphs (H21–H30)
+10 hypotheses: φ / Fibonacci growth laws applied to depth, width,
+resolution, layer counts, parameter budgets, LR schedulers.
 
-| ID | File | Idea |
-|---|---|---|
-| H21 | `H21_hexagonal_phi_packing.md` | Native hex grid + φ-modulated neighbours |
-| H22 | `H22_toroidal_phi_closure.md` | Circular padding + φ-scaled period |
-| H23 | `H23_platonic_phi_graph.md` | Metatron's-Cube adjacency for GNN |
-| H24 | `H24_icosahedral_phi_equivariant.md` | Full icosahedral group conv |
-| H25 | `H25_dodecahedral_latent.md` | 12-vertex dodeca latent projection |
-| H26 | `H26_fractal_toroidal.md` | Fractal recursion on toroidal manifold |
-| H27 | `H27_golden_spiral_graph.md` | Golden-spiral node-embedding init |
-| H28 | `H28_cymatic_hex_resonance.md` | φ-harmonic dynamic hex edge weights |
-| H29 | `H29_phi_small_world.md` | 1/φ rewiring probability |
-| H30 | `H30_platonic_fib_hybrid.md` | Icosa/dodeca + Fib node degrees |
+| ID | File |
+|---|---|
+| H01 | `g1_scaling_growth/H01_phi_compound_scaling.md` |
+| H02 | `g1_scaling_growth/H02_fibonacci_depth_progression.md` |
+| H03 | `g1_scaling_growth/H03_golden_spiral_resolution_scaling.md` |
+| H04 | `g1_scaling_growth/H04_phi_self_similar_width.md` |
+| H05 | `g1_scaling_growth/H05_fractal_phi_recursion.md` |
+| H06 | `g1_scaling_growth/H06_golden_ratio_bottleneck.md` |
+| H07 | `g1_scaling_growth/H07_phi_modulated_multi_scale.md` |
+| H08 | `g1_scaling_growth/H08_dynamic_phi_growth.md` |
+| H09 | `g1_scaling_growth/H09_golden_proportion_param_budget.md` |
+| H10 | `g1_scaling_growth/H10_phi_decay_lr_scheduler.md` |
 
-## Group G4 — Kernels / Attention / Filters (H31–H40)
+## Group G2 — Layer / Channel / Neuron Architectures (`g2_layer_channel_neuron/`)
 
-| ID | File | Idea |
-|---|---|---|
-| H31 | `H31_golden_spiral_kernel.md` | Discretised golden-spiral kernel init |
-| H32 | `H32_fibonacci_dilation_attention.md` | Fibottention (Fib dilations per head) |
-| H33 | `H33_vesica_piscis_filter.md` | Overlapping-circle multi-path conv |
-| H34 | `H34_golden_angle_rotary.md` | Golden-angle RoPE frequencies |
-| H35 | `H35_cymatic_wavelet.md` | Chladni-eigenmode kernel basis |
-| H36 | `H36_phi_spiral_positional_encoding.md` | Golden-spiral PE trajectory |
-| H37 | `H37_pentagonal_phi_attention.md` | Pentagonal-symmetry head grouping |
-| H38 | `H38_fractal_golden_filter.md` | Self-similar kernels at φ scales |
-| H39 | `H39_harmonic_phi_activation.md` | φ-parameterised GELU / SwiGLU |
-| H40 | `H40_metatron_kernel_overlap.md` | Metatron-Cube shared kernel basis |
+10 hypotheses: Fib-sized MLPs, channel counts, neuron connectivity,
+skip scaling, head diversity, activation thresholds, ensembles.
 
-## Group G5 — Optimization / Init / Regularization / NAS (H41–H50)
+| ID | File |
+|---|---|
+| H11 | `g2_layer_channel_neuron/H11_pure_fibonacci_mlp.md` |
+| H12 | `g2_layer_channel_neuron/H12_fib_channel_cnn.md` |
+| H13 | `g2_layer_channel_neuron/H13_golden_neuron_connectivity.md` |
+| H14 | `g2_layer_channel_neuron/H14_fibonacci_recurrent.md` |
+| H15 | `g2_layer_channel_neuron/H15_phi_initialized_embedding.md` |
+| H16 | `g2_layer_channel_neuron/H16_fibonacci_head_diversity.md` |
+| H17 | `g2_layer_channel_neuron/H17_golden_ratio_skip_connections.md` |
+| H18 | `g2_layer_channel_neuron/H18_fib_stage_transition.md` |
+| H19 | `g2_layer_channel_neuron/H19_phi_neuron_activation_threshold.md` |
+| H20 | `g2_layer_channel_neuron/H20_fibonacci_ensemble.md` |
 
-| ID | File | Idea |
-|---|---|---|
-| H41 | `H41_golden_ratio_optimizer.md` | φ-derived LR / momentum (Jaeger 2020) |
-| H42 | `H42_phi_weight_initialization.md` | φ-scaled He init |
-| H43 | `H43_fibonacci_pruning.md` | Iterative Fib-ratio magnitude pruning |
-| H44 | `H44_golden_regularization.md` | Per-layer 1/φ^k weight decay |
-| H45 | `H45_sacred_nas.md` | NAS restricted to φ/Fib/Platonic priors |
-| H46 | `H46_cymatic_loss.md` | φ-harmonic Fourier-domain loss term |
-| H47 | `H47_phi_dropout.md` | Fib-cycled dropout rates |
-| H48 | `H48_golden_momentum_scheduler.md` | φ^{-epoch} momentum decay |
-| H49 | `H49_platonic_representation_alignment_loss.md` | PRH alignment auxiliary loss |
-| H50 | `H50_full_sacred_hybrid.md` | All-priors-on hybrid block |
+## Group G3 — Topologies & Graphs (`g3_topologies_graphs/`)
 
-## Group G6 — Topological + bridging additions (H51–H60)
+10 hypotheses: hex lattices, toroidal closures, Platonic graphs,
+icosahedral / dodecahedral equivariance, fractal toroidal, cymatic hex
+resonance, small-world, Platonic-Fib hybrids.
 
-| ID | File | Idea |
-|---|---|---|
-| H51 | `H51_topological_betti_loss.md` | Differentiable PH loss |
-| H52 | `H52_drop_path_anytime.md` | FractalNet drop-path + anytime eval |
-| H53 | `H53_icosa_unfold_bridge.md` | GICOPix 2D-3D bridge |
-| H54 | `H54_persistent_homology_activation_reg.md` | β-target Betti regularisation |
-| H55 | `H55_platonic_transformers.md` | Islam 2025 Platonic-Transformer reference impl |
-| H56 | `H56_cymatic_pattern_dataset.md` | Synthetic Chladni-frequency dataset |
-| H57 | `H57_audio_cymatic_cross_modal.md` | AudioSet × spectrogram cymatic priors |
-| H58 | `H58_group_avg_pool.md` | **C4 max→avg pool fix** (top-priority next experiment) |
-| H59 | `H59_trained_feature_betti.md` | Trained-feature Betti curves |
-| H60 | `H60_three_seed_uncertainty.md` | 3-seed error bars on every row |
+| ID | File |
+|---|---|
+| H21 | `g3_topologies_graphs/H21_hexagonal_phi_packing.md` |
+| H22 | `g3_topologies_graphs/H22_toroidal_phi_closure.md` |
+| H23 | `g3_topologies_graphs/H23_platonic_phi_graph.md` |
+| H24 | `g3_topologies_graphs/H24_icosahedral_phi_equivariant.md` |
+| H25 | `g3_topologies_graphs/H25_dodecahedral_latent.md` |
+| H26 | `g3_topologies_graphs/H26_fractal_toroidal.md` |
+| H27 | `g3_topologies_graphs/H27_golden_spiral_graph.md` |
+| H28 | `g3_topologies_graphs/H28_cymatic_hex_resonance.md` |
+| H29 | `g3_topologies_graphs/H29_phi_small_world.md` |
+| H30 | `g3_topologies_graphs/H30_platonic_fib_hybrid.md` |
 
-## Group G7 — Cross-paradigm hybrids (H61–H71)
+## Group G4 — Kernels / Attention / Filters (`g4_kernels_attention_filters/`)
 
-| ID | File | Idea |
-|---|---|---|
-| H61 | `H61_sacred_liquid_jepa.md` | φ-modulated LTC inside JEPA encoder |
-| H62 | `H62_toroidal_kv_hex_attention.md` | Constant-memory KV + hex attention |
-| H63 | `H63_platonic_aux_cymatic_teacher.md` | dodeca-proj loss + cymatic teacher |
-| H64 | `H64_dynamic_growth_pruning.md` | Dynamic φ-grow + Fib-prune |
-| H65 | `H65_ph_betti_collapse_loss.md` | Differentiable Betti-collapse term |
-| H66 | `H66_cymatic_qkv_kernel.md` | Cymatic wavelet QKV init |
-| H67 | `H67_full_paradigm_hybrid.md` | Sacred-Liquid-JEPA-KAN-GNN-Transformer fusion |
-| H68 | `H68_ondevice_world_model.md` | On-device toroidal world model |
-| H69 | `H69_kan_metatron_symbolic_head.md` | KAN edges on Metatron graph |
-| H70 | `H70_cymatic_low_data_curriculum.md` | Low-data cymatic curriculum |
-| H71 | `H71_icosa_rope_3d.md` | Icosahedral RoPE for 3D spatial |
+10 hypotheses: golden-spiral kernels, Fibottention dilated attention,
+Vesica Piscis filters, golden-angle RoPE, cymatic wavelets, φ-spiral PE,
+pentagonal-symmetric attention, fractal golden filters, harmonic φ
+activations, Metatron kernel overlaps.
 
-### Group G7 cont'd — Combined LLM-track opportunities (H72–H75)
+| ID | File |
+|---|---|
+| H31 | `g4_kernels_attention_filters/H31_golden_spiral_kernel.md` |
+| H32 | `g4_kernels_attention_filters/H32_fibonacci_dilation_attention.md` |
+| H33 | `g4_kernels_attention_filters/H33_vesica_piscis_filter.md` |
+| H34 | `g4_kernels_attention_filters/H34_golden_angle_rotary.md` |
+| H35 | `g4_kernels_attention_filters/H35_cymatic_wavelet.md` |
+| H36 | `g4_kernels_attention_filters/H36_phi_spiral_positional_encoding.md` |
+| H37 | `g4_kernels_attention_filters/H37_pentagonal_phi_attention.md` |
+| H38 | `g4_kernels_attention_filters/H38_fractal_golden_filter.md` |
+| H39 | `g4_kernels_attention_filters/H39_harmonic_phi_activation.md` |
+| H40 | `g4_kernels_attention_filters/H40_metatron_kernel_overlap.md` |
 
-These come from the chunk-8 "25 untapped opportunities" expansion in
-the extended Grok transcript (opportunities 15, 16, 18, 19). They are
-not pure single-flag flips of H01–H50 but **combinations** specifically
-designed for decoder-only Transformers.
+## Group G5 — Optimization / Init / Regularization / NAS (`g5_optimization_init_reg_nas/`)
 
-| ID | File | Idea |
-|---|---|---|
-| H72 | `H72_fractal_vesica_ffn.md` | Fractal φ-recursion inside LLM FFN + Vesica multi-path residuals |
-| H73 | `H73_golden_spiral_metatron_pe.md` | Golden-angle RoPE + spiral pos-graph + Metatron edge weights |
-| H74 | `H74_metatron_overlap_tying.md` | Metatron overlap sharing across QKV/FFN + Platonic group tying |
-| H75 | `H75_harmonic_cymatic_swiglu.md` | Harmonic φ-activation in SwiGLU + dynamic cymatic thresholding |
+10 hypotheses: golden-ratio optimizer, φ weight init, Fib pruning,
+golden regularization, sacred NAS, cymatic loss, φ dropout, golden
+momentum scheduler, Platonic alignment loss, full sacred hybrid.
 
-## How files in this directory get written
+| ID | File |
+|---|---|
+| H41 | `g5_optimization_init_reg_nas/H41_golden_ratio_optimizer.md` |
+| H42 | `g5_optimization_init_reg_nas/H42_phi_weight_initialization.md` |
+| H43 | `g5_optimization_init_reg_nas/H43_fibonacci_pruning.md` |
+| H44 | `g5_optimization_init_reg_nas/H44_golden_regularization.md` |
+| H45 | `g5_optimization_init_reg_nas/H45_sacred_nas.md` |
+| H46 | `g5_optimization_init_reg_nas/H46_cymatic_loss.md` |
+| H47 | `g5_optimization_init_reg_nas/H47_phi_dropout.md` |
+| H48 | `g5_optimization_init_reg_nas/H48_golden_momentum_scheduler.md` |
+| H49 | `g5_optimization_init_reg_nas/H49_platonic_representation_alignment_loss.md` |
+| H50 | `g5_optimization_init_reg_nas/H50_full_sacred_hybrid.md` |
 
-The template (`_TEMPLATE.md`) is the contract. Each `H<NN>_<short>.md`
-must fill every section above the "Status journal" line. The status
-journal grows append-only.
+## Group G6 — Topological + Bridging (`g6_topological_bridging/`)
 
-**Parallel writing:** these files are generated by an agentic team
-(see the `Agent` dispatches in this session). Each agent owns a
-disjoint range of IDs (e.g., H01–H15), reads the template, reads
-`IDEA_TABLE.md` + `EXPERIMENT_LEDGER.md` for context, and produces
-one file per ID. No agent touches any other directory.
+10 hypotheses: Betti loss, drop-path anytime, 2D-3D icosa unfold,
+persistent-homology activation reg, Platonic Transformers (Islam 2025),
+cymatic dataset, audio-cymatic cross-modal, C4 max→avg pool fix (H58),
+trained-feature Betti (H59), 3-seed uncertainty (H60).
+
+| ID | File |
+|---|---|
+| H51 | `g6_topological_bridging/H51_topological_betti_loss.md` |
+| H52 | `g6_topological_bridging/H52_drop_path_anytime.md` |
+| H53 | `g6_topological_bridging/H53_icosa_unfold_bridge.md` |
+| H54 | `g6_topological_bridging/H54_persistent_homology_activation_reg.md` |
+| H55 | `g6_topological_bridging/H55_platonic_transformers.md` |
+| H56 | `g6_topological_bridging/H56_cymatic_pattern_dataset.md` |
+| H57 | `g6_topological_bridging/H57_audio_cymatic_cross_modal.md` |
+| H58 | `g6_topological_bridging/H58_group_avg_pool.md` |
+| H59 | `g6_topological_bridging/H59_trained_feature_betti.md` |
+| H60 | `g6_topological_bridging/H60_three_seed_uncertainty.md` |
+
+## Group G7 — Cross-paradigm Hybrids (`g7_cross_paradigm_hybrids/`)
+
+15 hypotheses: cross-paradigm fusions between sacred priors and the
+Liquid / JEPA / KAN / Transformer / GNN paradigms. H67 is the flagship
+full Sacred-Liquid-JEPA-KAN-GNN-Transformer hybrid.
+
+| ID | File |
+|---|---|
+| H61 | `g7_cross_paradigm_hybrids/H61_sacred_liquid_jepa.md` |
+| H62 | `g7_cross_paradigm_hybrids/H62_toroidal_kv_hex_attention.md` |
+| H63 | `g7_cross_paradigm_hybrids/H63_platonic_aux_cymatic_teacher.md` |
+| H64 | `g7_cross_paradigm_hybrids/H64_dynamic_growth_pruning.md` |
+| H65 | `g7_cross_paradigm_hybrids/H65_ph_betti_collapse_loss.md` |
+| H66 | `g7_cross_paradigm_hybrids/H66_cymatic_qkv_kernel.md` |
+| H67 | `g7_cross_paradigm_hybrids/H67_full_paradigm_hybrid.md` |
+| H68 | `g7_cross_paradigm_hybrids/H68_ondevice_world_model.md` |
+| H69 | `g7_cross_paradigm_hybrids/H69_kan_metatron_symbolic_head.md` |
+| H70 | `g7_cross_paradigm_hybrids/H70_cymatic_low_data_curriculum.md` |
+| H71 | `g7_cross_paradigm_hybrids/H71_icosa_rope_3d.md` |
+| H72 | `g7_cross_paradigm_hybrids/H72_fractal_vesica_ffn.md` |
+| H73 | `g7_cross_paradigm_hybrids/H73_golden_spiral_metatron_pe.md` |
+| H74 | `g7_cross_paradigm_hybrids/H74_metatron_overlap_tying.md` |
+| H75 | `g7_cross_paradigm_hybrids/H75_harmonic_cymatic_swiglu.md` |
+
+## How files are written
+
+`_TEMPLATE.md` is the contract. Each `H<NN>_<short>.md` fills every
+section above its "Status journal" line. The status journal grows
+append-only.
+
+The bulk of these files were generated by 5 parallel doc agents
+(Doc-Agent-A through Doc-Agent-E) in May 2026. Each agent owned a
+disjoint range of IDs and produced its files independently from
+the template + `IDEA_TABLE.md` + `EXPERIMENT_LEDGER.md`.
