@@ -1,373 +1,443 @@
-﻿# nature_inspired_networks — NaturePriorBlock
+# nature_inspired_networks
 
-> **An autoresearch-style ablation study of nature-inspired priors as
-> drop-in residual blocks for image classification.**
-> The block embeds φ/Fibonacci channel scaling, C4 group-equivariant
-> convolution (Platonic proxy), hexagonal-masked kernels, fractal
-> recursive sub-paths, toroidal (circular) padding, Chladni-mode
-> cymatic init, and golden-angle channel modulation — each toggleable
-> for principled ablation.
+> **An autoresearch-style ablation study of nature-inspired priors —
+> hex / Platonic / fractal / toroidal / φ / cymatic / golden-angle — as
+> drop-in residual & attention blocks for image classification and
+> decoder-only LLMs, with refusal-to-launch protocol gates, a
+> Goodhart-fingerprinted composite metric, and a publicly-pushed
+> dashboard refreshed every commit.**
 
-## Live links
+[![public](https://img.shields.io/badge/repo-public-brightgreen)](https://github.com/dlmastery/nature_inspired_networks)
+[![dashboard](https://img.shields.io/badge/dashboard-live-blue)](https://dlmastery.github.io/nature_inspired_networks/dashboard/dashboard.html)
+[![hypotheses](https://img.shields.io/badge/hypotheses-75-orange)](hypotheses/INDEX.md)
+[![tests](https://img.shields.io/badge/tests-29%20core%20%2B%2068%20idea--local-green)](tests/)
+[![license](https://img.shields.io/badge/license-MIT-lightgrey)](LICENSE)
 
-- **Dashboard:** [dlmastery.github.io/nature_inspired_networks/dashboard/dashboard.html](https://dlmastery.github.io/nature_inspired_networks/dashboard/dashboard.html)
-- **Findings (campaign verdict):** [`FINDINGS.md`](FINDINGS.md)
-- **Per-experiment narrative:** [`RESULTS.md`](RESULTS.md)
-- **Paper sketch:** [`PAPER.md`](PAPER.md)
-- **Process:** [`AUTORESEARCH_PROCESS.md`](AUTORESEARCH_PROCESS.md)
-- **Architecture:** [`ARCHITECTURE.md`](ARCHITECTURE.md)
-- **Sister project:** [autoresearchimage](https://github.com/dlmastery/autoresearchimage)
-  — this repo inherits its protocol gates verbatim and adapts them to
-  geometric-prior backbone ablations.
-
-## Headline finding (CIFAR-10, seed 0, 12 epochs, ResNet-20-shaped scaffold)
-
-| rank | tag | top-1 | params | composite |
-|---|---|---|---|---|
-| 1 | `baseline_resnet20` | 84.78 % | 272 k | **0.8458** |
-| 2 | `baseline_sg_vanilla` | 82.16 % | 186 k | 0.8258 |
-| 5 | `sg_only_fractal` | 82.46 % | 259 k | 0.8104 |
-| 10 | `sg_only_group` | 69.84 % | 127 k | 0.6937 |
-| 11 | `sg_full_fib` | 73.24 % | 259 k | **0.6966 (worst)** |
-
-**At this scale and budget the nature-inspired priors do NOT compound.**
-The full hybrid is the worst NaturePrior variant in the sweep; the C4
-group prior accounts for most of the damage (max-pool over the
-4-rotation orbit throws away 75 % of the signal). Fractal is the only
-single prior that lifts top-1. See [`FINDINGS.md`](FINDINGS.md) for the
-full single-prior decomposition and the next-campaign open axes.
-
-## ⚠️ Read this first — scope and honesty
-
-This is a **feasibility + ablation campaign** on one consumer GPU. It is
-**not** a SOTA claim against ImageNet leaderboards. What it does claim:
-
-| | what we run | what we don't |
-|---|---|---|
-| **Tier 1** | CIFAR-10 (full), 15-epoch quick runs, 11-cell curated ablation | CIFAR-100 ablation (just one validation run) |
-| **Tier 2** | (stretch) MedMNIST 2D — PathMNIST / OrganAMNIST / OCTMNIST | Tiny ImageNet, ImageNet-100, ImageNet-1k |
-| **Tier 3** | not run | IcoMNIST, ModelNet40, ogbg-molhiv |
-
-The expectation set by the source PDF — "20–50 % compression + 5–15 %
-capacity/speed gains" — is the *upper-bound literature compound* from
-{HexCNN ~25–42 % + FractalNet depth + IcosaCNN rot-robustness +
-Fibonacci-Net width}. Our single-GPU 15-epoch ablations cannot replicate
-that compound; they can only show that **the priors do not destroy
-training and individually contribute measurable changes in the Pareto
-frontier**.
-
-The autoresearch protocol (citation rigor, reasoning blob, Goodhart
-composite fingerprint, audit gates) is inherited from
-[`dlmastery/autoresearchimage`](https://github.com/dlmastery/autoresearchimage)
-and is the methodological deliverable, even on the small scale we run.
-
-## Quick stats
-
-| | |
-|---|---|
-| **Repo** | https://github.com/dlmastery/nature_inspired_networks |
-| **Dataset(s)** | CIFAR-10 (always) + optionally MedMNIST PathMNIST |
-| **Baseline** | ResNet-20 (272 k params, He 2015 CIFAR variant) |
-| **Block** | `NaturePriorBlock(c_in, c_out, stride, flags)` — see `src/nature_inspired_networks/blocks.py` |
-| **Priors** | hex, group (C4), fractal, toroidal, cymatic-init, golden-modulate |
-| **Channel modes** | `fib` (Fibonacci) / `phi` (golden) / `linear` (control) |
-| **Compute** | 1× RTX 4090 Laptop (16 GB), Windows 11, bf16 AMP |
-| **Composite metric** | `top1 − 0.05·log₁₀(params_M) − 0.05·log₁₀(latency_ms)` (SHA-256 fingerprinted) |
-| **Comparable to ImageNet SOTA?** | **NO** — see *Scope and honesty* above |
-
-## Table of contents
-
-1. [What this is](#what-this-is)
-2. [Why these priors?](#why-these-priors)
-3. [Quickstart](#quickstart)
-4. [NaturePriorBlock — anatomy](#NaturePriorBlock--anatomy)
-5. [The autoresearch protocol](#the-autoresearch-protocol)
-6. [Goodhart-fingerprinted composite](#goodhart-fingerprinted-composite)
-7. [Repo layout](#repo-layout)
-8. [Ablation matrix](#ablation-matrix)
-9. [Topology & CKA](#topology--cka)
-10. [Reproduce in 30 minutes](#reproduce-in-30-minutes)
-11. [Hardware notes](#hardware-notes)
-12. [Limitations & threats to validity](#limitations--threats-to-validity)
-13. [Open axes for the next campaign](#open-axes-for-the-next-campaign)
-14. [Citations](#citations)
+**Quick links:** [MINDMAP](MINDMAP.md) · [Live dashboard](https://dlmastery.github.io/nature_inspired_networks/dashboard/dashboard.html) · [Manifesto](MANIFESTO.md) · [75 hypotheses](hypotheses/INDEX.md) · [Findings](FINDINGS.md) · [Paradigm comparison](PARADIGM_COMPARISON.md) · [Nature-inspired networks reference](NATURE_INSPIRED_NETWORKS.md)
 
 ---
 
-## What this is
+## Table of contents
 
-`nature_inspired_networks` is a small, self-contained PyTorch project that implements
-the **NaturePriorBlock** — a drop-in CIFAR-scale residual block whose
-six "nature-inspired" priors can be individually switched on or off:
+1. [Overview](#1-overview)
+2. [Headline finding (honest scope)](#2-headline-finding-honest-scope)
+3. [What's in this repo](#3-whats-in-this-repo)
+4. [Quick start](#4-quick-start)
+5. [Architecture at a glance](#5-architecture-at-a-glance)
+6. [The 75-hypothesis design space](#6-the-75-hypothesis-design-space)
+7. [Modular `ideas/` taxonomy](#7-modular-ideas-taxonomy)
+8. [The autoresearch protocol](#8-the-autoresearch-protocol)
+9. [Reproducing the experiments](#9-reproducing-the-experiments)
+10. [Extending this work](#10-extending-this-work)
+11. [Documentation map](#11-documentation-map)
+12. [Sister projects](#12-sister-projects)
+13. [License & credits](#13-license--credits)
 
-| Prior | Library precedent | Why we include it |
-|---|---|---|
-| `hex` — 3×3 hex-masked conv | HexaConv 2018, HexagDLy 2019 | denser 7-tap honeycomb receptive field |
-| `group` — C4 group conv (rot-equivariant) | Cohen & Welling 2016, e2cnn | weight-sharing across 4 rotations; cheap Platonic proxy |
-| `fractal` — recursive sub-block (depth=2) | FractalNet 2017 (Larsson et al.) | ultra-deep without residuals, multi-path gradient |
-| `toroidal` — circular padding | Pittorino 2022, TopoCN | closed manifold — periodic boundary on the image |
-| `cymatic_init` — Chladni-mode wavelet init | implicit in wavelet/Fourier priors; novel here | initialise filters with sinusoidal eigenmodes of a square plate |
-| `golden_modulate` — golden-angle channel gate | rotary embeddings; phyllotaxis | output-stage rotary-like modulation by 2π/φ phases |
+---
 
-plus a **channel schedule** chosen from `fib` (Fibonacci-Net 2025-style),
-`phi` (golden-ratio compound scaling) or `linear` (control).
+## 1. Overview
 
-The runner produces autoresearch-protocol artifacts: per-run `metrics.json`
-+ `history.json`, a global `experiment_log.jsonl`, a sortable HTML
-dashboard, and a reasoning journal whose entries are gated by
-Citation Rigor + Reasoning Blob Completeness validators.
+`nature_inspired_networks` studies whether the inductive biases that
+nature uses — hexagonal lattices (cymatics, honeycomb, grid cells),
+Platonic / icosahedral symmetries, fractal self-similarity, toroidal
+manifolds (entorhinal grid cells), golden-ratio φ growth (phyllotaxis),
+Chladni-eigenmode wave patterns — provide engineering advantage when
+**imposed explicitly** rather than waiting for them to emerge from
+scale (the Platonic Representation Hypothesis, Huh et al. 2024
+[arXiv:2405.07987](https://arxiv.org/abs/2405.07987)).
 
-## Why these priors?
+The core artifact is **`NaturePriorBlock`** — a residual / attention
+block whose seven inductive biases are each Boolean-toggleable so a
+clean ablation matrix maps each prior's marginal effect. The block
+drops into a CIFAR-scale ResNet-20-shaped scaffold *and* a decoder-only
+GPT-style stack; the design space totals **75 hypotheses** across **7
+thematic groups** (see [§6](#6-the-75-hypothesis-design-space)).
 
-The source PDF (`nature-inspired-geometry and neural networks.pdf`) lays out a
-research program in which nature-inspired-geometry is treated **as engineering
-inductive bias**, not mysticism — each of the priors above has a
-peer-reviewed precedent in Geometric/Topological Deep Learning:
+Every experiment runs inside the **autoresearch protocol** inherited
+from [`dlmastery/autoresearchimage`](https://github.com/dlmastery/autoresearchimage):
+Citation Rigor + Reasoning Blob Completeness + Goodhart-fingerprinted
+composite metric + per-experiment archive subdirectory with a
+mandatory detailed README. There is no `--bypass` flag.
 
-- *Cymatics → hexagonal nodes on Chladni plates → honeycomb packing →*
-  **HexaConv** (Hoogeboom et al. 2018, arXiv:1803.02108).
-- *Platonic solids / icosahedron → 60-element rotation group →*
-  **Icosahedral CNN** (Cohen et al. 2019, arXiv:1902.04615); the
-  cheaper C4 proxy used here is **Group-Equivariant CNN** (Cohen &
-  Welling 2016, arXiv:1602.07576).
-- *Flower-of-Life recursion → self-similar paths →* **FractalNet**
-  (Larsson et al. 2017, arXiv:1605.07648).
-- *Toroidal flow / grid-cells → periodic latents →* **Deep Networks
-  on Toroids** (Pittorino et al. 2022, arXiv:2202.03038).
-- *φ / Fibonacci growth → channel schedule →* **Fibonacci-Net** (2025).
+## 2. Headline finding (honest scope)
 
-The PDF's contribution is to combine them in one residual block and
-study the ablation surface — which is what this repo does.
+The first 13-run CIFAR-10 campaign (single seed, 12 epochs each, RTX 4090
+Laptop, bf16 AMP) produced **a clear falsifiable negative result**:
 
-## Quickstart
+| rank | tag | top-1 | params | composite |
+|---|---|---|---|---|
+| 1 | `baseline_resnet20` (15 ep) | 84.78 % | 272 k | **0.8458** |
+| 2 | `baseline_sg_vanilla` | 82.16 % | 186 k | 0.8258 |
+| 5 | `sg_only_fractal` | 82.46 % | 259 k | 0.8104 (**only single lifter**) |
+| 10 | `sg_only_group` (C4, max-pool) | 69.84 % | 127 k | 0.6937 |
+| 11 | `sg_full_fib` (all 6 priors on) | 73.24 % | 259 k | **0.6966 (WORST)** |
+| 12 | `sg_only_group_avg` (H58 fix attempt) | 65.38 % | 127 k | 0.6597 (**FALSIFIED**) |
+| 13 | `sg_full_fib_avg` | 66.86 % | 259 k | 0.6432 |
 
-Tested on Python 3.13, PyTorch 2.6.0+cu124, Windows 11, NVIDIA RTX 4090
-Laptop (16 GB).
+**Three honest findings:**
 
-```powershell
-# 1. Install
-git clone https://github.com/dlmastery/nature_inspired_networks.git
-cd nature_inspired_networks
-python -m venv .venv
-.\.venv\Scripts\python -m pip install --upgrade pip
-.\.venv\Scripts\python -m pip install --index-url https://download.pytorch.org/whl/cu124 torch torchvision
-.\.venv\Scripts\python -m pip install -e .
+1. **The full hybrid is the worst NaturePrior variant.** At 12-epoch
+   CIFAR-10 the priors do NOT compound; the popular "20–50 % compound
+   efficiency" claim from the source PDF does not survive a single-GPU
+   ablation.
+2. **`sg_only_fractal` is the only single prior that lifts top-1**
+   (+2.35 pp), at 2× parameter cost. (Code-X discovered the
+   implementation was uniform-width FractalNet — the "φ" part of
+   "φ-recursion" was never wired in, so the gain is FractalNet, not H05.
+   v2 of H05 with explicit `phi_shrink` is the next experiment.)
+3. **The H58 hypothesis "max-pool over the C4 orbit discards 75 % of
+   the signal — replace with mean" is FALSIFIED.** Mean-pool hurts by
+   another 4–6 pp. The right fix is the *data*, not the operator:
+   group-conv should be tested on rotated-CIFAR / IcoMNIST where the
+   equivariance prior is data-aligned. See
+   [`FINDINGS.md`](FINDINGS.md#h58-follow-up--the-avg-pool-fix-discarded).
 
-# 2. Smoke test (3 epochs, ~2 min)
-$env:SSL_CERT_FILE = ".\.venv\Lib\site-packages\certifi\cacert.pem"
-.\.venv\Scripts\python -m nature_inspired_networks.runner `
-  --config configs\cifar10_smoke.yaml --tag smoke --seed 0
+**What this campaign explicitly does NOT claim:** ImageNet SOTA, that
+sacred geometry is "true" in any metaphysical sense, that any decoder-
+only LLM hypothesis (H01-LLM through H75) has been validated. The LLM
+track and the cross-paradigm hybrids (G7, H61–H75) are documented
+design but **not yet trained**.
 
-# 3. Curated 11-row ablation matrix (~60 min on 4090 Laptop)
-.\.venv\Scripts\python scripts\run_sweep.py `
-  --config configs\cifar10_quick.yaml --seeds 0 --skip-existing
-
-# 4. Topology metrics (β₀ / β₁ collapse curves)
-.\.venv\Scripts\python scripts\compute_topology.py --seeds 0
-
-# 5. Build the dashboard
-.\.venv\Scripts\python scripts\build_dashboard.py
-# → dashboard/dashboard.html + docs/dashboard/dashboard.html
-```
-
-## NaturePriorBlock — anatomy
-
-```
-   x ───────────────────────────────────────────────►── skip(x) ──┐
-                                                                  │
-   x ─► _GenericConv(c_in→c_out, stride)  ─► ReLU                 │
-        ├─ hex?   → 3×3 hex-masked conv                           │
-        ├─ group? → C4 group conv (4 rotations, max-pool orbit)   │
-        ├─ tor?   → circular padding                              │
-        └─ cymatic_init? → Chladni-mode filter init                │
-                                                                  │
-   ──► _FractalPath(c_out→c_out, depth=2) if fractal else single conv
-        a-branch: 1× conv
-        b-branch: conv → recursive sub-block (depth-1)
-        merge:   mean(a, b)                                       │
-                                                                  │
-   ──► golden_modulate? → y · (½ cos(φ-angle phases + α) + ½)     │
-                                                                  ▼
-   ──► y + skip(x) ─► ReLU
-```
-
-See [`ARCHITECTURE.md`](ARCHITECTURE.md) for the full module diagram and
-shape table.
-
-## The autoresearch protocol
-
-Every experiment follows the same 7-step ritual, inherited verbatim
-from `autoresearchimage`:
-
-```
-1. Diagnose  ←─ read prior run, identify weakest cell
-2. Cite      ←─ arXiv paper that addresses it (Citation Rigor gate)
-3. Hypothesise ←─ mechanistic claim (Reasoning Blob gate)
-4. Predict   ←─ numeric composite range
-5. Execute   ←─ ONE config change; runner enforces (Goodhart gate)
-6. Analyse   ←─ verdict KEEP / DISCARD / NEAR-MISS
-7. Checkpoint ←─ experiment_log.jsonl + research_journal.md
-```
-
-Word-count floors per field (`src/nature_inspired_networks/reasoning.py`):
-
-| field | floor |
-|---|---|
-| `diagnosis` | 60 |
-| `citation` (single-paper) | 40; (multi) 80 |
-| `hypothesis` | 50 |
-| `prediction` | 25 |
-| `verdict` | 30 |
-| `learning` | 40 |
-
-Citations must match
-`Author1, Author2, ..., YEAR VENUE 'Title' (arXiv:XXXX.XXXXX) — note.`
-
-There is **no `--bypass` flag**. `append_entry()` raises if the gates
-reject.
-
-## Goodhart-fingerprinted composite
-
-```python
-composite = top1 − 0.05·log₁₀(params_M) − 0.05·log₁₀(latency_ms)
-```
-
-The formula string is SHA-256 hashed
-(`COMPOSITE_FINGERPRINT` in `src/nature_inspired_networks/eval.py`); every run records
-the fingerprint so any mid-project edit makes the next experiment fail
-loudly.
-
-## Repo layout
+## 3. What's in this repo
 
 ```
 nature_inspired_networks/
-├── README.md                   ← this file
-├── ARCHITECTURE.md             ← module/data-flow diagram
-├── AUTORESEARCH_PROCESS.md     ← 7-step ritual, gates, dashboard mandate
-├── CLAUDE.md                   ← full normative rules (operator-facing)
-├── PAPER.md                    ← paper draft (work in progress)
-├── SOTA_COMPARISON.md          ← honest comparison to literature
-├── paper_abstract.md           ← 1-page summary
-├── sota_catalog.yaml           ← prior-art table consumed by SOTA_COMPARISON.md
+├── README.md ............... operator quick-start (this file)
+├── MINDMAP.md .............. one-page link map of every artifact
+├── MANIFESTO.md ............ research argument (committee-grade)
+├── CLAUDE.md ............... normative rules + 12 always-true assertions
+├── ARCHITECTURE.md ......... module + shape tables
+├── AUTORESEARCH_PROCESS.md . 7-step ritual + refusal-to-launch gates
+├── IDEA_TABLE.md ........... 75-hypothesis status table
+├── EXPERIMENT_LOG.md ....... master long-list of every run
+├── EXPERIMENT_LEDGER.md .... chunk-by-chunk audit of source documents
+├── PARADIGM_COMPARISON.md .. 8-chunk Liquid/JEPA/KAN/Transformer/GNN
+├── NATURE_INSPIRED_NETWORKS.md  state-of-the-field reference (May 2026)
+├── FINDINGS.md ............. campaign verdicts (H50 + H58 negatives)
+├── RESULTS.md .............. auto-generated per-run narratives
+├── SOTA_COMPARISON.md ...... honest map to the literature
+├── PAPER.md / paper_abstract.md
+├── SETUP.md / MEDIUM.md
+├── sota_catalog.yaml
 ├── pyproject.toml
-├── configs/                    ← YAML configs (smoke / quick / ablation)
-├── src/nature_inspired_networks/
-│   ├── priors.py               ← φ-channels, hex mask, Chladni modes, group conv
-│   ├── blocks.py               ← NaturePriorBlock + _FractalPath + _GenericConv
-│   ├── models.py               ← ResNet-20 baseline + NaturePriorNet
-│   ├── data.py                 ← CIFAR + MedMNIST loaders
-│   ├── train.py                ← Trainer + bf16 AMP + cosine LR
-│   ├── eval.py                 ← params/FLOPs/latency/CKA/composite
-│   ├── topology.py             ← Betti curves on stage features
-│   ├── reasoning.py            ← Citation Rigor + Reasoning Blob gates
-│   ├── dashboard.py            ← Pareto/ablation/curves/Betti plots + HTML
-│   └── runner.py               ← single-experiment entrypoint
-├── scripts/
-│   ├── run_sweep.py            ← ablation matrix driver
-│   ├── compute_topology.py     ← post-hoc Betti / CKA
-│   └── build_dashboard.py      ← static HTML/PNG bundle
-├── experiments/                ← per-run artifacts + experiment_log.jsonl
-├── dashboard/                  ← dashboard.html (latest build)
-├── docs/                       ← GitHub Pages root
-│   ├── index.html
-│   └── dashboard/
-└── memory/                     ← project checkpoint markdown
+├── hypotheses/ ............. 75 committee-grade design docs in 7 themed dirs
+├── ideas/ .................. 8 modular sub-projects + _TEMPLATE
+├── src/nature_inspired_networks/  shared infrastructure
+├── scripts/ ................ run_sweep / build_dashboard / build_report / compute_topology
+├── skills/ ................. 10 content-agnostic reusable auto-research skills
+├── tests/ .................. 29 core + 68 idea-local unit tests, all green
+├── configs/ ................ shared YAML configs (smoke / quick / ablation)
+├── experiments/ ............ legacy CIFAR-10 archive (13 runs + reasoning + dashboards)
+├── dashboard/ .............. latest static HTML dashboard
+├── docs/ ................... GitHub Pages root
+└── memory/ ................. project checkpoint markdown
 ```
 
-## Ablation matrix
+## 4. Quick start
 
-Curated 11-row matrix (run by `scripts/run_sweep.py`, no flags):
+### Prerequisites
 
-| # | tag | model | channels | priors on |
-|---|---|---|---|---|
-| 1 | `baseline_resnet20` | ResNet-20 | 16-32-64 | n/a |
-| 2 | `baseline_sg_vanilla` | NaturePriorNet | linear | none |
-| 3 | `sg_chan_fib` | NaturePriorNet | fib | none |
-| 4 | `sg_chan_phi` | NaturePriorNet | phi | none |
-| 5 | `sg_only_hex` | NaturePriorNet | fib | hex |
-| 6 | `sg_only_group` | NaturePriorNet | fib | C4 group |
-| 7 | `sg_only_fractal` | NaturePriorNet | fib | fractal |
-| 8 | `sg_only_toroidal` | NaturePriorNet | fib | toroidal |
-| 9 | `sg_only_cymatic_init` | NaturePriorNet | fib | cymatic |
-| 10 | `sg_only_golden_modulate` | NaturePriorNet | fib | golden-angle |
-| 11 | `sg_full_fib` | NaturePriorNet | fib | all six |
+- Windows 11 / Linux / macOS
+- Python 3.10–3.13
+- NVIDIA GPU with CUDA 12.x (tested: RTX 4090 Laptop, 16 GB)
+- ~3 GB free disk for CIFAR-10 tarball + venv
 
-The full sweep (`--full`) adds `sg_full_phi` and six `sg_loo_no_*`
-leave-one-out runs.
-
-## Topology & CKA
-
-`scripts/compute_topology.py` produces `experiments/betti.json` with
-β₀ / β₁ collapse curves per stage. The dashboard plots them. CKA between
-trained variants is available via `nature_inspired_networks.topology.cka_matrix` (called by
-the dashboard's optional CKA panel).
-
-## Reproduce in 30 minutes
+### Install
 
 ```powershell
-# minimal repro on a 4090 Laptop
+git clone https://github.com/dlmastery/nature_inspired_networks.git
+cd nature_inspired_networks
+
+python -m venv .venv
+.\.venv\Scripts\python -m pip install --upgrade pip wheel setuptools
+.\.venv\Scripts\python -m pip install `
+   --index-url https://download.pytorch.org/whl/cu124 torch torchvision
+.\.venv\Scripts\python -m pip install -e .
+```
+
+### Verify the GPU
+
+```powershell
+.\.venv\Scripts\python -c "import torch; print('cuda', torch.cuda.is_available(), torch.cuda.get_device_name(0) if torch.cuda.is_available() else '')"
+```
+
+### Smoke test (≈ 2 min on RTX 4090)
+
+```powershell
+$env:SSL_CERT_FILE = ".\.venv\Lib\site-packages\certifi\cacert.pem"
+.\.venv\Scripts\python -m nature_inspired_networks.runner `
+   --config configs\cifar10_smoke.yaml --tag smoke --seed 0
+```
+
+Detailed bring-up steps including the Python 3.13 SSL workaround for
+corporate networks: see [`SETUP.md`](SETUP.md).
+
+### Run the 13-row curated ablation (≈ 90 min)
+
+```powershell
 .\.venv\Scripts\python scripts\run_sweep.py `
-  --config configs\cifar10_quick.yaml --seeds 0 `
-  --only baseline_resnet20 baseline_sg_vanilla sg_chan_fib sg_full_fib
+   --config configs\cifar10_quick.yaml --seeds 0 --skip-existing
+.\.venv\Scripts\python scripts\compute_topology.py --seeds 0
 .\.venv\Scripts\python scripts\build_dashboard.py
+.\.venv\Scripts\python scripts\build_report.py
 start dashboard\dashboard.html
 ```
 
-## Hardware notes
+## 5. Architecture at a glance
 
-- RTX 4090 **Laptop** has **16 GB** VRAM, **not** 24 GB like the desktop
-  card. Batch-size 256 with bf16 fits CIFAR runs comfortably.
-- Group-conv (C4) forward is the bottleneck at small batches because
-  the kernel orbit is reconstructed each step. For real deployment use
-  `torch.compile` or freeze the orbit as a buffer after training.
-- Python 3.13 ships a stricter SSL implementation; corporate cert
-  bundles fail with `Basic Constraints of CA cert not marked critical`.
-  The CIFAR tarball is downloaded out-of-band by `curl.exe -k` and
-  verified by torchvision's MD5 check.
+**`NaturePriorBlock(c_in, c_out, stride, flags)`** is a residual block
+whose seven inductive biases are independently togglable via
+`NaturePriorFlags`:
 
-## Limitations & threats to validity
+```python
+@dataclass
+class NaturePriorFlags:
+    hex: bool = True            # H21: 3×3 hex-masked conv (HexaConv 2018)
+    group: bool = True          # H24 proxy: C4 group conv (Cohen 2016)
+    fractal: bool = True        # H05: recursive depth=2 path (FractalNet 2017)
+    toroidal: bool = True       # H22: circular padding (Pittorino 2022)
+    cymatic_init: bool = True   # H35: Chladni-eigenmode kernel init
+    golden_modulate: bool = True  # H17/H34: golden-angle channel gate
+    group_reduce: str = "max"   # H58 ablation: 'max' vs 'mean'
+```
 
-1. **Single seed by default.** The 3-seed setup costs ~3× wall-clock;
-   the included config runs `--seeds 0` only. Add `--seeds 0 1 2` to
-   produce ±std bars on the ablation chart.
-2. **CIFAR-10 only.** Tier-2 MedMNIST is wired in `data.py` but the
-   ablation matrix has not been re-run on it. ImageNet is explicitly
-   out of scope for this campaign.
-3. **C4 group, not full Platonic.** The block claims a *proxy* for
-   Platonic equivariance; full icosahedral equivariance needs `e2cnn`,
-   which currently lacks a Python 3.13 wheel.
-4. **15 epochs is short.** Final accuracies are *not* converged; the
-   ablation reads the **shape of the prior's effect**, not asymptotic
-   numbers.
-5. **Cymatic init is novel here.** No prior paper initialises filters
-   with Chladni eigenmodes; the comparison is to standard He init.
-6. **Betti is approximate.** β-curves are computed on fresh-init stage
-   features (pre-training) — they discriminate priors but do not
-   measure trained topology simplification yet. Adding a checkpoint
-   save + post-training Betti is on the open-axes list.
+Channel widths follow a Fibonacci, φ-geometric, or linear schedule
+(H04). Optional FFN-side priors per the design space include
+golden-spiral kernels (H31), Fibottention dilated attention (H32),
+Vesica-Piscis multi-path (H33), and Metatron overlap sharing (H40).
 
-## Open axes for the next campaign
+See [`ARCHITECTURE.md`](ARCHITECTURE.md) for the full module + shape
+table and [`hypotheses/INDEX.md`](hypotheses/INDEX.md) for the 75
+per-hypothesis design documents.
 
-- [ ] Save final model weights and re-run Betti / CKA on **trained**
-      features (currently fresh-init).
-- [ ] Add 3-seed runs by default; emit error bars on every plot.
-- [ ] Bring up MedMNIST PathMNIST + OrganAMNIST in the matrix.
-- [ ] Try `torch.compile` on the inference path for fair latency
-      numbers.
-- [ ] Port the C4 group conv to D4 (8-element) and to e2cnn's
-      icosahedron when a 3.13 wheel ships.
-- [ ] Synthetic cymatic-pattern dataset (Chladni plate sim via the
-      2-D wave equation in SciPy) for direct "resonance" validation.
+## 6. The 75-hypothesis design space
 
-## Citations
+The complete design space ([`IDEA_TABLE.md`](IDEA_TABLE.md)) is split
+into 7 thematic groups, each with its own subdirectory under
+`hypotheses/`:
 
-Authoritative arXiv IDs cited inline in `src/nature_inspired_networks/priors.py` and
-`src/nature_inspired_networks/blocks.py`. Full list in `sota_catalog.yaml`.
+| Group | Count | Theme | Folder |
+|---|---|---|---|
+| G1 | 10 | Scaling & growth (φ / Fib depth-width-resolution-LR-budget) | [`hypotheses/g1_scaling_growth/`](hypotheses/g1_scaling_growth/) |
+| G2 | 10 | Layer / channel / neuron architectures | [`hypotheses/g2_layer_channel_neuron/`](hypotheses/g2_layer_channel_neuron/) |
+| G3 | 10 | Topologies & graphs (hex / toroidal / Platonic) | [`hypotheses/g3_topologies_graphs/`](hypotheses/g3_topologies_graphs/) |
+| G4 | 10 | Kernels / attention / filters (spiral / Fibottention / Vesica / cymatic) | [`hypotheses/g4_kernels_attention_filters/`](hypotheses/g4_kernels_attention_filters/) |
+| G5 | 10 | Optimization / init / regularization / NAS + full hybrid | [`hypotheses/g5_optimization_init_reg_nas/`](hypotheses/g5_optimization_init_reg_nas/) |
+| G6 | 10 | Topological / bridging (Betti loss, drop-path, H58, trained-Betti, 3-seed) | [`hypotheses/g6_topological_bridging/`](hypotheses/g6_topological_bridging/) |
+| G7 | 15 | Cross-paradigm hybrids (Sacred-Liquid-JEPA-KAN-GNN-Transformer) | [`hypotheses/g7_cross_paradigm_hybrids/`](hypotheses/g7_cross_paradigm_hybrids/) |
 
-## License & credits
+Each hypothesis ships a committee-grade design document
+(400-800 lines): motivation, formal claim with a numeric falsifier,
+multi-paper citations in Citation-Rigor format, mechanism (CNN-track
+*and* LLM-track with PyTorch pseudocode), pre-registered predicted Δ
+table, three-part experimental protocol, cross-references, ≥ 4
+Committee Q&A, verification checklist, and a status journal.
 
-MIT. Author: dlmastery. Inherits the autoresearch protocol from
-[`dlmastery/autoresearchimage`](https://github.com/dlmastery/autoresearchimage)
-and [`dlmastery/autoresearch`](https://github.com/dlmastery/autoresearch).
-The "nature-inspired-geometry as inductive bias" framing is the user-provided
-PDF; this repo is the engineering implementation + ablation.
+The 4 doc agents that wrote H01-H75 are recorded in
+[`MANIFESTO.md`](MANIFESTO.md) and [`EXPERIMENT_LEDGER.md`](EXPERIMENT_LEDGER.md).
+
+## 7. Modular `ideas/` taxonomy
+
+Each implemented hypothesis is a self-contained sub-project at
+`ideas/<NN>_<short>/` with:
+
+- `README.md` (operator quick-start) + `IDEA.md` (formal claim)
+- `implementation.py` (imports primitives from
+  `nature_inspired_networks.priors`; never duplicates code)
+- `tests.py` (≥ 4 unit tests + at least one regression test)
+- `AUDIT.md` (self-found weaknesses) + `IMPROVEMENTS.md` + `VERIFY.md`
+- `experiment.py` (thin runner wrapper)
+- `configs/<*.yaml>` + `experiments/exp001_<short>/` archive + `dashboard/`
+
+Current sub-projects (all tests green):
+
+| Sub-project | Tests | Note |
+|---|---|---|
+| [`ideas/04_phi_fib_width/`](ideas/04_phi_fib_width/) | 7 ✓ | H04 channel scaling (mod-8 collapse documented) |
+| [`ideas/05_fractal_phi_recursion/`](ideas/05_fractal_phi_recursion/) | 9 ✓ | H05 — phi-shrink kwarg recommended for v2 |
+| [`ideas/17_golden_ratio_skip/`](ideas/17_golden_ratio_skip/) | 9 ✓ | H17 needs `forward_branch(x)` API |
+| [`ideas/21_hexagonal_phi_packing/`](ideas/21_hexagonal_phi_packing/) | 10 ✓ | H21 (3×3 mask is only 180° symmetric — k=5 recommended) |
+| [`ideas/22_toroidal_phi_closure/`](ideas/22_toroidal_phi_closure/) | 8 ✓ | H22 |
+| [`ideas/35_cymatic_wavelet/`](ideas/35_cymatic_wavelet/) | 9 ✓ | H35 with corrected `cymatic_init_ortho_` |
+| [`ideas/50_full_sacred_hybrid/`](ideas/50_full_sacred_hybrid/) | 8 ✓ | H50 (the negative-result archive) |
+| [`ideas/58_group_avg_pool/`](ideas/58_group_avg_pool/) | 8 ✓ | H58 (DISCARDED) |
+
+The remaining 67 hypotheses are documented but await `ideas/<NN>/`
+sub-projects (use `ideas/_TEMPLATE/` as the scaffold).
+
+## 8. The autoresearch protocol
+
+Every experiment passes a refusal-to-launch gate stack inherited
+verbatim from [`dlmastery/autoresearchimage`](https://github.com/dlmastery/autoresearchimage):
+
+1. **Citation Rigor** — author / year / venue / single-quoted title /
+   arXiv ID / relevance note. Parenthetical `(He2016)` is rejected.
+2. **Reasoning Blob Completeness** — word-count floors per field
+   (diagnosis ≥ 60, hypothesis ≥ 50, prediction ≥ 25, verdict ≥ 30,
+   learning ≥ 40, citation ≥ 40 single / 80 multi).
+3. **Goodhart fingerprint** — the composite formula is SHA-256 hashed;
+   any edit breaks the next run.
+4. **One config change per experiment** — no silent compounding.
+5. **`experiment_log.jsonl` append-only** — corrections add a new row.
+6. **Per-experiment archive with mandatory detailed README** — anyone
+   reading just that sub-directory should be able to reproduce the
+   experiment from cold.
+
+There is **no `--bypass` flag**. See [`AUTORESEARCH_PROCESS.md`](AUTORESEARCH_PROCESS.md)
+for the full 7-step ritual.
+
+## 9. Reproducing the experiments
+
+### Smoke (3 epochs, ~2 min)
+
+```powershell
+.\.venv\Scripts\python -m nature_inspired_networks.runner `
+   --config configs\cifar10_smoke.yaml --tag smoke --seed 0
+```
+
+### Curated 13-row CIFAR-10 ablation (~90 min on RTX 4090 Laptop)
+
+```powershell
+.\.venv\Scripts\python scripts\run_sweep.py `
+   --config configs\cifar10_quick.yaml --seeds 0 --skip-existing
+```
+
+### Trained-feature Betti curves
+
+```powershell
+.\.venv\Scripts\python scripts\compute_topology.py --seeds 0
+```
+
+### Refresh the dashboard
+
+```powershell
+.\.venv\Scripts\python scripts\build_dashboard.py
+.\.venv\Scripts\python scripts\build_report.py
+```
+
+The static HTML lands at `dashboard/dashboard.html` and is mirrored to
+`docs/dashboard/` for GitHub Pages.
+
+### 3-seed re-sweep (~5 hr) for error bars
+
+```powershell
+.\.venv\Scripts\python scripts\run_sweep.py `
+   --config configs\cifar10_quick.yaml --seeds 0 1 2 --skip-existing
+```
+
+### Full leave-one-out sweep (~3 hr extra)
+
+```powershell
+.\.venv\Scripts\python scripts\run_sweep.py `
+   --config configs\cifar10_quick.yaml --seeds 0 --full --skip-existing
+```
+
+## 10. Extending this work
+
+### Adding a new experiment
+
+1. Pick or create `ideas/<NN_idea>/` from `ideas/_TEMPLATE/`.
+2. Author a pre-run `reasoning.json` entry (Citation Rigor + word-count gates).
+3. Write `configs/<config>.yaml`.
+4. Run:
+   ```powershell
+   .\.venv\Scripts\python -m nature_inspired_networks.runner `
+     --config ideas\<NN>\configs\<config>.yaml --tag expNNN_<short> --seed 0 `
+     --root ideas\<NN>\experiments\expNNN_<short>\run
+   ```
+5. Append the post-run verdict + learning fields.
+6. Regenerate the dashboard and add a row to `EXPERIMENT_LOG.md`.
+
+### Adding a new hypothesis
+
+1. Pick an unused `H<NN>` slot from `IDEA_TABLE.md` (next free is `H76`).
+2. Copy `hypotheses/_TEMPLATE.md` to
+   `hypotheses/g<N>_<group>/H<NN>_<short>.md`.
+3. Fill every section per the template contract.
+4. Add a row to `IDEA_TABLE.md` and `EXPERIMENT_LOG.md`.
+
+### Adding a new dataset
+
+See the [`autoresearch-dataset-loader`](skills/autoresearch-dataset-loader/SKILL.md) skill — it covers torchvision / MedMNIST / WILDS / OGB
+patterns including the Python 3.13 SSL workaround.
+
+## 11. Documentation map
+
+**Start here:** [`MINDMAP.md`](MINDMAP.md) — single-page link map of
+every artifact in this repo.
+
+**Read first:**
+- [`README.md`](README.md) — operator quick-start (this file)
+- [`MANIFESTO.md`](MANIFESTO.md) — research argument (committee-grade)
+- [`FINDINGS.md`](FINDINGS.md) — campaign verdicts (incl. H50 + H58 negatives)
+- [`IDEA_TABLE.md`](IDEA_TABLE.md) — 75-hypothesis status table
+
+**Normative:**
+- [`CLAUDE.md`](CLAUDE.md) — 12 always-true assertions
+- [`AUTORESEARCH_PROCESS.md`](AUTORESEARCH_PROCESS.md) — 7-step ritual + gates
+
+**Reference:**
+- [`hypotheses/INDEX.md`](hypotheses/INDEX.md) — 75 per-hypothesis design docs
+- [`PARADIGM_COMPARISON.md`](PARADIGM_COMPARISON.md) — Liquid/JEPA/KAN/Transformer/GNN
+- [`NATURE_INSPIRED_NETWORKS.md`](NATURE_INSPIRED_NETWORKS.md) — state-of-the-field as of May 2026
+- [`ARCHITECTURE.md`](ARCHITECTURE.md) — module + shape tables
+- [`SOTA_COMPARISON.md`](SOTA_COMPARISON.md) — honest map to the literature
+- [`sota_catalog.yaml`](sota_catalog.yaml) — prior-art YAML
+
+**Per-run:**
+- [`RESULTS.md`](RESULTS.md) — auto-generated narratives with verdicts
+- [`EXPERIMENT_LOG.md`](EXPERIMENT_LOG.md) — master long-list, Tiers 0-6
+- [`EXPERIMENT_LEDGER.md`](EXPERIMENT_LEDGER.md) — chunk-by-chunk audit of sources
+
+**Reusable infrastructure:**
+- [`skills/README.md`](skills/README.md) — 10 content-agnostic skills
+
+## 12. Sister projects
+
+This repo inherits the autoresearch protocol from these sibling
+public repos under the same author:
+
+- [`dlmastery/autoresearch`](https://github.com/dlmastery/autoresearch) — FX prediction (the original)
+- [`dlmastery/autoresearchimage`](https://github.com/dlmastery/autoresearchimage) — protocol source-of-truth, OOD pathology
+- [`dlmastery/autoresearchtabular`](https://github.com/dlmastery/autoresearchtabular) — tabular ML (Higgs UCI)
+- [`dlmastery/autoresearchspy`](https://github.com/dlmastery/autoresearchspy) — SPY ETF prediction
+- [`dlmastery/autoresearchindexstock`](https://github.com/dlmastery/autoresearchindexstock) — QQQ index/stock
+
+If you change a gate or composite formula here, **also open an issue
+on `autoresearchimage`** explaining why — the gates are inherited and
+divergence should be deliberate.
+
+## 13. License & credits
+
+**License:** [MIT](LICENSE).
+
+**Author:** dlmastery (`eranti@gmail.com`).
+
+**Acknowledgments:**
+
+- The original PDF *Sacred Geometry and Neural Networks* (private)
+  framed the program; this repo treats every "sacred" prior as an
+  engineering hypothesis backed by a peer-reviewed paper.
+- The autoresearch protocol is inherited verbatim from
+  `dlmastery/autoresearchimage`.
+- Doc-team and code-team agents (general-purpose subagents,
+  parallel-dispatched in May 2026) wrote the 75 hypothesis design
+  documents and 8 idea sub-projects — see commit log for attribution
+  by batch.
+
+**How to cite:**
+
+```bibtex
+@misc{dlmastery_nature_inspired_networks_2026,
+  author = {dlmastery},
+  title  = {nature_inspired_networks: NaturePriorBlock and the
+            75-hypothesis autoresearch ablation},
+  year   = 2026,
+  url    = {https://github.com/dlmastery/nature_inspired_networks}
+}
+```
+
+---
+
+*Last refreshed: 2026-05-27. The dashboard is regenerated on every
+commit; the static URL above is always current.*
