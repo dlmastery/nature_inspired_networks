@@ -21,9 +21,15 @@ WORD_FLOORS = {
     "learning": 40,
 }
 
-CITATION_RE = re.compile(
-    r"^[^,]+(?:,\s*[^,]+)*\s+\d{4}\s+[A-Za-z\-/ ]+\s+'[^']+'.*?(?:arXiv|bioRxiv):\s*\d{4}\.\d{4,5}"
-)
+# A valid citation must contain (in any reasonable order):
+#   - a 4-digit year (1900–2099)
+#   - a single-quoted 'Title'
+#   - an arXiv or bioRxiv ID like arXiv:1234.56789
+# and end with a relevance note separated by an em-dash or "--".
+CITATION_RE_YEAR = re.compile(r"\b(?:19|20)\d{2}\b")
+CITATION_RE_TITLE = re.compile(r"'[^']{4,}'")
+CITATION_RE_ID = re.compile(r"(?:arXiv|bioRxiv):\s*\d{4}\.\d{4,5}")
+CITATION_RE_DASH = re.compile(r"(?:—|--)\s*\S")
 
 
 @dataclass
@@ -63,8 +69,19 @@ def validate_entry(e: ReasoningEntry, require_post: bool = False) -> list[str]:
         if cite_words < floor:
             errs.append(f"citations: {cite_words} words < floor {floor}")
         for c in e.citations:
-            if not CITATION_RE.search(c):
-                errs.append(f"citation format bad: '{c[:80]}...'")
+            missing = []
+            if not CITATION_RE_YEAR.search(c):
+                missing.append("year")
+            if not CITATION_RE_TITLE.search(c):
+                missing.append("'Title'")
+            if not CITATION_RE_ID.search(c):
+                missing.append("arXiv:NNNN.NNNNN")
+            if not CITATION_RE_DASH.search(c):
+                missing.append("--- relevance note")
+            if missing:
+                errs.append(
+                    f"citation missing {missing}: '{c[:80]}...'"
+                )
     if require_post:
         for fld in ("verdict", "learning"):
             n = _wc(getattr(e, fld))
