@@ -183,9 +183,18 @@ def render_dashboard(results_dir: str | Path, out_html: Path,
     pareto_png = p / "plot_pareto.png"
     ablate_png = p / "plot_ablation.png"
     curves_png = p / "plot_curves.png"
+    betti_png = p / "plot_betti.png"
     plot_pareto(df, pareto_png)
     plot_ablation(df, ablate_png)
     plot_training_curves(results_dir, curves_png)
+    # Betti panel from betti.json if present
+    bj = p / "betti.json"
+    if bj.exists():
+        try:
+            betti_rows = json.loads(bj.read_text())
+            plot_betti(betti_rows, betti_png)
+        except Exception:
+            pass
 
     # rank rows by composite, mark best per dataset
     if not df.empty:
@@ -205,6 +214,10 @@ def render_dashboard(results_dir: str | Path, out_html: Path,
         html.append(f"<div class='card'><h3>{cap}</h3><img src='{img}'/></div>")
     html.append(f"<div class='card' style='grid-column:1/3'><h3>Training curves</h3>"
                 f"<img src='{curves_png.name}'/></div>")
+    if betti_png.exists():
+        html.append(f"<div class='card' style='grid-column:1/3'><h3>"
+                    f"Persistent-homology Betti collapse</h3>"
+                    f"<img src='{betti_png.name}'/></div>")
     for title2, body in extra_sections:
         html.append(f"<div class='card' style='grid-column:1/3'><h3>{title2}</h3>{body}</div>")
     html.append("</div>")

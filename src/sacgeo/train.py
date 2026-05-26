@@ -130,8 +130,13 @@ def evaluate_full(model: nn.Module, test_loader, dataset: str, tag: str,
     )
 
 
-def save_run(out_dir: str, metrics: RunMetrics, fit_info: dict) -> Path:
+def save_run(out_dir: str, metrics: RunMetrics, fit_info: dict,
+             model: nn.Module | None = None) -> Path:
     p = Path(out_dir); p.mkdir(parents=True, exist_ok=True)
     (p / "metrics.json").write_text(json.dumps(metrics.to_dict(), indent=2))
     (p / "history.json").write_text(json.dumps(fit_info["history"], indent=2))
+    if model is not None:
+        # Save the trained state_dict so post-hoc topology / CKA can use
+        # *trained* features, not fresh-init ones.
+        torch.save(model.state_dict(), p / "best.pt")
     return p

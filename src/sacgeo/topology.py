@@ -48,21 +48,36 @@ def _betti_from_diagram(dgm: np.ndarray, threshold: float = 0.5) -> int:
     return int((lives > threshold).sum())
 
 
-def betti_curve(features: list[np.ndarray]) -> dict[str, list[int]]:
-    """Return β0, β1 per stage."""
+def betti_curve(features: list[np.ndarray], rel_thresh: float = 0.20) -> dict[str, list[int]]:
+    """Return β₀, β₁ per stage.
+
+    Threshold = rel_thresh × maximum finite life across all stages, so a
+    component / hole is counted only if its persistence is at least
+    rel_thresh of the longest feature in the diagram. This makes the
+    β-curves robust to the absolute scale of the feature embedding,
+    which varies per stage as widths change.
+    """
     try:
         from ripser import ripser  # type: ignore
     except Exception:
         return dict(b0=[len(features[0])] * len(features), b1=[0] * len(features))
-    b0s, b1s = [], []
+    dgms_per_stage = []
+    max_life = 0.0
     for f in features:
         f = (f - f.mean(0)) / (f.std(0) + 1e-6)
         res = ripser(f, maxdim=1)
-        d = res["dgms"]
-        thresh = float(np.median(d[0][:, 1][np.isfinite(d[0][:, 1])])) if len(d[0]) else 0.5
+        dgms_per_stage.append(res["dgms"])
+        for d in res["dgms"]:
+            if d.size:
+                finite = d[np.isfinite(d[:, 1])]
+                if finite.size:
+                    max_life = max(max_life, float((finite[:, 1] - finite[:, 0]).max()))
+    thresh = max(1e-4, rel_thresh * max_life)
+    b0s, b1s = [], []
+    for d in dgms_per_stage:
         b0s.append(_betti_from_diagram(d[0], threshold=thresh))
         b1s.append(_betti_from_diagram(d[1], threshold=thresh) if len(d) > 1 else 0)
-    return dict(b0=b0s, b1=b1s)
+    return dict(b0=b0s, b1=b1s, threshold=thresh)
 
 
 def cka_matrix(features_a: list[np.ndarray], features_b: list[np.ndarray]):

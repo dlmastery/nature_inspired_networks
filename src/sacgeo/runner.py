@@ -80,7 +80,7 @@ def run_one(cfg: dict, tag: str, seed: int, root: str = "experiments") -> Path:
                             seed=seed, epochs=train_cfg.epochs,
                             fit_info=fit_info, device=device)
     out_dir = Path(root) / ds_name / f"{tag}_seed{seed}"
-    save_run(str(out_dir), metrics, fit_info)
+    save_run(str(out_dir), metrics, fit_info, model=model)
 
     # append to experiment_log.jsonl
     log_path = Path(root) / "experiment_log.jsonl"

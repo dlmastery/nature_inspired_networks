@@ -72,6 +72,16 @@ def main(argv=None) -> int:
         model = build_model(model_name, num_classes=n_cls,
                             flags=flags if model_name == "sacredgeo" else None,
                             channel_mode=chan_mode).cuda()
+        # Load trained weights if a checkpoint exists alongside metrics.json
+        ckpt = mj.parent / "best.pt"
+        if ckpt.exists():
+            try:
+                model.load_state_dict(torch.load(ckpt, map_location="cuda"))
+                print(f"  [load] {ckpt.name} (trained features)")
+            except Exception as exc:
+                print(f"  [warn] could not load {ckpt}: {exc!r}")
+        else:
+            print(f"  [warn] no checkpoint for {tag}; using fresh-init features")
         feats = collect_features(model, te_loader, n_points=args.n_points)
         b = betti_curve(feats)
         out_rows.append(dict(tag=tag, seed=seed, **b))
