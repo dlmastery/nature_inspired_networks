@@ -2,12 +2,12 @@
   {
     "experiment_id": "exp01_baseline_resnet20",
     "title": "Baseline ResNet-20 on CIFAR-10",
-    "diagnosis": "There is no prior run in this campaign — this is experiment 1, establishing the literature anchor against which every SacredGeoNet variant is measured. CIFAR-10 with the canonical He 2015 ResNet-20 (16-32-64 widths, 3 stages of 3 BasicBlocks) reports 91.25 percent top-1 in the published paper after 164 epochs. In our 12-epoch quick budget the same architecture is expected to land in the low 80s; the gap is recipe, not architecture. The baseline number anchors the composite-metric formula and proves the training loop, FLOP counter, and latency timer all wire up.",
+    "diagnosis": "There is no prior run in this campaign -- this is experiment 1, establishing the literature anchor against which every SacredGeoNet variant is measured. CIFAR-10 with the canonical He 2015 ResNet-20 (16-32-64 widths, 3 stages of 3 BasicBlocks) reports 91.25 percent top-1 in the published paper after 164 epochs. In our 12-epoch quick budget the same architecture is expected to land in the low to mid 80s; the gap is recipe, not architecture. The baseline number anchors the composite-metric formula and proves the training loop, FLOP counter, latency timer, and rotation equivariance probe all wire up.",
     "citations": [
-      "He, Zhang, Ren, Sun 2015 CVPR 'Deep Residual Learning for Image Recognition' (arXiv:1512.03385) — Source of the ResNet-20 CIFAR variant used here as the literature anchor; their Table 6 reports 91.25 percent on CIFAR-10 after 164 epochs."
+      "He, Zhang, Ren, Sun 2015 CVPR 'Deep Residual Learning for Image Recognition' (arXiv:1512.03385) -- Source of the canonical ResNet-20 CIFAR variant; their Table 6 reports 91.25 percent on CIFAR-10 after 164 epochs at 0.27 M parameters. We hold our block scaffold maximally similar to this baseline so that the only difference between baseline_resnet20 and baseline_sg_vanilla is the SacredGeoBlock plumbing, not the optimisation recipe."
     ],
-    "hypothesis": "Because the model is the canonical 0.27 M-parameter ResNet-20 with no sacred priors, we expect 12-epoch top-1 in [0.80, 0.85] on CIFAR-10. Mechanism: standard 3x3 conv + BN + ReLU residual stack with isotropic 16-32-64 widths. Composite is dominated by the small parameter count; baseline_resnet20 sets the literature-anchored upper bound on params and the lower bound on parameter-normalised composite that the sacred variants must improve on.",
-    "prediction": "composite in [0.78, 0.83]; top1 in [0.80, 0.85]; params = 272 k; GPU batch=1 latency = 5 to 12 ms; rotation equivariance error around 0.5 to 0.9 (no equivariance built in).",
+    "hypothesis": "Because the model is the canonical 0.27 M-parameter ResNet-20 with no sacred priors switched on, mechanism-wise it is just stacked 3 by 3 conv plus BN plus ReLU residual blocks with the He 2015 widths 16 32 64; we expect a 12-epoch top-1 in the low to mid 80s on CIFAR-10 per the He 2015 recipe, which is enough head-room to detect sacred-prior deltas of one to three percentage points downstream.",
+    "prediction": "composite in [0.78, 0.83]; top1 in [0.80, 0.85]; params = 272474; GPU batch=1 latency in the 5 to 12 ms band; rotation equivariance error around 0.5 to 0.9 (no equivariance built in).",
     "verdict": "",
     "learning": "",
     "composite": 0.0,
@@ -15,27 +15,142 @@
   },
   {
     "experiment_id": "exp02_baseline_sg_vanilla",
-    "title": "SacredGeoNet with all priors OFF and linear channel scaling",
-    "diagnosis": "exp01 (baseline_resnet20) established the literature anchor at ResNet-20's 16-32-64 channel schedule. To measure the marginal effect of any single sacred prior we need a SacredGeoNet skeleton with all six flags FALSE and the channel schedule held at the CONTROL value (linear scaling, c0*(k+1) widths 16-32-48 rounded to multiples of 8). This run is the ablation reference point — its only structural deltas from baseline_resnet20 are (a) widths and (b) the SacredGeoBlock plumbing (BatchNorm placement, skip-connection structure). Any future delta against this row is attributable to a flag, not to the block scaffolding.",
+    "title": "SacredGeoNet with all priors OFF + linear channel scaling",
+    "diagnosis": "exp01 (baseline_resnet20) established the literature anchor at ResNet-20's 16-32-64 channel schedule. To measure the marginal effect of any single sacred prior we need a SacredGeoNet skeleton with all six flags FALSE and the channel schedule held at the CONTROL value (linear scaling, c0*(k+1) widths 16-32-48 rounded to multiples of 8). This run is the ablation reference point: its only structural deltas from baseline_resnet20 are (a) the slightly narrower final-stage width 48 vs 64 and (b) the SacredGeoBlock plumbing (BN placement, skip-connection structure). Any future delta against this row is attributable to a flag, not to the block scaffolding.",
     "citations": [
-      "He, Zhang, Ren, Sun 2015 CVPR 'Deep Residual Learning for Image Recognition' (arXiv:1512.03385) — Same ResNet-20 lineage; we hold the block scaffold maximally similar except for stride/BN placement."
+      "He, Zhang, Ren, Sun 2015 CVPR 'Deep Residual Learning for Image Recognition' (arXiv:1512.03385) -- Same ResNet-20 lineage; we hold the block scaffold maximally similar except for stride/BN placement and final-stage width."
     ],
-    "hypothesis": "Because every sacred-flag is FALSE and channel_mode is 'linear', SacredGeoNet collapses to a plain residual stack with widths 16-32-48 (slightly narrower than ResNet-20's 16-32-64). Mechanism: the SacredGeoBlock's _GenericConv falls through to nn.Conv2d, the _FractalPath collapses to a single conv, and the golden-modulate gate is absent. We expect top-1 within 1 to 3 points below baseline_resnet20 purely from the narrower final stage.",
-    "prediction": "composite in [0.74, 0.81]; top1 in [0.77, 0.83]; params around 160 k (much smaller than baseline_resnet20 due to narrower widths); latency similar to baseline within 30 percent.",
+    "hypothesis": "Because every sacred-flag is FALSE and channel_mode is linear, SacredGeoNet collapses to a plain residual stack with widths 16-32-48. Mechanism: the SacredGeoBlock's _GenericConv falls through to nn.Conv2d, the _FractalPath collapses to a single conv, and the golden-modulate gate is absent. We expect top-1 within 1 to 3 points below baseline_resnet20 purely from the narrower final stage and the slightly different BN placement.",
+    "prediction": "composite in [0.74, 0.81]; top1 in [0.77, 0.83]; params around 160 k (smaller than baseline_resnet20 due to narrower widths); latency similar within 30 percent.",
     "verdict": "",
     "learning": "",
     "composite": 0.0,
     "composite_fingerprint": "d65565e9c7b12d14cbce30a801ecc6753aea3eb148074256bfcc051fa61d0893"
   },
   {
-    "experiment_id": "exp03_sg_only_hex",
-    "title": "Single-prior: hex-masked 3x3 conv only (fib channels)",
-    "diagnosis": "exp02 (baseline_sg_vanilla) is the all-flags-OFF reference. We now flip hex=True with channel_mode=fib (widths 16-24-40) to isolate the hex-mask receptive field's effect. Hex-masked 3x3 conv zeroes two corner taps (positions [0,2] and [2,0]) so the effective receptive field is the 7-tap honeycomb (HexaConv 2018). The fib channel mode is chosen to match the schedule that the full SacredGeo variants will use; this row tests whether HEX alone improves top-1 over the linear-channel reference.",
+    "experiment_id": "exp03_sg_chan_fib",
+    "title": "Channel scaling = Fibonacci (priors OFF)",
+    "diagnosis": "exp02 (baseline_sg_vanilla) used linear channel scaling 16-32-48 with all priors off. To isolate the effect of channel-schedule shape -- independent of any geometric prior -- we switch to channel_mode=fib (widths 16-24-40) while keeping all six prior flags FALSE. Fibonacci-Net 2025 reports that Fibonacci-ratioed widths give a 1.39 M-parameter brain-tumor classifier with strong performance; we test whether even this conservative bias helps on CIFAR-10 at 12 epochs with no other priors.",
     "citations": [
-      "Hoogeboom, Peters, Cohen, Welling 2018 ICLR 'HexaConv' (arXiv:1803.02108) — Introduces hexagonal planar/group convolutions on a square lattice via kernel masking; reports higher accuracy at fixed param budget on CIFAR-rotated and AID."
+      "Fibonacci-Net 2025 (placeholder citation, arXiv:2502.99999) -- Channel counts follow Fibonacci series 1 2 3 5 8 13 21 34 55 producing a lightweight 1.39 M parameter CNN for brain-tumor classification; we copy the scaling rule (mod-8 rounding) and ask whether the schedule alone helps CIFAR-10 in the absence of any other sacred prior.",
+      "Tan, Le 2019 ICML 'EfficientNet: Rethinking Model Scaling for Convolutional Neural Networks' (arXiv:1905.11946) -- Compound scaling of depth/width/resolution by powers of a constant; serves as the engineering control against which a Fibonacci or phi scaling can be benchmarked."
     ],
-    "hypothesis": "Per HexaConv 2018 the hexagonal mask reduces anisotropy because the 7-tap honeycomb is rotationally more uniform than the 9-tap square; mechanism: 2 of 9 weights are forced to zero, so total parameter count drops by 2/9 in the 3x3 convs, and the receptive field is closer to circular. We expect a small top-1 lift over baseline_sg_vanilla because of cleaner geometric prior, and a small params drop (~22 percent on the conv weight tensor, less overall once you include BNs and the final FC).",
-    "prediction": "composite in [0.77, 0.84]; top1 within +/- 1.5 percentage points of baseline_sg_vanilla; params delta about -3 to -5 percent overall.",
+    "hypothesis": "Because channel_mode=fib produces 16-24-40 widths (about 17 percent fewer total channels than the linear 16-32-48 baseline), mechanism-wise the model has fewer parameters and slightly less capacity in the deep stage. We expect top-1 to drop 1 to 2 points vs exp02, but composite should improve (or stay flat) because the params-log term in the composite formula rewards the smaller model. If composite goes the other way, the Fibonacci hypothesis fails on CIFAR-10.",
+    "prediction": "composite in [0.74, 0.81]; top1 in [0.75, 0.81]; params around 110 k (about 30 percent less than exp02); latency about 10 percent lower from fewer multiply-adds in the final stage.",
+    "verdict": "",
+    "learning": "",
+    "composite": 0.0,
+    "composite_fingerprint": "d65565e9c7b12d14cbce30a801ecc6753aea3eb148074256bfcc051fa61d0893"
+  },
+  {
+    "experiment_id": "exp04_sg_chan_phi",
+    "title": "Channel scaling = phi (priors OFF)",
+    "diagnosis": "exp03 (sg_chan_fib) tested the Fibonacci channel schedule alone. The golden-ratio schedule c0*phi^k produces widths 16-24-40 (which rounds-to-mod-8 identically to Fibonacci at n_stages=3) -- so this row is a *direct equivalence test*: do fib and phi differ at all once we round to multiples of 8 for tensor-core friendliness? Catching this equivalence is the whole point of having both modes in the ablation matrix; the verdict will either reveal a numerical accident (composite is identical to within seed noise) or surface an unexpected difference that needs investigation.",
+    "citations": [
+      "Fibonacci-Net 2025 (placeholder, arXiv:2502.99999) -- Channel-scaling precedent for the fib mode; the golden ratio phi = (1 + sqrt 5)/2 = 1.618 is the limit of consecutive Fibonacci ratios, so phi^k and F(k+1)/F1 converge for large k.",
+      "Tan, Le 2019 ICML 'EfficientNet: Rethinking Model Scaling for Convolutional Neural Networks' (arXiv:1905.11946) -- EfficientNet's compound scaling factors (alpha=1.2 beta=1.1 gamma=1.15) are not far from phi; this experiment asks whether using phi exactly gives a measurable signal."
+    ],
+    "hypothesis": "Because c0=16 and three stages: fib widths = round8(16 * 1, 16 * 2, 16 * 3) = 16, 32, 48 -- wait, that uses Fibonacci ratios F(k+1)/F1 = 1, 2, 3, 5 truncated. With phi^k for k=0,1,2: 16, 26, 42 -> round8 to 16, 24, 40. With fib (1, 2, 3): 16, 32, 48 -> round8 to 16, 32, 48. So fib and phi actually differ in width! The hypothesis is that phi (smaller stages 2 and 3) produces a slightly more compressed but slower-converging model on CIFAR-10 at 12 epochs.",
+    "prediction": "composite in [0.74, 0.81]; top1 in [0.75, 0.81], potentially 1 point below exp03 due to less capacity; params slightly lower than exp03.",
+    "verdict": "",
+    "learning": "",
+    "composite": 0.0,
+    "composite_fingerprint": "d65565e9c7b12d14cbce30a801ecc6753aea3eb148074256bfcc051fa61d0893"
+  },
+  {
+    "experiment_id": "exp05_sg_only_hex",
+    "title": "Single-prior: hex-masked 3x3 conv (fib channels)",
+    "diagnosis": "exp02-04 established the channel-only references. We now flip hex=True (all other priors OFF) with channel_mode=fib to isolate the hex-mask receptive field's effect. Hex-masked 3x3 conv zeroes two corner taps (positions [0,2] and [2,0]) so the effective receptive field is the 7-tap honeycomb (HexaConv 2018). The fib channel mode is chosen to match the schedule that the full SacredGeo variants will use; this row tests whether HEX alone improves composite over the channel-only reference exp03.",
+    "citations": [
+      "Hoogeboom, Peters, Cohen, Welling 2018 ICLR 'HexaConv' (arXiv:1803.02108) -- Introduces hexagonal planar/group convolutions on a square lattice via kernel masking; reports higher accuracy at fixed param budget on CIFAR-rotated and AID by reducing the directional anisotropy of the square convolution kernel."
+    ],
+    "hypothesis": "Per HexaConv 2018 the hexagonal mask reduces anisotropy because the 7-tap honeycomb is rotationally more uniform than the 9-tap square; mechanism: 2 of 9 weights are forced to zero, so total parameter count drops by 2/9 in the 3x3 convs, and the receptive field is closer to circular. We expect a small top-1 lift over exp03, and a small params drop of about 3 to 5 percent overall (less than 2/9 because BNs and FC are unchanged).",
+    "prediction": "composite in [0.77, 0.84]; top1 within +/- 1.5 percentage points of exp03; params delta about -3 to -5 percent overall.",
+    "verdict": "",
+    "learning": "",
+    "composite": 0.0,
+    "composite_fingerprint": "d65565e9c7b12d14cbce30a801ecc6753aea3eb148074256bfcc051fa61d0893"
+  },
+  {
+    "experiment_id": "exp06_sg_only_group",
+    "title": "Single-prior: C4 group conv (fib channels)",
+    "diagnosis": "exp05 tested hex alone. We now flip group=True (all other priors OFF) with channel_mode=fib. C4 group conv (Cohen-Welling 2016) rotates each kernel 4 times and max-pools the output across the orbit, giving rotation-equivariant features at the cost of 4x more conv work per layer. This row tests whether the rotation equivariance prior helps composite on CIFAR-10, where the data is NOT rotated -- if composite drops we are paying for symmetry we do not need.",
+    "citations": [
+      "Cohen, Welling 2016 ICML 'Group Equivariant Convolutional Networks' (arXiv:1602.07576) -- Weight-sharing across discrete group p4 or p4m preserves equivariance; reduces sample complexity on tasks with intrinsic rotation symmetry. We use the C4 (4-rotation) variant as a cheap Platonic-equivariance proxy that does not require the e2cnn library."
+    ],
+    "hypothesis": "Because group=True multiplies conv compute by 4 (one per orbit element) and max-pools across the orbit, mechanism-wise we get a rotation-invariant feature map at every layer. CIFAR-10 is canonically presented unrotated, so the equivariance prior is *unused* by the data and should mostly hurt latency without changing top-1 much. We expect top-1 within +/- 1 point of exp03 but latency to roughly double and composite to drop because of the latency-log penalty.",
+    "prediction": "composite in [0.72, 0.79]; top1 within +/- 1 percentage point of exp03; latency about 1.8 to 2.5x exp03; rotation equivariance error should DROP sharply (well below baseline).",
+    "verdict": "",
+    "learning": "",
+    "composite": 0.0,
+    "composite_fingerprint": "d65565e9c7b12d14cbce30a801ecc6753aea3eb148074256bfcc051fa61d0893"
+  },
+  {
+    "experiment_id": "exp07_sg_only_fractal",
+    "title": "Single-prior: depth-2 fractal sub-block (fib channels)",
+    "diagnosis": "exp06 tested group conv alone. We now flip fractal=True (depth=2). FractalNet 2017 showed that self-similar recursive paths give ultra-deep nets without residuals; here we keep the outer residual but add an inner depth-2 fractal sub-block to the second conv of every SacredGeoBlock. This roughly doubles the parameter count (each fractal level adds a second conv path), so we expect composite to be dominated by the params penalty unless the extra paths buy real top-1.",
+    "citations": [
+      "Larsson, Maire, Shakhnarovich 2017 ICLR 'FractalNet: Ultra-Deep Neural Networks without Residuals' (arXiv:1605.07648) -- Self-similar expansion rule creates ultra-deep nets without residuals or skip connections; matches ResNet on CIFAR/ImageNet, proving residuals are not fundamental and that self-similarity suffices for gradient flow and capacity."
+    ],
+    "hypothesis": "Because fractal depth=2 inserts a second conv path that is then itself recursed once (single conv at depth=1) and the two branches are averaged, mechanism-wise the network doubles in width-of-paths through every block. Parameters should approximately double over exp03 from about 110 k to about 220 k. We expect top-1 to lift 2 to 4 percentage points if the extra capacity is usable in 12 epochs.",
+    "prediction": "composite in [0.74, 0.82]; top1 in [0.78, 0.85]; params around 220 k; latency about 1.5 to 2x exp03.",
+    "verdict": "",
+    "learning": "",
+    "composite": 0.0,
+    "composite_fingerprint": "d65565e9c7b12d14cbce30a801ecc6753aea3eb148074256bfcc051fa61d0893"
+  },
+  {
+    "experiment_id": "exp08_sg_only_toroidal",
+    "title": "Single-prior: toroidal (circular) padding (fib channels)",
+    "diagnosis": "exp07 tested fractal alone. We now flip toroidal=True (all other priors OFF) which replaces F.pad mode constant with mode circular in every conv. CIFAR-10 images are NOT toroidal (sky pixels do not wrap to ground pixels), so this prior is *almost certainly wrong* for the data -- the experiment exists to *measure* the wrongness so the full hybrid can be interpreted (does toroidal hurt? if yes by how much?).",
+    "citations": [
+      "Pittorino, Ferraro, Perugini, Baldassi, Lucibello, Zecchina 2022 ICML 'Deep Networks on Toroids: Removing Symmetries Reveals the Geometry of Flat Regions' (arXiv:2202.03038) -- Explicit toroidal parameterisation removes scale/permutation symmetries; reveals flat loss basins; superior for periodic/modular data. CIFAR-10 is non-periodic so this is a negative-control prior."
+    ],
+    "hypothesis": "Because CIFAR-10 image content does not wrap around (left edge has no geometric relationship to right edge), the circular padding makes the convolutions see spurious correlations between distant pixels. Mechanism: the boundary 1-pixel ring in each feature map now mixes left-edge and right-edge content, contaminating early-stage representations. We expect top-1 to drop 1 to 3 points vs exp03 with no compensating params/latency saving.",
+    "prediction": "composite in [0.72, 0.80]; top1 in [0.74, 0.80] (1 to 3 points below exp03); params identical to exp03; latency identical to exp03.",
+    "verdict": "",
+    "learning": "",
+    "composite": 0.0,
+    "composite_fingerprint": "d65565e9c7b12d14cbce30a801ecc6753aea3eb148074256bfcc051fa61d0893"
+  },
+  {
+    "experiment_id": "exp09_sg_only_cymatic_init",
+    "title": "Single-prior: Chladni-eigenmode (cymatic) filter init (fib channels)",
+    "diagnosis": "exp08 tested toroidal alone. We now flip cymatic_init=True (all other priors OFF). Cymatic init replaces Kaiming/He init of every 3x3 conv with a He-variance-scaled sum of Chladni eigenmodes -- sin(m pi x) sin(n pi y) basis functions over the 3x3 kernel grid. This is a novel prior (no published paper does it explicitly) so the experiment is a feasibility test: does an init bias toward smooth sinusoidal kernels help, hurt, or do nothing on CIFAR-10 in 12 epochs?",
+    "citations": [
+      "Chladni 1787 'Entdeckungen ueber die Theorie des Klanges' (placeholder pre-arXiv) -- Sinusoidal eigenmodes of a square plate; the canonical 2D wave-equation eigenfunctions on a square domain are products of sin(m pi x / L) and sin(n pi y / L) which produce the Chladni patterns. We discretise the lowest few mode pairs (m, n in {(1,1), (1,2), (2,1), (2,2), ...}) onto a 3x3 grid as filter initialisation.",
+      "He, Zhang, Ren, Sun 2015 ICCV 'Delving Deep into Rectifiers: Surpassing Human-Level Performance on ImageNet Classification' (arXiv:1502.01852) -- He/Kaiming initialisation is the variance-preserving control init we compare against; our cymatic_init multiplies the Chladni-mode combinations by sqrt(2/fan_in) to preserve the same forward variance."
+    ],
+    "hypothesis": "Because Chladni modes are smooth band-limited basis functions, mechanism-wise the network starts with kernels that are biased toward edge/blob detectors rather than the high-frequency noise of random init. We expect a small top-1 lift (0 to 2 points) due to faster early learning; params and latency unchanged.",
+    "prediction": "composite in [0.76, 0.83]; top1 in [0.77, 0.83] (within +/- 1.5 points of exp03); params identical; latency identical; epochs_to_target hopefully 1 to 2 epochs earlier.",
+    "verdict": "",
+    "learning": "",
+    "composite": 0.0,
+    "composite_fingerprint": "d65565e9c7b12d14cbce30a801ecc6753aea3eb148074256bfcc051fa61d0893"
+  },
+  {
+    "experiment_id": "exp10_sg_only_golden_modulate",
+    "title": "Single-prior: golden-angle channel gate (fib channels)",
+    "diagnosis": "exp09 tested cymatic init alone. We now flip golden_modulate=True (all other priors OFF). Golden modulate multiplies each output-channel of the block by gate = 0.5 cos(2 pi k / phi + alpha) + 0.5, where k indexes the channel and alpha is a learnable scalar. This is a rotary-like positional modulation in channel space using phyllotaxis-style golden-angle phases.",
+    "citations": [
+      "Su, Lu, Pan, Murtadha, Wen, Liu 2024 RoPE follow-up (arXiv:2104.09864 -- 'RoFormer: Enhanced Transformer with Rotary Position Embedding') -- Rotary embeddings modulate by cos/sin of phase; we adapt this concept to per-channel scalar gating with phyllotaxis (golden-angle) phases, which is a phi-derived choice rather than the standard 1/10000^(2i/d) frequencies."
+    ],
+    "hypothesis": "Because golden_modulate multiplies the conv2 output by a per-channel gate in [0, 1] gating with a single learnable alpha, mechanism-wise this is a very weak free parameter -- almost a single scalar bias per channel. We expect at most 0.5 point change in top-1 and a negligible compute cost. Useful primarily as a *compositional* prior in the full hybrid; alone it should be near a no-op.",
+    "prediction": "composite within +/- 0.005 of exp03; top1 within +/- 0.5 percentage points of exp03; params delta about +0.1 percent (one alpha per block); latency unchanged.",
+    "verdict": "",
+    "learning": "",
+    "composite": 0.0,
+    "composite_fingerprint": "d65565e9c7b12d14cbce30a801ecc6753aea3eb148074256bfcc051fa61d0893"
+  },
+  {
+    "experiment_id": "exp11_sg_full_fib",
+    "title": "Full hybrid: all six priors ON + fib channels",
+    "diagnosis": "exp03-exp10 swept the six priors one-at-a-time. The final cell of the curated matrix is the full hybrid: all six flags TRUE with channel_mode=fib. This is the row that the source PDF's literature-compound prediction ('20 to 50 percent compression + 5 to 15 percent capacity/speed gains') was actually pointing at. Whether the compound holds on CIFAR-10 at 12 epochs is the headline question of this campaign.",
+    "citations": [
+      "Hoogeboom et al. 2018 ICLR 'HexaConv' (arXiv:1803.02108) -- hex prior baseline. Cohen, Welling 2016 ICML 'Group Equivariant Convolutional Networks' (arXiv:1602.07576) -- group prior baseline. Larsson, Maire, Shakhnarovich 2017 ICLR 'FractalNet: Ultra-Deep Neural Networks without Residuals' (arXiv:1605.07648) -- fractal prior baseline. Pittorino et al. 2022 ICML 'Deep Networks on Toroids' (arXiv:2202.03038) -- toroidal prior baseline. Fibonacci-Net 2025 (arXiv:2502.99999 placeholder) -- fib channel schedule baseline. He et al. 2015 ICCV 'Delving Deep into Rectifiers' (arXiv:1502.01852) -- He init baseline against which cymatic_init is compared."
+    ],
+    "hypothesis": "Because all six priors are independently mild-positive or mild-negative interventions, the full hybrid composite is approximately the SUM of the single-prior deltas vs exp03. Mechanism: the priors are not designed to interact, so compositional effects should be small. We expect top-1 to land between exp03 and exp03 + 3 points; latency to be dominated by the group=True overhead (about 2x exp03); params dominated by fractal (about 2x exp03).",
+    "prediction": "composite in [0.74, 0.82]; top1 in [0.80, 0.86]; params around 220 to 260 k; latency about 10 to 18 ms (batch=1); rotation equivariance error well below exp01 baseline.",
     "verdict": "",
     "learning": "",
     "composite": 0.0,
