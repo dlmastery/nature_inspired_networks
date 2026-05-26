@@ -30,10 +30,15 @@ class NaturePriorFlags:
     toroidal: bool = True       # circular padding
     cymatic_init: bool = True   # Chladni-mode init
     golden_modulate: bool = True  # golden-angle channel rotary
+    group_reduce: str = "max"   # H58: "max" (legacy) | "mean" (avg-pool fix)
 
     def tag(self) -> str:
-        on = [k for k, v in self.__dict__.items() if v]
-        return "+".join(on) if on else "vanilla"
+        on = [k for k, v in self.__dict__.items()
+              if k != "group_reduce" and isinstance(v, bool) and v]
+        s = "+".join(on) if on else "vanilla"
+        if self.group and self.group_reduce == "mean":
+            s = s + "(avg)"
+        return s
 
 
 class _GenericConv(nn.Module):
@@ -49,7 +54,8 @@ class _GenericConv(nn.Module):
         super().__init__()
         if flags.group:
             self.conv = GroupConv2d(c_in, c_out, kernel_size=3, stride=stride,
-                                    padding=1, group="c4", bias=False)
+                                    padding=1, group="c4", bias=False,
+                                    reduce=flags.group_reduce)
         elif flags.hex:
             self.conv = HexConv2d(c_in, c_out, kernel_size=3, stride=stride,
                                   padding=1, toroidal=flags.toroidal, bias=False)

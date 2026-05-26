@@ -42,6 +42,7 @@ def make_flags(d: dict) -> NaturePriorFlags:
         toroidal=bool(d.get("toroidal", True)),
         cymatic_init=bool(d.get("cymatic_init", True)),
         golden_modulate=bool(d.get("golden_modulate", True)),
+        group_reduce=str(d.get("group_reduce", "max")),
     )
 
 

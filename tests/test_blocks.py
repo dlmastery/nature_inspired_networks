@@ -68,6 +68,37 @@ def test_resnet20_param_count_in_expected_band():
     assert 250_000 < n < 290_000, n
 
 
+def test_h58_group_reduce_mean_forward_shape():
+    """H58 regression test inside the block.
+
+    Setting group_reduce='mean' in NaturePriorFlags must not change the
+    output shape vs. group_reduce='max'; only the values change.
+    """
+    flags_max = NaturePriorFlags(False, True, False, False, False, False,
+                                  group_reduce="max")
+    flags_mean = NaturePriorFlags(False, True, False, False, False, False,
+                                   group_reduce="mean")
+    torch.manual_seed(0)
+    blk_max = NaturePriorBlock(16, 32, stride=2, flags=flags_max)
+    torch.manual_seed(0)
+    blk_mean = NaturePriorBlock(16, 32, stride=2, flags=flags_mean)
+    x = torch.randn(2, 16, 8, 8)
+    y_max = blk_max(x); y_mean = blk_mean(x)
+    assert y_max.shape == y_mean.shape == (2, 32, 4, 4)
+    # The values differ because the orbit reduction differs
+    assert not torch.allclose(y_max, y_mean, atol=1e-4)
+
+
+def test_flag_tag_reflects_group_reduce():
+    """H58: the tag string must surface (avg) when group_reduce='mean'."""
+    f_max = NaturePriorFlags(False, True, False, False, False, False,
+                              group_reduce="max")
+    f_mean = NaturePriorFlags(False, True, False, False, False, False,
+                               group_reduce="mean")
+    assert "(avg)" not in f_max.tag()
+    assert f_mean.tag().endswith("(avg)")
+
+
 if __name__ == "__main__":
     import inspect
 

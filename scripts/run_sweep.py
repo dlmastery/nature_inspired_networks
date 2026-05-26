@@ -54,10 +54,22 @@ def build_matrix(curated: bool = True) -> list[dict]:
                          overrides=dict(model="NaturePrior",
                                         channel_mode="fib", flags=f)))
 
+    # H58: avg-pool group reduction (fix for the dominant -10pp finding).
+    # group_reduce lives INSIDE the flags dict so make_flags picks it up.
+    f = base_flags.copy(); f["group"] = True; f["group_reduce"] = "mean"
+    rows.append(dict(tag="sg_only_group_avg",
+                     overrides=dict(model="NaturePrior", channel_mode="fib",
+                                    flags=f)))
+
     # Full NaturePrior with each channel mode
     rows.append(dict(tag="sg_full_fib",
                      overrides=dict(model="NaturePrior",
                                     channel_mode="fib", flags=full.copy())))
+    # H58 + full hybrid: full priors but with avg-pool group reduction
+    full_avg = full.copy(); full_avg["group_reduce"] = "mean"
+    rows.append(dict(tag="sg_full_fib_avg",
+                     overrides=dict(model="NaturePrior",
+                                    channel_mode="fib", flags=full_avg)))
     if not curated:
         rows.append(dict(tag="sg_full_phi",
                          overrides=dict(model="NaturePrior",

@@ -166,13 +166,16 @@ class GroupConv2d(nn.Module):
         group: str = "c4",
         bias: bool = False,
         mask: torch.Tensor | None = None,
+        reduce: str = "max",
     ) -> None:
         super().__init__()
         assert group in {"c4", "d4"}
+        assert reduce in {"max", "mean"}
         self.group = group
         self.n_orbits = 4 if group == "c4" else 8
         self.stride = stride
         self.padding = padding
+        self.reduce = reduce
         self.weight = nn.Parameter(
             torch.empty(out_channels, in_channels, kernel_size, kernel_size)
         )
@@ -200,8 +203,15 @@ class GroupConv2d(nn.Module):
         G, O, I, k, _ = orbit.shape
         w = orbit.reshape(G * O, I, k, k)
         y = F.conv2d(x, w, stride=self.stride, padding=self.padding)
-        # group max-pool → invariance
-        y = y.view(x.shape[0], G, O, y.shape[-2], y.shape[-1]).amax(dim=1)
+        # Group orbit reduction. Max-pool (legacy) is the dominant negative in
+        # the prior CIFAR sweep — it throws away 75% of the signal at C4. The
+        # H58 fix is mean-pool, which preserves the orbit's full signal while
+        # still giving rotation invariance after averaging.
+        y = y.view(x.shape[0], G, O, y.shape[-2], y.shape[-1])
+        if self.reduce == "mean":
+            y = y.mean(dim=1)
+        else:
+            y = y.amax(dim=1)
         if self.bias is not None:
             y = y + self.bias.view(1, -1, 1, 1)
         return y
