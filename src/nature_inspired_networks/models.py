@@ -151,11 +151,12 @@ class NaturePriorNet(nn.Module):
 
 def build_model(name: str, num_classes: int, flags: NaturePriorFlags | None = None,
                 channel_mode: str = "fib") -> nn.Module:
-    name = name.lower()
-    if name == "resnet20":
+    # Accept any casing; canonicalize once.
+    n = name.lower()
+    if n == "resnet20":
         return ResNet20(num_classes=num_classes)
-    if name == "NaturePrior":
+    if n in ("natureprior", "nature_prior", "sacredgeo"):  # legacy alias for old configs
         cfg = NaturePriorConfig(num_classes=num_classes, channel_mode=channel_mode,
-                              flags=flags)
+                                flags=flags)
         return NaturePriorNet(cfg)
     raise ValueError(f"unknown model '{name}'")

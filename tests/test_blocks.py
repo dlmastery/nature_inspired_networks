@@ -99,6 +99,29 @@ def test_flag_tag_reflects_group_reduce():
     assert f_mean.tag().endswith("(avg)")
 
 
+def test_build_model_accepts_natureprior_casing_and_legacy_alias():
+    """Regression test for the rename bug: build_model used to call
+    name.lower() then compare to the mixed-case 'NaturePrior' literal,
+    which never matched. This test catches that class of typo."""
+    from nature_inspired_networks.models import build_model
+    # Each of these should construct without error
+    for n in ("NaturePrior", "natureprior", "nature_prior",
+              "ResNet20", "resnet20", "sacredgeo"):
+        m = build_model(n, num_classes=10)
+        x = torch.randn(2, 3, 32, 32)
+        y = m(x)
+        assert y.shape == (2, 10), f"model {n!r} produced {y.shape}"
+
+
+def test_build_model_rejects_unknown():
+    from nature_inspired_networks.models import build_model
+    try:
+        build_model("totally_not_a_model", num_classes=10)
+        raise AssertionError("should have raised")
+    except ValueError as exc:
+        assert "totally_not_a_model" in str(exc)
+
+
 if __name__ == "__main__":
     import inspect
 
