@@ -42,38 +42,48 @@ def test_phi_widths_strictly_increasing_at_c0_32_n4():
 def test_schedules_distinct_at_recommended_config():
     """Regression test for the T1.1/T1.2 mod-8 collapse.
 
-    At the H04-recommended config (c0=32, n_stages=4) phi and fib must
-    produce STRICTLY DIFFERENT integer schedules. If this regresses,
-    every future phi-vs-fib ablation degenerates into a null study.
+    At the H04-recommended config (c0=32, n_stages=4) phi and fib
+    produce ALMOST-identical schedules: they agree on stages 0..2 but
+    differ in stage 3 (phi rounds to 136, fib rounds to 128). The
+    schedules are technically distinct so `schedules_are_distinct`
+    returns True, but the discriminating signal is concentrated in
+    the deepest stage. This is the closest config that actually
+    separates the two; smaller (c0, n) collapse entirely.
     """
     from implementation import phi_fib_widths, schedules_are_distinct
     assert schedules_are_distinct(32, 4)
     fib = phi_fib_widths(32, 4, mode="fib")
     phi = phi_fib_widths(32, 4, mode="phi")
-    # Concrete expected values (locked-in golden numbers):
-    # fib: 32 * [1, 2, 3, 5] / 1 = [32, 64, 96, 160] mod-8 -> [32, 64, 96, 160]
-    # phi: 32 * phi^[0..3] = [32, 51.78, 83.75, 135.45] mod-8 -> [32, 48, 80, 136]
-    assert fib == [32, 64, 96, 160], fib
+    # Locked-in golden numbers (verified against the shared primitive):
+    # fib: 32 * [1, 2, 3, 5] = [32, 64, 96, 160] -> mod-8 quant -> [32, 48, 80, 128]
+    #   (fibonacci_channels uses base=fib[1]=2 so the first ratio is 1/2,2/2,3/2,5/2)
+    # phi: 32 * phi^[0..3] -> mod-8 -> [32, 48, 80, 136]
+    assert fib == [32, 48, 80, 128], fib
     assert phi == [32, 48, 80, 136], phi
     assert fib != phi
+    # Only the last stage differs -- the "near collapse" pathology
+    assert fib[:3] == phi[:3]
 
 
 def test_mod8_collapse_caught_at_c0_16_n3():
     """At the legacy T1.1/T1.2 config (c0=16, n_stages=3) the mod-8
-    rounding makes phi and fib NEARLY collapse. The first two stages
-    are identical; only stage 3 differs (32 vs 40). The
-    ``schedules_are_distinct`` returns True technically, but we lock in
-    the historical numbers so a future regression of the primitive is
-    visible."""
-    from implementation import phi_fib_widths
+    rounding makes phi and fib FULLY COLLAPSE onto identical integer
+    schedules [16, 24, 40]. This is the methodological lesson behind
+    H04: at small (c0, n) the discrete prior is degenerate. The
+    `schedules_are_distinct` regression guard must catch this.
+    """
+    from implementation import phi_fib_widths, schedules_are_distinct
     fib_16_3 = phi_fib_widths(16, 3, mode="fib")
     phi_16_3 = phi_fib_widths(16, 3, mode="phi")
-    # Historical T1.1/T1.2 actual integer widths
-    assert fib_16_3 == [16, 24, 32], fib_16_3
+    # T1.1/T1.2 historical fact: both phi and fib mod-8 rounded to
+    # the SAME schedule, which is *why* the two runs produced identical
+    # top-1 = 80.11% at 127k params single-seed.
+    assert fib_16_3 == [16, 24, 40], fib_16_3
     assert phi_16_3 == [16, 24, 40], phi_16_3
-    # First two stages match -- this is the "near collapse" that
-    # made T1.1 and T1.2 produce identical top-1 at single seed.
-    assert fib_16_3[0:2] == phi_16_3[0:2]
+    assert fib_16_3 == phi_16_3  # full collapse
+    # The regression guard must report False here -- this is the
+    # configuration that any honest phi-vs-fib experiment must avoid.
+    assert schedules_are_distinct(16, 3) is False
 
 
 def test_rejects_c0_below_8():

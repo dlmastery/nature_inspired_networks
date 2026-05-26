@@ -81,14 +81,31 @@ def test_toroidal_conv_phi_scaled_grows_spatial_dim():
 
 
 def test_toroidal_pad_is_translation_equivariant_on_torus():
-    """Shifting input on the torus then padding == padding then shifting."""
+    """A conv with toroidal pad is shift-equivariant on the torus.
+
+    Concretely: rolling the input on the torus then conv-with-toroidal-pad
+    equals conv-with-toroidal-pad then rolling the output (the unpadded
+    output, which lives on the same HxW torus). This is what makes
+    circular padding the "right" choice for cyclic data: ordinary
+    zero-padding breaks at the seam.
+    """
     torch.manual_seed(0)
-    x = torch.randn(1, 1, 6, 6)
+    x = torch.randn(1, 2, 6, 6)
     # roll on the torus
-    x_shifted = torch.roll(x, shifts=(2, 3), dims=(2, 3))
-    y_a = toroidal_pad(x_shifted, 1)
-    y_b = torch.roll(toroidal_pad(x, 1), shifts=(2, 3), dims=(2, 3))
-    assert torch.allclose(y_a, y_b, atol=1e-6)
+    shifts = (2, 3)
+    x_shifted = torch.roll(x, shifts=shifts, dims=(2, 3))
+
+    # Plain 1x1 conv (no spatial mixing) under toroidal pad with k=3
+    w = torch.randn(3, 2, 3, 3)
+
+    import torch.nn.functional as F
+    def conv_tor(t: torch.Tensor) -> torch.Tensor:
+        t = toroidal_pad(t, 1)
+        return F.conv2d(t, w, padding=0)
+
+    y_a = conv_tor(x_shifted)
+    y_b = torch.roll(conv_tor(x), shifts=shifts, dims=(2, 3))
+    assert torch.allclose(y_a, y_b, atol=1e-5), (y_a - y_b).abs().max().item()
 
 
 def test_phi_value_is_golden_ratio():

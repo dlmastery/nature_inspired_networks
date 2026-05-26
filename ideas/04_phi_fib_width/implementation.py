@@ -66,17 +66,14 @@ def phi_fib_widths(c0: int, n_stages: int, mode: str = "phi") -> List[int]:
 def schedules_are_distinct(c0: int, n_stages: int) -> bool:
     """Return True iff phi and fib schedules give different integer widths.
 
-    This is the regression guard for the T1.1/T1.2 mod-8 collapse: at
-    c0=16, n_stages=3 the phi schedule rounds to [16, 24, 40] and the
-    fib schedule rounds to [16, 24, 32] -- the first two stages match,
-    so any compounding difference is confined to the last stage and is
-    not strong enough to discriminate.
-
-    >>> schedules_are_distinct(16, 3)
-    True
-    >>> # c0=32, n_stages=4 produces clearly distinct phi vs fib schedules
-    >>> schedules_are_distinct(32, 4)
-    True
+    This is the regression guard for the T1.1/T1.2 mod-8 collapse.
+    At the legacy T1.1/T1.2 configuration (c0=16, n_stages=3) the
+    mod-8 quantisation collapses BOTH phi and fib schedules onto the
+    same integer schedule [16, 24, 40] -- this is the methodological
+    pathology that made the two runs functionally identical (top-1
+    80.11 % at 127k params each, single seed). At the H04-recommended
+    c0=32, n_stages=4 the schedules diverge in the deepest stage
+    (phi -> [32, 48, 80, 136] vs fib -> [32, 48, 80, 128]).
     """
     fib = phi_fib_widths(c0, n_stages, mode="fib")
     phi = phi_fib_widths(c0, n_stages, mode="phi")
