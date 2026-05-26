@@ -37,10 +37,10 @@
 
 ## Tier 2 — Negative-result follow-ups (in-flight + queued)
 
-| # | Idea | Tag | Dataset | Status | Notes |
-|---|---|---|---|---|---|
-| T2.1 | **H58 — C4 group max → avg pool fix** | `sg_only_group_avg` | CIFAR-10 | ▶ running | regression-tested + smoke-passed; first arch to save `best.pt` |
-| T2.2 | H58 + H50 — full hybrid with avg-pool reduction | `sg_full_fib_avg` | CIFAR-10 | ▶ running | queued behind T2.1 |
+| # | Idea | Tag | Dataset | Status | Top-1 | Composite | Verdict |
+|---|---|---|---|---|---|---|---|
+| T2.1 | **H58 — C4 group max → avg pool fix** | `sg_only_group_avg` | CIFAR-10 | ✓ done | **65.38 %** | **0.6597** | **DISCARD** — mean-pool *hurts* worse than max (-4.46 pp). Hypothesis falsified. |
+| T2.2 | H58 + H50 — full hybrid with avg-pool reduction | `sg_full_fib_avg` | CIFAR-10 | ✓ done | **66.86 %** | **0.6432** | **DISCARD** — confirms T2.1; mean-pool consistently worse (-6.38 pp). |
 | T2.3 | H59 — trained-feature Betti on T1.* using newly saved checkpoints | n/a | CIFAR-10 | ⏸ queued | depends on T2.1/T2.2; checkpoint saving wired but legacy runs lack `best.pt` |
 | T2.4 | H60 — 3-seed re-sweep for error bars on the 11-row matrix | various | CIFAR-10 | ⏸ queued | `run_sweep.py --seeds 0 1 2 --skip-existing` |
 | T2.5 | H05.v2 — fractal with explicit 1/φ depth shrink per recursion | `sg_fractal_phi_shrink` | CIFAR-10 | ⏸ queued | extends T1.5 with proper 1/φ rule |
@@ -91,6 +91,10 @@ benchmarks.
 | T5.9 | **H69** KAN edges on Metatron graphs (symbolic head) | `kan_metatron_head` | ○ planned |  |
 | T5.10 | **H70** Cymatic resonance low-data curriculum | `cymatic_curr` | ○ planned |  |
 | T5.11 | **H71** Icosahedral RoPE for 3D spatial reasoning | `icosa_rope` | ○ planned |  |
+| T5.12 | **H72** Fractal+Vesica FFN | `llm_fractal_vesica_ffn` | ○ planned | ext H05+H33 inside decoder FFN |
+| T5.13 | **H73** Golden-spiral+Metatron PE | `llm_golden_spiral_metatron_pe` | ○ planned | ext H34+H36+H40 |
+| T5.14 | **H74** Metatron overlap tying | `llm_metatron_overlap_tying` | ○ planned | ext H40+H23/H30 weight tying |
+| T5.15 | **H75** Harmonic+cymatic SwiGLU | `llm_harmonic_cymatic_swiglu` | ○ planned | ext H19+H39+H35 inside FFN |
 
 ## Tier 6 — Robustness & specialized validation (bonus)
 

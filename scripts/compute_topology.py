@@ -53,16 +53,34 @@ def main(argv=None) -> int:
         # discriminate between priors)
         set_seed(seed)
         model_name = "NaturePrior" if not tag.startswith("baseline_resnet") else "resnet20"
-        flags = NaturePriorFlags(False, False, False, False, False, False)
+
+        # Reconstruct flags from the tag string. group_reduce is a STRING
+        # field on NaturePriorFlags, not a Boolean, so we must not iterate
+        # all dataclass fields uniformly — that bug was caught by the
+        # H58 sweep crashing here.
+        BOOL_FIELDS = ("hex", "group", "fractal", "toroidal",
+                       "cymatic_init", "golden_modulate")
+        bool_flags = {k: False for k in BOOL_FIELDS}
+        group_reduce = "max"
         if "_only_" in tag:
             k = tag.split("_only_", 1)[1]
-            flags = NaturePriorFlags(**{f.name: (f.name == k) for f in
-                                   NaturePriorFlags().__dataclass_fields__.values()})  # type: ignore[attr-defined]
-        if tag.startswith("sg_full") or tag.startswith("sg_loo_no_"):
-            flags = NaturePriorFlags(True, True, True, True, True, True)
-            if tag.startswith("sg_loo_no_"):
-                k = tag.split("sg_loo_no_", 1)[1]
-                setattr(flags, k, False)
+            # H58 variants surface as `sg_only_group_avg`
+            if k.endswith("_avg"):
+                k = k[: -len("_avg")]
+                group_reduce = "mean"
+            if k in BOOL_FIELDS:
+                bool_flags[k] = True
+        if tag.startswith("sg_full"):
+            bool_flags = {k: True for k in BOOL_FIELDS}
+            if tag.endswith("_avg"):
+                group_reduce = "mean"
+        if tag.startswith("sg_loo_no_"):
+            bool_flags = {k: True for k in BOOL_FIELDS}
+            k = tag.split("sg_loo_no_", 1)[1]
+            if k in BOOL_FIELDS:
+                bool_flags[k] = False
+        flags = NaturePriorFlags(group_reduce=group_reduce, **bool_flags)
+
         chan_mode = "linear"
         if "_chan_" in tag:
             chan_mode = tag.split("_chan_", 1)[1]

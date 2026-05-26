@@ -110,6 +110,20 @@
 | H70 | `H70_cymatic_low_data_curriculum.md` | Low-data cymatic curriculum |
 | H71 | `H71_icosa_rope_3d.md` | Icosahedral RoPE for 3D spatial |
 
+### Group G7 cont'd — Combined LLM-track opportunities (H72–H75)
+
+These come from the chunk-8 "25 untapped opportunities" expansion in
+the extended Grok transcript (opportunities 15, 16, 18, 19). They are
+not pure single-flag flips of H01–H50 but **combinations** specifically
+designed for decoder-only Transformers.
+
+| ID | File | Idea |
+|---|---|---|
+| H72 | `H72_fractal_vesica_ffn.md` | Fractal φ-recursion inside LLM FFN + Vesica multi-path residuals |
+| H73 | `H73_golden_spiral_metatron_pe.md` | Golden-angle RoPE + spiral pos-graph + Metatron edge weights |
+| H74 | `H74_metatron_overlap_tying.md` | Metatron overlap sharing across QKV/FFN + Platonic group tying |
+| H75 | `H75_harmonic_cymatic_swiglu.md` | Harmonic φ-activation in SwiGLU + dynamic cymatic thresholding |
+
 ## How files in this directory get written
 
 The template (`_TEMPLATE.md`) is the contract. Each `H<NN>_<short>.md`

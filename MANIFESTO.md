@@ -96,7 +96,7 @@ Three structural choices ensure scientific rigor:
 
 ## 4. The design-space audit
 
-The full 71-hypothesis design space was assembled by chunk-reading four
+The full 75-hypothesis design space was assembled by chunk-reading four
 source documents (the PDF + three Grok transcripts including a 1224-line
 extended transcript) and cross-referencing with `IDEA_TABLE.md`:
 
@@ -118,7 +118,7 @@ extended transcript) and cross-referencing with `IDEA_TABLE.md`:
   dataset, **C4 max→avg pool fix** (H58 — the top-priority follow-up
   surfaced by the previous campaign's negative result), trained-feature
   Betti, 3-seed uncertainty.
-- **G7 Cross-paradigm hybrids** (H61–H71): Sacred-Liquid-JEPA decoder
+- **G7 Cross-paradigm hybrids** (H61–H75; 15 entries total): Sacred-Liquid-JEPA decoder
   block, toroidal-KV + hex attention + Fib-pruning, Platonic projection
   auxiliary + cymatic teachers, full Sacred-Liquid-JEPA-KAN-GNN-
   Transformer fusion, on-device world model, KAN edges on Metatron
@@ -200,7 +200,7 @@ See `CLAUDE.md` § 3 for the canonical tree. Highlights:
 - `EXPERIMENT_LOG.md` — append-only master long-list of every run
 - `EXPERIMENT_LEDGER.md` — chunk-by-chunk audit log of source-document
   reads
-- `IDEA_TABLE.md` — 71-hypothesis status table (one row per H)
+- `IDEA_TABLE.md` — 75-hypothesis status table (one row per H)
 - `MANIFESTO.md` — this file
 - `PAPER.md` / `PAPER_ABSTRACT.md` — auto-fillable paper draft
 - `FINDINGS.md` / `RESULTS.md` — campaign verdicts + per-run narratives

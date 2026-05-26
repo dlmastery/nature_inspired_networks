@@ -111,4 +111,7 @@ def load_all(path: str | Path) -> list[dict]:
     p = Path(path)
     if not p.exists():
         return []
-    return json.loads(p.read_text() or "[]")
+    # PowerShell's Set-Content -Encoding UTF8 writes a BOM that breaks
+    # json.loads; strip it defensively with utf-8-sig.
+    text = p.read_text(encoding="utf-8-sig")
+    return json.loads(text or "[]")

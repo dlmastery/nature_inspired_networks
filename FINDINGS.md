@@ -44,6 +44,58 @@
 - **latency: 20.02 ms** (5× the baseline)
 - **composite: 0.6966** (worst in sweep, tied with `sg_only_group`)
 
+## H58 follow-up — the avg-pool fix DISCARDED
+
+The first campaign's top-priority follow-up was **H58**: replace the C4
+group convolution's max-pool reduction with mean-pool. Pre-registered
+prediction: the +5 to +10 pp top-1 recovery on `sg_only_group` would
+prove that "max-pool over the 4-rotation orbit throws away 75 % of the
+signal." The 2-row sweep (`sg_only_group_avg`, `sg_full_fib_avg`)
+trained on 2026-05-27 with checkpoint saving enabled returned the
+following:
+
+| variant | reduce | top-1 | params | composite | Δ vs same-arch max |
+|---|---|---|---|---|---|
+| `sg_only_group` | max | 69.84 % | 127 k | 0.6937 | (ref) |
+| `sg_only_group_avg` | mean | **65.38 %** | 127 k | **0.6597** | **-4.46 pp** |
+| `sg_full_fib` | max | 73.24 % | 259 k | 0.6966 | (ref) |
+| `sg_full_fib_avg` | mean | **66.86 %** | 259 k | **0.6432** | **-6.38 pp** |
+
+**Verdict: DISCARD.** Mean-pool over the orbit *hurts* worse than
+max-pool — the opposite of the prediction. The "discards 75 % signal"
+intuition was wrong: max-pool over rotated copies actually preserves
+the strongest evidence at every spatial location (a soft argmax over
+orientations), while mean-pool *dilutes* discriminative features by
+averaging out the response-vs-orientation mismatch. The autoresearch
+protocol delivered exactly what it should: a clean falsifiable
+negative against a confidently-stated hypothesis.
+
+**New direction for H24 (Platonic equivariance):** the fix is not the
+reduction operator but the data. C4-equivariant features are useful on
+data with rotational variance (rotated CIFAR, IcoMNIST, spherical
+MNIST) — not on canonically-oriented CIFAR-10. The next experiment
+should test the *same* `sg_only_group` (max-pool) variant on
+rotated-CIFAR-10 where the equivariance prior is data-aligned.
+
+## Trained-feature Betti (first data)
+
+The H58 sweep produced the first `best.pt` checkpoints, enabling
+trained-feature Betti curves for the first time. Two interesting
+observations:
+
+| variant | β₀ per stage (trained) | β₀ per stage (fresh-init) |
+|---|---|---|
+| `sg_only_group_avg` | [121, 127, 127, 127] | [93, 71, 122, 100] |
+| `sg_full_fib_avg` | [123, 124, 127, 127] | [123, 124, 127, 127]* |
+
+Trained models *increase* β₀ relative to fresh init — they cluster
+features by class, producing more isolated connected components at the
+relative-threshold band. β₁ also rises (one 1-D hole detected in
+`sg_full_fib_avg`), consistent with class-prototype loop structures.
+This inverts the naive "topology simplification" reading and motivates
+a follow-up where Betti is tracked **per epoch** to see whether the
+β-curves cross the random baseline at convergence.
+
 The naive additive-deltas prediction (sum of single-prior Δs ≈ -13 pp
 top-1) would put `sg_full_fib` at ≈ 67 %; observed 73.24 % is actually
 *better* than the additive prediction, suggesting some priors do

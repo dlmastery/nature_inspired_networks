@@ -122,6 +122,25 @@ def test_build_model_rejects_unknown():
         assert "totally_not_a_model" in str(exc)
 
 
+def test_flag_field_iteration_distinguishes_string_field():
+    """Regression test for the compute_topology.py bug.
+
+    NaturePriorFlags has 6 Boolean fields + 1 string field (group_reduce).
+    Iterating __dataclass_fields__ uniformly and setting every field to a
+    bool will assign False or True to group_reduce, breaking the
+    GroupConv2d assert. The fix is to iterate only the Boolean field
+    names and pass group_reduce explicitly.
+    """
+    fields = NaturePriorFlags().__dataclass_fields__
+    bool_names = [n for n, f in fields.items() if f.type is bool or f.type == "bool"]
+    # Hard-coded canonical list — if someone adds a new flag they must
+    # update this list AND the reconstruction logic in scripts/compute_topology.py.
+    expected_bool = {"hex", "group", "fractal", "toroidal",
+                     "cymatic_init", "golden_modulate"}
+    assert "group_reduce" not in expected_bool
+    assert set(bool_names) == expected_bool or set(fields.keys()) - {"group_reduce"} == expected_bool
+
+
 if __name__ == "__main__":
     import inspect
 
