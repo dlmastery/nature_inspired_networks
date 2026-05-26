@@ -8,15 +8,34 @@
 > cymatic init, and golden-angle channel modulation — each toggleable
 > for principled ablation.
 
-## 🌐 Live links
+## Live links
 
-- **📊 Dashboard:** [dlmastery.github.io/sacgeometry/dashboard/](https://dlmastery.github.io/sacgeometry/dashboard/) (after first publish)
-- **📑 Paper sketch:** [`PAPER.md`](PAPER.md) (in progress)
-- **📚 Process:** [`AUTORESEARCH_PROCESS.md`](AUTORESEARCH_PROCESS.md)
-- **🏗 Architecture:** [`ARCHITECTURE.md`](ARCHITECTURE.md)
-- **📈 Sister project:** [autoresearchimage](https://github.com/dlmastery/autoresearchimage)
+- **Dashboard:** [dlmastery.github.io/sacgeometry/dashboard/dashboard.html](https://dlmastery.github.io/sacgeometry/dashboard/dashboard.html)
+- **Findings (campaign verdict):** [`FINDINGS.md`](FINDINGS.md)
+- **Per-experiment narrative:** [`RESULTS.md`](RESULTS.md)
+- **Paper sketch:** [`PAPER.md`](PAPER.md)
+- **Process:** [`AUTORESEARCH_PROCESS.md`](AUTORESEARCH_PROCESS.md)
+- **Architecture:** [`ARCHITECTURE.md`](ARCHITECTURE.md)
+- **Sister project:** [autoresearchimage](https://github.com/dlmastery/autoresearchimage)
   — this repo inherits its protocol gates verbatim and adapts them to
   geometric-prior backbone ablations.
+
+## Headline finding (CIFAR-10, seed 0, 12 epochs, ResNet-20-shaped scaffold)
+
+| rank | tag | top-1 | params | composite |
+|---|---|---|---|---|
+| 1 | `baseline_resnet20` | 84.78 % | 272 k | **0.8458** |
+| 2 | `baseline_sg_vanilla` | 82.16 % | 186 k | 0.8258 |
+| 5 | `sg_only_fractal` | 82.46 % | 259 k | 0.8104 |
+| 10 | `sg_only_group` | 69.84 % | 127 k | 0.6937 |
+| 11 | `sg_full_fib` | 73.24 % | 259 k | **0.6966 (worst)** |
+
+**At this scale and budget the sacred-geometry priors do NOT compound.**
+The full hybrid is the worst SacredGeo variant in the sweep; the C4
+group prior accounts for most of the damage (max-pool over the
+4-rotation orbit throws away 75 % of the signal). Fractal is the only
+single prior that lifts top-1. See [`FINDINGS.md`](FINDINGS.md) for the
+full single-prior decomposition and the next-campaign open axes.
 
 ## ⚠️ Read this first — scope and honesty
 
