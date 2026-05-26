@@ -1,0 +1,44 @@
+[
+  {
+    "experiment_id": "exp01_baseline_resnet20",
+    "title": "Baseline ResNet-20 on CIFAR-10",
+    "diagnosis": "There is no prior run in this campaign — this is experiment 1, establishing the literature anchor against which every SacredGeoNet variant is measured. CIFAR-10 with the canonical He 2015 ResNet-20 (16-32-64 widths, 3 stages of 3 BasicBlocks) reports 91.25 percent top-1 in the published paper after 164 epochs. In our 12-epoch quick budget the same architecture is expected to land in the low 80s; the gap is recipe, not architecture. The baseline number anchors the composite-metric formula and proves the training loop, FLOP counter, and latency timer all wire up.",
+    "citations": [
+      "He, Zhang, Ren, Sun 2015 CVPR 'Deep Residual Learning for Image Recognition' (arXiv:1512.03385) — Source of the ResNet-20 CIFAR variant used here as the literature anchor; their Table 6 reports 91.25 percent on CIFAR-10 after 164 epochs."
+    ],
+    "hypothesis": "Because the model is the canonical 0.27 M-parameter ResNet-20 with no sacred priors, we expect 12-epoch top-1 in [0.80, 0.85] on CIFAR-10. Mechanism: standard 3x3 conv + BN + ReLU residual stack with isotropic 16-32-64 widths. Composite is dominated by the small parameter count; baseline_resnet20 sets the literature-anchored upper bound on params and the lower bound on parameter-normalised composite that the sacred variants must improve on.",
+    "prediction": "composite in [0.78, 0.83]; top1 in [0.80, 0.85]; params = 272 k; GPU batch=1 latency = 5 to 12 ms; rotation equivariance error around 0.5 to 0.9 (no equivariance built in).",
+    "verdict": "",
+    "learning": "",
+    "composite": 0.0,
+    "composite_fingerprint": "d65565e9c7b12d14cbce30a801ecc6753aea3eb148074256bfcc051fa61d0893"
+  },
+  {
+    "experiment_id": "exp02_baseline_sg_vanilla",
+    "title": "SacredGeoNet with all priors OFF and linear channel scaling",
+    "diagnosis": "exp01 (baseline_resnet20) established the literature anchor at ResNet-20's 16-32-64 channel schedule. To measure the marginal effect of any single sacred prior we need a SacredGeoNet skeleton with all six flags FALSE and the channel schedule held at the CONTROL value (linear scaling, c0*(k+1) widths 16-32-48 rounded to multiples of 8). This run is the ablation reference point — its only structural deltas from baseline_resnet20 are (a) widths and (b) the SacredGeoBlock plumbing (BatchNorm placement, skip-connection structure). Any future delta against this row is attributable to a flag, not to the block scaffolding.",
+    "citations": [
+      "He, Zhang, Ren, Sun 2015 CVPR 'Deep Residual Learning for Image Recognition' (arXiv:1512.03385) — Same ResNet-20 lineage; we hold the block scaffold maximally similar except for stride/BN placement."
+    ],
+    "hypothesis": "Because every sacred-flag is FALSE and channel_mode is 'linear', SacredGeoNet collapses to a plain residual stack with widths 16-32-48 (slightly narrower than ResNet-20's 16-32-64). Mechanism: the SacredGeoBlock's _GenericConv falls through to nn.Conv2d, the _FractalPath collapses to a single conv, and the golden-modulate gate is absent. We expect top-1 within 1 to 3 points below baseline_resnet20 purely from the narrower final stage.",
+    "prediction": "composite in [0.74, 0.81]; top1 in [0.77, 0.83]; params around 160 k (much smaller than baseline_resnet20 due to narrower widths); latency similar to baseline within 30 percent.",
+    "verdict": "",
+    "learning": "",
+    "composite": 0.0,
+    "composite_fingerprint": "d65565e9c7b12d14cbce30a801ecc6753aea3eb148074256bfcc051fa61d0893"
+  },
+  {
+    "experiment_id": "exp03_sg_only_hex",
+    "title": "Single-prior: hex-masked 3x3 conv only (fib channels)",
+    "diagnosis": "exp02 (baseline_sg_vanilla) is the all-flags-OFF reference. We now flip hex=True with channel_mode=fib (widths 16-24-40) to isolate the hex-mask receptive field's effect. Hex-masked 3x3 conv zeroes two corner taps (positions [0,2] and [2,0]) so the effective receptive field is the 7-tap honeycomb (HexaConv 2018). The fib channel mode is chosen to match the schedule that the full SacredGeo variants will use; this row tests whether HEX alone improves top-1 over the linear-channel reference.",
+    "citations": [
+      "Hoogeboom, Peters, Cohen, Welling 2018 ICLR 'HexaConv' (arXiv:1803.02108) — Introduces hexagonal planar/group convolutions on a square lattice via kernel masking; reports higher accuracy at fixed param budget on CIFAR-rotated and AID."
+    ],
+    "hypothesis": "Per HexaConv 2018 the hexagonal mask reduces anisotropy because the 7-tap honeycomb is rotationally more uniform than the 9-tap square; mechanism: 2 of 9 weights are forced to zero, so total parameter count drops by 2/9 in the 3x3 convs, and the receptive field is closer to circular. We expect a small top-1 lift over baseline_sg_vanilla because of cleaner geometric prior, and a small params drop (~22 percent on the conv weight tensor, less overall once you include BNs and the final FC).",
+    "prediction": "composite in [0.77, 0.84]; top1 within +/- 1.5 percentage points of baseline_sg_vanilla; params delta about -3 to -5 percent overall.",
+    "verdict": "",
+    "learning": "",
+    "composite": 0.0,
+    "composite_fingerprint": "d65565e9c7b12d14cbce30a801ecc6753aea3eb148074256bfcc051fa61d0893"
+  }
+]

@@ -1,0 +1,97 @@
+"""Citation Rigor + Reasoning Blob Completeness gates (autoresearch protocol).
+
+Adapted from dlmastery/autoresearchimage/core/reasoning.py. The validator
+refuses to write a research_journal entry unless every required field meets
+its word-count floor and citations are properly formatted.
+"""
+from __future__ import annotations
+
+import json
+import re
+from dataclasses import dataclass, field
+from pathlib import Path
+
+
+WORD_FLOORS = {
+    "diagnosis": 60,
+    "citation": 40,           # single-paper floor; multi-paper floor is 80
+    "hypothesis": 50,
+    "prediction": 25,
+    "verdict": 30,
+    "learning": 40,
+}
+
+CITATION_RE = re.compile(
+    r"^[^,]+(?:,\s*[^,]+)*\s+\d{4}\s+[A-Za-z\-/ ]+\s+'[^']+'.*?(?:arXiv|bioRxiv):\s*\d{4}\.\d{4,5}"
+)
+
+
+@dataclass
+class ReasoningEntry:
+    experiment_id: str
+    title: str
+    diagnosis: str
+    citations: list[str]
+    hypothesis: str
+    prediction: str
+    verdict: str = ""
+    learning: str = ""
+    composite: float = 0.0
+    composite_fingerprint: str = ""
+
+    def to_dict(self) -> dict:
+        return self.__dict__.copy()
+
+
+def _wc(s: str) -> int:
+    return len([w for w in s.strip().split() if w])
+
+
+def validate_entry(e: ReasoningEntry, require_post: bool = False) -> list[str]:
+    """Return list of validation errors. Empty list = pass."""
+    errs: list[str] = []
+    for fld in ("diagnosis", "hypothesis", "prediction"):
+        n = _wc(getattr(e, fld))
+        if n < WORD_FLOORS[fld]:
+            errs.append(f"{fld}: {n} words < floor {WORD_FLOORS[fld]}")
+    # citation rigor
+    if not e.citations:
+        errs.append("citations: empty list")
+    else:
+        cite_words = sum(_wc(c) for c in e.citations)
+        floor = WORD_FLOORS["citation"] if len(e.citations) == 1 else 80
+        if cite_words < floor:
+            errs.append(f"citations: {cite_words} words < floor {floor}")
+        for c in e.citations:
+            if not CITATION_RE.search(c):
+                errs.append(f"citation format bad: '{c[:80]}...'")
+    if require_post:
+        for fld in ("verdict", "learning"):
+            n = _wc(getattr(e, fld))
+            if n < WORD_FLOORS[fld]:
+                errs.append(f"{fld}: {n} words < floor {WORD_FLOORS[fld]}")
+    return errs
+
+
+def append_entry(path: str | Path, entry: ReasoningEntry,
+                 require_post: bool = False) -> None:
+    p = Path(path); p.parent.mkdir(parents=True, exist_ok=True)
+    errs = validate_entry(entry, require_post=require_post)
+    if errs:
+        raise ValueError(
+            "Reasoning entry rejected by autoresearch gates:\n  - " +
+            "\n  - ".join(errs)
+        )
+    rows = []
+    if p.exists():
+        rows = json.loads(p.read_text() or "[]")
+    rows = [r for r in rows if r.get("experiment_id") != entry.experiment_id]
+    rows.append(entry.to_dict())
+    p.write_text(json.dumps(rows, indent=2))
+
+
+def load_all(path: str | Path) -> list[dict]:
+    p = Path(path)
+    if not p.exists():
+        return []
+    return json.loads(p.read_text() or "[]")

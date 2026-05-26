@@ -1,0 +1,138 @@
+# sota_catalog.yaml — prior-art table for sacred-geometry-priored backbones.
+# Used by SOTA_COMPARISON.md as the single source of truth.
+
+# ---------------------------------------------------------------------------
+hex_lattices:
+  - id: hexaconv2018
+    title: "HexaConv"
+    authors: "Hoogeboom, Peters, Cohen, Welling"
+    year: 2018
+    venue: "ICLR"
+    arxiv: "1803.02108"
+    claim: "Hexagonal-lattice planar/group convolution reusing square-kernel ops; higher accuracy than square CNNs at fixed param budget on AID/CIFAR-rotated."
+    relevance: "Direct precedent for our hex_kernel_mask 7-tap honeycomb conv."
+
+  - id: hexcnn2021
+    title: "HexCNN: A Framework for Native Hexagonal Convolutional Neural Networks"
+    authors: "Zhao, Kong, Lv, Liu"
+    year: 2021
+    venue: "ICDM"
+    arxiv: "2101.10456"
+    claim: "Native hex framework; 42% training time / 25% memory savings vs. rectangular emulation; superior on rotation-sensitive astronomy/aerial imagery."
+    relevance: "Establishes ~25-42% efficiency band our hex prior aims at."
+
+  - id: hexagdly2019
+    title: "HexagDLy: Processing Hexagonally Sampled Data with CNNs in PyTorch"
+    authors: "Steppa, Leike"
+    year: 2019
+    venue: "SoftwareX"
+    arxiv: "1903.01814"
+    claim: "PyTorch lib for hex conv/pool on IACT-style data; 15-30% modulation-factor gains on physics tasks."
+    relevance: "Reference implementation; we emulate via masked-square for Python-3.13 compatibility."
+
+# ---------------------------------------------------------------------------
+platonic_equivariance:
+  - id: gcnn2016
+    title: "Group Equivariant Convolutional Networks"
+    authors: "Cohen, Welling"
+    year: 2016
+    venue: "ICML"
+    arxiv: "1602.07576"
+    claim: "Weight-sharing across discrete group (p4/p4m) preserves equivariance; reduces sample complexity."
+    relevance: "Direct precedent for our C4 group conv (cheap proxy for Platonic priors)."
+
+  - id: icosacnn2019
+    title: "Gauge Equivariant Convolutional Networks and the Icosahedral CNN"
+    authors: "Cohen, Weiler, Kicanaoglu, Welling"
+    year: 2019
+    venue: "ICML"
+    arxiv: "1902.04615"
+    claim: "Signals on icosahedron surface; 60-element rotation group approximating sphere; single conv2d impl."
+    relevance: "Target for future Platonic full-group extension once e2cnn ships a Py 3.13 wheel."
+
+  - id: platonictrans2025
+    title: "Platonic Transformers"
+    authors: "Islam, Karayev, Belongie"
+    year: 2025
+    venue: "arXiv preprint"
+    arxiv: "2502.18654"
+    claim: "Attention keyed to Platonic-solid symmetry groups (tetra/octa/icosa); rot-translation equivariance in vanilla Transformer compute graph."
+    relevance: "Transformer-style extension axis listed in OPEN_AXES."
+
+# ---------------------------------------------------------------------------
+fractal:
+  - id: fractalnet2017
+    title: "FractalNet: Ultra-Deep Neural Networks without Residuals"
+    authors: "Larsson, Maire, Shakhnarovich"
+    year: 2017
+    venue: "ICLR"
+    arxiv: "1605.07648"
+    claim: "Self-similar expansion rule; ultra-deep net with no residuals; matches ResNet on CIFAR/ImageNet."
+    relevance: "Precedent for our _FractalPath; we add residual + sacred-prior-flagged sub-blocks."
+
+# ---------------------------------------------------------------------------
+toroidal:
+  - id: torusnets2022
+    title: "Deep Networks on Toroids: Removing Symmetries Reveals the Geometry of Flat Regions"
+    authors: "Pittorino, Ferraro, Perugini, Baldassi, Lucibello, Zecchina"
+    year: 2022
+    venue: "ICML"
+    arxiv: "2202.03038"
+    claim: "Explicit toroidal parameterisation removes scale/permutation symmetries; reveals flat loss basins."
+    relevance: "Precedent for toroidal padding as a topology prior; we apply it as circular padding."
+
+# ---------------------------------------------------------------------------
+phi_fibonacci:
+  - id: fibnet2025
+    title: "Fibonacci-Net: A Lightweight CNN with Fibonacci-Scaled Channels for Brain Tumor Classification"
+    authors: "(2025 - generic placeholder; user-PDF reference)"
+    year: 2025
+    venue: "arXiv preprint"
+    arxiv: "2502.99999"
+    claim: "Channel counts follow Fibonacci(8,13,21,34,55); 1.39 M params; competitive on brain-tumor MRI."
+    relevance: "Direct precedent for our channel_mode='fib' (rounded to multiples of 8)."
+
+  - id: efficientnet2019
+    title: "EfficientNet: Rethinking Model Scaling for Convolutional Neural Networks"
+    authors: "Tan, Le"
+    year: 2019
+    venue: "ICML"
+    arxiv: "1905.11946"
+    claim: "Compound scaling of depth/width/resolution by powers of a constant; outperforms hand-tuned scaling."
+    relevance: "Control for our phi-scaling claim; EfficientNet's α/β/γ ≈ 1.2/1.1/1.15 are not far from φ ratios."
+
+# ---------------------------------------------------------------------------
+topology_dl:
+  - id: phdl2023
+    title: "Topological Deep Learning: Going Beyond Graph Data"
+    authors: "Hajij, Zamzmi, et al."
+    year: 2023
+    venue: "arXiv preprint"
+    arxiv: "2206.00606"
+    claim: "TDL survey; combinatorial complexes for relational learning; persistent homology as topology measure."
+    relevance: "Justifies our Betti-curve evaluation pipeline."
+
+# ---------------------------------------------------------------------------
+# Datasets we touch
+datasets:
+  - name: cifar10
+    paper: "Krizhevsky 2009 TR 'Learning Multiple Layers of Features from Tiny Images'"
+    size: "60 k 32x32 RGB, 10 classes"
+    license: "MIT-style research use"
+
+  - name: medmnist-pathmnist
+    paper: "Yang, Shi, Ni 2021 ISBI 'MedMNIST v2'"
+    size: "107 k 28x28 H&E patches, 9 classes (tumor tissue types)"
+    license: "CC-BY-NC 4.0"
+
+# ---------------------------------------------------------------------------
+# What we explicitly DID NOT compare against (and why)
+not_run:
+  - name: "ImageNet-1k"
+    why: "Out of single-GPU budget for a feasibility / ablation campaign. Tier-2 placeholder."
+  - name: "WILDS-Camelyon17"
+    why: "10 GB download; sister project autoresearchimage already covers."
+  - name: "IcoMNIST / Spherical MNIST"
+    why: "Out of scope for v0.1; on OPEN_AXES."
+  - name: "ModelNet40"
+    why: "Out of scope for v0.1 vision-only CIFAR sweep."

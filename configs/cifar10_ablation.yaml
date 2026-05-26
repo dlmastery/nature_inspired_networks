@@ -1,0 +1,26 @@
+# CIFAR-10 ablation sweep config.
+# One file = one DATASET/EPOCHS/HYPERPARAM choice; tags/flags come from the sweep script.
+
+dataset: cifar10
+data_root: ./data
+batch_size: 256
+num_workers: 2
+
+# Training
+epochs: 30
+lr: 1.0e-3
+weight_decay: 5.0e-4
+label_smoothing: 0.1
+target_top1: 0.85
+use_bf16: true
+
+# Model (overridden by sweep)
+model: sacredgeo
+channel_mode: fib  # 'fib' | 'phi' | 'linear'
+flags:
+  hex: true
+  group: true
+  fractal: true
+  toroidal: true
+  cymatic_init: true
+  golden_modulate: true

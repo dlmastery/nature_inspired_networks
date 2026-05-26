@@ -1,0 +1,20 @@
+# Smoke-test config: short training to validate the pipeline (5-10 min total).
+dataset: cifar10
+data_root: ./data
+batch_size: 256
+num_workers: 2
+epochs: 3
+lr: 1.0e-3
+weight_decay: 5.0e-4
+label_smoothing: 0.1
+target_top1: 0.50
+use_bf16: true
+model: sacredgeo
+channel_mode: fib
+flags:
+  hex: true
+  group: true
+  fractal: false
+  toroidal: true
+  cymatic_init: true
+  golden_modulate: true
