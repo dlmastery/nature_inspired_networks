@@ -1,0 +1,18 @@
+{
+  "tag": "sg_only_cymatic_init",
+  "dataset": "cifar10",
+  "seed": 2,
+  "epochs": 12,
+  "top1": 0.7634,
+  "top5": 0.9858,
+  "params": 127146,
+  "flops": 27793296.0,
+  "latency_ms": 4.701190999767277,
+  "rot_eq_err": 0.8535969456036886,
+  "composite": 0.7745744701045146,
+  "composite_fingerprint": "d65565e9c7b12d14cbce30a801ecc6753aea3eb148074256bfcc051fa61d0893",
+  "epochs_to_target": -1,
+  "train_seconds": 415.99932820000686,
+  "train_top1": 0.7746995192307692,
+  "generalization_gap": 0.011299519230769217
+}
