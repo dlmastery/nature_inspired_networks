@@ -1,4 +1,4 @@
-# exp001_audio_seed0 — MIGRATED stub for H35 (cymatic wavelet init)
+﻿# exp001_audio_seed0 — MIGRATED stub for H35 (cymatic wavelet init)
 
 > **MIGRATED FROM** `experiments/cifar10/sg_only_cymatic_init_seed0/`
 > (legacy single-seed CIFAR-10 sweep, T1.7).
@@ -33,7 +33,7 @@ records that intent.
 **Unexpected negative on CIFAR-10.** Latency is effectively unchanged
 (init only) but top-1 dropped 2.67 pp - the second-worst single-prior
 delta after `sg_only_group`. Root-cause analysis in
-`hypotheses/H35_cymatic_wavelet.md` § 11 attributes this to (a) no
+`hypotheses/g4_kernels_attention_filters/H35_cymatic_wavelet.md` § 11 attributes this to (a) no
 Gram-Schmidt across output channels, (b) (1,1) DC-dominated band, and
 (c) data misalignment.
 
@@ -53,5 +53,5 @@ $env:SSL_CERT_FILE = "..\..\..\..\.venv\Lib\site-packages\certifi\cacert.pem"
 ## See also
 
 - Legacy archive: `../../../../experiments/cifar10/sg_only_cymatic_init_seed0/`
-- Hypothesis design doc: `../../../../hypotheses/H35_cymatic_wavelet.md`
+- Hypothesis design doc: `../../../../hypotheses/g4_kernels_attention_filters/H35_cymatic_wavelet.md`
 - Headline campaign verdict: `../../../../FINDINGS.md` row "cymatic_init -2.67 pp"

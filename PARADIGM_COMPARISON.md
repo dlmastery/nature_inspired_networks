@@ -1,4 +1,4 @@
-# PARADIGM_COMPARISON — Six-Paradigm Synthesis
+﻿# PARADIGM_COMPARISON — Six-Paradigm Synthesis
 
 > Generated from the 8-chunk extended-transcript expansion (chunks 1-8,
 > EXPERIMENT_LEDGER.md). This file is the **synthesis claim** of the
@@ -15,7 +15,7 @@
 > in every row.
 >
 > Cross-links: `MANIFESTO.md` § 6, `IDEA_TABLE.md` § G7 rows H61–H71,
-> `hypotheses/H67_full_paradigm_hybrid.md` (the operational test of
+> `hypotheses/g7_cross_paradigm_hybrids/H67_full_paradigm_hybrid.md` (the operational test of
 > this synthesis), `EXPERIMENT_LEDGER.md` chunks 5–7.
 
 ---

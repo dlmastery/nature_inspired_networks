@@ -1,6 +1,6 @@
-# H04 — phi / Fibonacci channel scaling (idea sub-project)
+﻿# H04 — phi / Fibonacci channel scaling (idea sub-project)
 
-> See the full design document at `../../hypotheses/H04_phi_self_similar_width.md`.
+> See the full design document at `../../hypotheses/g1_scaling_growth/H04_phi_self_similar_width.md`.
 > This README is the OPERATOR-FACING summary: implementation status,
 > file layout, how to test it, how to run an experiment.
 
@@ -63,7 +63,7 @@ Or via the global sweep:
 
 ## Cross-references
 
-- Full hypothesis design doc: `../../hypotheses/H04_phi_self_similar_width.md`
+- Full hypothesis design doc: `../../hypotheses/g1_scaling_growth/H04_phi_self_similar_width.md`
 - Master experiment list: `../../EXPERIMENT_LOG.md` rows T1.1, T1.2
 - Manifesto: `../../MANIFESTO.md`
 - IDEA table row: `../../IDEA_TABLE.md` H04

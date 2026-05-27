@@ -1,4 +1,4 @@
-# VERIFY — H17
+﻿# VERIFY — H17
 
 > Sign-off that the implementation is ready for its first archived
 > experiment.
@@ -30,7 +30,7 @@
       recorded
 - [x] `AUDIT.md` has 5 weaknesses listed (5 of them real)
 - [x] `IMPROVEMENTS.md` addresses 3 of them; 2 deferred with rationale
-- [x] Cross-reference to `hypotheses/H17_golden_ratio_skip_connections.md`
+- [x] Cross-reference to `hypotheses/g2_layer_channel_neuron/H17_golden_ratio_skip_connections.md`
       in place
 
 ## Sign-off

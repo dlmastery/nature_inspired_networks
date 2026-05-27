@@ -1,4 +1,4 @@
-# VERIFY — H21
+﻿# VERIFY — H21
 
 > Sign-off that the implementation is ready for its first archived
 > experiment.
@@ -31,7 +31,7 @@
       recorded
 - [x] `AUDIT.md` has 5 weaknesses listed
 - [x] `IMPROVEMENTS.md` addresses 3 of them; 4 deferred with rationale
-- [x] Cross-reference to `hypotheses/H21_hexagonal_phi_packing.md` in place
+- [x] Cross-reference to `hypotheses/g3_topologies_graphs/H21_hexagonal_phi_packing.md` in place
 
 ## Sign-off
 

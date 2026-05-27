@@ -1,4 +1,4 @@
-# VERIFY — H05
+﻿# VERIFY — H05
 
 > Sign-off that the implementation is ready for its first archived
 > experiment.
@@ -29,7 +29,7 @@
       recorded
 - [x] `AUDIT.md` has 4 weaknesses listed
 - [x] `IMPROVEMENTS.md` addresses 3 of them; 3 deferred with rationale
-- [x] Cross-reference to `hypotheses/H05_fractal_phi_recursion.md` in place
+- [x] Cross-reference to `hypotheses/g1_scaling_growth/H05_fractal_phi_recursion.md` in place
 
 ## Sign-off
 

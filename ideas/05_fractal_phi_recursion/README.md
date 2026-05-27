@@ -1,6 +1,6 @@
-# H05 — Fractal phi-Recursion (sub-block depth=2) (idea sub-project)
+﻿# H05 — Fractal phi-Recursion (sub-block depth=2) (idea sub-project)
 
-> See the full design document at `../../hypotheses/H05_fractal_phi_recursion.md`.
+> See the full design document at `../../hypotheses/g1_scaling_growth/H05_fractal_phi_recursion.md`.
 > This README is the OPERATOR-FACING summary: implementation status,
 > file layout, how to test it, how to run an experiment.
 
@@ -62,7 +62,7 @@ Or via the global sweep:
 
 ## Cross-references
 
-- Full hypothesis design doc: `../../hypotheses/H05_fractal_phi_recursion.md`
+- Full hypothesis design doc: `../../hypotheses/g1_scaling_growth/H05_fractal_phi_recursion.md`
 - Master experiment list: `../../EXPERIMENT_LOG.md` row T1.5
 - Manifesto: `../../MANIFESTO.md`
 - IDEA table row: `../../IDEA_TABLE.md` H05

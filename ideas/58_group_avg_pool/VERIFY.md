@@ -1,4 +1,4 @@
-# VERIFY — H58
+﻿# VERIFY — H58
 
 > Sign-off for the DISCARDED avg-pool fix.
 
@@ -22,7 +22,7 @@
 
 ## Documentation
 
-- [x] `README.md` notes the absence of `hypotheses/H58_*.md` and
+- [x] `README.md` notes the absence of `hypotheses/g6_topological_bridging/H58_*.md` and
       points to `FINDINGS.md` as the canonical record (per the
       task brief)
 - [x] `IDEA.md` records the original prediction AND the empirical

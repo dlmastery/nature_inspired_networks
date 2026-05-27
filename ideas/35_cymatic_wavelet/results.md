@@ -1,4 +1,4 @@
-# RESULTS — H35
+﻿# RESULTS — H35
 
 > Auto-generated rollup across every archive sub-directory under
 > `experiments/`. Re-generate with `python ../../scripts/build_report.py
@@ -19,7 +19,7 @@ legacy cymatic init in `priors.py::cymatic_init_` was the only single
 prior whose negative result on CIFAR-10 was NOT predicted by the
 source PDF (the others — group, toroidal, golden — were predicted
 neutral-or-negative). Post-hoc root-cause analysis (see
-`hypotheses/H35_cymatic_wavelet.md` § 11) identified TWO bugs and one
+`hypotheses/g4_kernels_attention_filters/H35_cymatic_wavelet.md` § 11) identified TWO bugs and one
 wrong-dataset choice:
 
 1. all output channels initialised from the same low-frequency mode →

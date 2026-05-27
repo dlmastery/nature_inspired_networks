@@ -1,6 +1,6 @@
-# H22 — Toroidal φ-Closure (idea sub-project)
+﻿# H22 — Toroidal φ-Closure (idea sub-project)
 
-> See the full design document at `hypotheses/H22_toroidal_phi_closure.md`.
+> See the full design document at `hypotheses/g3_topologies_graphs/H22_toroidal_phi_closure.md`.
 > This README is the OPERATOR-FACING summary: implementation status,
 > file layout, how to test it, how to run an experiment.
 
@@ -61,7 +61,7 @@ Or via the global sweep:
 
 ## Cross-references
 
-- Full hypothesis design doc: `../../hypotheses/H22_toroidal_phi_closure.md`
+- Full hypothesis design doc: `../../hypotheses/g3_topologies_graphs/H22_toroidal_phi_closure.md`
 - Master experiment list: `../../EXPERIMENT_LOG.md` row T1.6 (legacy single-prior) + queued T2.6 (φ-scaled wrap-aware re-test)
 - Manifesto: `../../README.md`
 - IDEA table row: `../../IDEA_TABLE.md` H22

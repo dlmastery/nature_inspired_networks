@@ -1,6 +1,6 @@
-# H17 — Golden Ratio Skip Connections (idea sub-project)
+﻿# H17 — Golden Ratio Skip Connections (idea sub-project)
 
-> See the full design document at `../../hypotheses/H17_golden_ratio_skip_connections.md`.
+> See the full design document at `../../hypotheses/g2_layer_channel_neuron/H17_golden_ratio_skip_connections.md`.
 > This README is the OPERATOR-FACING summary: implementation status,
 > file layout, how to test it, how to run an experiment.
 
@@ -56,7 +56,7 @@ $env:SSL_CERT_FILE = "..\..\.venv\Lib\site-packages\certifi\cacert.pem"
 
 ## Cross-references
 
-- Full hypothesis design doc: `../../hypotheses/H17_golden_ratio_skip_connections.md`
+- Full hypothesis design doc: `../../hypotheses/g2_layer_channel_neuron/H17_golden_ratio_skip_connections.md`
 - Master experiment list: `../../EXPERIMENT_LOG.md` row T1.8 (variant)
 - Manifesto: `../../MANIFESTO.md`
 - IDEA table row: `../../IDEA_TABLE.md` H17

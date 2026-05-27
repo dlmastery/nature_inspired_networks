@@ -1,10 +1,10 @@
-# H58 — C4 max-pool to avg-pool fix (idea sub-project)
+﻿# H58 — C4 max-pool to avg-pool fix (idea sub-project)
 
-> **NOTE:** there is no formal `hypotheses/H58_group_avg_pool.md`
+> **NOTE:** there is no formal `hypotheses/g6_topological_bridging/H58_group_avg_pool.md`
 > design doc in this repo. The H58 hypothesis is documented in
 > `FINDINGS.md` § "H58 follow-up — the avg-pool fix DISCARDED",
 > reproduced inline in this README and in `IDEA.md`. Once a formal
-> `hypotheses/H58_*.md` is written, replace this paragraph with the
+> `hypotheses/g6_topological_bridging/H58_*.md` is written, replace this paragraph with the
 > standard "See the full design document at ..." cross-reference.
 
 ## TL;DR

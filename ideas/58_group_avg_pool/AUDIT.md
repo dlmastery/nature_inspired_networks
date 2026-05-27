@@ -1,4 +1,4 @@
-# AUDIT — H58
+﻿# AUDIT — H58
 
 > Adversarial self-critique of the DISCARDED avg-pool fix. This audit
 > doubles as a post-mortem of the wrong intuition that motivated the
@@ -63,7 +63,7 @@
   same `sg_only_group` (max-pool) variant on rotated-CIFAR-10. The
   expected outcome is the equivariance prior FINALLY pays off (~+3
   to +6 pp top-1 over a vanilla rotated-CIFAR baseline).
-- Add a hypothesis doc `hypotheses/H58_group_avg_pool.md` capturing
+- Add a hypothesis doc `hypotheses/g6_topological_bridging/H58_group_avg_pool.md` capturing
   this post-mortem in the standard committee-grade format.
 
 ## Sign-off

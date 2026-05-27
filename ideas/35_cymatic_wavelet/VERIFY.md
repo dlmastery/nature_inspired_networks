@@ -1,4 +1,4 @@
-# VERIFY — H35
+﻿# VERIFY — H35
 
 > Sign-off that the implementation is ready for its first archived
 > experiment.
@@ -27,7 +27,7 @@
       recorded
 - [x] `AUDIT.md` has >= 3 weaknesses listed
 - [x] `IMPROVEMENTS.md` addresses every blocking weakness
-- [x] Cross-reference to `hypotheses/H35_cymatic_wavelet.md` in place
+- [x] Cross-reference to `hypotheses/g4_kernels_attention_filters/H35_cymatic_wavelet.md` in place
 
 ## Sign-off
 

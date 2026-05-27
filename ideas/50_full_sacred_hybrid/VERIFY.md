@@ -1,4 +1,4 @@
-# VERIFY — H50
+﻿# VERIFY — H50
 
 > Sign-off for the FALSIFIED H50 composition.
 
@@ -26,7 +26,7 @@
 - [x] `AUDIT.md` lists >= 3 weaknesses, doubles as a post-mortem
 - [x] `IMPROVEMENTS.md` records H58 (DISCARDED), H45 (queued),
       leave-one-out (queued)
-- [x] Cross-reference to `hypotheses/H50_full_sacred_hybrid.md` and
+- [x] Cross-reference to `hypotheses/g5_optimization_init_reg_nas/H50_full_sacred_hybrid.md` and
       `FINDINGS.md` in place
 
 ## Sign-off

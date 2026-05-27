@@ -1,4 +1,4 @@
-# IMPROVEMENTS — H58
+﻿# IMPROVEMENTS — H58
 
 > Append-only log of refinements queued or executed in response to
 > the H58 DISCARD verdict.
@@ -26,7 +26,7 @@
 
 - **Addresses:** future-Claude / future-operator should not re-derive
   the "75 % signal loss" mistake from first principles.
-- **Change:** write `hypotheses/H58_group_avg_pool.md` (currently
+- **Change:** write `hypotheses/g6_topological_bridging/H58_group_avg_pool.md` (currently
   absent — README points to FINDINGS.md as the canonical record)
   with the standard 12-section committee-grade structure. The
   motivation section must explain WHY the intuition was wrong, not

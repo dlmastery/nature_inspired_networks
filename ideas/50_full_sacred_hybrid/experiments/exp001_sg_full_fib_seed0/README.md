@@ -1,4 +1,4 @@
-# exp001_sg_full_fib_seed0 — MIGRATED stub for H50 (full hybrid)
+﻿# exp001_sg_full_fib_seed0 — MIGRATED stub for H50 (full hybrid)
 
 > **MIGRATED FROM** `experiments/cifar10/sg_full_fib_seed0/`
 > (legacy single-seed CIFAR-10 sweep, T1.9). This is **the headline
@@ -68,7 +68,7 @@ Wall-clock: ~8 min on RTX 4090 Laptop, 16 GB.
 ## See also
 
 - Legacy archive: `../../../../experiments/cifar10/sg_full_fib_seed0/`
-- Hypothesis design doc: `../../../../hypotheses/H50_full_sacred_hybrid.md`
+- Hypothesis design doc: `../../../../hypotheses/g5_optimization_init_reg_nas/H50_full_sacred_hybrid.md`
 - Headline campaign verdict: `../../../../FINDINGS.md`
 - Refined follow-ups:
   - `../../../58_group_avg_pool/` (H58 DISCARDED — avg-pool was worse)

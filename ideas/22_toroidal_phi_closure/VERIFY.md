@@ -1,4 +1,4 @@
-# VERIFY — H22
+﻿# VERIFY — H22
 
 > Sign-off that the implementation is ready for its first archived
 > experiment. All checkboxes must be green BEFORE
@@ -28,7 +28,7 @@
       recorded
 - [x] `AUDIT.md` has >= 3 weaknesses listed
 - [x] `IMPROVEMENTS.md` addresses every blocking weakness
-- [x] Cross-reference to `hypotheses/H22_toroidal_phi_closure.md` in place
+- [x] Cross-reference to `hypotheses/g3_topologies_graphs/H22_toroidal_phi_closure.md` in place
 
 ## Sign-off
 

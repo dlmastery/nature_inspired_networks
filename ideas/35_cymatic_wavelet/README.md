@@ -1,6 +1,6 @@
-# H35 — Cymatic Wavelet Kernels (idea sub-project)
+﻿# H35 — Cymatic Wavelet Kernels (idea sub-project)
 
-> See the full design document at `hypotheses/H35_cymatic_wavelet.md`.
+> See the full design document at `hypotheses/g4_kernels_attention_filters/H35_cymatic_wavelet.md`.
 > This README is the OPERATOR-FACING summary: implementation status,
 > file layout, how to test it, how to run an experiment.
 
@@ -56,7 +56,7 @@ $env:SSL_CERT_FILE = "..\..\.venv\Lib\site-packages\certifi\cacert.pem"
 
 ## Cross-references
 
-- Full hypothesis design doc: `../../hypotheses/H35_cymatic_wavelet.md`
+- Full hypothesis design doc: `../../hypotheses/g4_kernels_attention_filters/H35_cymatic_wavelet.md`
 - Master experiment list: `../../EXPERIMENT_LOG.md` row T1.7 (legacy single-prior negative) + queued T2.7 (orthonormalized + band-corrected re-test)
 - IDEA table row: `../../IDEA_TABLE.md` H35
 - Composes with: H28 (cymatic hex resonance), H46 (cymatic loss), H56 (cymatic dataset), H66 (cymatic QKV)

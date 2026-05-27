@@ -1,6 +1,6 @@
-# H50 — Full Sacred-Geometry Hybrid (idea sub-project)
+﻿# H50 — Full Sacred-Geometry Hybrid (idea sub-project)
 
-> See the full design document at `hypotheses/H50_full_sacred_hybrid.md`.
+> See the full design document at `hypotheses/g5_optimization_init_reg_nas/H50_full_sacred_hybrid.md`.
 > This README is the OPERATOR-FACING summary: implementation status,
 > file layout, the **headline negative result**, and what comes next.
 
@@ -69,7 +69,7 @@ $env:SSL_CERT_FILE = "..\..\.venv\Lib\site-packages\certifi\cacert.pem"
 
 ## Cross-references
 
-- Full hypothesis design doc: `../../hypotheses/H50_full_sacred_hybrid.md`
+- Full hypothesis design doc: `../../hypotheses/g5_optimization_init_reg_nas/H50_full_sacred_hybrid.md`
 - Headline campaign verdict: `../../FINDINGS.md`
 - Refined follow-up hypotheses:
   - **H58** — group avg-pool fix (DISCARDED — `ideas/58_group_avg_pool/`)

@@ -1,4 +1,4 @@
-# VERIFY — H04
+﻿# VERIFY — H04
 
 > Sign-off that the implementation is ready for its first archived
 > experiment.
@@ -33,7 +33,7 @@
 - [x] `AUDIT.md` has 4 weaknesses listed (4 of them real)
 - [x] `IMPROVEMENTS.md` addresses 3 blocking weaknesses; 2 deferred
       with rationale
-- [x] Cross-reference to `hypotheses/H04_phi_self_similar_width.md`
+- [x] Cross-reference to `hypotheses/g1_scaling_growth/H04_phi_self_similar_width.md`
       in place
 
 ## Sign-off

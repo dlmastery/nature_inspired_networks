@@ -1,4 +1,4 @@
-# exp001_tiled_seed0 — MIGRATED stub for H22 (toroidal phi-closure)
+﻿# exp001_tiled_seed0 — MIGRATED stub for H22 (toroidal phi-closure)
 
 > **MIGRATED FROM** `experiments/cifar10/sg_only_toroidal_seed0/`
 > (legacy single-seed CIFAR-10 sweep, T1.6).
@@ -29,7 +29,7 @@ artifacts (`metrics.json`, `history.json`, `config.yaml`, `best.pt`,
 **Predicted-negative.** Toroidal closure on upright CIFAR-10 is data-misaligned
 (CIFAR images do not wrap), so the -2.06 pp top-1 shortfall is a confirmation,
 not a refutation, of the wrap-awareness mechanism stated in
-`hypotheses/H22_toroidal_phi_closure.md` § 11. The next archived run under this
+`hypotheses/g3_topologies_graphs/H22_toroidal_phi_closure.md` § 11. The next archived run under this
 idea will be the **wrap-aware tiled-CIFAR + φ-scaled wrap distance** experiment
 (planned T2.6 in `EXPERIMENT_LOG.md`); CLAUDE.md rule #1 forbids changing more
 than one knob at a time, so the data shift and the φ-scaling will be staged
@@ -47,5 +47,5 @@ $env:SSL_CERT_FILE = "..\..\..\..\.venv\Lib\site-packages\certifi\cacert.pem"
 ## See also
 
 - Legacy archive: `../../../../experiments/cifar10/sg_only_toroidal_seed0/`
-- Hypothesis design doc: `../../../../hypotheses/H22_toroidal_phi_closure.md`
+- Hypothesis design doc: `../../../../hypotheses/g3_topologies_graphs/H22_toroidal_phi_closure.md`
 - Headline campaign verdict: `../../../../FINDINGS.md` row "toroidal -2.06 pp"

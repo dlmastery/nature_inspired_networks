@@ -1,6 +1,6 @@
-# H21 — Hexagonal phi-Packing (idea sub-project)
+﻿# H21 — Hexagonal phi-Packing (idea sub-project)
 
-> See the full design document at `../../hypotheses/H21_hexagonal_phi_packing.md`.
+> See the full design document at `../../hypotheses/g3_topologies_graphs/H21_hexagonal_phi_packing.md`.
 > This README is the OPERATOR-FACING summary: implementation status,
 > file layout, how to test it, how to run an experiment.
 
@@ -58,7 +58,7 @@ $env:SSL_CERT_FILE = "..\..\.venv\Lib\site-packages\certifi\cacert.pem"
 
 ## Cross-references
 
-- Full hypothesis design doc: `../../hypotheses/H21_hexagonal_phi_packing.md`
+- Full hypothesis design doc: `../../hypotheses/g3_topologies_graphs/H21_hexagonal_phi_packing.md`
 - Master experiment list: `../../EXPERIMENT_LOG.md` row T1.3 (uniform variant)
 - Manifesto: `../../MANIFESTO.md`
 - IDEA table row: `../../IDEA_TABLE.md` H21
