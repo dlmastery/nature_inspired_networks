@@ -1,0 +1,18 @@
+{
+  "tag": "sg_only_constant_width",
+  "dataset": "cifar10",
+  "seed": 0,
+  "epochs": 12,
+  "top1": 0.7595,
+  "top5": 0.9849,
+  "params": 127146,
+  "flops": 27793296.0,
+  "latency_ms": 6.724338000003627,
+  "rot_eq_err": 0.8347595209876696,
+  "composite": 0.7629023881465025,
+  "composite_fingerprint": "d65565e9c7b12d14cbce30a801ecc6753aea3eb148074256bfcc051fa61d0893",
+  "epochs_to_target": -1,
+  "train_seconds": 391.67587789999925,
+  "train_top1": 0.7783653846153846,
+  "generalization_gap": 0.018865384615384673
+}

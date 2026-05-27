@@ -77,12 +77,18 @@ look), `phi_relu` (71.07), `fib_stride` (72.55), `phi_sparse` (73.33),
 `phi_init` (76.56). The φ-init and sparse-connectivity priors actively
 hurt at this scale.
 
-### G8 esoteric-extension tags (queued)
+### G8 esoteric-extension tags (smoked 2026-05-27)
 
-`sg_only_constant_width` (H80) and `sg_only_sine_act` (H81) were added
-to the matrix after this sweep launched and are smoking now in a
-follow-up run; the other 7 G8 modules ship as standalone primitives
-without a CNN sweep row.
+| tag | hyp | top-1 | params | composite | verdict |
+|---|---|---|---|---|---|
+| `sg_only_sine_act` | H81 SIREN sin(ωx) | 80.62 % | 127 k | 0.8197 | neutral — lands mid-pack, beats every φ-channel variant; ω=1 near-identity start trains stably |
+| `sg_only_constant_width` | H80 Reuleaux | 75.95 % | 127 k | 0.7629 | mild negative — constant-width mask is too aggressive on 3×3 convs (drops ~4 of 9 taps), losing kernel capacity the isotropy gain doesn't recover at this scale |
+
+`sine_act` is the better-behaved of the two and could merit a second
+row at the SIREN-canonical `ω=30` first-layer recipe. The other 7 G8
+modules (radial-12 / toroidal-latent / morphing-graph / voronoi-attn /
+collapse-attn / spectral-hopfield) ship as standalone primitives
+without a CNN sweep row, matching the G2/G4/G7 convention.
 
 ### Phase-4 CIFAR-100 graduation shortlist (by this campaign)
 
