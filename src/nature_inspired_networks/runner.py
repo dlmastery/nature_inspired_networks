@@ -63,8 +63,19 @@ def run_one(cfg: dict, tag: str, seed: int, root: str = "experiments") -> Path:
         flags = make_flags(cfg.get("flags", {}))
     else:
         flags = None
-    model = build_model(model_name, num_classes=n_cls, flags=flags,
-                        channel_mode=channel_mode)
+    # H02 / H03 — optional new kwargs (defaults preserve legacy behaviour).
+    blocks_mode = cfg.get("blocks_mode", "uniform")
+    blocks_per_stage = int(cfg.get("blocks_per_stage", 3))
+    fib_start = int(cfg.get("fib_start", 3))
+    input_resolution = cfg.get("input_resolution", None)
+    model = build_model(
+        model_name, num_classes=n_cls, flags=flags,
+        channel_mode=channel_mode,
+        blocks_mode=blocks_mode,
+        blocks_per_stage=blocks_per_stage,
+        fib_start=fib_start,
+        input_resolution=input_resolution,
+    )
 
     train_cfg = TrainConfig(
         epochs=cfg.get("epochs", 30),
@@ -73,6 +84,8 @@ def run_one(cfg: dict, tag: str, seed: int, root: str = "experiments") -> Path:
         label_smoothing=cfg.get("label_smoothing", 0.1),
         target_top1=cfg.get("target_top1", 0.85),
         use_bf16=cfg.get("use_bf16", True),
+        scheduler=cfg.get("scheduler", "cosine"),       # H10
+        phi_lr_floor=float(cfg.get("phi_lr_floor", 1e-6)),
     )
     tr = Trainer(model, tr_loader, te_loader, n_cls, train_cfg, device=device)
     fit_info = tr.fit()

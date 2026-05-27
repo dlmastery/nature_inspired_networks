@@ -92,14 +92,14 @@ def fibonacci_sequence(n: int) -> list[int]:
     return out
 
 
-def fibonacci_depths(n_stages: int, start_index: int = 4) -> list[int]:
+def fibonacci_depths(n_stages: int, start_index: int = 3) -> list[int]:
     """Per-stage block counts following Fibonacci.
 
     ``start_index`` selects the offset into the (1, 1, 2, 3, 5, 8, 13,
     21, 34) sequence at which the first stage begins. With the default
-    ``start_index=4`` and ``n_stages=4`` the schedule is the canonical
+    ``start_index=3`` and ``n_stages=4`` the schedule is the canonical
     H02 spec ``[3, 5, 8, 13]`` (total depth 29). For 5 stages with
-    ``start_index=3`` the schedule is ``[2, 3, 5, 8, 13]``.
+    ``start_index=2`` the schedule is ``[2, 3, 5, 8, 13]``.
     """
     if n_stages < 1:
         raise ValueError("n_stages must be >= 1")
@@ -114,7 +114,7 @@ def resolve_blocks_schedule(
     blocks_per_stage: int | Sequence[int],
     n_stages: int,
     mode: str = "uniform",
-    fib_start: int = 4,
+    fib_start: int = 3,
 ) -> list[int]:
     """Resolve a depth schedule from either a scalar, a list, or a mode.
 

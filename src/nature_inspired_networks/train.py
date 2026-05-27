@@ -41,6 +41,23 @@ class TrainConfig:
     phi_lr_floor: float = 1e-6
 
 
+def _build_scheduler(opt: torch.optim.Optimizer, cfg: "TrainConfig"):
+    """Dispatch on ``cfg.scheduler`` — default 'cosine' is the legacy path.
+
+    Adding new modes here is the canonical wiring point so the Trainer
+    body stays scheduler-agnostic. PhiDecayLR uses ``T_max=epochs`` so
+    the LR shrinks by exactly 1/phi over the run (matching H10's
+    cosine-comparable mid-train LR).
+    """
+    name = getattr(cfg, "scheduler", "cosine").lower()
+    if name == "cosine":
+        return CosineAnnealingLR(opt, T_max=cfg.epochs)
+    if name in ("phi_decay", "phidecay", "phi"):
+        return PhiDecayLR(opt, T_max=cfg.epochs,
+                          lr_floor=getattr(cfg, "phi_lr_floor", 1e-6))
+    raise ValueError(f"unknown scheduler '{name}'")
+
+
 class Trainer:
     def __init__(self, model: nn.Module, train_loader, test_loader,
                  num_classes: int, cfg: TrainConfig | None = None,

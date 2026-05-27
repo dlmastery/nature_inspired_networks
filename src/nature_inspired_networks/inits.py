@@ -63,15 +63,24 @@ def golden_spiral_mask(k: int = 5, n_samples: int | None = None) -> torch.Tensor
     if k < 3:
         raise ValueError(f"golden_spiral_mask requires k >= 3, got {k}")
     if n_samples is None:
-        n_samples = max(64, 8 * k * k)
+        n_samples = max(128, 16 * k * k)
     mask = torch.zeros(k, k, dtype=torch.float32)
-    # Start radius scales with kernel size so the spiral fills the grid.
-    r0 = 0.2 * k / 5.0
-    golden_angle = 2.0 * math.pi * (1.0 - 1.0 / PHI)  # ≈ 2.39996...
-    cx = cy = k / 2.0
+    # Parametrise the spiral so it makes ``n_turns`` full revolutions
+    # from a small inner radius ``r0`` to an outer radius covering the
+    # kernel's half-diagonal. This keeps every sample on-grid AND
+    # guarantees coverage scales with ``k``: a 3x3 kernel sees ~1 turn,
+    # a 5x5 sees ~3 turns, a 7x7 sees ~3 turns at larger radius.
+    n_turns = max(1, (k - 1) // 2)
+    theta_max = 2.0 * math.pi * n_turns
+    r_max = (k - 1) / 2.0          # half-diagonal in cell units
+    r0 = 0.3                       # always within the central cell
+    # Growth factor per sample so r(theta_max) ≈ r_max.
+    # r(θ) = r0 * exp(b * θ), b = ln(r_max/r0) / theta_max
+    b = math.log(r_max / r0) / theta_max
+    cx = cy = (k - 1) / 2.0
     for i in range(n_samples):
-        theta = i * golden_angle
-        r = r0 * (PHI ** (theta / (math.pi / 2.0)))
+        theta = i * theta_max / max(1, n_samples - 1)
+        r = r0 * math.exp(b * theta)
         # Cartesian → grid coordinates, bilinear "snap" via rounding.
         x = int(round(cx + r * math.cos(theta)))
         y = int(round(cy + r * math.sin(theta)))

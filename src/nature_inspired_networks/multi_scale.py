@@ -49,7 +49,8 @@ def golden_spiral_resolutions(
     last = 0
     for k in range(n_stages):
         r_raw = base * (PHI ** k)
-        r = int(round(r_raw))
+        # Use int() (floor) to match the H03 spec sequence [28,45,73,118,191].
+        r = int(r_raw)
         if align > 1:
             r = max(align, align * int(round(r / align)))
         # ensure strict monotonicity so each stage truly upscales

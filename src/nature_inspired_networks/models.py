@@ -101,7 +101,7 @@ class NaturePriorConfig:
     # replicates the legacy scalar behaviour byte-for-byte; 'fib' selects
     # per-stage Fibonacci block counts via scaling.fibonacci_depths.
     blocks_mode: str = "uniform"     # 'uniform' | 'fib' | 'linear'
-    fib_start: int = 4               # offset into (1,1,2,3,5,8,13,21,...)
+    fib_start: int = 3               # offset into (1,1,2,3,5,8,13,21,...)
     # H03 — Golden-spiral input resize. None preserves the legacy input
     # resolution (no resize); an int wraps the stem with GoldenSpiralResize.
     input_resolution: int | None = None
@@ -180,7 +180,7 @@ def build_model(name: str, num_classes: int, flags: NaturePriorFlags | None = No
                 channel_mode: str = "fib",
                 blocks_mode: str = "uniform",
                 blocks_per_stage: int = 3,
-                fib_start: int = 4,
+                fib_start: int = 3,
                 input_resolution: int | None = None) -> nn.Module:
     # Accept any casing; canonicalize once.
     n = name.lower()

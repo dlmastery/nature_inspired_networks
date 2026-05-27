@@ -118,6 +118,155 @@ def build_matrix(curated: bool = True) -> list[dict]:
                                     phi_model="golden_skip",
                                     phi_skip_init=None,
                                     phi_skip_trainable=True)))
+
+    # ---------------------------------------------------------------
+    # Code-Agent-4 — H31, H39, H42, H44 rows.
+    # Each row is one config change vs. baseline_sg_vanilla (Rule 1).
+    # Primitives live in src/nature_inspired_networks/{inits,activations,
+    # phi_decay}.py; the runner-side wiring is intentionally additive
+    # (init / activation / regulariser overrides are picked up by the
+    # runner via the documented override keys: phi_init, phi_activation,
+    # golden_spiral_init, phi_decay_wd).
+    # ---------------------------------------------------------------
+    # H31 — Golden Spiral Kernel: 5x5 conv init from discretised golden
+    # spiral, He-variance-preserving. Vanilla baseline + init flip only.
+    rows.append(dict(tag="sg_only_golden_spiral_init",
+                     overrides=dict(model="NaturePrior",
+                                    channel_mode="fib",
+                                    flags=base_flags.copy(),
+                                    golden_spiral_init=True,
+                                    golden_spiral_kernel=5)))
+    # H39 — Harmonic φ-Activation: PhiGELU (x·σ(φx)) replaces ReLU.
+    rows.append(dict(tag="sg_only_phi_activation",
+                     overrides=dict(model="NaturePrior",
+                                    channel_mode="fib",
+                                    flags=base_flags.copy(),
+                                    phi_activation=True)))
+    # H42 — φ-Weight Initialization: He's √2 swapped for √φ. Init only.
+    rows.append(dict(tag="sg_only_phi_init",
+                     overrides=dict(model="NaturePrior",
+                                    channel_mode="fib",
+                                    flags=base_flags.copy(),
+                                    phi_init=True)))
+    # H44 — Golden Regularization: per-layer wd = base_wd / φ^k.
+    rows.append(dict(tag="sg_only_phi_decay",
+                     overrides=dict(model="NaturePrior",
+                                    channel_mode="fib",
+                                    flags=base_flags.copy(),
+                                    phi_decay_wd=True,
+                                    phi_decay_base=1e-2)))
+
+    # ---------------------------------------------------------------
+    # Code-Agent-5 — H41, H43, H47, H48 rows.
+    # Each row is one config change vs. baseline_resnet20 (Rule 1).
+    # Primitives live in src/nature_inspired_networks/{optimizers,
+    # pruning,regularizers,schedulers}.py; runner-side wiring is
+    # intentionally additive — the override keys (`optimizer`,
+    # `prune_schedule`, `dropout`, `momentum_schedule`) are picked up
+    # by a follow-up runner patch.
+    # ---------------------------------------------------------------
+    # H41 — Golden Ratio Optimizer: AdamW with β1=1/φ, β2=1/φ².
+    rows.append(dict(tag="sg_only_golden_adam",
+                     overrides=dict(model="resnet20",
+                                    optimizer="golden_adam")))
+    # H43 — Fibonacci Pruning: iterative magnitude prune at Fib epochs.
+    rows.append(dict(tag="sg_only_fib_prune",
+                     overrides=dict(model="resnet20",
+                                    prune_schedule="fibonacci",
+                                    prune_length=5)))
+    # H47 — φ-Dropout: cyclical Fibonacci-ratio dropout rates.
+    rows.append(dict(tag="sg_only_phi_dropout",
+                     overrides=dict(model="resnet20",
+                                    dropout="phi_dropout",
+                                    dropout_cycle="fib",
+                                    dropout_length=5)))
+    # H48 — Golden Momentum Scheduler: β1 *= 1/φ per epoch, floor 1/φ².
+    rows.append(dict(tag="sg_only_golden_momentum",
+                     overrides=dict(model="resnet20",
+                                    momentum_schedule="golden")))
+
+    # ---------------------------------------------------------------
+    # Code-Agent-3 — H13, H18, H19, H20 (G2 layer/channel/neuron).
+    # Each row toggles exactly one Rule-1 atomic change vs.
+    # baseline_sg_vanilla. The new model variants
+    # (``natureprior_phi_sparse``, ``natureprior_fib_stride``,
+    # ``natureprior_phi_relu``) are registered with build_model at
+    # import time by the corresponding src/ modules
+    # (``sparse.py``, ``stride.py``, ``phi_threshold.py``) so the
+    # runner resolves the names without an explicit edit to
+    # models.build_model.
+    # ---------------------------------------------------------------
+    # H13 — Golden Neuron Connectivity: classifier head swapped for
+    # PhiSparseLinear at density 1/phi (~0.618). Backbone priors all
+    # off; the sparse-head effect is isolated.
+    rows.append(dict(tag="sg_only_phi_sparse",
+                     overrides=dict(model="natureprior_phi_sparse",
+                                    channel_mode="fib",
+                                    flags=base_flags.copy())))
+    # H18 — Fibonacci Stage Transition: per-stage downsampling schedule
+    # (1, 2, 3) instead of (1, 2, 2). AdaptiveAvgPool guarantees a
+    # final 1x1 spatial regardless of cascade.
+    rows.append(dict(tag="sg_only_fib_stride",
+                     overrides=dict(model="natureprior_fib_stride",
+                                    channel_mode="fib",
+                                    flags=base_flags.copy())))
+    # H19 — phi-Neuron Activation Threshold: stem ReLU replaced with
+    # PhiReLU (per-channel learnable threshold init = 1/phi).
+    rows.append(dict(tag="sg_only_phi_relu",
+                     overrides=dict(model="natureprior_phi_relu",
+                                    channel_mode="fib",
+                                    flags=base_flags.copy())))
+    # H20 — Fibonacci Ensemble: inference-time checkpoint averaging
+    # with Fib weights (FibEnsemble / FibEMA wrappers in
+    # src/nature_inspired_networks/ensemble.py). Training is unchanged;
+    # the ``fib_ensemble`` override key documents the intent so a
+    # follow-up runner patch can wire the post-hoc averaging.
+    rows.append(dict(tag="sg_only_fib_ensemble",
+                     overrides=dict(model="NaturePrior",
+                                    channel_mode="fib",
+                                    flags=base_flags.copy(),
+                                    fib_ensemble=dict(enabled=True, K=8))))
+
+    # ---------------------------------------------------------------
+    # Code-Agent-1 — H01, H02, H03, H10 rows (G1 scaling-growth).
+    # Each row toggles exactly one Rule-1 atomic change vs.
+    # baseline_sg_vanilla. Primitives live in
+    # src/nature_inspired_networks/{scaling,multi_scale,schedulers}.py
+    # and are picked up by build_model + Trainer via documented
+    # override keys (channel_mode, blocks_mode, input_resolution,
+    # scheduler).
+    # ---------------------------------------------------------------
+    # H01 — phi-Compound Scaling: channel_mode='phi_compound' (single
+    # change vs. baseline_sg_vanilla which uses 'linear'). All priors off.
+    rows.append(dict(tag="sg_only_phi_compound",
+                     overrides=dict(model="NaturePrior",
+                                    channel_mode="phi_compound",
+                                    flags=base_flags.copy())))
+    # H02 — Fibonacci Depth Progression: blocks_mode='fib' (single
+    # change vs. baseline; 3-stage backbone → [2, 3, 5] block schedule).
+    rows.append(dict(tag="sg_only_fib_depth",
+                     overrides=dict(model="NaturePrior",
+                                    channel_mode="fib",
+                                    blocks_mode="fib",
+                                    fib_start=2,
+                                    flags=base_flags.copy())))
+    # H03 — Golden Spiral Resolution Scaling: input_resolution=45
+    # (the phi^1 multiple of the 28-base spec; closest /1-aligned value
+    # to CIFAR's 32 that still inflates by phi). All priors off so the
+    # resize wrapper is the only delta.
+    rows.append(dict(tag="sg_only_golden_resize",
+                     overrides=dict(model="NaturePrior",
+                                    channel_mode="fib",
+                                    input_resolution=45,
+                                    flags=base_flags.copy())))
+    # H10 — phi-Decay LR Scheduler: scheduler='phi_decay' replaces
+    # CosineAnnealingLR. All priors off so the LR schedule is the only
+    # delta (Rule 1).
+    rows.append(dict(tag="sg_only_phi_lr",
+                     overrides=dict(model="NaturePrior",
+                                    channel_mode="fib",
+                                    scheduler="phi_decay",
+                                    flags=base_flags.copy())))
     return rows
 
 
