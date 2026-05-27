@@ -1,0 +1,18 @@
+{
+  "tag": "sg_only_golden_spiral_init",
+  "dataset": "cifar10",
+  "seed": 0,
+  "epochs": 12,
+  "top1": 0.8042,
+  "top5": 0.9909,
+  "params": 127146,
+  "flops": 27793296.0,
+  "latency_ms": 4.960833999998613,
+  "rot_eq_err": 0.8859420220057169,
+  "composite": 0.814207130163285,
+  "composite_fingerprint": "d65565e9c7b12d14cbce30a801ecc6753aea3eb148074256bfcc051fa61d0893",
+  "epochs_to_target": -1,
+  "train_seconds": 398.60779920000004,
+  "train_top1": 0.8184895833333333,
+  "generalization_gap": 0.0142895833333333
+}

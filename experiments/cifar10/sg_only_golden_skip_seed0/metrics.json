@@ -1,0 +1,18 @@
+{
+  "tag": "sg_only_golden_skip",
+  "dataset": "cifar10",
+  "seed": 0,
+  "epochs": 12,
+  "top1": 0.8163,
+  "top5": 0.9894,
+  "params": 272483,
+  "flops": 41218688.0,
+  "latency_ms": 7.293664000003446,
+  "rot_eq_err": 0.8969467307130495,
+  "composite": 0.801385741760194,
+  "composite_fingerprint": "d65565e9c7b12d14cbce30a801ecc6753aea3eb148074256bfcc051fa61d0893",
+  "epochs_to_target": -1,
+  "train_seconds": 396.68273550000004,
+  "train_top1": 0.8377003205128205,
+  "generalization_gap": 0.02140032051282048
+}
