@@ -75,3 +75,23 @@ class PhiGELU(nn.Module):
     def extra_repr(self) -> str:
         b = self.beta.item() if self.beta.numel() == 1 else float("nan")
         return f"beta={b:.6f}, learnable={self.learnable}"
+
+
+def swap_relu_with_phigelu(module: nn.Module,
+                           learnable: bool = False,
+                           beta_init: float = PHI) -> nn.Module:
+    """Recursively replace every ``nn.ReLU`` in ``module`` with a fresh
+    :class:`PhiGELU`. Functional ``F.relu`` calls inside hand-written
+    forward methods are NOT touched -- this helper only addresses the
+    submodule tree. Returns the module for chaining.
+
+    Wired by the runner for the H39 ``sg_only_phi_activation`` row.
+    """
+    for name, child in list(module.named_children()):
+        if isinstance(child, nn.ReLU):
+            setattr(module, name, PhiGELU(learnable=learnable,
+                                          beta_init=beta_init))
+        else:
+            swap_relu_with_phigelu(child, learnable=learnable,
+                                    beta_init=beta_init)
+    return module

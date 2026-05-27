@@ -159,14 +159,14 @@ def _register_fib_stride_variant() -> None:
         return
 
     def build_model(name: str, num_classes: int, flags=None,
-                    channel_mode: str = "fib"):
+                    channel_mode: str = "fib", **kwargs):
         if name.lower() in {"natureprior_fib_stride", "fib_stride_natureprior"}:
             return FibStrideNaturePriorNet(
                 num_classes=num_classes, channel_mode=channel_mode,
                 flags=flags, strides=DEFAULT_FIB_STRIDES,
             )
         return original(name, num_classes, flags=flags,
-                        channel_mode=channel_mode)
+                        channel_mode=channel_mode, **kwargs)
 
     build_model._fib_stride_wrapped = True  # type: ignore[attr-defined]
     build_model._original = original  # type: ignore[attr-defined]

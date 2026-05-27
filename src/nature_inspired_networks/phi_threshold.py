@@ -225,14 +225,14 @@ def _register_phi_relu_variant() -> None:
         return
 
     def build_model(name: str, num_classes: int, flags=None,
-                    channel_mode: str = "fib"):
+                    channel_mode: str = "fib", **kwargs):
         if name.lower() in {"natureprior_phi_relu", "phi_relu_natureprior"}:
             return PhiReLUNaturePriorNet(
                 num_classes=num_classes, channel_mode=channel_mode,
                 flags=flags,
             )
         return original(name, num_classes, flags=flags,
-                        channel_mode=channel_mode)
+                        channel_mode=channel_mode, **kwargs)
 
     build_model._phi_relu_wrapped = True  # type: ignore[attr-defined]
     build_model._original = original  # type: ignore[attr-defined]

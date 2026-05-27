@@ -137,6 +137,25 @@ def build_phi_decay_param_groups(
     return groups
 
 
+def phi_decay_param_groups(
+    model: nn.Module,
+    base_wd: float = 1e-2,
+    phi: float = PHI,
+    block_attr: str | None = None,
+) -> list[dict]:
+    """Public alias for :func:`build_phi_decay_param_groups`.
+
+    Wired by the runner: when ``cfg.phi_decay_wd`` is set, the trainer
+    builds AdamW param groups via this function so each top-level block
+    receives weight-decay ``base_wd / phi^k`` (k = block index). Kept as
+    a thin wrapper so the runner imports a stable name even if the
+    underlying implementation moves.
+    """
+    return build_phi_decay_param_groups(
+        model, base_wd=base_wd, phi=phi, block_attr=block_attr,
+    )
+
+
 class GoldenRegularizer:
     """Apply φ-decay weight-decay to an existing optimiser's groups.
 

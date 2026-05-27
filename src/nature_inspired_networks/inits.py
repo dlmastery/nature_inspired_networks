@@ -197,3 +197,24 @@ def apply_phi_init(module: nn.Module, phi: float = PHI) -> nn.Module:
             if m.bias is not None:
                 nn.init.zeros_(m.bias)
     return module
+
+
+def apply_golden_spiral_init(module: nn.Module, k: int = 5,
+                             scale: float = 1.0) -> nn.Module:
+    """Apply :func:`golden_spiral_init_` to every Conv2d whose kernel
+    is ``k x k`` in ``module``. Convs with different kernel sizes keep
+    their existing initialisation. Returns the module for chaining.
+
+    Wired by the runner for the H31 ``sg_only_golden_spiral_init`` row
+    (default ``k=5`` per H31 design doc).
+    """
+    if k < 3:
+        raise ValueError(f"apply_golden_spiral_init requires k >= 3, got {k}")
+    matched = 0
+    for m in module.modules():
+        if isinstance(m, nn.Conv2d):
+            kh, kw = m.weight.shape[-2], m.weight.shape[-1]
+            if kh == k and kw == k:
+                golden_spiral_init_(m.weight, scale=scale)
+                matched += 1
+    return module

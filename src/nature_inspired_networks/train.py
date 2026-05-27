@@ -39,6 +39,20 @@ class TrainConfig:
     # 'phi_decay' selects schedulers.PhiDecayLR with T_max=epochs.
     scheduler: str = "cosine"
     phi_lr_floor: float = 1e-6
+    # Phase C — optimizer + per-layer weight decay routing.
+    # ``optimizer`` is 'adamw' (default) or 'golden_adam' (H41).
+    # ``phi_decay_wd`` enables per-block weight decay = base / phi^k (H44).
+    optimizer: str = "adamw"
+    phi_decay_wd: bool = False
+    phi_decay_base: float = 5e-4
+    # Phase D — epoch callbacks. ``prune_schedule='fibonacci'`` triggers
+    # H43 fibonacci_prune at Fib-indexed epochs; ``momentum_schedule=
+    # 'golden'`` wraps the optimizer with H48 GoldenMomentumScheduler;
+    # ``fib_ensemble`` (dict or None) enables H20 FibEnsemble averaging.
+    prune_schedule: str = ""
+    prune_length: int = 5
+    momentum_schedule: str = ""
+    fib_ensemble: object = None  # dict {enabled: bool, K: int} or None
 
 
 def _build_scheduler(opt: torch.optim.Optimizer, cfg: "TrainConfig"):
@@ -69,10 +83,64 @@ class Trainer:
         self.test_loader = test_loader
         self.num_classes = num_classes
         self.on_epoch = on_epoch
-        self.opt = AdamW(model.parameters(), lr=self.cfg.lr,
-                         weight_decay=self.cfg.weight_decay)
+        self.opt = self._build_optimizer(self.model, self.cfg)
         self.sched = _build_scheduler(self.opt, self.cfg)
+        # H48 — optional golden-momentum scheduler that decays beta1 once
+        # per epoch. Constructed AFTER the optimizer so the override
+        # respects the optimizer family detected by GoldenMomentumScheduler.
+        self.momentum_sched = None
+        if (getattr(self.cfg, "momentum_schedule", "") or "").lower() in (
+            "golden", "phi", "golden_momentum",
+        ):
+            from .schedulers import GoldenMomentumScheduler
+            self.momentum_sched = GoldenMomentumScheduler(self.opt)
+        # H20 — optional FibEnsemble averager. Off by default; when on,
+        # state-dict snapshots are pushed once per epoch and the final
+        # averaged weights are loaded into ``self.model`` at the end of
+        # ``fit()``.
+        self.fib_ensemble = None
+        fe_cfg = getattr(self.cfg, "fib_ensemble", None)
+        if isinstance(fe_cfg, dict) and bool(fe_cfg.get("enabled", False)):
+            from .ensemble import FibEnsemble
+            self.fib_ensemble = FibEnsemble(K=int(fe_cfg.get("K", 8)))
         self.history: list[dict] = []
+        # H43 — Fibonacci pruning. The flag triggers fibonacci_prune at
+        # epoch boundaries from FIB_SCHEDULE[:prune_length].
+        self._prune_enabled = (
+            (getattr(self.cfg, "prune_schedule", "") or "").lower()
+            in ("fibonacci", "fib")
+        )
+
+    @staticmethod
+    def _build_optimizer(model: nn.Module, cfg: "TrainConfig") -> torch.optim.Optimizer:
+        """Dispatch the optimizer based on cfg.optimizer + cfg.phi_decay_wd.
+
+        Priority:
+          1. ``phi_decay_wd=True`` -> build per-layer param groups via
+             :func:`phi_decay.phi_decay_param_groups` and pass to
+             :class:`torch.optim.AdamW` (or GoldenRatioAdamW when also
+             optimizer='golden_adam').
+          2. ``optimizer='golden_adam'`` -> H41 GoldenRatioAdamW.
+          3. Default -> stock AdamW (the legacy behaviour).
+        """
+        opt_name = (getattr(cfg, "optimizer", "adamw") or "adamw").lower()
+        if getattr(cfg, "phi_decay_wd", False):
+            from .phi_decay import phi_decay_param_groups
+            groups = phi_decay_param_groups(
+                model, base_wd=float(getattr(cfg, "phi_decay_base", 5e-4)),
+            )
+            if opt_name in ("golden_adam", "golden_adamw", "phi_adam", "phi_adamw"):
+                from .optimizers import GoldenRatioAdamW
+                return GoldenRatioAdamW(groups, lr=cfg.lr,
+                                        weight_decay=cfg.weight_decay)
+            return AdamW(groups, lr=cfg.lr,
+                         weight_decay=cfg.weight_decay)
+        if opt_name in ("golden_adam", "golden_adamw", "phi_adam", "phi_adamw"):
+            from .optimizers import build_optimizer
+            return build_optimizer("golden_adam", model.parameters(),
+                                   lr=cfg.lr, weight_decay=cfg.weight_decay)
+        return AdamW(model.parameters(), lr=cfg.lr,
+                     weight_decay=cfg.weight_decay)
 
     def _step(self, x, y) -> tuple[float, float]:
         x = x.to(self.device, non_blocking=True)
@@ -106,6 +174,17 @@ class Trainer:
                 lo, ac = self._step(x, y)
                 losses.append(lo); accs.append(ac)
             self.sched.step()
+            # H48 — decay beta1 once per epoch.
+            if self.momentum_sched is not None:
+                self.momentum_sched.step()
+            # H43 — fibonacci prune at Fib-indexed epochs.
+            if self._prune_enabled:
+                from .pruning import fibonacci_prune
+                fibonacci_prune(
+                    self.model, epoch=epoch,
+                    schedule_length=int(getattr(self.cfg, "prune_length", 5)),
+                    make_permanent=False,
+                )
             tr_loss = sum(losses) / len(losses)
             tr_acc = sum(accs) / len(accs)
             train_top1_final = tr_acc
@@ -118,8 +197,24 @@ class Trainer:
             self.history.append(row)
             if self.on_epoch:
                 self.on_epoch(row)
+            # H20 — push current weights into the FibEnsemble buffer.
+            if self.fib_ensemble is not None:
+                self.fib_ensemble.update(self.model.state_dict())
             if epochs_to_target < 0 and te["top1"] >= self.cfg.target_top1:
                 epochs_to_target = epoch + 1
+
+        # H20 finalisation -- load Fib-weighted averaged weights so the
+        # post-fit evaluation runs through the ensemble. Pruning leaves
+        # behind ``weight_orig`` / ``weight_mask`` parameterisations that
+        # are not strict-compatible with the FibEnsemble snapshots
+        # captured pre-prune; we skip the load in that case to keep the
+        # raw final weights.
+        if self.fib_ensemble is not None and len(self.fib_ensemble) > 0:
+            try:
+                self.fib_ensemble.load_into(self.model)
+            except RuntimeError:  # state-dict shape mismatch — keep raw
+                pass
+
         train_seconds = time.perf_counter() - t0
         return dict(
             history=self.history,

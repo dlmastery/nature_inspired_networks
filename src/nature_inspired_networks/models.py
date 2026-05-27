@@ -181,7 +181,15 @@ def build_model(name: str, num_classes: int, flags: NaturePriorFlags | None = No
                 blocks_mode: str = "uniform",
                 blocks_per_stage: int = 3,
                 fib_start: int = 3,
-                input_resolution: int | None = None) -> nn.Module:
+                input_resolution: int | None = None,
+                **kwargs) -> nn.Module:
+    """Dispatch a model name to its constructor.
+
+    ``**kwargs`` carries optional sweep-row override keys that target
+    sibling factory modules (``phi_scaling.build_phi_model`` for the H06
+    / H07 / H09 / H17.pure families). Unknown kwargs are ignored at the
+    legacy paths so the runner can forward all sweep keys uniformly.
+    """
     # Accept any casing; canonicalize once.
     n = name.lower()
     if n == "resnet20":
@@ -194,4 +202,44 @@ def build_model(name: str, num_classes: int, flags: NaturePriorFlags | None = No
                                 fib_start=fib_start,
                                 input_resolution=input_resolution)
         return NaturePriorNet(cfg)
+    # H06 / H09 / H17.pure — phi-scaling family. Route via build_phi_model
+    # (imported lazily to avoid a circular dep at module load time).
+    if n in ("golden_bottleneck", "phi_budget", "golden_skip"):
+        from .phi_scaling import build_phi_model
+        # Translate the runner-side ``phi_*`` cfg keys into the kwarg
+        # names that build_phi_model accepts.
+        phi_kw: dict = {}
+        if n == "golden_bottleneck":
+            if "phi_inverted" in kwargs:
+                phi_kw["inverted"] = bool(kwargs["phi_inverted"])
+        elif n == "phi_budget":
+            if "phi_budget_total" in kwargs:
+                phi_kw["B_total"] = int(kwargs["phi_budget_total"])
+            if "phi_budget_n_stages" in kwargs:
+                phi_kw["n_stages"] = int(kwargs["phi_budget_n_stages"])
+            if "phi_budget_mode" in kwargs:
+                phi_kw["budget_mode"] = str(kwargs["phi_budget_mode"])
+            if "phi_budget_blocks_per_stage" in kwargs:
+                phi_kw["blocks_per_stage"] = int(kwargs["phi_budget_blocks_per_stage"])
+        elif n == "golden_skip":
+            if "phi_skip_init" in kwargs:
+                init_val = kwargs["phi_skip_init"]
+                phi_kw["init"] = None if init_val is None else float(init_val)
+            if "phi_skip_trainable" in kwargs:
+                phi_kw["trainable"] = bool(kwargs["phi_skip_trainable"])
+        return build_phi_model(n, num_classes=num_classes, **phi_kw)
     raise ValueError(f"unknown model '{name}'")
+
+
+# Ensure the H13 / H18 / H19 self-registering variants are imported so
+# their ``build_model`` wrappers run at package import time. The imports
+# are guarded — if one fails the runner still works on the legacy paths.
+def _autoregister_variants() -> None:
+    for mod in ("sparse", "stride", "phi_threshold"):
+        try:
+            __import__(f"nature_inspired_networks.{mod}")
+        except Exception:  # noqa: BLE001 — diagnostic-only autoregister
+            pass
+
+
+_autoregister_variants()
