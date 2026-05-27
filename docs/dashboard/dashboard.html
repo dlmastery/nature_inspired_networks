@@ -133,23 +133,7 @@
 <div class='card panel-2col'><h3>Training curves</h3><img src='plot_curves.png'/></div>
 <div class='card panel-2col'><h3>Persistent-homology Betti collapse</h3><img src='plot_betti.png'/></div>
 <div class='card panel-2col'><h3>Best per dataset (by composite)</h3><ul style='margin-left:18px;font-size:0.9em'><li><b>cifar10</b>: top-1 <b>84.78%</b>, params <b>0.272M</b>, latency <b>4.03 ms</b>, composite <b>0.8458</b> &nbsp;—&nbsp; <code>baseline_resnet20</code> seed=0</li></ul></div>
-<div class='card panel-2col'><h3>Hypothesis ledger — 71-cell status grid (G1..G7 × hypothesis index; click to view the spec)</h3><div class='legend-row'>Legend:
-<span class='swatch status-done'></span>done
-<span class='swatch status-running'></span>running
-<span class='swatch status-queued'></span>queued
-<span class='swatch status-planned'></span>planned
-<span class='swatch status-failed'></span>failed
-<span class='swatch status-superseded'></span>superseded
-</div>
-<div id='hyp-grid'>
-<div class='hyp-grid-row'><span class='gid'>G1</span><span class='cell status-planned' title='H01 — φ-compound scaling (EfficientNet replacement) (status: planned)' onclick="openHypothesis('H01','H01_phi_compound_scaling.md')">01</span><span class='cell status-planned' title='H02 — Fib depth progression per stage (status: planned)' onclick="openHypothesis('H02','H02_fibonacci_depth_progression.md')">02</span><span class='cell status-planned' title='H03 — Golden-angle + φ-multiple resolution (status: planned)' onclick="openHypothesis('H03','H03_golden_spiral_resolution_scaling.md')">03</span><span class='cell status-done' title='H04 — φ-scaled channel widths (rounded to Fib) (status: done)' onclick="openHypothesis('H04','H04_phi_self_similar_width.md')">04</span><span class='cell status-done' title='H05 — Recursive sub-block at 1/φ scale (status: done)' onclick="openHypothesis('H05','H05_fractal_phi_recursion.md')">05</span><span class='cell status-planned' title='H06 — Vesica-Piscis-style 1/φ bottleneck (status: planned)' onclick="openHypothesis('H06','H06_golden_ratio_bottleneck.md')">06</span><span class='cell status-planned' title='H07 — φ-spaced FPN levels (status: planned)' onclick="openHypothesis('H07','H07_phi_modulated_multi_scale.md')">07</span><span class='cell status-planned' title='H08 — Adaptive Fib layer addition during training (status: planned)' onclick="openHypothesis('H08','H08_dynamic_phi_growth.md')">08</span><span class='cell status-planned' title='H09 — 1:φ:φ² param allocation across stages (status: planned)' onclick="openHypothesis('H09','H09_golden_proportion_param_budget.md')">09</span><span class='cell status-planned' title='H10 — φ^{-k} LR / momentum scheduler (status: planned)' onclick="openHypothesis('H10','H10_phi_decay_lr_scheduler.md')">10</span></div>
-<div class='hyp-grid-row'><span class='gid'>G2</span><span class='cell status-planned' title='H11 — Fib-sized MLP hidden states (status: planned)' onclick="openHypothesis('H11','H11_pure_fibonacci_mlp.md')">11</span><span class='cell status-planned' title='H12 — Fib filter counts + φ kernel sizes (status: planned)' onclick="openHypothesis('H12','H12_fib_channel_cnn.md')">12</span><span class='cell status-planned' title='H13 — φ-pruned sparse intra-layer wiring (status: planned)' onclick="openHypothesis('H13','H13_golden_neuron_connectivity.md')">13</span><span class='cell status-planned' title='H14 — Fib-sized RNN/GRU + φ-gated updates (status: planned)' onclick="openHypothesis('H14','H14_fibonacci_recurrent.md')">14</span><span class='cell status-planned' title='H15 — Golden-spiral embedding init (status: planned)' onclick="openHypothesis('H15','H15_phi_initialized_embedding.md')">15</span><span class='cell status-planned' title='H16 — Fib head counts + Fib dilations (status: planned)' onclick="openHypothesis('H16','H16_fibonacci_head_diversity.md')">16</span><span class='cell status-done' title='H17 — φ-scaled residual skips (status: done)' onclick="openHypothesis('H17','H17_golden_ratio_skip_connections.md')">17</span><span class='cell status-planned' title='H18 — Fib alternating downsample factors (status: planned)' onclick="openHypothesis('H18','H18_fib_stage_transition.md')">18</span><span class='cell status-planned' title='H19 — Per-neuron φ-tuned thresholds (status: planned)' onclick="openHypothesis('H19','H19_phi_neuron_activation_threshold.md')">19</span><span class='cell status-planned' title='H20 — Fib-weighted ensemble averaging (status: planned)' onclick="openHypothesis('H20','H20_fibonacci_ensemble.md')">20</span></div>
-<div class='hyp-grid-row'><span class='gid'>G3</span><span class='cell status-done' title='H21 — Native hex grid + φ-modulated neighbours (status: done)' onclick="openHypothesis('H21','H21_hexagonal_phi_packing.md')">21</span><span class='cell status-done' title='H22 — Circular padding + φ-scaled period (status: done)' onclick="openHypothesis('H22','H22_toroidal_phi_closure.md')">22</span><span class='cell status-planned' title='H23 — Metatron&#39;s-Cube adjacency for GNN (status: planned)' onclick="openHypothesis('H23','H23_platonic_phi_graph.md')">23</span><span class='cell status-done' title='H24 — Full icosahedral group conv (status: done)' onclick="openHypothesis('H24','H24_icosahedral_phi_equivariant.md')">24</span><span class='cell status-planned' title='H25 — 12-vertex dodeca latent projection (status: planned)' onclick="openHypothesis('H25','H25_dodecahedral_latent.md')">25</span><span class='cell status-planned' title='H26 — Fractal recursion on toroidal manifold (status: planned)' onclick="openHypothesis('H26','H26_fractal_toroidal.md')">26</span><span class='cell status-planned' title='H27 — Golden-spiral node-embedding init (status: planned)' onclick="openHypothesis('H27','H27_golden_spiral_graph.md')">27</span><span class='cell status-planned' title='H28 — φ-harmonic dynamic hex edge weights (status: planned)' onclick="openHypothesis('H28','H28_cymatic_hex_resonance.md')">28</span><span class='cell status-planned' title='H29 — 1/φ rewiring probability (status: planned)' onclick="openHypothesis('H29','H29_phi_small_world.md')">29</span><span class='cell status-planned' title='H30 — Icosa/dodeca + Fib node degrees (status: planned)' onclick="openHypothesis('H30','H30_platonic_fib_hybrid.md')">30</span></div>
-<div class='hyp-grid-row'><span class='gid'>G4</span><span class='cell status-planned' title='H31 — Discretised golden-spiral kernel init (status: planned)' onclick="openHypothesis('H31','H31_golden_spiral_kernel.md')">31</span><span class='cell status-planned' title='H32 — Fibottention (Fib dilations per head) (status: planned)' onclick="openHypothesis('H32','H32_fibonacci_dilation_attention.md')">32</span><span class='cell status-planned' title='H33 — Overlapping-circle multi-path conv (status: planned)' onclick="openHypothesis('H33','H33_vesica_piscis_filter.md')">33</span><span class='cell status-done' title='H34 — Golden-angle RoPE frequencies (status: done)' onclick="openHypothesis('H34','H34_golden_angle_rotary.md')">34</span><span class='cell status-done' title='H35 — Chladni-eigenmode kernel basis (status: done)' onclick="openHypothesis('H35','H35_cymatic_wavelet.md')">35</span><span class='cell status-planned' title='H36 — Golden-spiral PE trajectory (status: planned)' onclick="openHypothesis('H36','H36_phi_spiral_positional_encoding.md')">36</span><span class='cell status-planned' title='H37 — Pentagonal-symmetry head grouping (status: planned)' onclick="openHypothesis('H37','H37_pentagonal_phi_attention.md')">37</span><span class='cell status-planned' title='H38 — Self-similar kernels at φ scales (status: planned)' onclick="openHypothesis('H38','H38_fractal_golden_filter.md')">38</span><span class='cell status-planned' title='H39 — φ-parameterised GELU / SwiGLU (status: planned)' onclick="openHypothesis('H39','H39_harmonic_phi_activation.md')">39</span><span class='cell status-planned' title='H40 — Metatron-Cube shared kernel basis (status: planned)' onclick="openHypothesis('H40','H40_metatron_kernel_overlap.md')">40</span></div>
-<div class='hyp-grid-row'><span class='gid'>G5</span><span class='cell status-planned' title='H41 — φ-derived LR / momentum (Jaeger 2020) (status: planned)' onclick="openHypothesis('H41','H41_golden_ratio_optimizer.md')">41</span><span class='cell status-planned' title='H42 — φ-scaled He init (status: planned)' onclick="openHypothesis('H42','H42_phi_weight_initialization.md')">42</span><span class='cell status-planned' title='H43 — Iterative Fib-ratio magnitude pruning (status: planned)' onclick="openHypothesis('H43','H43_fibonacci_pruning.md')">43</span><span class='cell status-planned' title='H44 — Per-layer 1/φ^k weight decay (status: planned)' onclick="openHypothesis('H44','H44_golden_regularization.md')">44</span><span class='cell status-planned' title='H45 — NAS restricted to φ/Fib/Platonic priors (status: planned)' onclick="openHypothesis('H45','H45_sacred_nas.md')">45</span><span class='cell status-planned' title='H46 — φ-harmonic Fourier-domain loss term (status: planned)' onclick="openHypothesis('H46','H46_cymatic_loss.md')">46</span><span class='cell status-planned' title='H47 — Fib-cycled dropout rates (status: planned)' onclick="openHypothesis('H47','H47_phi_dropout.md')">47</span><span class='cell status-planned' title='H48 — φ^{-epoch} momentum decay (status: planned)' onclick="openHypothesis('H48','H48_golden_momentum_scheduler.md')">48</span><span class='cell status-planned' title='H49 — PRH alignment auxiliary loss (status: planned)' onclick="openHypothesis('H49','H49_platonic_representation_alignment_loss.md')">49</span><span class='cell status-done' title='H50 — All-priors-on hybrid block (status: done)' onclick="openHypothesis('H50','H50_full_sacred_hybrid.md')">50</span></div>
-<div class='hyp-grid-row'><span class='gid'>G6</span><span class='cell status-planned' title='H51 — Differentiable PH loss (status: planned)' onclick="openHypothesis('H51','H51_topological_betti_loss.md')">51</span><span class='cell status-planned' title='H52 — FractalNet drop-path + anytime eval (status: planned)' onclick="openHypothesis('H52','H52_drop_path_anytime.md')">52</span><span class='cell status-planned' title='H53 — GICOPix 2D-3D bridge (status: planned)' onclick="openHypothesis('H53','H53_icosa_unfold_bridge.md')">53</span><span class='cell status-planned' title='H54 — β-target Betti regularisation (status: planned)' onclick="openHypothesis('H54','H54_persistent_homology_activation_reg.md')">54</span><span class='cell status-planned' title='H55 — Islam 2025 Platonic-Transformer reference impl (status: planned)' onclick="openHypothesis('H55','H55_platonic_transformers.md')">55</span><span class='cell status-planned' title='H56 — Synthetic Chladni-frequency dataset (status: planned)' onclick="openHypothesis('H56','H56_cymatic_pattern_dataset.md')">56</span><span class='cell status-planned' title='H57 — AudioSet × spectrogram cymatic priors (status: planned)' onclick="openHypothesis('H57','H57_audio_cymatic_cross_modal.md')">57</span><span class='cell status-done' title='H58 — **C4 max→avg pool fix** (top-priority next experiment) (status: done)' onclick="openHypothesis('H58','H58_group_avg_pool.md')">58</span><span class='cell status-queued' title='H59 — Trained-feature Betti curves (status: queued)' onclick="openHypothesis('H59','H59_trained_feature_betti.md')">59</span><span class='cell status-queued' title='H60 — 3-seed error bars on every row (status: queued)' onclick="openHypothesis('H60','H60_three_seed_uncertainty.md')">60</span></div>
-<div class='hyp-grid-row'><span class='gid'>G7</span><span class='cell status-planned' title='H61 — φ-modulated LTC inside JEPA encoder (status: planned)' onclick="openHypothesis('H61','H61_sacred_liquid_jepa.md')">61</span><span class='cell status-planned' title='H62 — Constant-memory KV + hex attention (status: planned)' onclick="openHypothesis('H62','H62_toroidal_kv_hex_attention.md')">62</span><span class='cell status-planned' title='H63 — dodeca-proj loss + cymatic teacher (status: planned)' onclick="openHypothesis('H63','H63_platonic_aux_cymatic_teacher.md')">63</span><span class='cell status-planned' title='H64 — Dynamic φ-grow + Fib-prune (status: planned)' onclick="openHypothesis('H64','H64_dynamic_growth_pruning.md')">64</span><span class='cell status-planned' title='H65 — Differentiable Betti-collapse term (status: planned)' onclick="openHypothesis('H65','H65_ph_betti_collapse_loss.md')">65</span><span class='cell status-planned' title='H66 — Cymatic wavelet QKV init (status: planned)' onclick="openHypothesis('H66','H66_cymatic_qkv_kernel.md')">66</span><span class='cell status-planned' title='H67 — Sacred-Liquid-JEPA-KAN-GNN-Transformer fusion (status: planned)' onclick="openHypothesis('H67','H67_full_paradigm_hybrid.md')">67</span><span class='cell status-planned' title='H68 — On-device toroidal world model (status: planned)' onclick="openHypothesis('H68','H68_ondevice_world_model.md')">68</span><span class='cell status-planned' title='H69 — KAN edges on Metatron graph (status: planned)' onclick="openHypothesis('H69','H69_kan_metatron_symbolic_head.md')">69</span><span class='cell status-planned' title='H70 — Low-data cymatic curriculum (status: planned)' onclick="openHypothesis('H70','H70_cymatic_low_data_curriculum.md')">70</span><span class='cell status-planned' title='H71 — Icosahedral RoPE for 3D spatial (status: planned)' onclick="openHypothesis('H71','H71_icosa_rope_3d.md')">71</span><span class='cell status-planned' title='H72 — Fractal φ-recursion inside LLM FFN + Vesica multi-path residuals (status: planned)' onclick="openHypothesis('H72','H72_fractal_vesica_ffn.md')">72</span><span class='cell status-planned' title='H73 — Golden-angle RoPE + spiral pos-graph + Metatron edge weights (status: planned)' onclick="openHypothesis('H73','H73_golden_spiral_metatron_pe.md')">73</span><span class='cell status-planned' title='H74 — Metatron overlap sharing across QKV/FFN + Platonic group tying (status: planned)' onclick="openHypothesis('H74','H74_metatron_overlap_tying.md')">74</span><span class='cell status-planned' title='H75 — Harmonic φ-activation in SwiGLU + dynamic cymatic thresholding (status: planned)' onclick="openHypothesis('H75','H75_harmonic_cymatic_swiglu.md')">75</span></div>
-</div></div>
+<div class='card panel-2col'><h3>Hypothesis ledger — 71-cell status grid (G1..G7 × hypothesis index; click to view the spec)</h3><i style='color:#8b949e'>hypotheses/INDEX.md not found.</i></div>
 </div>
 <h2 style='margin-top:30px'>Runs — click a row for reasoning ledger; ▸ for per-run training-curve + latency breakdown</h2>
 <div><span class='tier-chip active' onclick="setTier('ALL',this)">ALL</span><span class='tier-chip' onclick="setTier('T0',this)">T0</span><span class='tier-chip' onclick="setTier('T1',this)">T1</span><span class='tier-chip' onclick="setTier('T2',this)">T2</span><span class='tier-chip' onclick="setTier('T3',this)">T3</span><span class='tier-chip' onclick="setTier('T4',this)">T4</span><span class='tier-chip' onclick="setTier('T5',this)">T5</span></div>
@@ -189,6 +173,96 @@
 <td data-v='T0'><span class='chip'>T0</span></td>
 </tr>
 <tr class='detail-row' style='display:none'><td colspan='15'><div class='detail-grid'><div class='detail-block'><div class='lbl'>Training curve (epoch → test top-1)</div><div><svg width='220' height='36' viewBox='0 0 220 36' xmlns='http://www.w3.org/2000/svg' style='vertical-align:middle'><polyline points='2.0,34.0 17.4,26.8 32.9,22.1 48.3,16.5 63.7,17.6 79.1,14.0 94.6,8.0 110.0,7.0 125.4,7.6 140.9,5.8 156.3,4.5 171.7,4.3 187.1,2.7 202.6,2.3 218.0,2.0' fill='none' stroke='#58a6ff' stroke-width='1.6'/><circle cx='218.0' cy='2.0' r='2.4' fill='#3fb950'/><text x='218' y='32' fill='#8b949e' font-size='10' text-anchor='end'>84.8%</text></svg></div></div><div class='detail-block'><div class='lbl'>Latency / compute breakdown</div><div>latency (batch=1): <b>4.030 ms</b><br>train wall-clock: <b>194.4 s</b><br>generalisation gap (train−test top1): <b>2.46 pp</b><br>model: <b>?</b> · channel_mode: <b>?</b></div></div><div class='detail-block panel-2col' style='grid-column:1/3'><div class='lbl'>Prior flags</div><div><i style="color:#8b949e">no flags recorded</i></div></div></div></td></tr>
+<tr class='clickable ' data-tier='' onclick="openReasoning('sg_only_phi_budget')">
+<td onclick='event.stopPropagation();toggleDetail(this,"sg_only_phi_budget")' style='cursor:pointer;color:#58a6ff;font-weight:600;text-align:center'>▸</td>
+<td data-v='sg_only_phi_budget'><span class='tag-pill'>sg_only_phi_budget</span></td>
+<td data-v='cifar10'>cifar10</td>
+<td data-v='0'>0</td>
+<td data-v='12'>12</td>
+<td data-v='0.8554'>85.54%</td>
+<td data-v='0.9939'>99.39%</td>
+<td data-v='283570'>0.284M</td>
+<td data-v='90550912.0'>90.6M</td>
+<td data-v='6.266307999999299'>6.27 ms</td>
+<td data-v='0.861528384188811'>0.8615</td>
+<td data-v='0.8429163989699194'>0.8429</td>
+<td data-v='12'>12</td>
+<td data-v='570.051993'>570.0520</td>
+<td data-v=''><span class='chip'>—</span></td>
+</tr>
+<tr class='detail-row' style='display:none'><td colspan='15'><div class='detail-grid'><div class='detail-block'><div class='lbl'>Training curve (epoch → test top-1)</div><div><svg width='220' height='36' viewBox='0 0 220 36' xmlns='http://www.w3.org/2000/svg' style='vertical-align:middle'><polyline points='2.0,34.0 21.6,22.8 41.3,19.0 60.9,14.1 80.5,8.6 100.2,8.3 119.8,6.3 139.5,6.4 159.1,3.2 178.7,3.4 198.4,2.7 218.0,2.0' fill='none' stroke='#58a6ff' stroke-width='1.6'/><circle cx='218.0' cy='2.0' r='2.4' fill='#3fb950'/><text x='218' y='32' fill='#8b949e' font-size='10' text-anchor='end'>85.5%</text></svg></div></div><div class='detail-block'><div class='lbl'>Latency / compute breakdown</div><div>latency (batch=1): <b>6.266 ms</b><br>train wall-clock: <b>570.1 s</b><br>generalisation gap (train−test top1): <b>2.87 pp</b><br>model: <b>?</b> · channel_mode: <b>?</b></div></div><div class='detail-block panel-2col' style='grid-column:1/3'><div class='lbl'>Prior flags</div><div><i style="color:#8b949e">no flags recorded</i></div></div></div></td></tr>
+<tr class='clickable ' data-tier='T0' onclick="openReasoning('baseline_resnet20')">
+<td onclick='event.stopPropagation();toggleDetail(this,"baseline_resnet20")' style='cursor:pointer;color:#58a6ff;font-weight:600;text-align:center'>▸</td>
+<td data-v='baseline_resnet20'><span class='swatch status-done' style='display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle'></span><span class='tag-pill'>baseline_resnet20</span></td>
+<td data-v='cifar10'>cifar10</td>
+<td data-v='2'>2</td>
+<td data-v='12'>12</td>
+<td data-v='0.8346'>83.46%</td>
+<td data-v='0.9912'>99.12%</td>
+<td data-v='272474'>0.272M</td>
+<td data-v='41218688.0'>41.2M</td>
+<td data-v='3.935339000017848'>3.94 ms</td>
+<td data-v='0.8840218136707941'>0.8840</td>
+<td data-v='0.8330846391554206'>0.8331</td>
+<td data-v='-1'>-1</td>
+<td data-v='497.1665828000114'>497.1666</td>
+<td data-v='T0'><span class='chip'>T0</span></td>
+</tr>
+<tr class='detail-row' style='display:none'><td colspan='15'><div class='detail-grid'><div class='detail-block'><div class='lbl'>Training curve (epoch → test top-1)</div><div><svg width='220' height='36' viewBox='0 0 220 36' xmlns='http://www.w3.org/2000/svg' style='vertical-align:middle'><polyline points='2.0,34.0 21.6,27.6 41.3,21.4 60.9,14.2 80.5,16.2 100.2,10.4 119.8,5.7 139.5,5.6 159.1,4.6 178.7,3.3 198.4,2.1 218.0,2.0' fill='none' stroke='#58a6ff' stroke-width='1.6'/><circle cx='218.0' cy='2.0' r='2.4' fill='#3fb950'/><text x='218' y='32' fill='#8b949e' font-size='10' text-anchor='end'>83.5%</text></svg></div></div><div class='detail-block'><div class='lbl'>Latency / compute breakdown</div><div>latency (batch=1): <b>3.935 ms</b><br>train wall-clock: <b>497.2 s</b><br>generalisation gap (train−test top1): <b>2.12 pp</b><br>model: <b>?</b> · channel_mode: <b>?</b></div></div><div class='detail-block panel-2col' style='grid-column:1/3'><div class='lbl'>Prior flags</div><div><i style="color:#8b949e">no flags recorded</i></div></div></div></td></tr>
+<tr class='clickable ' data-tier='' onclick="openReasoning('sg_only_golden_momentum')">
+<td onclick='event.stopPropagation();toggleDetail(this,"sg_only_golden_momentum")' style='cursor:pointer;color:#58a6ff;font-weight:600;text-align:center'>▸</td>
+<td data-v='sg_only_golden_momentum'><span class='tag-pill'>sg_only_golden_momentum</span></td>
+<td data-v='cifar10'>cifar10</td>
+<td data-v='0'>0</td>
+<td data-v='12'>12</td>
+<td data-v='0.8352'>83.52%</td>
+<td data-v='0.9931'>99.31%</td>
+<td data-v='272474'>0.272M</td>
+<td data-v='41218688.0'>41.2M</td>
+<td data-v='4.510139999993044'>4.51 ms</td>
+<td data-v='0.9021276285250982'>0.9021</td>
+<td data-v='0.8307242454771374'>0.8307</td>
+<td data-v='-1'>-1</td>
+<td data-v='380.7645726999999'>380.7646</td>
+<td data-v=''><span class='chip'>—</span></td>
+</tr>
+<tr class='detail-row' style='display:none'><td colspan='15'><div class='detail-grid'><div class='detail-block'><div class='lbl'>Training curve (epoch → test top-1)</div><div><svg width='220' height='36' viewBox='0 0 220 36' xmlns='http://www.w3.org/2000/svg' style='vertical-align:middle'><polyline points='2.0,34.0 21.6,24.9 41.3,18.3 60.9,21.6 80.5,13.0 100.2,8.3 119.8,5.5 139.5,6.1 159.1,4.1 178.7,3.0 198.4,2.4 218.0,2.0' fill='none' stroke='#58a6ff' stroke-width='1.6'/><circle cx='218.0' cy='2.0' r='2.4' fill='#3fb950'/><text x='218' y='32' fill='#8b949e' font-size='10' text-anchor='end'>83.5%</text></svg></div></div><div class='detail-block'><div class='lbl'>Latency / compute breakdown</div><div>latency (batch=1): <b>4.510 ms</b><br>train wall-clock: <b>380.8 s</b><br>generalisation gap (train−test top1): <b>1.90 pp</b><br>model: <b>?</b> · channel_mode: <b>?</b></div></div><div class='detail-block panel-2col' style='grid-column:1/3'><div class='lbl'>Prior flags</div><div><i style="color:#8b949e">no flags recorded</i></div></div></div></td></tr>
+<tr class='clickable ' data-tier='T0' onclick="openReasoning('baseline_sg_vanilla')">
+<td onclick='event.stopPropagation();toggleDetail(this,"baseline_sg_vanilla")' style='cursor:pointer;color:#58a6ff;font-weight:600;text-align:center'>▸</td>
+<td data-v='baseline_sg_vanilla'><span class='swatch status-done' style='display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle'></span><span class='tag-pill'>baseline_sg_vanilla</span></td>
+<td data-v='cifar10'>cifar10</td>
+<td data-v='1'>1</td>
+<td data-v='12'>12</td>
+<td data-v='0.8295'>82.95%</td>
+<td data-v='0.9897'>98.97%</td>
+<td data-v='186330'>0.186M</td>
+<td data-v='35714528.0'>35.7M</td>
+<td data-v='5.276428000070155'>5.28 ms</td>
+<td data-v='0.8783902501066526'>0.8784</td>
+<td data-v='0.8298688599859824'>0.8299</td>
+<td data-v='-1'>-1</td>
+<td data-v='457.453337199986'>457.4533</td>
+<td data-v='T0'><span class='chip'>T0</span></td>
+</tr>
+<tr class='detail-row' style='display:none'><td colspan='15'><div class='detail-grid'><div class='detail-block'><div class='lbl'>Training curve (epoch → test top-1)</div><div><svg width='220' height='36' viewBox='0 0 220 36' xmlns='http://www.w3.org/2000/svg' style='vertical-align:middle'><polyline points='2.0,34.0 21.6,20.4 41.3,17.2 60.9,14.9 80.5,10.0 100.2,7.0 119.8,8.3 139.5,5.2 159.1,3.9 178.7,2.5 198.4,2.2 218.0,2.0' fill='none' stroke='#58a6ff' stroke-width='1.6'/><circle cx='218.0' cy='2.0' r='2.4' fill='#3fb950'/><text x='218' y='32' fill='#8b949e' font-size='10' text-anchor='end'>83.0%</text></svg></div></div><div class='detail-block'><div class='lbl'>Latency / compute breakdown</div><div>latency (batch=1): <b>5.276 ms</b><br>train wall-clock: <b>457.5 s</b><br>generalisation gap (train−test top1): <b>2.03 pp</b><br>model: <b>?</b> · channel_mode: <b>?</b></div></div><div class='detail-block panel-2col' style='grid-column:1/3'><div class='lbl'>Prior flags</div><div><i style="color:#8b949e">no flags recorded</i></div></div></div></td></tr>
+<tr class='clickable ' data-tier='' onclick="openReasoning('sg_only_fib_depth')">
+<td onclick='event.stopPropagation();toggleDetail(this,"sg_only_fib_depth")' style='cursor:pointer;color:#58a6ff;font-weight:600;text-align:center'>▸</td>
+<td data-v='sg_only_fib_depth'><span class='tag-pill'>sg_only_fib_depth</span></td>
+<td data-v='cifar10'>cifar10</td>
+<td data-v='0'>0</td>
+<td data-v='12'>12</td>
+<td data-v='0.8218'>82.18%</td>
+<td data-v='0.9896'>98.96%</td>
+<td data-v='180394'>0.180M</td>
+<td data-v='26716048.0'>26.7M</td>
+<td data-v='4.547947000010026'>4.55 ms</td>
+<td data-v='0.9224301651120186'>0.9224</td>
+<td data-v='0.8260981258235349'>0.8261</td>
+<td data-v='-1'>-1</td>
+<td data-v='375.60437470000033'>375.6044</td>
+<td data-v=''><span class='chip'>—</span></td>
+</tr>
+<tr class='detail-row' style='display:none'><td colspan='15'><div class='detail-grid'><div class='detail-block'><div class='lbl'>Training curve (epoch → test top-1)</div><div><svg width='220' height='36' viewBox='0 0 220 36' xmlns='http://www.w3.org/2000/svg' style='vertical-align:middle'><polyline points='2.0,34.0 21.6,28.0 41.3,19.0 60.9,11.6 80.5,13.5 100.2,10.6 119.8,7.8 139.5,4.9 159.1,4.0 178.7,2.5 198.4,2.3 218.0,2.0' fill='none' stroke='#58a6ff' stroke-width='1.6'/><circle cx='218.0' cy='2.0' r='2.4' fill='#3fb950'/><text x='218' y='32' fill='#8b949e' font-size='10' text-anchor='end'>82.2%</text></svg></div></div><div class='detail-block'><div class='lbl'>Latency / compute breakdown</div><div>latency (batch=1): <b>4.548 ms</b><br>train wall-clock: <b>375.6 s</b><br>generalisation gap (train−test top1): <b>1.37 pp</b><br>model: <b>?</b> · channel_mode: <b>?</b></div></div><div class='detail-block panel-2col' style='grid-column:1/3'><div class='lbl'>Prior flags</div><div><i style="color:#8b949e">no flags recorded</i></div></div></div></td></tr>
 <tr class='clickable ' data-tier='T0' onclick="openReasoning('baseline_sg_vanilla')">
 <td onclick='event.stopPropagation();toggleDetail(this,"baseline_sg_vanilla")' style='cursor:pointer;color:#58a6ff;font-weight:600;text-align:center'>▸</td>
 <td data-v='baseline_sg_vanilla'><span class='swatch status-done' style='display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle'></span><span class='tag-pill'>baseline_sg_vanilla</span></td>
@@ -207,6 +281,132 @@
 <td data-v='T0'><span class='chip'>T0</span></td>
 </tr>
 <tr class='detail-row' style='display:none'><td colspan='15'><div class='detail-grid'><div class='detail-block'><div class='lbl'>Training curve (epoch → test top-1)</div><div><svg width='220' height='36' viewBox='0 0 220 36' xmlns='http://www.w3.org/2000/svg' style='vertical-align:middle'><polyline points='2.0,34.0 21.6,23.5 41.3,15.9 60.9,16.3 80.5,11.2 100.2,10.2 119.8,9.7 139.5,4.5 159.1,3.0 178.7,2.5 198.4,2.0 218.0,2.0' fill='none' stroke='#58a6ff' stroke-width='1.6'/><circle cx='218.0' cy='2.0' r='2.4' fill='#3fb950'/><text x='218' y='32' fill='#8b949e' font-size='10' text-anchor='end'>82.2%</text></svg></div></div><div class='detail-block'><div class='lbl'>Latency / compute breakdown</div><div>latency (batch=1): <b>4.425 ms</b><br>train wall-clock: <b>348.1 s</b><br>generalisation gap (train−test top1): <b>1.71 pp</b><br>model: <b>?</b> · channel_mode: <b>?</b></div></div><div class='detail-block panel-2col' style='grid-column:1/3'><div class='lbl'>Prior flags</div><div><i style="color:#8b949e">no flags recorded</i></div></div></div></td></tr>
+<tr class='clickable ' data-tier='T0' onclick="openReasoning('baseline_sg_vanilla')">
+<td onclick='event.stopPropagation();toggleDetail(this,"baseline_sg_vanilla")' style='cursor:pointer;color:#58a6ff;font-weight:600;text-align:center'>▸</td>
+<td data-v='baseline_sg_vanilla'><span class='swatch status-done' style='display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle'></span><span class='tag-pill'>baseline_sg_vanilla</span></td>
+<td data-v='cifar10'>cifar10</td>
+<td data-v='2'>2</td>
+<td data-v='12'>12</td>
+<td data-v='0.8226'>82.26%</td>
+<td data-v='0.9907'>99.07%</td>
+<td data-v='186330'>0.186M</td>
+<td data-v='35714528.0'>35.7M</td>
+<td data-v='4.95492700021714'>4.95 ms</td>
+<td data-v='0.8992879365881284'>0.8993</td>
+<td data-v='0.8243339977762792'>0.8243</td>
+<td data-v='-1'>-1</td>
+<td data-v='447.044426700013'>447.0444</td>
+<td data-v='T0'><span class='chip'>T0</span></td>
+</tr>
+<tr class='detail-row' style='display:none'><td colspan='15'><div class='detail-grid'><div class='detail-block'><div class='lbl'>Training curve (epoch → test top-1)</div><div><svg width='220' height='36' viewBox='0 0 220 36' xmlns='http://www.w3.org/2000/svg' style='vertical-align:middle'><polyline points='2.0,34.0 21.6,21.3 41.3,16.6 60.9,13.3 80.5,12.1 100.2,8.2 119.8,7.6 139.5,4.8 159.1,3.9 178.7,3.4 198.4,2.2 218.0,2.0' fill='none' stroke='#58a6ff' stroke-width='1.6'/><circle cx='218.0' cy='2.0' r='2.4' fill='#3fb950'/><text x='218' y='32' fill='#8b949e' font-size='10' text-anchor='end'>82.3%</text></svg></div></div><div class='detail-block'><div class='lbl'>Latency / compute breakdown</div><div>latency (batch=1): <b>4.955 ms</b><br>train wall-clock: <b>447.0 s</b><br>generalisation gap (train−test top1): <b>1.63 pp</b><br>model: <b>?</b> · channel_mode: <b>?</b></div></div><div class='detail-block panel-2col' style='grid-column:1/3'><div class='lbl'>Prior flags</div><div><i style="color:#8b949e">no flags recorded</i></div></div></div></td></tr>
+<tr class='clickable ' data-tier='T0' onclick="openReasoning('baseline_resnet20')">
+<td onclick='event.stopPropagation();toggleDetail(this,"baseline_resnet20")' style='cursor:pointer;color:#58a6ff;font-weight:600;text-align:center'>▸</td>
+<td data-v='baseline_resnet20'><span class='swatch status-done' style='display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle'></span><span class='tag-pill'>baseline_resnet20</span></td>
+<td data-v='cifar10'>cifar10</td>
+<td data-v='1'>1</td>
+<td data-v='12'>12</td>
+<td data-v='0.8339'>83.39%</td>
+<td data-v='0.9907'>99.07%</td>
+<td data-v='272474'>0.272M</td>
+<td data-v='41218688.0'>41.2M</td>
+<td data-v='5.778082000033464'>5.78 ms</td>
+<td data-v='0.9029927551746368'>0.9030</td>
+<td data-v='0.8240445615882567'>0.8240</td>
+<td data-v='-1'>-1</td>
+<td data-v='557.2852373999776'>557.2852</td>
+<td data-v='T0'><span class='chip'>T0</span></td>
+</tr>
+<tr class='detail-row' style='display:none'><td colspan='15'><div class='detail-grid'><div class='detail-block'><div class='lbl'>Training curve (epoch → test top-1)</div><div><svg width='220' height='36' viewBox='0 0 220 36' xmlns='http://www.w3.org/2000/svg' style='vertical-align:middle'><polyline points='2.0,34.0 21.6,24.3 41.3,18.0 60.9,15.0 80.5,11.0 100.2,11.8 119.8,6.1 139.5,5.1 159.1,3.4 178.7,2.9 198.4,2.2 218.0,2.0' fill='none' stroke='#58a6ff' stroke-width='1.6'/><circle cx='218.0' cy='2.0' r='2.4' fill='#3fb950'/><text x='218' y='32' fill='#8b949e' font-size='10' text-anchor='end'>83.4%</text></svg></div></div><div class='detail-block'><div class='lbl'>Latency / compute breakdown</div><div>latency (batch=1): <b>5.778 ms</b><br>train wall-clock: <b>557.3 s</b><br>generalisation gap (train−test top1): <b>2.03 pp</b><br>model: <b>?</b> · channel_mode: <b>?</b></div></div><div class='detail-block panel-2col' style='grid-column:1/3'><div class='lbl'>Prior flags</div><div><i style="color:#8b949e">no flags recorded</i></div></div></div></td></tr>
+<tr class='clickable ' data-tier='' onclick="openReasoning('sg_only_phi_dropout')">
+<td onclick='event.stopPropagation();toggleDetail(this,"sg_only_phi_dropout")' style='cursor:pointer;color:#58a6ff;font-weight:600;text-align:center'>▸</td>
+<td data-v='sg_only_phi_dropout'><span class='tag-pill'>sg_only_phi_dropout</span></td>
+<td data-v='cifar10'>cifar10</td>
+<td data-v='0'>0</td>
+<td data-v='12'>12</td>
+<td data-v='0.828'>82.80%</td>
+<td data-v='0.9917'>99.17%</td>
+<td data-v='272474'>0.272M</td>
+<td data-v='41218688.0'>41.2M</td>
+<td data-v='4.747944000000643'>4.75 ms</td>
+<td data-v='0.8726996953288714'>0.8727</td>
+<td data-v='0.8224084672321829'>0.8224</td>
+<td data-v='-1'>-1</td>
+<td data-v='390.4186864000003'>390.4187</td>
+<td data-v=''><span class='chip'>—</span></td>
+</tr>
+<tr class='detail-row' style='display:none'><td colspan='15'><div class='detail-grid'><div class='detail-block'><div class='lbl'>Training curve (epoch → test top-1)</div><div><svg width='220' height='36' viewBox='0 0 220 36' xmlns='http://www.w3.org/2000/svg' style='vertical-align:middle'><polyline points='2.0,34.0 21.6,22.7 41.3,20.3 60.9,14.1 80.5,15.2 100.2,9.1 119.8,8.2 139.5,6.9 159.1,3.4 178.7,3.5 198.4,2.2 218.0,2.0' fill='none' stroke='#58a6ff' stroke-width='1.6'/><circle cx='218.0' cy='2.0' r='2.4' fill='#3fb950'/><text x='218' y='32' fill='#8b949e' font-size='10' text-anchor='end'>82.8%</text></svg></div></div><div class='detail-block'><div class='lbl'>Latency / compute breakdown</div><div>latency (batch=1): <b>4.748 ms</b><br>train wall-clock: <b>390.4 s</b><br>generalisation gap (train−test top1): <b>1.12 pp</b><br>model: <b>?</b> · channel_mode: <b>?</b></div></div><div class='detail-block panel-2col' style='grid-column:1/3'><div class='lbl'>Prior flags</div><div><i style="color:#8b949e">no flags recorded</i></div></div></div></td></tr>
+<tr class='clickable ' data-tier='' onclick="openReasoning('sg_chan_fib')">
+<td onclick='event.stopPropagation();toggleDetail(this,"sg_chan_fib")' style='cursor:pointer;color:#58a6ff;font-weight:600;text-align:center'>▸</td>
+<td data-v='sg_chan_fib'><span class='tag-pill'>sg_chan_fib</span></td>
+<td data-v='cifar10'>cifar10</td>
+<td data-v='1'>1</td>
+<td data-v='12'>12</td>
+<td data-v='0.8074'>80.74%</td>
+<td data-v='0.9891'>98.91%</td>
+<td data-v='127146'>0.127M</td>
+<td data-v='27793296.0'>27.8M</td>
+<td data-v='4.684984000050463'>4.68 ms</td>
+<td data-v='0.8614050770799319'>0.8614</td>
+<td data-v='0.8186494593044866'>0.8186</td>
+<td data-v='-1'>-1</td>
+<td data-v='453.77678240000387'>453.7768</td>
+<td data-v=''><span class='chip'>—</span></td>
+</tr>
+<tr class='detail-row' style='display:none'><td colspan='15'><div class='detail-grid'><div class='detail-block'><div class='lbl'>Training curve (epoch → test top-1)</div><div><svg width='220' height='36' viewBox='0 0 220 36' xmlns='http://www.w3.org/2000/svg' style='vertical-align:middle'><polyline points='2.0,34.0 21.6,29.5 41.3,17.0 60.9,16.4 80.5,10.8 100.2,12.0 119.8,7.0 139.5,5.7 159.1,4.4 178.7,3.3 198.4,2.1 218.0,2.0' fill='none' stroke='#58a6ff' stroke-width='1.6'/><circle cx='218.0' cy='2.0' r='2.4' fill='#3fb950'/><text x='218' y='32' fill='#8b949e' font-size='10' text-anchor='end'>80.7%</text></svg></div></div><div class='detail-block'><div class='lbl'>Latency / compute breakdown</div><div>latency (batch=1): <b>4.685 ms</b><br>train wall-clock: <b>453.8 s</b><br>generalisation gap (train−test top1): <b>1.51 pp</b><br>model: <b>?</b> · channel_mode: <b>?</b></div></div><div class='detail-block panel-2col' style='grid-column:1/3'><div class='lbl'>Prior flags</div><div><i style="color:#8b949e">no flags recorded</i></div></div></div></td></tr>
+<tr class='clickable ' data-tier='' onclick="openReasoning('sg_chan_fib')">
+<td onclick='event.stopPropagation();toggleDetail(this,"sg_chan_fib")' style='cursor:pointer;color:#58a6ff;font-weight:600;text-align:center'>▸</td>
+<td data-v='sg_chan_fib'><span class='tag-pill'>sg_chan_fib</span></td>
+<td data-v='cifar10'>cifar10</td>
+<td data-v='2'>2</td>
+<td data-v='12'>12</td>
+<td data-v='0.8121'>81.21%</td>
+<td data-v='0.9897'>98.97%</td>
+<td data-v='127146'>0.127M</td>
+<td data-v='27793296.0'>27.8M</td>
+<td data-v='6.115084999764804'>6.12 ms</td>
+<td data-v='0.8528568496306738'>0.8529</td>
+<td data-v='0.8175647400009669'>0.8176</td>
+<td data-v='-1'>-1</td>
+<td data-v='513.9827173000085'>513.9827</td>
+<td data-v=''><span class='chip'>—</span></td>
+</tr>
+<tr class='detail-row' style='display:none'><td colspan='15'><div class='detail-grid'><div class='detail-block'><div class='lbl'>Training curve (epoch → test top-1)</div><div><svg width='220' height='36' viewBox='0 0 220 36' xmlns='http://www.w3.org/2000/svg' style='vertical-align:middle'><polyline points='2.0,34.0 21.6,23.4 41.3,22.8 60.9,13.7 80.5,19.3 100.2,9.3 119.8,7.4 139.5,6.5 159.1,4.0 178.7,3.3 198.4,2.3 218.0,2.0' fill='none' stroke='#58a6ff' stroke-width='1.6'/><circle cx='218.0' cy='2.0' r='2.4' fill='#3fb950'/><text x='218' y='32' fill='#8b949e' font-size='10' text-anchor='end'>81.2%</text></svg></div></div><div class='detail-block'><div class='lbl'>Latency / compute breakdown</div><div>latency (batch=1): <b>6.115 ms</b><br>train wall-clock: <b>514.0 s</b><br>generalisation gap (train−test top1): <b>0.44 pp</b><br>model: <b>?</b> · channel_mode: <b>?</b></div></div><div class='detail-block panel-2col' style='grid-column:1/3'><div class='lbl'>Prior flags</div><div><i style="color:#8b949e">no flags recorded</i></div></div></div></td></tr>
+<tr class='clickable ' data-tier='' onclick="openReasoning('sg_chan_phi')">
+<td onclick='event.stopPropagation();toggleDetail(this,"sg_chan_phi")' style='cursor:pointer;color:#58a6ff;font-weight:600;text-align:center'>▸</td>
+<td data-v='sg_chan_phi'><span class='tag-pill'>sg_chan_phi</span></td>
+<td data-v='cifar10'>cifar10</td>
+<td data-v='1'>1</td>
+<td data-v='12'>12</td>
+<td data-v='0.8074'>80.74%</td>
+<td data-v='0.9891'>98.91%</td>
+<td data-v='127146'>0.127M</td>
+<td data-v='27793296.0'>27.8M</td>
+<td data-v='5.353305999888107'>5.35 ms</td>
+<td data-v='0.8614050770799319'>0.8614</td>
+<td data-v='0.8157537614684178'>0.8158</td>
+<td data-v='-1'>-1</td>
+<td data-v='562.6482586000056'>562.6483</td>
+<td data-v=''><span class='chip'>—</span></td>
+</tr>
+<tr class='detail-row' style='display:none'><td colspan='15'><div class='detail-grid'><div class='detail-block'><div class='lbl'>Training curve (epoch → test top-1)</div><div><svg width='220' height='36' viewBox='0 0 220 36' xmlns='http://www.w3.org/2000/svg' style='vertical-align:middle'><polyline points='2.0,34.0 21.6,29.5 41.3,17.0 60.9,16.4 80.5,10.8 100.2,12.0 119.8,7.0 139.5,5.7 159.1,4.4 178.7,3.3 198.4,2.1 218.0,2.0' fill='none' stroke='#58a6ff' stroke-width='1.6'/><circle cx='218.0' cy='2.0' r='2.4' fill='#3fb950'/><text x='218' y='32' fill='#8b949e' font-size='10' text-anchor='end'>80.7%</text></svg></div></div><div class='detail-block'><div class='lbl'>Latency / compute breakdown</div><div>latency (batch=1): <b>5.353 ms</b><br>train wall-clock: <b>562.6 s</b><br>generalisation gap (train−test top1): <b>1.51 pp</b><br>model: <b>?</b> · channel_mode: <b>?</b></div></div><div class='detail-block panel-2col' style='grid-column:1/3'><div class='lbl'>Prior flags</div><div><i style="color:#8b949e">no flags recorded</i></div></div></div></td></tr>
+<tr class='clickable ' data-tier='' onclick="openReasoning('sg_only_golden_resize')">
+<td onclick='event.stopPropagation();toggleDetail(this,"sg_only_golden_resize")' style='cursor:pointer;color:#58a6ff;font-weight:600;text-align:center'>▸</td>
+<td data-v='sg_only_golden_resize'><span class='tag-pill'>sg_only_golden_resize</span></td>
+<td data-v='cifar10'>cifar10</td>
+<td data-v='0'>0</td>
+<td data-v='12'>12</td>
+<td data-v='0.8067'>80.67%</td>
+<td data-v='0.99'>99.00%</td>
+<td data-v='127146'>0.127M</td>
+<td data-v='57104284.0'>57.1M</td>
+<td data-v='5.186431000001903'>5.19 ms</td>
+<td data-v='0.8393248890837034'>0.8393</td>
+<td data-v='0.8157414346846577'>0.8157</td>
+<td data-v='-1'>-1</td>
+<td data-v='373.2694706000002'>373.2695</td>
+<td data-v=''><span class='chip'>—</span></td>
+</tr>
+<tr class='detail-row' style='display:none'><td colspan='15'><div class='detail-grid'><div class='detail-block'><div class='lbl'>Training curve (epoch → test top-1)</div><div><svg width='220' height='36' viewBox='0 0 220 36' xmlns='http://www.w3.org/2000/svg' style='vertical-align:middle'><polyline points='2.0,34.0 21.6,24.4 41.3,21.1 60.9,14.1 80.5,13.2 100.2,8.2 119.8,11.5 139.5,6.7 159.1,5.5 178.7,3.1 198.4,2.3 218.0,2.0' fill='none' stroke='#58a6ff' stroke-width='1.6'/><circle cx='218.0' cy='2.0' r='2.4' fill='#3fb950'/><text x='218' y='32' fill='#8b949e' font-size='10' text-anchor='end'>80.7%</text></svg></div></div><div class='detail-block'><div class='lbl'>Latency / compute breakdown</div><div>latency (batch=1): <b>5.186 ms</b><br>train wall-clock: <b>373.3 s</b><br>generalisation gap (train−test top1): <b>1.26 pp</b><br>model: <b>?</b> · channel_mode: <b>?</b></div></div><div class='detail-block panel-2col' style='grid-column:1/3'><div class='lbl'>Prior flags</div><div><i style="color:#8b949e">no flags recorded</i></div></div></div></td></tr>
 <tr class='clickable ' data-tier='' onclick="openReasoning('sg_chan_phi')">
 <td onclick='event.stopPropagation();toggleDetail(this,"sg_chan_phi")' style='cursor:pointer;color:#58a6ff;font-weight:600;text-align:center'>▸</td>
 <td data-v='sg_chan_phi'><span class='tag-pill'>sg_chan_phi</span></td>
@@ -225,6 +425,60 @@
 <td data-v=''><span class='chip'>—</span></td>
 </tr>
 <tr class='detail-row' style='display:none'><td colspan='15'><div class='detail-grid'><div class='detail-block'><div class='lbl'>Training curve (epoch → test top-1)</div><div><svg width='220' height='36' viewBox='0 0 220 36' xmlns='http://www.w3.org/2000/svg' style='vertical-align:middle'><polyline points='2.0,34.0 21.6,26.5 41.3,14.4 60.9,14.7 80.5,11.7 100.2,7.9 119.8,7.0 139.5,6.3 159.1,4.0 178.7,2.8 198.4,2.1 218.0,2.0' fill='none' stroke='#58a6ff' stroke-width='1.6'/><circle cx='218.0' cy='2.0' r='2.4' fill='#3fb950'/><text x='218' y='32' fill='#8b949e' font-size='10' text-anchor='end'>80.1%</text></svg></div></div><div class='detail-block'><div class='lbl'>Latency / compute breakdown</div><div>latency (batch=1): <b>4.106 ms</b><br>train wall-clock: <b>351.4 s</b><br>generalisation gap (train−test top1): <b>1.69 pp</b><br>model: <b>?</b> · channel_mode: <b>?</b></div></div><div class='detail-block panel-2col' style='grid-column:1/3'><div class='lbl'>Prior flags</div><div><i style="color:#8b949e">no flags recorded</i></div></div></div></td></tr>
+<tr class='clickable ' data-tier='' onclick="openReasoning('sg_only_phi_compound')">
+<td onclick='event.stopPropagation();toggleDetail(this,"sg_only_phi_compound")' style='cursor:pointer;color:#58a6ff;font-weight:600;text-align:center'>▸</td>
+<td data-v='sg_only_phi_compound'><span class='tag-pill'>sg_only_phi_compound</span></td>
+<td data-v='cifar10'>cifar10</td>
+<td data-v='0'>0</td>
+<td data-v='12'>12</td>
+<td data-v='0.8042'>80.42%</td>
+<td data-v='0.9909'>99.09%</td>
+<td data-v='127146'>0.127M</td>
+<td data-v='27793296.0'>27.8M</td>
+<td data-v='4.738268000000971'>4.74 ms</td>
+<td data-v='0.8859420220057169'>0.8859</td>
+<td data-v='0.815203883851445'>0.8152</td>
+<td data-v='-1'>-1</td>
+<td data-v='378.0504057999997'>378.0504</td>
+<td data-v=''><span class='chip'>—</span></td>
+</tr>
+<tr class='detail-row' style='display:none'><td colspan='15'><div class='detail-grid'><div class='detail-block'><div class='lbl'>Training curve (epoch → test top-1)</div><div><svg width='220' height='36' viewBox='0 0 220 36' xmlns='http://www.w3.org/2000/svg' style='vertical-align:middle'><polyline points='2.0,34.0 21.6,24.6 41.3,15.0 60.9,14.7 80.5,14.7 100.2,7.1 119.8,6.5 139.5,5.2 159.1,4.1 178.7,3.6 198.4,2.1 218.0,2.0' fill='none' stroke='#58a6ff' stroke-width='1.6'/><circle cx='218.0' cy='2.0' r='2.4' fill='#3fb950'/><text x='218' y='32' fill='#8b949e' font-size='10' text-anchor='end'>80.4%</text></svg></div></div><div class='detail-block'><div class='lbl'>Latency / compute breakdown</div><div>latency (batch=1): <b>4.738 ms</b><br>train wall-clock: <b>378.1 s</b><br>generalisation gap (train−test top1): <b>1.43 pp</b><br>model: <b>?</b> · channel_mode: <b>?</b></div></div><div class='detail-block panel-2col' style='grid-column:1/3'><div class='lbl'>Prior flags</div><div><i style="color:#8b949e">no flags recorded</i></div></div></div></td></tr>
+<tr class='clickable ' data-tier='' onclick="openReasoning('sg_only_phi_multiscale')">
+<td onclick='event.stopPropagation();toggleDetail(this,"sg_only_phi_multiscale")' style='cursor:pointer;color:#58a6ff;font-weight:600;text-align:center'>▸</td>
+<td data-v='sg_only_phi_multiscale'><span class='tag-pill'>sg_only_phi_multiscale</span></td>
+<td data-v='cifar10'>cifar10</td>
+<td data-v='0'>0</td>
+<td data-v='12'>12</td>
+<td data-v='0.82'>82.00%</td>
+<td data-v='0.9898'>98.98%</td>
+<td data-v='194612'>0.195M</td>
+<td data-v='30318208.0'>30.3M</td>
+<td data-v='6.437582999999449'>6.44 ms</td>
+<td data-v='0.9378497923413912'>0.9378</td>
+<td data-v='0.8151053771341897'>0.8151</td>
+<td data-v='-1'>-1</td>
+<td data-v='486.8563945000001'>486.8564</td>
+<td data-v=''><span class='chip'>—</span></td>
+</tr>
+<tr class='detail-row' style='display:none'><td colspan='15'><div class='detail-grid'><div class='detail-block'><div class='lbl'>Training curve (epoch → test top-1)</div><div><svg width='220' height='36' viewBox='0 0 220 36' xmlns='http://www.w3.org/2000/svg' style='vertical-align:middle'><polyline points='2.0,34.0 21.6,24.6 41.3,19.0 60.9,13.3 80.5,10.5 100.2,11.6 119.8,11.7 139.5,6.3 159.1,4.5 178.7,3.6 198.4,2.5 218.0,2.0' fill='none' stroke='#58a6ff' stroke-width='1.6'/><circle cx='218.0' cy='2.0' r='2.4' fill='#3fb950'/><text x='218' y='32' fill='#8b949e' font-size='10' text-anchor='end'>82.0%</text></svg></div></div><div class='detail-block'><div class='lbl'>Latency / compute breakdown</div><div>latency (batch=1): <b>6.438 ms</b><br>train wall-clock: <b>486.9 s</b><br>generalisation gap (train−test top1): <b>0.87 pp</b><br>model: <b>?</b> · channel_mode: <b>?</b></div></div><div class='detail-block panel-2col' style='grid-column:1/3'><div class='lbl'>Prior flags</div><div><i style="color:#8b949e">no flags recorded</i></div></div></div></td></tr>
+<tr class='clickable ' data-tier='' onclick="openReasoning('sg_only_golden_spiral_init')">
+<td onclick='event.stopPropagation();toggleDetail(this,"sg_only_golden_spiral_init")' style='cursor:pointer;color:#58a6ff;font-weight:600;text-align:center'>▸</td>
+<td data-v='sg_only_golden_spiral_init'><span class='tag-pill'>sg_only_golden_spiral_init</span></td>
+<td data-v='cifar10'>cifar10</td>
+<td data-v='0'>0</td>
+<td data-v='12'>12</td>
+<td data-v='0.8042'>80.42%</td>
+<td data-v='0.9909'>99.09%</td>
+<td data-v='127146'>0.127M</td>
+<td data-v='27793296.0'>27.8M</td>
+<td data-v='4.960833999998613'>4.96 ms</td>
+<td data-v='0.8859420220057169'>0.8859</td>
+<td data-v='0.814207130163285'>0.8142</td>
+<td data-v='-1'>-1</td>
+<td data-v='398.60779920000004'>398.6078</td>
+<td data-v=''><span class='chip'>—</span></td>
+</tr>
+<tr class='detail-row' style='display:none'><td colspan='15'><div class='detail-grid'><div class='detail-block'><div class='lbl'>Training curve (epoch → test top-1)</div><div><svg width='220' height='36' viewBox='0 0 220 36' xmlns='http://www.w3.org/2000/svg' style='vertical-align:middle'><polyline points='2.0,34.0 21.6,24.6 41.3,15.0 60.9,14.7 80.5,14.7 100.2,7.1 119.8,6.5 139.5,5.2 159.1,4.1 178.7,3.6 198.4,2.1 218.0,2.0' fill='none' stroke='#58a6ff' stroke-width='1.6'/><circle cx='218.0' cy='2.0' r='2.4' fill='#3fb950'/><text x='218' y='32' fill='#8b949e' font-size='10' text-anchor='end'>80.4%</text></svg></div></div><div class='detail-block'><div class='lbl'>Latency / compute breakdown</div><div>latency (batch=1): <b>4.961 ms</b><br>train wall-clock: <b>398.6 s</b><br>generalisation gap (train−test top1): <b>1.43 pp</b><br>model: <b>?</b> · channel_mode: <b>?</b></div></div><div class='detail-block panel-2col' style='grid-column:1/3'><div class='lbl'>Prior flags</div><div><i style="color:#8b949e">no flags recorded</i></div></div></div></td></tr>
 <tr class='clickable ' data-tier='' onclick="openReasoning('sg_chan_fib')">
 <td onclick='event.stopPropagation();toggleDetail(this,"sg_chan_fib")' style='cursor:pointer;color:#58a6ff;font-weight:600;text-align:center'>▸</td>
 <td data-v='sg_chan_fib'><span class='tag-pill'>sg_chan_fib</span></td>
@@ -243,6 +497,42 @@
 <td data-v=''><span class='chip'>—</span></td>
 </tr>
 <tr class='detail-row' style='display:none'><td colspan='15'><div class='detail-grid'><div class='detail-block'><div class='lbl'>Training curve (epoch → test top-1)</div><div><svg width='220' height='36' viewBox='0 0 220 36' xmlns='http://www.w3.org/2000/svg' style='vertical-align:middle'><polyline points='2.0,34.0 21.6,26.5 41.3,14.4 60.9,14.7 80.5,11.7 100.2,7.9 119.8,7.0 139.5,6.3 159.1,4.0 178.7,2.8 198.4,2.1 218.0,2.0' fill='none' stroke='#58a6ff' stroke-width='1.6'/><circle cx='218.0' cy='2.0' r='2.4' fill='#3fb950'/><text x='218' y='32' fill='#8b949e' font-size='10' text-anchor='end'>80.1%</text></svg></div></div><div class='detail-block'><div class='lbl'>Latency / compute breakdown</div><div>latency (batch=1): <b>4.435 ms</b><br>train wall-clock: <b>358.2 s</b><br>generalisation gap (train−test top1): <b>1.69 pp</b><br>model: <b>?</b> · channel_mode: <b>?</b></div></div><div class='detail-block panel-2col' style='grid-column:1/3'><div class='lbl'>Prior flags</div><div><i style="color:#8b949e">no flags recorded</i></div></div></div></td></tr>
+<tr class='clickable ' data-tier='' onclick="openReasoning('sg_only_fib_ensemble')">
+<td onclick='event.stopPropagation();toggleDetail(this,"sg_only_fib_ensemble")' style='cursor:pointer;color:#58a6ff;font-weight:600;text-align:center'>▸</td>
+<td data-v='sg_only_fib_ensemble'><span class='tag-pill'>sg_only_fib_ensemble</span></td>
+<td data-v='cifar10'>cifar10</td>
+<td data-v='0'>0</td>
+<td data-v='12'>12</td>
+<td data-v='0.8011'>80.11%</td>
+<td data-v='0.99'>99.00%</td>
+<td data-v='127146'>0.127M</td>
+<td data-v='27793296.0'>27.8M</td>
+<td data-v='4.511694000002535'>4.51 ms</td>
+<td data-v='0.8777794962128004'>0.8778</td>
+<td data-v='0.8131678830819117'>0.8132</td>
+<td data-v='-1'>-1</td>
+<td data-v='380.07190619999983'>380.0719</td>
+<td data-v=''><span class='chip'>—</span></td>
+</tr>
+<tr class='detail-row' style='display:none'><td colspan='15'><div class='detail-grid'><div class='detail-block'><div class='lbl'>Training curve (epoch → test top-1)</div><div><svg width='220' height='36' viewBox='0 0 220 36' xmlns='http://www.w3.org/2000/svg' style='vertical-align:middle'><polyline points='2.0,34.0 21.6,24.6 41.3,15.0 60.9,14.7 80.5,14.7 100.2,7.1 119.8,6.5 139.5,5.2 159.1,4.1 178.7,3.6 198.4,2.1 218.0,2.0' fill='none' stroke='#58a6ff' stroke-width='1.6'/><circle cx='218.0' cy='2.0' r='2.4' fill='#3fb950'/><text x='218' y='32' fill='#8b949e' font-size='10' text-anchor='end'>80.4%</text></svg></div></div><div class='detail-block'><div class='lbl'>Latency / compute breakdown</div><div>latency (batch=1): <b>4.512 ms</b><br>train wall-clock: <b>380.1 s</b><br>generalisation gap (train−test top1): <b>1.74 pp</b><br>model: <b>?</b> · channel_mode: <b>?</b></div></div><div class='detail-block panel-2col' style='grid-column:1/3'><div class='lbl'>Prior flags</div><div><i style="color:#8b949e">no flags recorded</i></div></div></div></td></tr>
+<tr class='clickable ' data-tier='' onclick="openReasoning('sg_only_phi_decay')">
+<td onclick='event.stopPropagation();toggleDetail(this,"sg_only_phi_decay")' style='cursor:pointer;color:#58a6ff;font-weight:600;text-align:center'>▸</td>
+<td data-v='sg_only_phi_decay'><span class='tag-pill'>sg_only_phi_decay</span></td>
+<td data-v='cifar10'>cifar10</td>
+<td data-v='0'>0</td>
+<td data-v='12'>12</td>
+<td data-v='0.7981'>79.81%</td>
+<td data-v='0.9881'>98.81%</td>
+<td data-v='127146'>0.127M</td>
+<td data-v='27793296.0'>27.8M</td>
+<td data-v='4.174344000002748'>4.17 ms</td>
+<td data-v='0.8800353904565176'>0.8800</td>
+<td data-v='0.8118554531260024'>0.8119</td>
+<td data-v='-1'>-1</td>
+<td data-v='368.55770540000003'>368.5577</td>
+<td data-v=''><span class='chip'>—</span></td>
+</tr>
+<tr class='detail-row' style='display:none'><td colspan='15'><div class='detail-grid'><div class='detail-block'><div class='lbl'>Training curve (epoch → test top-1)</div><div><svg width='220' height='36' viewBox='0 0 220 36' xmlns='http://www.w3.org/2000/svg' style='vertical-align:middle'><polyline points='2.0,34.0 21.6,26.1 41.3,15.8 60.9,14.3 80.5,12.6 100.2,10.5 119.8,6.1 139.5,5.9 159.1,5.2 178.7,2.5 198.4,2.2 218.0,2.0' fill='none' stroke='#58a6ff' stroke-width='1.6'/><circle cx='218.0' cy='2.0' r='2.4' fill='#3fb950'/><text x='218' y='32' fill='#8b949e' font-size='10' text-anchor='end'>79.8%</text></svg></div></div><div class='detail-block'><div class='lbl'>Latency / compute breakdown</div><div>latency (batch=1): <b>4.174 ms</b><br>train wall-clock: <b>368.6 s</b><br>generalisation gap (train−test top1): <b>1.56 pp</b><br>model: <b>?</b> · channel_mode: <b>?</b></div></div><div class='detail-block panel-2col' style='grid-column:1/3'><div class='lbl'>Prior flags</div><div><i style="color:#8b949e">no flags recorded</i></div></div></div></td></tr>
 <tr class='clickable ' data-tier='T1' onclick="openReasoning('sg_only_fractal')">
 <td onclick='event.stopPropagation();toggleDetail(this,"sg_only_fractal")' style='cursor:pointer;color:#58a6ff;font-weight:600;text-align:center'>▸</td>
 <td data-v='sg_only_fractal'><span class='swatch status-done' style='display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle'></span><span class='tag-pill'>sg_only_fractal</span></td>
@@ -261,6 +551,42 @@
 <td data-v='T1'><span class='chip'>T1</span></td>
 </tr>
 <tr class='detail-row' style='display:none'><td colspan='15'><div class='detail-grid'><div class='detail-block'><div class='lbl'>Training curve (epoch → test top-1)</div><div><svg width='220' height='36' viewBox='0 0 220 36' xmlns='http://www.w3.org/2000/svg' style='vertical-align:middle'><polyline points='2.0,34.0 21.6,29.0 41.3,27.6 60.9,17.5 80.5,16.1 100.2,10.4 119.8,14.1 139.5,6.9 159.1,4.6 178.7,3.4 198.4,2.6 218.0,2.0' fill='none' stroke='#58a6ff' stroke-width='1.6'/><circle cx='218.0' cy='2.0' r='2.4' fill='#3fb950'/><text x='218' y='32' fill='#8b949e' font-size='10' text-anchor='end'>82.5%</text></svg></div></div><div class='detail-block'><div class='lbl'>Latency / compute breakdown</div><div>latency (batch=1): <b>7.420 ms</b><br>train wall-clock: <b>373.8 s</b><br>generalisation gap (train−test top1): <b>0.86 pp</b><br>model: <b>?</b> · channel_mode: <b>?</b></div></div><div class='detail-block panel-2col' style='grid-column:1/3'><div class='lbl'>Prior flags</div><div><i style="color:#8b949e">no flags recorded</i></div></div></div></td></tr>
+<tr class='clickable ' data-tier='' onclick="openReasoning('sg_only_phi_activation')">
+<td onclick='event.stopPropagation();toggleDetail(this,"sg_only_phi_activation")' style='cursor:pointer;color:#58a6ff;font-weight:600;text-align:center'>▸</td>
+<td data-v='sg_only_phi_activation'><span class='tag-pill'>sg_only_phi_activation</span></td>
+<td data-v='cifar10'>cifar10</td>
+<td data-v='0'>0</td>
+<td data-v='12'>12</td>
+<td data-v='0.7995'>79.95%</td>
+<td data-v='0.9889'>98.89%</td>
+<td data-v='127146'>0.127M</td>
+<td data-v='27793296.0'>27.8M</td>
+<td data-v='5.023253999997905'>5.02 ms</td>
+<td data-v='0.8756484488646189'>0.8756</td>
+<td data-v='0.809235607969512'>0.8092</td>
+<td data-v='-1'>-1</td>
+<td data-v='390.5195355000001'>390.5195</td>
+<td data-v=''><span class='chip'>—</span></td>
+</tr>
+<tr class='detail-row' style='display:none'><td colspan='15'><div class='detail-grid'><div class='detail-block'><div class='lbl'>Training curve (epoch → test top-1)</div><div><svg width='220' height='36' viewBox='0 0 220 36' xmlns='http://www.w3.org/2000/svg' style='vertical-align:middle'><polyline points='2.0,34.0 21.6,21.6 41.3,15.2 60.9,14.4 80.5,8.3 100.2,8.3 119.8,6.8 139.5,5.2 159.1,3.7 178.7,2.9 198.4,2.3 218.0,2.0' fill='none' stroke='#58a6ff' stroke-width='1.6'/><circle cx='218.0' cy='2.0' r='2.4' fill='#3fb950'/><text x='218' y='32' fill='#8b949e' font-size='10' text-anchor='end'>80.0%</text></svg></div></div><div class='detail-block'><div class='lbl'>Latency / compute breakdown</div><div>latency (batch=1): <b>5.023 ms</b><br>train wall-clock: <b>390.5 s</b><br>generalisation gap (train−test top1): <b>1.43 pp</b><br>model: <b>?</b> · channel_mode: <b>?</b></div></div><div class='detail-block panel-2col' style='grid-column:1/3'><div class='lbl'>Prior flags</div><div><i style="color:#8b949e">no flags recorded</i></div></div></div></td></tr>
+<tr class='clickable ' data-tier='T1' onclick="openReasoning('sg_only_fractal')">
+<td onclick='event.stopPropagation();toggleDetail(this,"sg_only_fractal")' style='cursor:pointer;color:#58a6ff;font-weight:600;text-align:center'>▸</td>
+<td data-v='sg_only_fractal'><span class='swatch status-done' style='display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle'></span><span class='tag-pill'>sg_only_fractal</span></td>
+<td data-v='cifar10'>cifar10</td>
+<td data-v='2'>2</td>
+<td data-v='12'>12</td>
+<td data-v='0.8246'>82.46%</td>
+<td data-v='0.9908'>99.08%</td>
+<td data-v='259434'>0.259M</td>
+<td data-v='55742352.0'>55.7M</td>
+<td data-v='9.027069000003394'>9.03 ms</td>
+<td data-v='0.8385620191693306'>0.8386</td>
+<td data-v='0.8061213173092527'>0.8061</td>
+<td data-v='-1'>-1</td>
+<td data-v='393.06934139999794'>393.0693</td>
+<td data-v='T1'><span class='chip'>T1</span></td>
+</tr>
+<tr class='detail-row' style='display:none'><td colspan='15'><div class='detail-grid'><div class='detail-block'><div class='lbl'>Training curve (epoch → test top-1)</div><div><svg width='220' height='36' viewBox='0 0 220 36' xmlns='http://www.w3.org/2000/svg' style='vertical-align:middle'><polyline points='2.0,34.0 21.6,28.7 41.3,15.9 60.9,14.5 80.5,9.8 100.2,13.4 119.8,7.0 139.5,7.3 159.1,4.5 178.7,2.7 198.4,2.4 218.0,2.0' fill='none' stroke='#58a6ff' stroke-width='1.6'/><circle cx='218.0' cy='2.0' r='2.4' fill='#3fb950'/><text x='218' y='32' fill='#8b949e' font-size='10' text-anchor='end'>82.5%</text></svg></div></div><div class='detail-block'><div class='lbl'>Latency / compute breakdown</div><div>latency (batch=1): <b>9.027 ms</b><br>train wall-clock: <b>393.1 s</b><br>generalisation gap (train−test top1): <b>1.34 pp</b><br>model: <b>?</b> · channel_mode: <b>?</b></div></div><div class='detail-block panel-2col' style='grid-column:1/3'><div class='lbl'>Prior flags</div><div><i style="color:#8b949e">no flags recorded</i></div></div></div></td></tr>
 <tr class='clickable ' data-tier='T1' onclick="openReasoning('sg_only_golden_modulate')">
 <td onclick='event.stopPropagation();toggleDetail(this,"sg_only_golden_modulate")' style='cursor:pointer;color:#58a6ff;font-weight:600;text-align:center'>▸</td>
 <td data-v='sg_only_golden_modulate'><span class='swatch status-done' style='display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle'></span><span class='tag-pill'>sg_only_golden_modulate</span></td>
@@ -279,6 +605,78 @@
 <td data-v='T1'><span class='chip'>T1</span></td>
 </tr>
 <tr class='detail-row' style='display:none'><td colspan='15'><div class='detail-grid'><div class='detail-block'><div class='lbl'>Training curve (epoch → test top-1)</div><div><svg width='220' height='36' viewBox='0 0 220 36' xmlns='http://www.w3.org/2000/svg' style='vertical-align:middle'><polyline points='2.0,34.0 21.6,18.2 41.3,16.3 60.9,13.3 80.5,10.5 100.2,8.0 119.8,6.7 139.5,5.3 159.1,4.5 178.7,3.1 198.4,2.3 218.0,2.0' fill='none' stroke='#58a6ff' stroke-width='1.6'/><circle cx='218.0' cy='2.0' r='2.4' fill='#3fb950'/><text x='218' y='32' fill='#8b949e' font-size='10' text-anchor='end'>79.8%</text></svg></div></div><div class='detail-block'><div class='lbl'>Latency / compute breakdown</div><div>latency (batch=1): <b>5.948 ms</b><br>train wall-clock: <b>363.0 s</b><br>generalisation gap (train−test top1): <b>0.42 pp</b><br>model: <b>?</b> · channel_mode: <b>?</b></div></div><div class='detail-block panel-2col' style='grid-column:1/3'><div class='lbl'>Prior flags</div><div><i style="color:#8b949e">no flags recorded</i></div></div></div></td></tr>
+<tr class='clickable ' data-tier='' onclick="openReasoning('sg_only_golden_skip')">
+<td onclick='event.stopPropagation();toggleDetail(this,"sg_only_golden_skip")' style='cursor:pointer;color:#58a6ff;font-weight:600;text-align:center'>▸</td>
+<td data-v='sg_only_golden_skip'><span class='tag-pill'>sg_only_golden_skip</span></td>
+<td data-v='cifar10'>cifar10</td>
+<td data-v='0'>0</td>
+<td data-v='12'>12</td>
+<td data-v='0.8163'>81.63%</td>
+<td data-v='0.9894'>98.94%</td>
+<td data-v='272483'>0.272M</td>
+<td data-v='41218688.0'>41.2M</td>
+<td data-v='7.293664000003446'>7.29 ms</td>
+<td data-v='0.8969467307130495'>0.8969</td>
+<td data-v='0.801385741760194'>0.8014</td>
+<td data-v='-1'>-1</td>
+<td data-v='396.68273550000004'>396.6827</td>
+<td data-v=''><span class='chip'>—</span></td>
+</tr>
+<tr class='detail-row' style='display:none'><td colspan='15'><div class='detail-grid'><div class='detail-block'><div class='lbl'>Training curve (epoch → test top-1)</div><div><svg width='220' height='36' viewBox='0 0 220 36' xmlns='http://www.w3.org/2000/svg' style='vertical-align:middle'><polyline points='2.0,34.0 21.6,23.5 41.3,17.4 60.9,12.4 80.5,12.1 100.2,7.4 119.8,6.3 139.5,5.8 159.1,3.8 178.7,2.9 198.4,2.4 218.0,2.0' fill='none' stroke='#58a6ff' stroke-width='1.6'/><circle cx='218.0' cy='2.0' r='2.4' fill='#3fb950'/><text x='218' y='32' fill='#8b949e' font-size='10' text-anchor='end'>81.6%</text></svg></div></div><div class='detail-block'><div class='lbl'>Latency / compute breakdown</div><div>latency (batch=1): <b>7.294 ms</b><br>train wall-clock: <b>396.7 s</b><br>generalisation gap (train−test top1): <b>2.14 pp</b><br>model: <b>?</b> · channel_mode: <b>?</b></div></div><div class='detail-block panel-2col' style='grid-column:1/3'><div class='lbl'>Prior flags</div><div><i style="color:#8b949e">no flags recorded</i></div></div></div></td></tr>
+<tr class='clickable ' data-tier='' onclick="openReasoning('sg_only_phi_lr')">
+<td onclick='event.stopPropagation();toggleDetail(this,"sg_only_phi_lr")' style='cursor:pointer;color:#58a6ff;font-weight:600;text-align:center'>▸</td>
+<td data-v='sg_only_phi_lr'><span class='tag-pill'>sg_only_phi_lr</span></td>
+<td data-v='cifar10'>cifar10</td>
+<td data-v='0'>0</td>
+<td data-v='12'>12</td>
+<td data-v='0.7875'>78.75%</td>
+<td data-v='0.9865'>98.65%</td>
+<td data-v='127146'>0.127M</td>
+<td data-v='27793296.0'>27.8M</td>
+<td data-v='4.323868999999831'>4.32 ms</td>
+<td data-v='0.8693871150414149'>0.8694</td>
+<td data-v='0.8004912385223066'>0.8005</td>
+<td data-v='-1'>-1</td>
+<td data-v='379.1762232000001'>379.1762</td>
+<td data-v=''><span class='chip'>—</span></td>
+</tr>
+<tr class='detail-row' style='display:none'><td colspan='15'><div class='detail-grid'><div class='detail-block'><div class='lbl'>Training curve (epoch → test top-1)</div><div><svg width='220' height='36' viewBox='0 0 220 36' xmlns='http://www.w3.org/2000/svg' style='vertical-align:middle'><polyline points='2.0,34.0 21.6,20.5 41.3,14.2 60.9,15.2 80.5,17.2 100.2,8.2 119.8,6.6 139.5,5.4 159.1,8.9 178.7,4.3 198.4,5.6 218.0,2.0' fill='none' stroke='#58a6ff' stroke-width='1.6'/><circle cx='218.0' cy='2.0' r='2.4' fill='#3fb950'/><text x='218' y='32' fill='#8b949e' font-size='10' text-anchor='end'>78.8%</text></svg></div></div><div class='detail-block'><div class='lbl'>Latency / compute breakdown</div><div>latency (batch=1): <b>4.324 ms</b><br>train wall-clock: <b>379.2 s</b><br>generalisation gap (train−test top1): <b>2.82 pp</b><br>model: <b>?</b> · channel_mode: <b>?</b></div></div><div class='detail-block panel-2col' style='grid-column:1/3'><div class='lbl'>Prior flags</div><div><i style="color:#8b949e">no flags recorded</i></div></div></div></td></tr>
+<tr class='clickable ' data-tier='' onclick="openReasoning('sg_only_fib_prune')">
+<td onclick='event.stopPropagation();toggleDetail(this,"sg_only_fib_prune")' style='cursor:pointer;color:#58a6ff;font-weight:600;text-align:center'>▸</td>
+<td data-v='sg_only_fib_prune'><span class='tag-pill'>sg_only_fib_prune</span></td>
+<td data-v='cifar10'>cifar10</td>
+<td data-v='0'>0</td>
+<td data-v='12'>12</td>
+<td data-v='0.8115'>81.15%</td>
+<td data-v='0.9894'>98.94%</td>
+<td data-v='272474'>0.272M</td>
+<td data-v='41218688.0'>41.2M</td>
+<td data-v='6.106534999998985'>6.11 ms</td>
+<td data-v='0.8886150866746902'>0.8886</td>
+<td data-v='0.8004440041003462'>0.8004</td>
+<td data-v='-1'>-1</td>
+<td data-v='382.14564489999975'>382.1456</td>
+<td data-v=''><span class='chip'>—</span></td>
+</tr>
+<tr class='detail-row' style='display:none'><td colspan='15'><div class='detail-grid'><div class='detail-block'><div class='lbl'>Training curve (epoch → test top-1)</div><div><svg width='220' height='36' viewBox='0 0 220 36' xmlns='http://www.w3.org/2000/svg' style='vertical-align:middle'><polyline points='2.0,16.8 21.6,14.3 41.3,10.3 60.9,7.4 80.5,7.4 100.2,4.5 119.8,3.6 139.5,34.0 159.1,2.7 178.7,2.2 198.4,2.0 218.0,2.0' fill='none' stroke='#58a6ff' stroke-width='1.6'/><circle cx='218.0' cy='2.0' r='2.4' fill='#3fb950'/><text x='218' y='32' fill='#8b949e' font-size='10' text-anchor='end'>81.2%</text></svg></div></div><div class='detail-block'><div class='lbl'>Latency / compute breakdown</div><div>latency (batch=1): <b>6.107 ms</b><br>train wall-clock: <b>382.1 s</b><br>generalisation gap (train−test top1): <b>2.02 pp</b><br>model: <b>?</b> · channel_mode: <b>?</b></div></div><div class='detail-block panel-2col' style='grid-column:1/3'><div class='lbl'>Prior flags</div><div><i style="color:#8b949e">no flags recorded</i></div></div></div></td></tr>
+<tr class='clickable ' data-tier='' onclick="openReasoning('sg_chan_phi')">
+<td onclick='event.stopPropagation();toggleDetail(this,"sg_chan_phi")' style='cursor:pointer;color:#58a6ff;font-weight:600;text-align:center'>▸</td>
+<td data-v='sg_chan_phi'><span class='tag-pill'>sg_chan_phi</span></td>
+<td data-v='cifar10'>cifar10</td>
+<td data-v='2'>2</td>
+<td data-v='12'>12</td>
+<td data-v='0.8121'>81.21%</td>
+<td data-v='0.9897'>98.97%</td>
+<td data-v='127146'>0.127M</td>
+<td data-v='27793296.0'>27.8M</td>
+<td data-v='16.622123999986798'>16.62 ms</td>
+<td data-v='0.8528568496306738'>0.8529</td>
+<td data-v='0.7958505390168599'>0.7959</td>
+<td data-v='-1'>-1</td>
+<td data-v='928.6691117000009'>928.6691</td>
+<td data-v=''><span class='chip'>—</span></td>
+</tr>
+<tr class='detail-row' style='display:none'><td colspan='15'><div class='detail-grid'><div class='detail-block'><div class='lbl'>Training curve (epoch → test top-1)</div><div><svg width='220' height='36' viewBox='0 0 220 36' xmlns='http://www.w3.org/2000/svg' style='vertical-align:middle'><polyline points='2.0,34.0 21.6,23.4 41.3,22.8 60.9,13.7 80.5,19.3 100.2,9.3 119.8,7.4 139.5,6.5 159.1,4.0 178.7,3.3 198.4,2.3 218.0,2.0' fill='none' stroke='#58a6ff' stroke-width='1.6'/><circle cx='218.0' cy='2.0' r='2.4' fill='#3fb950'/><text x='218' y='32' fill='#8b949e' font-size='10' text-anchor='end'>81.2%</text></svg></div></div><div class='detail-block'><div class='lbl'>Latency / compute breakdown</div><div>latency (batch=1): <b>16.622 ms</b><br>train wall-clock: <b>928.7 s</b><br>generalisation gap (train−test top1): <b>0.44 pp</b><br>model: <b>?</b> · channel_mode: <b>?</b></div></div><div class='detail-block panel-2col' style='grid-column:1/3'><div class='lbl'>Prior flags</div><div><i style="color:#8b949e">no flags recorded</i></div></div></div></td></tr>
 <tr class='clickable ' data-tier='T1' onclick="openReasoning('sg_only_hex')">
 <td onclick='event.stopPropagation();toggleDetail(this,"sg_only_hex")' style='cursor:pointer;color:#58a6ff;font-weight:600;text-align:center'>▸</td>
 <td data-v='sg_only_hex'><span class='swatch status-done' style='display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle'></span><span class='tag-pill'>sg_only_hex</span></td>
@@ -315,6 +713,42 @@
 <td data-v='T1'><span class='chip'>T1</span></td>
 </tr>
 <tr class='detail-row' style='display:none'><td colspan='15'><div class='detail-grid'><div class='detail-block'><div class='lbl'>Training curve (epoch → test top-1)</div><div><svg width='220' height='36' viewBox='0 0 220 36' xmlns='http://www.w3.org/2000/svg' style='vertical-align:middle'><polyline points='2.0,34.0 21.6,27.3 41.3,16.5 60.9,14.6 80.5,15.1 100.2,9.9 119.8,8.2 139.5,7.3 159.1,3.5 178.7,3.2 198.4,2.2 218.0,2.0' fill='none' stroke='#58a6ff' stroke-width='1.6'/><circle cx='218.0' cy='2.0' r='2.4' fill='#3fb950'/><text x='218' y='32' fill='#8b949e' font-size='10' text-anchor='end'>77.4%</text></svg></div></div><div class='detail-block'><div class='lbl'>Latency / compute breakdown</div><div>latency (batch=1): <b>4.141 ms</b><br>train wall-clock: <b>358.2 s</b><br>generalisation gap (train−test top1): <b>0.98 pp</b><br>model: <b>?</b> · channel_mode: <b>?</b></div></div><div class='detail-block panel-2col' style='grid-column:1/3'><div class='lbl'>Prior flags</div><div><i style="color:#8b949e">no flags recorded</i></div></div></div></td></tr>
+<tr class='clickable ' data-tier='T1' onclick="openReasoning('sg_only_fractal')">
+<td onclick='event.stopPropagation();toggleDetail(this,"sg_only_fractal")' style='cursor:pointer;color:#58a6ff;font-weight:600;text-align:center'>▸</td>
+<td data-v='sg_only_fractal'><span class='swatch status-done' style='display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle'></span><span class='tag-pill'>sg_only_fractal</span></td>
+<td data-v='cifar10'>cifar10</td>
+<td data-v='1'>1</td>
+<td data-v='12'>12</td>
+<td data-v='0.817'>81.70%</td>
+<td data-v='0.9914'>99.14%</td>
+<td data-v='259434'>0.259M</td>
+<td data-v='55742352.0'>55.7M</td>
+<td data-v='15.272800000093412'>15.27 ms</td>
+<td data-v='0.8979389096299807'>0.8979</td>
+<td data-v='0.7871027221815037'>0.7871</td>
+<td data-v='-1'>-1</td>
+<td data-v='623.3819452000025'>623.3819</td>
+<td data-v='T1'><span class='chip'>T1</span></td>
+</tr>
+<tr class='detail-row' style='display:none'><td colspan='15'><div class='detail-grid'><div class='detail-block'><div class='lbl'>Training curve (epoch → test top-1)</div><div><svg width='220' height='36' viewBox='0 0 220 36' xmlns='http://www.w3.org/2000/svg' style='vertical-align:middle'><polyline points='2.0,34.0 21.6,29.6 41.3,20.6 60.9,13.8 80.5,18.0 100.2,11.3 119.8,7.3 139.5,5.3 159.1,5.5 178.7,3.2 198.4,2.2 218.0,2.0' fill='none' stroke='#58a6ff' stroke-width='1.6'/><circle cx='218.0' cy='2.0' r='2.4' fill='#3fb950'/><text x='218' y='32' fill='#8b949e' font-size='10' text-anchor='end'>81.7%</text></svg></div></div><div class='detail-block'><div class='lbl'>Latency / compute breakdown</div><div>latency (batch=1): <b>15.273 ms</b><br>train wall-clock: <b>623.4 s</b><br>generalisation gap (train−test top1): <b>1.83 pp</b><br>model: <b>?</b> · channel_mode: <b>?</b></div></div><div class='detail-block panel-2col' style='grid-column:1/3'><div class='lbl'>Prior flags</div><div><i style="color:#8b949e">no flags recorded</i></div></div></div></td></tr>
+<tr class='clickable ' data-tier='T1' onclick="openReasoning('sg_only_toroidal')">
+<td onclick='event.stopPropagation();toggleDetail(this,"sg_only_toroidal")' style='cursor:pointer;color:#58a6ff;font-weight:600;text-align:center'>▸</td>
+<td data-v='sg_only_toroidal'><span class='swatch status-done' style='display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle'></span><span class='tag-pill'>sg_only_toroidal</span></td>
+<td data-v='cifar10'>cifar10</td>
+<td data-v='1'>1</td>
+<td data-v='12'>12</td>
+<td data-v='0.7865'>78.65%</td>
+<td data-v='0.9874'>98.74%</td>
+<td data-v='127146'>0.127M</td>
+<td data-v='27793296.0'>27.8M</td>
+<td data-v='8.455823000113014'>8.46 ms</td>
+<td data-v='0.865244448184967'>0.8652</td>
+<td data-v='0.7849270707261963'>0.7849</td>
+<td data-v='-1'>-1</td>
+<td data-v='410.20236809999915'>410.2024</td>
+<td data-v='T1'><span class='chip'>T1</span></td>
+</tr>
+<tr class='detail-row' style='display:none'><td colspan='15'><div class='detail-grid'><div class='detail-block'><div class='lbl'>Training curve (epoch → test top-1)</div><div><svg width='220' height='36' viewBox='0 0 220 36' xmlns='http://www.w3.org/2000/svg' style='vertical-align:middle'><polyline points='2.0,34.0 21.6,31.7 41.3,22.4 60.9,18.5 80.5,14.3 100.2,11.7 119.8,11.1 139.5,9.1 159.1,5.2 178.7,4.2 198.4,3.1 218.0,2.0' fill='none' stroke='#58a6ff' stroke-width='1.6'/><circle cx='218.0' cy='2.0' r='2.4' fill='#3fb950'/><text x='218' y='32' fill='#8b949e' font-size='10' text-anchor='end'>78.6%</text></svg></div></div><div class='detail-block'><div class='lbl'>Latency / compute breakdown</div><div>latency (batch=1): <b>8.456 ms</b><br>train wall-clock: <b>410.2 s</b><br>generalisation gap (train−test top1): <b>2.48 pp</b><br>model: <b>?</b> · channel_mode: <b>?</b></div></div><div class='detail-block panel-2col' style='grid-column:1/3'><div class='lbl'>Prior flags</div><div><i style="color:#8b949e">no flags recorded</i></div></div></div></td></tr>
 <tr class='clickable ' data-tier='T1' onclick="openReasoning('sg_only_toroidal')">
 <td onclick='event.stopPropagation();toggleDetail(this,"sg_only_toroidal")' style='cursor:pointer;color:#58a6ff;font-weight:600;text-align:center'>▸</td>
 <td data-v='sg_only_toroidal'><span class='swatch status-done' style='display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle'></span><span class='tag-pill'>sg_only_toroidal</span></td>
@@ -333,6 +767,168 @@
 <td data-v='T1'><span class='chip'>T1</span></td>
 </tr>
 <tr class='detail-row' style='display:none'><td colspan='15'><div class='detail-grid'><div class='detail-block'><div class='lbl'>Training curve (epoch → test top-1)</div><div><svg width='220' height='36' viewBox='0 0 220 36' xmlns='http://www.w3.org/2000/svg' style='vertical-align:middle'><polyline points='2.0,34.0 21.6,18.5 41.3,15.0 60.9,15.9 80.5,11.5 100.2,6.5 119.8,6.0 139.5,5.4 159.1,4.2 178.7,2.7 198.4,2.3 218.0,2.0' fill='none' stroke='#58a6ff' stroke-width='1.6'/><circle cx='218.0' cy='2.0' r='2.4' fill='#3fb950'/><text x='218' y='32' fill='#8b949e' font-size='10' text-anchor='end'>78.0%</text></svg></div></div><div class='detail-block'><div class='lbl'>Latency / compute breakdown</div><div>latency (batch=1): <b>9.344 ms</b><br>train wall-clock: <b>395.4 s</b><br>generalisation gap (train−test top1): <b>3.29 pp</b><br>model: <b>?</b> · channel_mode: <b>?</b></div></div><div class='detail-block panel-2col' style='grid-column:1/3'><div class='lbl'>Prior flags</div><div><i style="color:#8b949e">no flags recorded</i></div></div></div></td></tr>
+<tr class='clickable ' data-tier='' onclick="openReasoning('sg_only_phi_init')">
+<td onclick='event.stopPropagation();toggleDetail(this,"sg_only_phi_init")' style='cursor:pointer;color:#58a6ff;font-weight:600;text-align:center'>▸</td>
+<td data-v='sg_only_phi_init'><span class='tag-pill'>sg_only_phi_init</span></td>
+<td data-v='cifar10'>cifar10</td>
+<td data-v='0'>0</td>
+<td data-v='12'>12</td>
+<td data-v='0.7656'>76.56%</td>
+<td data-v='0.9854'>98.54%</td>
+<td data-v='127146'>0.127M</td>
+<td data-v='27793296.0'>27.8M</td>
+<td data-v='4.73920100000214'>4.74 ms</td>
+<td data-v='0.867423452436924'>0.8674</td>
+<td data-v='0.7765996084826368'>0.7766</td>
+<td data-v='-1'>-1</td>
+<td data-v='374.9710511000003'>374.9711</td>
+<td data-v=''><span class='chip'>—</span></td>
+</tr>
+<tr class='detail-row' style='display:none'><td colspan='15'><div class='detail-grid'><div class='detail-block'><div class='lbl'>Training curve (epoch → test top-1)</div><div><svg width='220' height='36' viewBox='0 0 220 36' xmlns='http://www.w3.org/2000/svg' style='vertical-align:middle'><polyline points='2.0,34.0 21.6,29.0 41.3,26.0 60.9,17.2 80.5,12.7 100.2,8.0 119.8,7.0 139.5,5.7 159.1,4.1 178.7,2.6 198.4,2.0 218.0,2.1' fill='none' stroke='#58a6ff' stroke-width='1.6'/><circle cx='218.0' cy='2.1' r='2.4' fill='#3fb950'/><text x='218' y='32' fill='#8b949e' font-size='10' text-anchor='end'>76.6%</text></svg></div></div><div class='detail-block'><div class='lbl'>Latency / compute breakdown</div><div>latency (batch=1): <b>4.739 ms</b><br>train wall-clock: <b>375.0 s</b><br>generalisation gap (train−test top1): <b>0.84 pp</b><br>model: <b>?</b> · channel_mode: <b>?</b></div></div><div class='detail-block panel-2col' style='grid-column:1/3'><div class='lbl'>Prior flags</div><div><i style="color:#8b949e">no flags recorded</i></div></div></div></td></tr>
+<tr class='clickable ' data-tier='T1' onclick="openReasoning('sg_only_toroidal')">
+<td onclick='event.stopPropagation();toggleDetail(this,"sg_only_toroidal")' style='cursor:pointer;color:#58a6ff;font-weight:600;text-align:center'>▸</td>
+<td data-v='sg_only_toroidal'><span class='swatch status-done' style='display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle'></span><span class='tag-pill'>sg_only_toroidal</span></td>
+<td data-v='cifar10'>cifar10</td>
+<td data-v='2'>2</td>
+<td data-v='12'>12</td>
+<td data-v='0.7743'>77.43%</td>
+<td data-v='0.9859'>98.59%</td>
+<td data-v='127146'>0.127M</td>
+<td data-v='27793296.0'>27.8M</td>
+<td data-v='7.758522999938577'>7.76 ms</td>
+<td data-v='0.8809363568822542'>0.8809</td>
+<td data-v='0.7745959123104172'>0.7746</td>
+<td data-v='-1'>-1</td>
+<td data-v='388.04712020000443'>388.0471</td>
+<td data-v='T1'><span class='chip'>T1</span></td>
+</tr>
+<tr class='detail-row' style='display:none'><td colspan='15'><div class='detail-grid'><div class='detail-block'><div class='lbl'>Training curve (epoch → test top-1)</div><div><svg width='220' height='36' viewBox='0 0 220 36' xmlns='http://www.w3.org/2000/svg' style='vertical-align:middle'><polyline points='2.0,34.0 21.6,29.5 41.3,22.6 60.9,17.3 80.5,18.7 100.2,11.4 119.8,12.2 139.5,9.1 159.1,4.4 178.7,3.2 198.4,2.4 218.0,2.0' fill='none' stroke='#58a6ff' stroke-width='1.6'/><circle cx='218.0' cy='2.0' r='2.4' fill='#3fb950'/><text x='218' y='32' fill='#8b949e' font-size='10' text-anchor='end'>77.4%</text></svg></div></div><div class='detail-block'><div class='lbl'>Latency / compute breakdown</div><div>latency (batch=1): <b>7.759 ms</b><br>train wall-clock: <b>388.0 s</b><br>generalisation gap (train−test top1): <b>3.10 pp</b><br>model: <b>?</b> · channel_mode: <b>?</b></div></div><div class='detail-block panel-2col' style='grid-column:1/3'><div class='lbl'>Prior flags</div><div><i style="color:#8b949e">no flags recorded</i></div></div></div></td></tr>
+<tr class='clickable ' data-tier='T1' onclick="openReasoning('sg_only_cymatic_init')">
+<td onclick='event.stopPropagation();toggleDetail(this,"sg_only_cymatic_init")' style='cursor:pointer;color:#58a6ff;font-weight:600;text-align:center'>▸</td>
+<td data-v='sg_only_cymatic_init'><span class='swatch status-done' style='display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle'></span><span class='tag-pill'>sg_only_cymatic_init</span></td>
+<td data-v='cifar10'>cifar10</td>
+<td data-v='2'>2</td>
+<td data-v='12'>12</td>
+<td data-v='0.7634'>76.34%</td>
+<td data-v='0.9858'>98.58%</td>
+<td data-v='127146'>0.127M</td>
+<td data-v='27793296.0'>27.8M</td>
+<td data-v='4.701190999767277'>4.70 ms</td>
+<td data-v='0.8535969456036886'>0.8536</td>
+<td data-v='0.7745744701045146'>0.7746</td>
+<td data-v='-1'>-1</td>
+<td data-v='415.99932820000686'>415.9993</td>
+<td data-v='T1'><span class='chip'>T1</span></td>
+</tr>
+<tr class='detail-row' style='display:none'><td colspan='15'><div class='detail-grid'><div class='detail-block'><div class='lbl'>Training curve (epoch → test top-1)</div><div><svg width='220' height='36' viewBox='0 0 220 36' xmlns='http://www.w3.org/2000/svg' style='vertical-align:middle'><polyline points='2.0,34.0 21.6,28.6 41.3,23.6 60.9,14.5 80.5,14.7 100.2,9.4 119.8,6.6 139.5,5.9 159.1,3.8 178.7,2.9 198.4,2.5 218.0,2.0' fill='none' stroke='#58a6ff' stroke-width='1.6'/><circle cx='218.0' cy='2.0' r='2.4' fill='#3fb950'/><text x='218' y='32' fill='#8b949e' font-size='10' text-anchor='end'>76.3%</text></svg></div></div><div class='detail-block'><div class='lbl'>Latency / compute breakdown</div><div>latency (batch=1): <b>4.701 ms</b><br>train wall-clock: <b>416.0 s</b><br>generalisation gap (train−test top1): <b>1.13 pp</b><br>model: <b>?</b> · channel_mode: <b>?</b></div></div><div class='detail-block panel-2col' style='grid-column:1/3'><div class='lbl'>Prior flags</div><div><i style="color:#8b949e">no flags recorded</i></div></div></div></td></tr>
+<tr class='clickable ' data-tier='T1' onclick="openReasoning('sg_only_hex')">
+<td onclick='event.stopPropagation();toggleDetail(this,"sg_only_hex")' style='cursor:pointer;color:#58a6ff;font-weight:600;text-align:center'>▸</td>
+<td data-v='sg_only_hex'><span class='swatch status-done' style='display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle'></span><span class='tag-pill'>sg_only_hex</span></td>
+<td data-v='cifar10'>cifar10</td>
+<td data-v='2'>2</td>
+<td data-v='12'>12</td>
+<td data-v='0.7929'>79.29%</td>
+<td data-v='0.987'>98.70%</td>
+<td data-v='127146'>0.127M</td>
+<td data-v='27793296.0'>27.8M</td>
+<td data-v='21.09210399998119'>21.09 ms</td>
+<td data-v='0.8455614248911539'>0.8456</td>
+<td data-v='0.7714788697034375'>0.7715</td>
+<td data-v='-1'>-1</td>
+<td data-v='868.2052711999859'>868.2053</td>
+<td data-v='T1'><span class='chip'>T1</span></td>
+</tr>
+<tr class='detail-row' style='display:none'><td colspan='15'><div class='detail-grid'><div class='detail-block'><div class='lbl'>Training curve (epoch → test top-1)</div><div><svg width='220' height='36' viewBox='0 0 220 36' xmlns='http://www.w3.org/2000/svg' style='vertical-align:middle'><polyline points='2.0,34.0 21.6,24.2 41.3,27.8 60.9,14.0 80.5,15.2 100.2,12.5 119.8,9.7 139.5,6.6 159.1,4.4 178.7,3.6 198.4,2.3 218.0,2.0' fill='none' stroke='#58a6ff' stroke-width='1.6'/><circle cx='218.0' cy='2.0' r='2.4' fill='#3fb950'/><text x='218' y='32' fill='#8b949e' font-size='10' text-anchor='end'>79.3%</text></svg></div></div><div class='detail-block'><div class='lbl'>Latency / compute breakdown</div><div>latency (batch=1): <b>21.092 ms</b><br>train wall-clock: <b>868.2 s</b><br>generalisation gap (train−test top1): <b>1.09 pp</b><br>model: <b>?</b> · channel_mode: <b>?</b></div></div><div class='detail-block panel-2col' style='grid-column:1/3'><div class='lbl'>Prior flags</div><div><i style="color:#8b949e">no flags recorded</i></div></div></div></td></tr>
+<tr class='clickable ' data-tier='T1' onclick="openReasoning('sg_only_hex')">
+<td onclick='event.stopPropagation();toggleDetail(this,"sg_only_hex")' style='cursor:pointer;color:#58a6ff;font-weight:600;text-align:center'>▸</td>
+<td data-v='sg_only_hex'><span class='swatch status-done' style='display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle'></span><span class='tag-pill'>sg_only_hex</span></td>
+<td data-v='cifar10'>cifar10</td>
+<td data-v='1'>1</td>
+<td data-v='12'>12</td>
+<td data-v='0.7993'>79.93%</td>
+<td data-v='0.9887'>98.87%</td>
+<td data-v='127146'>0.127M</td>
+<td data-v='27793296.0'>27.8M</td>
+<td data-v='31.012129000155255'>31.01 ms</td>
+<td data-v='0.8471158072352409'>0.8471</td>
+<td data-v='0.76950828581554'>0.7695</td>
+<td data-v='-1'>-1</td>
+<td data-v='1147.5855601999792'>1147.5856</td>
+<td data-v='T1'><span class='chip'>T1</span></td>
+</tr>
+<tr class='detail-row' style='display:none'><td colspan='15'><div class='detail-grid'><div class='detail-block'><div class='lbl'>Training curve (epoch → test top-1)</div><div><svg width='220' height='36' viewBox='0 0 220 36' xmlns='http://www.w3.org/2000/svg' style='vertical-align:middle'><polyline points='2.0,34.0 21.6,27.9 41.3,19.7 60.9,15.4 80.5,13.4 100.2,10.0 119.8,9.6 139.5,7.4 159.1,4.1 178.7,3.9 198.4,2.2 218.0,2.0' fill='none' stroke='#58a6ff' stroke-width='1.6'/><circle cx='218.0' cy='2.0' r='2.4' fill='#3fb950'/><text x='218' y='32' fill='#8b949e' font-size='10' text-anchor='end'>79.9%</text></svg></div></div><div class='detail-block'><div class='lbl'>Latency / compute breakdown</div><div>latency (batch=1): <b>31.012 ms</b><br>train wall-clock: <b>1147.6 s</b><br>generalisation gap (train−test top1): <b>1.33 pp</b><br>model: <b>?</b> · channel_mode: <b>?</b></div></div><div class='detail-block panel-2col' style='grid-column:1/3'><div class='lbl'>Prior flags</div><div><i style="color:#8b949e">no flags recorded</i></div></div></div></td></tr>
+<tr class='clickable ' data-tier='T1' onclick="openReasoning('sg_only_cymatic_init')">
+<td onclick='event.stopPropagation();toggleDetail(this,"sg_only_cymatic_init")' style='cursor:pointer;color:#58a6ff;font-weight:600;text-align:center'>▸</td>
+<td data-v='sg_only_cymatic_init'><span class='swatch status-done' style='display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle'></span><span class='tag-pill'>sg_only_cymatic_init</span></td>
+<td data-v='cifar10'>cifar10</td>
+<td data-v='1'>1</td>
+<td data-v='12'>12</td>
+<td data-v='0.758'>75.80%</td>
+<td data-v='0.9846'>98.46%</td>
+<td data-v='127146'>0.127M</td>
+<td data-v='27793296.0'>27.8M</td>
+<td data-v='4.757726999814622'>4.76 ms</td>
+<td data-v='0.8410295049349467'>0.8410</td>
+<td data-v='0.7689148889849619'>0.7689</td>
+<td data-v='-1'>-1</td>
+<td data-v='355.6233824999945'>355.6234</td>
+<td data-v='T1'><span class='chip'>T1</span></td>
+</tr>
+<tr class='detail-row' style='display:none'><td colspan='15'><div class='detail-grid'><div class='detail-block'><div class='lbl'>Training curve (epoch → test top-1)</div><div><svg width='220' height='36' viewBox='0 0 220 36' xmlns='http://www.w3.org/2000/svg' style='vertical-align:middle'><polyline points='2.0,34.0 21.6,25.7 41.3,19.3 60.9,16.9 80.5,10.9 100.2,11.2 119.8,7.9 139.5,6.2 159.1,4.3 178.7,3.6 198.4,2.5 218.0,2.0' fill='none' stroke='#58a6ff' stroke-width='1.6'/><circle cx='218.0' cy='2.0' r='2.4' fill='#3fb950'/><text x='218' y='32' fill='#8b949e' font-size='10' text-anchor='end'>75.8%</text></svg></div></div><div class='detail-block'><div class='lbl'>Latency / compute breakdown</div><div>latency (batch=1): <b>4.758 ms</b><br>train wall-clock: <b>355.6 s</b><br>generalisation gap (train−test top1): <b>0.96 pp</b><br>model: <b>?</b> · channel_mode: <b>?</b></div></div><div class='detail-block panel-2col' style='grid-column:1/3'><div class='lbl'>Prior flags</div><div><i style="color:#8b949e">no flags recorded</i></div></div></div></td></tr>
+<tr class='clickable ' data-tier='T1' onclick="openReasoning('sg_only_golden_modulate')">
+<td onclick='event.stopPropagation();toggleDetail(this,"sg_only_golden_modulate")' style='cursor:pointer;color:#58a6ff;font-weight:600;text-align:center'>▸</td>
+<td data-v='sg_only_golden_modulate'><span class='swatch status-done' style='display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle'></span><span class='tag-pill'>sg_only_golden_modulate</span></td>
+<td data-v='cifar10'>cifar10</td>
+<td data-v='1'>1</td>
+<td data-v='12'>12</td>
+<td data-v='0.7832'>78.32%</td>
+<td data-v='0.9878'>98.78%</td>
+<td data-v='127155'>0.127M</td>
+<td data-v='27793296.0'>27.8M</td>
+<td data-v='22.284775000007357'>22.28 ms</td>
+<td data-v='0.780075249572595'>0.7801</td>
+<td data-v='0.7605829152115625'>0.7606</td>
+<td data-v='-1'>-1</td>
+<td data-v='1115.6782544999733'>1115.6783</td>
+<td data-v='T1'><span class='chip'>T1</span></td>
+</tr>
+<tr class='detail-row' style='display:none'><td colspan='15'><div class='detail-grid'><div class='detail-block'><div class='lbl'>Training curve (epoch → test top-1)</div><div><svg width='220' height='36' viewBox='0 0 220 36' xmlns='http://www.w3.org/2000/svg' style='vertical-align:middle'><polyline points='2.0,33.2 21.6,34.0 41.3,21.0 60.9,15.0 80.5,11.9 100.2,13.4 119.8,11.8 139.5,6.1 159.1,3.8 178.7,3.1 198.4,2.6 218.0,2.0' fill='none' stroke='#58a6ff' stroke-width='1.6'/><circle cx='218.0' cy='2.0' r='2.4' fill='#3fb950'/><text x='218' y='32' fill='#8b949e' font-size='10' text-anchor='end'>78.3%</text></svg></div></div><div class='detail-block'><div class='lbl'>Latency / compute breakdown</div><div>latency (batch=1): <b>22.285 ms</b><br>train wall-clock: <b>1115.7 s</b><br>generalisation gap (train−test top1): <b>1.24 pp</b><br>model: <b>?</b> · channel_mode: <b>?</b></div></div><div class='detail-block panel-2col' style='grid-column:1/3'><div class='lbl'>Prior flags</div><div><i style="color:#8b949e">no flags recorded</i></div></div></div></td></tr>
+<tr class='clickable ' data-tier='T1' onclick="openReasoning('sg_only_golden_modulate')">
+<td onclick='event.stopPropagation();toggleDetail(this,"sg_only_golden_modulate")' style='cursor:pointer;color:#58a6ff;font-weight:600;text-align:center'>▸</td>
+<td data-v='sg_only_golden_modulate'><span class='swatch status-done' style='display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle'></span><span class='tag-pill'>sg_only_golden_modulate</span></td>
+<td data-v='cifar10'>cifar10</td>
+<td data-v='2'>2</td>
+<td data-v='12'>12</td>
+<td data-v='0.7792'>77.92%</td>
+<td data-v='0.9879'>98.79%</td>
+<td data-v='127155'>0.127M</td>
+<td data-v='27793296.0'>27.8M</td>
+<td data-v='21.743281000235584'>21.74 ms</td>
+<td data-v='0.8142004782954851'>0.8142</td>
+<td data-v='0.7571170739635115'>0.7571</td>
+<td data-v='-1'>-1</td>
+<td data-v='1156.8229001'>1156.8229</td>
+<td data-v='T1'><span class='chip'>T1</span></td>
+</tr>
+<tr class='detail-row' style='display:none'><td colspan='15'><div class='detail-grid'><div class='detail-block'><div class='lbl'>Training curve (epoch → test top-1)</div><div><svg width='220' height='36' viewBox='0 0 220 36' xmlns='http://www.w3.org/2000/svg' style='vertical-align:middle'><polyline points='2.0,34.0 21.6,28.9 41.3,23.0 60.9,16.5 80.5,13.3 100.2,18.3 119.8,8.4 139.5,10.6 159.1,4.9 178.7,3.9 198.4,2.1 218.0,2.0' fill='none' stroke='#58a6ff' stroke-width='1.6'/><circle cx='218.0' cy='2.0' r='2.4' fill='#3fb950'/><text x='218' y='32' fill='#8b949e' font-size='10' text-anchor='end'>77.9%</text></svg></div></div><div class='detail-block'><div class='lbl'>Latency / compute breakdown</div><div>latency (batch=1): <b>21.743 ms</b><br>train wall-clock: <b>1156.8 s</b><br>generalisation gap (train−test top1): <b>1.27 pp</b><br>model: <b>?</b> · channel_mode: <b>?</b></div></div><div class='detail-block panel-2col' style='grid-column:1/3'><div class='lbl'>Prior flags</div><div><i style="color:#8b949e">no flags recorded</i></div></div></div></td></tr>
+<tr class='clickable ' data-tier='' onclick="openReasoning('sg_only_golden_bottleneck')">
+<td onclick='event.stopPropagation();toggleDetail(this,"sg_only_golden_bottleneck")' style='cursor:pointer;color:#58a6ff;font-weight:600;text-align:center'>▸</td>
+<td data-v='sg_only_golden_bottleneck'><span class='tag-pill'>sg_only_golden_bottleneck</span></td>
+<td data-v='cifar10'>cifar10</td>
+<td data-v='0'>0</td>
+<td data-v='12'>12</td>
+<td data-v='0.6925'>69.25%</td>
+<td data-v='0.9733'>97.33%</td>
+<td data-v='58170'>0.058M</td>
+<td data-v='8567424.0'>8.6M</td>
+<td data-v='7.088909000001422'>7.09 ms</td>
+<td data-v='0.8893873939911524'>0.8894</td>
+<td data-v='0.7117360767416048'>0.7117</td>
+<td data-v='-1'>-1</td>
+<td data-v='456.78928399999995'>456.7893</td>
+<td data-v=''><span class='chip'>—</span></td>
+</tr>
+<tr class='detail-row' style='display:none'><td colspan='15'><div class='detail-grid'><div class='detail-block'><div class='lbl'>Training curve (epoch → test top-1)</div><div><svg width='220' height='36' viewBox='0 0 220 36' xmlns='http://www.w3.org/2000/svg' style='vertical-align:middle'><polyline points='2.0,34.0 21.6,23.6 41.3,17.9 60.9,18.3 80.5,15.0 100.2,8.4 119.8,8.1 139.5,5.4 159.1,3.7 178.7,3.0 198.4,2.6 218.0,2.0' fill='none' stroke='#58a6ff' stroke-width='1.6'/><circle cx='218.0' cy='2.0' r='2.4' fill='#3fb950'/><text x='218' y='32' fill='#8b949e' font-size='10' text-anchor='end'>69.2%</text></svg></div></div><div class='detail-block'><div class='lbl'>Latency / compute breakdown</div><div>latency (batch=1): <b>7.089 ms</b><br>train wall-clock: <b>456.8 s</b><br>generalisation gap (train−test top1): <b>0.10 pp</b><br>model: <b>?</b> · channel_mode: <b>?</b></div></div><div class='detail-block panel-2col' style='grid-column:1/3'><div class='lbl'>Prior flags</div><div><i style="color:#8b949e">no flags recorded</i></div></div></div></td></tr>
 <tr class='clickable ' data-tier='T1' onclick="openReasoning('sg_full_fib')">
 <td onclick='event.stopPropagation();toggleDetail(this,"sg_full_fib")' style='cursor:pointer;color:#58a6ff;font-weight:600;text-align:center'>▸</td>
 <td data-v='sg_full_fib'><span class='swatch status-done' style='display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle'></span><span class='tag-pill'>sg_full_fib</span></td>
@@ -351,6 +947,24 @@
 <td data-v='T1'><span class='chip'>T1</span></td>
 </tr>
 <tr class='detail-row' style='display:none'><td colspan='15'><div class='detail-grid'><div class='detail-block'><div class='lbl'>Training curve (epoch → test top-1)</div><div><svg width='220' height='36' viewBox='0 0 220 36' xmlns='http://www.w3.org/2000/svg' style='vertical-align:middle'><polyline points='2.0,34.0 21.6,23.9 41.3,22.3 60.9,14.4 80.5,14.2 100.2,10.1 119.8,9.6 139.5,5.4 159.1,3.9 178.7,2.6 198.4,2.2 218.0,2.0' fill='none' stroke='#58a6ff' stroke-width='1.6'/><circle cx='218.0' cy='2.0' r='2.4' fill='#3fb950'/><text x='218' y='32' fill='#8b949e' font-size='10' text-anchor='end'>73.2%</text></svg></div></div><div class='detail-block'><div class='lbl'>Latency / compute breakdown</div><div>latency (batch=1): <b>20.016 ms</b><br>train wall-clock: <b>478.9 s</b><br>generalisation gap (train−test top1): <b>1.93 pp</b><br>model: <b>?</b> · channel_mode: <b>?</b></div></div><div class='detail-block panel-2col' style='grid-column:1/3'><div class='lbl'>Prior flags</div><div><i style="color:#8b949e">no flags recorded</i></div></div></div></td></tr>
+<tr class='clickable ' data-tier='' onclick="openReasoning('sg_only_phi_sparse')">
+<td onclick='event.stopPropagation();toggleDetail(this,"sg_only_phi_sparse")' style='cursor:pointer;color:#58a6ff;font-weight:600;text-align:center'>▸</td>
+<td data-v='sg_only_phi_sparse'><span class='tag-pill'>sg_only_phi_sparse</span></td>
+<td data-v='cifar10'>cifar10</td>
+<td data-v='0'>0</td>
+<td data-v='12'>12</td>
+<td data-v='0.7333'>73.33%</td>
+<td data-v='0.98'>98.00%</td>
+<td data-v='259443'>0.259M</td>
+<td data-v='219197328.0'>219.2M</td>
+<td data-v='22.216779000000315'>22.22 ms</td>
+<td data-v='0.6951554814974467'>0.6952</td>
+<td data-v='0.6952638473762637'>0.6953</td>
+<td data-v='-1'>-1</td>
+<td data-v='507.20866230000047'>507.2087</td>
+<td data-v=''><span class='chip'>—</span></td>
+</tr>
+<tr class='detail-row' style='display:none'><td colspan='15'><div class='detail-grid'><div class='detail-block'><div class='lbl'>Training curve (epoch → test top-1)</div><div><svg width='220' height='36' viewBox='0 0 220 36' xmlns='http://www.w3.org/2000/svg' style='vertical-align:middle'><polyline points='2.0,34.0 21.6,23.9 41.3,17.3 60.9,16.4 80.5,11.4 100.2,11.7 119.8,10.1 139.5,5.8 159.1,4.1 178.7,2.5 198.4,2.4 218.0,2.0' fill='none' stroke='#58a6ff' stroke-width='1.6'/><circle cx='218.0' cy='2.0' r='2.4' fill='#3fb950'/><text x='218' y='32' fill='#8b949e' font-size='10' text-anchor='end'>73.3%</text></svg></div></div><div class='detail-block'><div class='lbl'>Latency / compute breakdown</div><div>latency (batch=1): <b>22.217 ms</b><br>train wall-clock: <b>507.2 s</b><br>generalisation gap (train−test top1): <b>1.01 pp</b><br>model: <b>?</b> · channel_mode: <b>?</b></div></div><div class='detail-block panel-2col' style='grid-column:1/3'><div class='lbl'>Prior flags</div><div><i style="color:#8b949e">no flags recorded</i></div></div></div></td></tr>
 <tr class='clickable ' data-tier='T1' onclick="openReasoning('sg_only_group')">
 <td onclick='event.stopPropagation();toggleDetail(this,"sg_only_group")' style='cursor:pointer;color:#58a6ff;font-weight:600;text-align:center'>▸</td>
 <td data-v='sg_only_group'><span class='swatch status-done' style='display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle'></span><span class='tag-pill'>sg_only_group</span></td>
@@ -369,6 +983,78 @@
 <td data-v='T1'><span class='chip'>T1</span></td>
 </tr>
 <tr class='detail-row' style='display:none'><td colspan='15'><div class='detail-grid'><div class='detail-block'><div class='lbl'>Training curve (epoch → test top-1)</div><div><svg width='220' height='36' viewBox='0 0 220 36' xmlns='http://www.w3.org/2000/svg' style='vertical-align:middle'><polyline points='2.0,34.0 21.6,28.0 41.3,22.8 60.9,19.4 80.5,16.9 100.2,10.1 119.8,6.6 139.5,8.0 159.1,4.3 178.7,2.6 198.4,2.0 218.0,2.0' fill='none' stroke='#58a6ff' stroke-width='1.6'/><circle cx='218.0' cy='2.0' r='2.4' fill='#3fb950'/><text x='218' y='32' fill='#8b949e' font-size='10' text-anchor='end'>69.8%</text></svg></div></div><div class='detail-block'><div class='lbl'>Latency / compute breakdown</div><div>latency (batch=1): <b>9.749 ms</b><br>train wall-clock: <b>379.6 s</b><br>generalisation gap (train−test top1): <b>1.33 pp</b><br>model: <b>?</b> · channel_mode: <b>?</b></div></div><div class='detail-block panel-2col' style='grid-column:1/3'><div class='lbl'>Prior flags</div><div><i style="color:#8b949e">no flags recorded</i></div></div></div></td></tr>
+<tr class='clickable ' data-tier='T1' onclick="openReasoning('sg_only_group')">
+<td onclick='event.stopPropagation();toggleDetail(this,"sg_only_group")' style='cursor:pointer;color:#58a6ff;font-weight:600;text-align:center'>▸</td>
+<td data-v='sg_only_group'><span class='swatch status-done' style='display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle'></span><span class='tag-pill'>sg_only_group</span></td>
+<td data-v='cifar10'>cifar10</td>
+<td data-v='1'>1</td>
+<td data-v='12'>12</td>
+<td data-v='0.6993'>69.93%</td>
+<td data-v='0.9788'>97.88%</td>
+<td data-v='127146'>0.127M</td>
+<td data-v='108304272.0'>108.3M</td>
+<td data-v='12.25558899983298'>12.26 ms</td>
+<td data-v='0.8003101075688998'>0.8003</td>
+<td data-v='0.6896681554992048'>0.6897</td>
+<td data-v='-1'>-1</td>
+<td data-v='929.9928890999872'>929.9929</td>
+<td data-v='T1'><span class='chip'>T1</span></td>
+</tr>
+<tr class='detail-row' style='display:none'><td colspan='15'><div class='detail-grid'><div class='detail-block'><div class='lbl'>Training curve (epoch → test top-1)</div><div><svg width='220' height='36' viewBox='0 0 220 36' xmlns='http://www.w3.org/2000/svg' style='vertical-align:middle'><polyline points='2.0,34.0 21.6,30.8 41.3,22.5 60.9,21.7 80.5,11.0 100.2,9.4 119.8,8.2 139.5,7.2 159.1,3.9 178.7,2.8 198.4,2.1 218.0,2.0' fill='none' stroke='#58a6ff' stroke-width='1.6'/><circle cx='218.0' cy='2.0' r='2.4' fill='#3fb950'/><text x='218' y='32' fill='#8b949e' font-size='10' text-anchor='end'>69.9%</text></svg></div></div><div class='detail-block'><div class='lbl'>Latency / compute breakdown</div><div>latency (batch=1): <b>12.256 ms</b><br>train wall-clock: <b>930.0 s</b><br>generalisation gap (train−test top1): <b>0.97 pp</b><br>model: <b>?</b> · channel_mode: <b>?</b></div></div><div class='detail-block panel-2col' style='grid-column:1/3'><div class='lbl'>Prior flags</div><div><i style="color:#8b949e">no flags recorded</i></div></div></div></td></tr>
+<tr class='clickable ' data-tier='' onclick="openReasoning('sg_only_fib_stride')">
+<td onclick='event.stopPropagation();toggleDetail(this,"sg_only_fib_stride")' style='cursor:pointer;color:#58a6ff;font-weight:600;text-align:center'>▸</td>
+<td data-v='sg_only_fib_stride'><span class='tag-pill'>sg_only_fib_stride</span></td>
+<td data-v='cifar10'>cifar10</td>
+<td data-v='0'>0</td>
+<td data-v='12'>12</td>
+<td data-v='0.7255'>72.55%</td>
+<td data-v='0.98'>98.00%</td>
+<td data-v='259443'>0.259M</td>
+<td data-v='200431728.0'>200.4M</td>
+<td data-v='22.516780000005383'>22.52 ms</td>
+<td data-v='0.6716147375603517'>0.6716</td>
+<td data-v='0.6871725878943181'>0.6872</td>
+<td data-v='-1'>-1</td>
+<td data-v='514.1618564'>514.1619</td>
+<td data-v=''><span class='chip'>—</span></td>
+</tr>
+<tr class='detail-row' style='display:none'><td colspan='15'><div class='detail-grid'><div class='detail-block'><div class='lbl'>Training curve (epoch → test top-1)</div><div><svg width='220' height='36' viewBox='0 0 220 36' xmlns='http://www.w3.org/2000/svg' style='vertical-align:middle'><polyline points='2.0,34.0 21.6,26.8 41.3,18.9 60.9,13.9 80.5,12.7 100.2,10.0 119.8,9.7 139.5,5.9 159.1,3.9 178.7,3.7 198.4,2.4 218.0,2.0' fill='none' stroke='#58a6ff' stroke-width='1.6'/><circle cx='218.0' cy='2.0' r='2.4' fill='#3fb950'/><text x='218' y='32' fill='#8b949e' font-size='10' text-anchor='end'>72.5%</text></svg></div></div><div class='detail-block'><div class='lbl'>Latency / compute breakdown</div><div>latency (batch=1): <b>22.517 ms</b><br>train wall-clock: <b>514.2 s</b><br>generalisation gap (train−test top1): <b>1.41 pp</b><br>model: <b>?</b> · channel_mode: <b>?</b></div></div><div class='detail-block panel-2col' style='grid-column:1/3'><div class='lbl'>Prior flags</div><div><i style="color:#8b949e">no flags recorded</i></div></div></div></td></tr>
+<tr class='clickable ' data-tier='T1' onclick="openReasoning('sg_only_group')">
+<td onclick='event.stopPropagation();toggleDetail(this,"sg_only_group")' style='cursor:pointer;color:#58a6ff;font-weight:600;text-align:center'>▸</td>
+<td data-v='sg_only_group'><span class='swatch status-done' style='display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle'></span><span class='tag-pill'>sg_only_group</span></td>
+<td data-v='cifar10'>cifar10</td>
+<td data-v='2'>2</td>
+<td data-v='12'>12</td>
+<td data-v='0.7033'>70.33%</td>
+<td data-v='0.9777'>97.77%</td>
+<td data-v='127146'>0.127M</td>
+<td data-v='108304272.0'>108.3M</td>
+<td data-v='24.551828999829013'>24.55 ms</td>
+<td data-v='0.7686978876590729'>0.7687</td>
+<td data-v='0.6785806723750444'>0.6786</td>
+<td data-v='-1'>-1</td>
+<td data-v='422.8197736000002'>422.8198</td>
+<td data-v='T1'><span class='chip'>T1</span></td>
+</tr>
+<tr class='detail-row' style='display:none'><td colspan='15'><div class='detail-grid'><div class='detail-block'><div class='lbl'>Training curve (epoch → test top-1)</div><div><svg width='220' height='36' viewBox='0 0 220 36' xmlns='http://www.w3.org/2000/svg' style='vertical-align:middle'><polyline points='2.0,34.0 21.6,24.8 41.3,16.2 60.9,13.5 80.5,10.3 100.2,9.4 119.8,9.1 139.5,4.4 159.1,3.5 178.7,3.3 198.4,2.3 218.0,2.0' fill='none' stroke='#58a6ff' stroke-width='1.6'/><circle cx='218.0' cy='2.0' r='2.4' fill='#3fb950'/><text x='218' y='32' fill='#8b949e' font-size='10' text-anchor='end'>70.3%</text></svg></div></div><div class='detail-block'><div class='lbl'>Latency / compute breakdown</div><div>latency (batch=1): <b>24.552 ms</b><br>train wall-clock: <b>422.8 s</b><br>generalisation gap (train−test top1): <b>0.97 pp</b><br>model: <b>?</b> · channel_mode: <b>?</b></div></div><div class='detail-block panel-2col' style='grid-column:1/3'><div class='lbl'>Prior flags</div><div><i style="color:#8b949e">no flags recorded</i></div></div></div></td></tr>
+<tr class='clickable ' data-tier='' onclick="openReasoning('sg_only_phi_relu')">
+<td onclick='event.stopPropagation();toggleDetail(this,"sg_only_phi_relu")' style='cursor:pointer;color:#58a6ff;font-weight:600;text-align:center'>▸</td>
+<td data-v='sg_only_phi_relu'><span class='tag-pill'>sg_only_phi_relu</span></td>
+<td data-v='cifar10'>cifar10</td>
+<td data-v='0'>0</td>
+<td data-v='12'>12</td>
+<td data-v='0.7107'>71.07%</td>
+<td data-v='0.9785'>97.85%</td>
+<td data-v='259459'>0.259M</td>
+<td data-v='219197328.0'>219.2M</td>
+<td data-v='21.60098299999845'>21.60 ms</td>
+<td data-v='0.676224966843923'>0.6762</td>
+<td data-v='0.673272887248495'>0.6733</td>
+<td data-v='-1'>-1</td>
+<td data-v='509.9574723000005'>509.9575</td>
+<td data-v=''><span class='chip'>—</span></td>
+</tr>
+<tr class='detail-row' style='display:none'><td colspan='15'><div class='detail-grid'><div class='detail-block'><div class='lbl'>Training curve (epoch → test top-1)</div><div><svg width='220' height='36' viewBox='0 0 220 36' xmlns='http://www.w3.org/2000/svg' style='vertical-align:middle'><polyline points='2.0,34.0 21.6,26.9 41.3,22.2 60.9,19.5 80.5,13.0 100.2,10.5 119.8,7.5 139.5,6.5 159.1,4.2 178.7,3.0 198.4,2.5 218.0,2.0' fill='none' stroke='#58a6ff' stroke-width='1.6'/><circle cx='218.0' cy='2.0' r='2.4' fill='#3fb950'/><text x='218' y='32' fill='#8b949e' font-size='10' text-anchor='end'>71.1%</text></svg></div></div><div class='detail-block'><div class='lbl'>Latency / compute breakdown</div><div>latency (batch=1): <b>21.601 ms</b><br>train wall-clock: <b>510.0 s</b><br>generalisation gap (train−test top1): <b>1.35 pp</b><br>model: <b>?</b> · channel_mode: <b>?</b></div></div><div class='detail-block panel-2col' style='grid-column:1/3'><div class='lbl'>Prior flags</div><div><i style="color:#8b949e">no flags recorded</i></div></div></div></td></tr>
 <tr class='clickable ' data-tier='T2' onclick="openReasoning('sg_only_group_avg')">
 <td onclick='event.stopPropagation();toggleDetail(this,"sg_only_group_avg")' style='cursor:pointer;color:#58a6ff;font-weight:600;text-align:center'>▸</td>
 <td data-v='sg_only_group_avg'><span class='swatch status-done' style='display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle'></span><span class='tag-pill'>sg_only_group_avg</span></td>
@@ -405,6 +1091,24 @@
 <td data-v='T2'><span class='chip'>T2</span></td>
 </tr>
 <tr class='detail-row' style='display:none'><td colspan='15'><div class='detail-grid'><div class='detail-block'><div class='lbl'>Training curve (epoch → test top-1)</div><div><svg width='220' height='36' viewBox='0 0 220 36' xmlns='http://www.w3.org/2000/svg' style='vertical-align:middle'><polyline points='2.0,26.4 21.6,34.0 41.3,18.6 60.9,18.5 80.5,18.5 100.2,9.2 119.8,8.7 139.5,6.4 159.1,3.3 178.7,3.5 198.4,2.5 218.0,2.0' fill='none' stroke='#58a6ff' stroke-width='1.6'/><circle cx='218.0' cy='2.0' r='2.4' fill='#3fb950'/><text x='218' y='32' fill='#8b949e' font-size='10' text-anchor='end'>66.9%</text></svg></div></div><div class='detail-block'><div class='lbl'>Latency / compute breakdown</div><div>latency (batch=1): <b>19.900 ms</b><br>train wall-clock: <b>582.5 s</b><br>generalisation gap (train−test top1): <b>0.70 pp</b><br>model: <b>?</b> · channel_mode: <b>?</b></div></div><div class='detail-block panel-2col' style='grid-column:1/3'><div class='lbl'>Prior flags</div><div><i style="color:#8b949e">no flags recorded</i></div></div></div></td></tr>
+<tr class='clickable ' data-tier='' onclick="openReasoning('sg_only_golden_adam')">
+<td onclick='event.stopPropagation();toggleDetail(this,"sg_only_golden_adam")' style='cursor:pointer;color:#58a6ff;font-weight:600;text-align:center'>▸</td>
+<td data-v='sg_only_golden_adam'><span class='tag-pill'>sg_only_golden_adam</span></td>
+<td data-v='cifar10'>cifar10</td>
+<td data-v='0'>0</td>
+<td data-v='12'>12</td>
+<td data-v='0.5196'>51.96%</td>
+<td data-v='0.9449'>94.49%</td>
+<td data-v='272474'>0.272M</td>
+<td data-v='41218688.0'>41.2M</td>
+<td data-v='4.7063319999961095'>4.71 ms</td>
+<td data-v='0.8711273297667503'>0.8711</td>
+<td data-v='0.5141996186083642'>0.5142</td>
+<td data-v='-1'>-1</td>
+<td data-v='375.9741912999998'>375.9742</td>
+<td data-v=''><span class='chip'>—</span></td>
+</tr>
+<tr class='detail-row' style='display:none'><td colspan='15'><div class='detail-grid'><div class='detail-block'><div class='lbl'>Training curve (epoch → test top-1)</div><div><svg width='220' height='36' viewBox='0 0 220 36' xmlns='http://www.w3.org/2000/svg' style='vertical-align:middle'><polyline points='2.0,34.0 21.6,25.1 41.3,20.0 60.9,14.9 80.5,9.1 100.2,8.2 119.8,4.9 139.5,4.2 159.1,3.2 178.7,2.0 198.4,2.5 218.0,2.0' fill='none' stroke='#58a6ff' stroke-width='1.6'/><circle cx='218.0' cy='2.0' r='2.4' fill='#3fb950'/><text x='218' y='32' fill='#8b949e' font-size='10' text-anchor='end'>52.0%</text></svg></div></div><div class='detail-block'><div class='lbl'>Latency / compute breakdown</div><div>latency (batch=1): <b>4.706 ms</b><br>train wall-clock: <b>376.0 s</b><br>generalisation gap (train−test top1): <b>0.20 pp</b><br>model: <b>?</b> · channel_mode: <b>?</b></div></div><div class='detail-block panel-2col' style='grid-column:1/3'><div class='lbl'>Prior flags</div><div><i style="color:#8b949e">no flags recorded</i></div></div></div></td></tr>
 </tbody></table>
 <div class='meta'>Generated by <code>nature_inspired_networks.dashboard.render_dashboard</code> · dark theme adapted from dlmastery/autoresearchspy/docs/spy_dashboard · all CSS+JS inline; no external CDN; PNG plots kept as PNG.</div>
 

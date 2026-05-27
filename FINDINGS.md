@@ -8,7 +8,93 @@
 > The autoresearch protocol delivered exactly what it is supposed to:
 > a falsifiable negative result with clear single-prior decomposition.
 
-## Final ranking (composite descending, single seed)
+## Expansion campaign — 2026-05-27 — 20 new hypotheses smoked (seed 0, 12 ep)
+
+After the implementation campaign brought the repo from 7 to 74/75
+hypothesis implementations, all 20 newly-wired CIFAR-10-droppable tags
+were smoked at seed 0 / 12 epochs (zero failures, 8559 s total). The
+result **sharpens, not overturns, the original headline**: of 20 new
+single-change variants, exactly **one beats the ResNet-20 baseline on
+top-1**, and **none beats it on composite** (the baseline's 272 k params
+at 84.78 % remain the composite leader at 0.8458).
+
+### The one positive: H09 φ-Proportion Parameter Budget
+
+| tag | hyp | top-1 | params | composite | verdict |
+|---|---|---|---|---|---|
+| `sg_only_phi_budget` | H09 | **85.54 %** | 284 k | 0.8429 | **only variant > baseline top-1 (+0.76 pp)** |
+
+`phi_budget` allocates the per-stage parameter budget in a `1 : φ : φ²`
+ratio rather than the uniform doubling of a stock ResNet. It is the
+**single strongest CIFAR-10 lead the project has produced** and the
+clear #1 candidate to graduate to CIFAR-100 (Phase 4). The composite is
+fractionally below baseline only because it carries 11 k more params;
+on raw accuracy it wins. Pre-registered falsifier (top-1 ≤ baseline)
+is **not** met → hypothesis survives.
+
+### The clean falsification: H41 Golden-Ratio AdamW
+
+| tag | hyp | top-1 | verdict |
+|---|---|---|---|
+| `sg_only_golden_adam` | H41 | **51.96 %** | **falsified — worst run in the entire project** |
+
+Setting Adam's `β1 = 1/φ ≈ 0.618`, `β2 = 1/φ² ≈ 0.382` sits far below
+the empirically-stable regime (`0.9 / 0.999`). The low `β2` makes the
+second-moment estimate hyper-noisy, so the optimiser never stabilises —
+a 33 pp collapse vs baseline. This is exactly the kind of confidently-
+stated "golden constants improve everything" claim the protocol exists
+to kill. **Verdict: DISCARD**; the golden ratio is not a universal
+substitute for tuned optimiser moments.
+
+### The efficiency story: H02 Fibonacci depth + the φ-channel family
+
+| tag | hyp | top-1 | params | composite |
+|---|---|---|---|---|
+| `sg_only_fib_depth` | H02 | 82.18 % | **180 k** | 0.8261 |
+| `sg_only_golden_resize` | H03 | 80.67 % | 127 k | 0.8157 |
+| `sg_only_phi_compound` | H01 | 80.42 % | 127 k | 0.8152 |
+
+`fib_depth` reaches the #3 composite slot at **0.66× the baseline
+parameter count** — the priors that touch *scaling* (depth schedule,
+channel schedule) are consistently the most parameter-efficient family,
+even when raw top-1 trails. Worth a CIFAR-100 look as the "small-model"
+graduate.
+
+### Mid-pack (neutral, within ±2 pp of the no-prior scaffold)
+
+`golden_momentum` (83.52), `phi_dropout` (82.80), `phi_multiscale`
+(82.00), `golden_skip` (81.63), `fib_prune` (81.15), `golden_spiral_init`
+(80.42), `fib_ensemble` (80.11), `phi_activation` (79.95), `phi_decay`
+(79.81), `phi_lr` (78.75) — all land in the neutral band: a real
+implementation, no reliable lift at 12 ep. These are "needs-more-epochs
+or needs-the-right-dataset" rather than falsified.
+
+### New strong negatives (join group/cymatic/toroidal)
+
+`golden_adam` (51.96, above), `group_avg` (65.38), `golden_bottleneck`
+(69.25, but at **0.21× params** — efficiency outlier worth a second
+look), `phi_relu` (71.07), `fib_stride` (72.55), `phi_sparse` (73.33),
+`phi_init` (76.56). The φ-init and sparse-connectivity priors actively
+hurt at this scale.
+
+### G8 esoteric-extension tags (queued)
+
+`sg_only_constant_width` (H80) and `sg_only_sine_act` (H81) were added
+to the matrix after this sweep launched and are smoking now in a
+follow-up run; the other 7 G8 modules ship as standalone primitives
+without a CNN sweep row.
+
+### Phase-4 CIFAR-100 graduation shortlist (by this campaign)
+
+1. **H09 `phi_budget`** — only top-1 winner; clear #1.
+2. **H02 `fib_depth`** — best param-efficiency (comp 0.8261 @ 180 k).
+3. **H05 `fractal`** — the original campaign's only positive single prior.
+4. **H48 `golden_momentum`** — closest neutral to baseline (83.52).
+5. `baseline_resnet20` rail (always carried).
+
+---
+
+## Final ranking (composite descending, single seed) — original 11-row campaign
 
 | rank | tag | top-1 | params | latency ms | composite | Δ vs `sg_chan_fib` |
 |---|---|---|---|---|---|---|
