@@ -1,119 +1,171 @@
 # CLAUDE.md — normative rules for `nature_inspired_networks`
 
 > Canonical rules for any future Claude / operator working on this repo.
-> Captures **every operational directive the user has given across the
-> design-and-build session**. README, IDEA_TABLE, ARCHITECTURE, and
-> AUTORESEARCH_PROCESS summarise this file.
+> **Every rule below is strictly enforced.** Failure to follow these
+> rules is a defect, not a style choice. The rules consolidate every
+> operational directive the user has given across the session. Each
+> rule has a section in `memory/` with the original directive,
+> rationale, and how-to-apply pattern.
 
 ---
 
 ## 0. What this project is
 
-A modular auto-research framework for studying nature-inspired
-inductive biases (φ-scaling, Fibonacci channels, hexagonal lattices,
-Platonic equivariance, fractal recursion, toroidal closure, cymatic
-init, golden-angle modulation, Betti loss, etc.) as drop-in residual /
-attention blocks in image classification and graph learning.
+A modular autoresearch framework for studying nature-inspired
+inductive biases (φ/Fibonacci scaling, Platonic / icosahedral
+equivariance, hexagonal lattices, fractal self-similarity, toroidal
+closure, Chladni cymatic init, golden-angle modulation) as drop-in
+residual / attention blocks in CIFAR-scale image classification and
+decoder-only LLMs. Each prior maps to a peer-reviewed GDL/TDL paper.
+The mystical motivation is acknowledged in prose only; artifact names
+are academic / neutral.
 
-The framing is engineering: each "sacred" / "nature" prior maps to a
-peer-reviewed Geometric / Topological Deep Learning paper. The mystical
-inspiration is acknowledged in the source PDF but **never appears in
-artifact names**.
-
----
-
-## 1. Session-derived directives (the full list)
-
-In order received from the user during the design conversation:
-
-1. **"Read the PDF + the autoresearch skills + write code + ablation/
-   feasibility on popular benchmarks + RTX 4090 + detailed dashboards
-   like autoresearch + principled."**
-   → driven by `C:\Users\evija\Downloads\sacred geometry and neural
-   networks.pdf` and the `dlmastery/autoresearchimage` template.
-2. **"Checkpoint progress in a public dlmastery repo and write detailed
-   docs in autoresearch style."**
-   → repo: `dlmastery/nature_inspired_networks` (Pages on `/docs`).
-3. **"Each idea is an independent task with its own experiment strategy;
-   then a mix-of-all-ideas; each implementation audited, critiqued,
-   improved, verified for correctness; each archived in its own
-   directory; modular to mix-and-match."**
-   → `ideas/NNN_<name>/` taxonomy with one self-contained sub-project
-   per hypothesis; `ideas/99_mix_all/` for the composed model.
-4. **"Verify you went through all 4 source files chunk by chunk and
-   build an incremental design-space table."**
-   → `IDEA_TABLE.md`: 60 hypotheses in 6 thematic groups.
-5. **"Use neutral / academic naming instead of `sacred*`."**
-   → project renamed `sacgeometry → nature_inspired_networks`; classes
-   `SacredGeo* → NaturePrior*`. Local working dir
-   `C:\Users\evija\sacgeometry` is the legacy path; GitHub repo is
-   `dlmastery/nature_inspired_networks`. **Operator may rename the
-   local dir off-session** with `Move-Item sacgeometry
-   nature_inspired_networks`.
-6. **"Nice taxonomy directory. Every experiment's artifacts (including
-   very very detailed design README) archived in a separate
-   sub-directory on GitHub. All code modular and reusable by anyone."**
-   → `ideas/<idea>/experiments/expNNN_<short-name>/` is the archive
-   unit. Each archive sub-directory contains: README.md (very
-   detailed design + hypothesis + prediction + actual + verdict),
-   `config.yaml`, `reasoning.json`, per-seed `run_seed<N>/` with
-   metrics/history/best.pt, and a local `dashboard/`.
-7. **"Update CLAUDE.md with all the things asked + create a `skills/`
-   directory with modular skills (agnostic to nature stuff) that can
-   reproduce these kinds of experiments."**
-   → this file + `skills/SKILL_NAME/SKILL.md` set. Skills must be
-   *content-agnostic* — they reference the autoresearch protocol, not
-   the specific nature-inspired hypotheses.
+The single source of truth for the design space is
+[`IDEA_TABLE.md`](IDEA_TABLE.md) (75 hypotheses across 7 thematic
+groups). Per-hypothesis design documents live under
+`hypotheses/g<N>_<group>/H<NN>_<short>.md`. Each implemented
+hypothesis has a self-contained sub-project under `ideas/<NN>_<short>/`.
 
 ---
 
-## 2. Always-true assertions (the gates)
+## 1. The 18 strict rules
 
-The following are **non-negotiable** unless the user explicitly waives:
+### Rule 1 — One config change per experiment
+Either a single flag in `flags:` flips, one `channel_mode` switches,
+or one optimizer/init differs. No silent compounding.
 
-1. **One config change per experiment.** Either a single flag flips,
-   one channel mode changes, or one optimizer/init differs. No silent
-   compounding.
-2. **Composite formula is SHA-256 fingerprinted.** Edit the string and
-   the next run refuses to launch with `CompositeFingerprintError`.
-   New formulas require a new repo / branch.
-3. **`experiment_log.jsonl` is append-only.** Never edit a past row.
-   Corrections append a new row with the same tag plus `_v2` and a
-   journal entry explaining why.
-4. **Citation Rigor.** Every reasoning entry needs an `Author1, Author2,
-   …, YEAR VENUE 'Title' (arXiv:XXXX.XXXXX) — relevance` line. The
-   validator in `src/nature_inspired_networks/reasoning.py` rejects
-   parenthetical-only tags like `(He2016)`.
-5. **Reasoning Blob Completeness.** Word-count floors per field:
-   `diagnosis ≥ 60`, `citation ≥ 40 (single) / 80 (multi)`,
-   `hypothesis ≥ 50`, `prediction ≥ 25`, `verdict ≥ 30`,
-   `learning ≥ 40`.
-6. **No silent randomness.** `set_seed(seed)` is called at the top of
-   every run; `cudnn.benchmark = True` is intentional. Headline
-   numbers are seed-median composite over `--seeds 0 1 2`.
-7. **No `--bypass` flag.** If a gate refuses, fix the entry, do not
-   disable the gate.
-8. **Per-experiment archive sub-directory is mandatory.** Even single
-   smoke runs land in `ideas/<idea>/experiments/expNNN_<name>/`.
-9. **Every experiment archive has a very detailed README.md** that
-   stands alone — anyone reading just that directory should be able to
-   reproduce the experiment.
-10. **Skills under `skills/` are content-agnostic.** A skill that
-    mentions sacred-geometry-specifics is leaking domain detail and
-    must be rewritten.
-11. **Periodic GitHub checkpoint is mandatory.** Commit + push to
-    `dlmastery/nature_inspired_networks` on **every** milestone:
-    code edit, test green, ledger update, run-folder created, dashboard
-    refreshed. Default cadence ≤ 15 min during active work; before AND
-    after every background training task. Many small commits beat one
-    big commit. The checkpoint is the deliverable — a power outage
-    must never lose progress. (See
-    `memory/feedback_checkpoint_discipline.md` for the trigger table.)
-12. **Test discipline.** Every new module/class/function ships with a
-    unit test in `tests/test_<module>.py` exercising shape, branches,
-    and the bug class it was added to fix. Tests must pass before
-    any training-loop background task is launched. (See
-    `memory/feedback_test_discipline.md`.)
+### Rule 2 — Composite formula is SHA-256 fingerprinted
+The string in `src/nature_inspired_networks/eval.py:COMPOSITE_FORMULA`
+is hashed at import time. Editing it makes the next run refuse to
+launch with `CompositeFingerprintError`. New formulas require a new
+branch / repo.
+
+### Rule 3 — `experiment_log.jsonl` is append-only
+Never edit a past row. Corrections add a `_v2` row with a journal
+entry explaining why.
+
+### Rule 4 — Citation Rigor
+Every reasoning entry needs the format
+`Author1, Author2, … YEAR VENUE 'Title' (arXiv:XXXX.XXXXX) — relevance`.
+The validator in `src/nature_inspired_networks/reasoning.py` rejects
+parenthetical-only tags like `(He2016)`.
+
+### Rule 5 — Reasoning Blob Completeness
+Word-count floors per field: `diagnosis ≥ 60`, `citation ≥ 40 single
+/ 80 multi`, `hypothesis ≥ 50`, `prediction ≥ 25`, `verdict ≥ 30`,
+`learning ≥ 40`. Padding to hit the floor is a defect — the floor
+exists to force substantive content.
+
+### Rule 6 — No silent randomness
+`set_seed(seed)` is called at the top of every run.
+`cudnn.benchmark = True` is intentional. Headline numbers are
+seed-median composite over `--seeds 0 1 2`.
+
+### Rule 7 — No `--bypass` flag
+If a gate refuses, fix the entry, do not disable the gate. There is
+no emergency-bypass mode.
+
+### Rule 8 — Per-experiment archive sub-directory is mandatory
+Even single smoke runs land in
+`ideas/<idea>/experiments/exp<NNN>_<short>/`. The archive
+sub-directory carries `README.md` (very detailed design + result +
+verdict), `config.yaml`, `reasoning.json`, `run_seed<N>/{metrics.json,
+history.json, best.pt}`, and a local `dashboard/`.
+
+### Rule 9 — Every experiment archive has a very detailed README.md
+The README stands alone — anyone reading just that sub-directory must
+be able to reproduce the experiment from cold. The README is the
+deliverable; the weights are secondary.
+
+### Rule 10 — Skills under `skills/` are content-agnostic
+A skill that mentions sacred-geometry-specifics is leaking domain
+detail and must be rewritten. The skills exist so that ANY future
+autoresearch project (tabular, medical, FX, …) can pick them up
+unchanged.
+
+### Rule 11 — Periodic GitHub checkpoint is mandatory
+Commit + push to `dlmastery/nature_inspired_networks` on EVERY
+milestone: file edit, test green, ledger update, run-folder created,
+dashboard refreshed. Default cadence ≤ 15 min during active work;
+BEFORE AND AFTER every background training task. Many small commits
+beat one big commit. The checkpoint is the deliverable — a power
+outage must never lose progress.
+See [`memory/feedback_checkpoint_discipline.md`](../.claude/projects/C--Users-evija-sacgeometry/memory/feedback_checkpoint_discipline.md)
+for the trigger table.
+
+### Rule 12 — Test discipline
+Every new module / class / function ships with a unit test in
+`tests/test_<module>.py` (or `ideas/<NN>/tests.py`) exercising shape,
+every Boolean-flag combination, and the bug class it was added to
+fix. Tests must pass before any training-loop background task is
+launched. End every test file with `"All N tests passed."` or fail
+loudly.
+See [`memory/feedback_test_discipline.md`](../.claude/projects/C--Users-evija-sacgeometry/memory/feedback_test_discipline.md).
+
+### Rule 13 — SOTA smoke first
+Every experiment workflow on a given dataset runs a known-good
+baseline at the **SOTA recipe** as a pre-flight smoke BEFORE any
+nature-inspired variant. For CIFAR-10 the canonical smoke is
+`configs/cifar10_sota_smoke.yaml` (ResNet-20 + AdamW + cosine + label
+smoothing + RandomCrop+HFlip; expected ≥ 80 % top-1 at 12 ep,
+≥ 89 % at 30 ep, ≥ 91 % at 164 ep). If the smoke falls below the
+expected band, STOP and diagnose the environment — do not run any
+variant. `scripts/run_sweep.py` enforces this by gating subsequent
+rows on the baseline result.
+See [`memory/feedback_sota_smoke_first.md`](../.claude/projects/C--Users-evija-sacgeometry/memory/feedback_sota_smoke_first.md).
+
+### Rule 14 — Modular & reusable architecture
+Shared primitives live in `src/nature_inspired_networks/` (single
+import surface). Each `ideas/<NN>_<short>/implementation.py` imports
+from there — it does NOT duplicate code. The idea sub-project glue is
+a thin composition wrapper. Hypothesis documentation lives under
+`hypotheses/g<N>_<group>/H<NN>_*.md` (75 docs, 7 thematic groups).
+
+### Rule 15 — Hierarchical agent teams with SMEs
+When the workload is parallelizable (writing many design docs,
+building many idea sub-projects, conducting research surveys), use
+parallel `Agent` calls with hierarchical SME roles. Each agent gets
+a disjoint scope, references the shared `_TEMPLATE`, and reports back
+with file byte counts + recommended refinements. Experiments
+themselves run serially on the single 4090; **only docs / code /
+research run in parallel.**
+
+### Rule 16 — Neutral / academic naming
+Artifact names are neutral; mystical inspiration is acknowledged only
+in prose. The renames from the original `sacgeometry` / `SacredGeo*`
+project to `nature_inspired_networks` / `NaturePrior*` are normative,
+not cosmetic.
+See [`memory/feedback_naming_preference.md`](../.claude/projects/C--Users-evija-sacgeometry/memory/feedback_naming_preference.md).
+
+### Rule 17 — Source-document audit must be chunk-by-chunk
+When the user provides multiple source documents (PDFs, transcripts),
+they are read in ≤ 250-line chunks with an
+[`EXPERIMENT_LEDGER.md`](EXPERIMENT_LEDGER.md) row appended after
+each chunk. No source document is treated as read-once-and-summarised
+from memory; the chunked audit is the deliverable.
+
+### Rule 18 — Documentation must be committee-grade
+Every hypothesis file (`hypotheses/g<N>/H<NN>_*.md`), every experiment
+archive README, every paradigm-comparison entry must be detailed
+enough to satisfy a hostile NeurIPS / ICML reviewer. Sections per
+template are MANDATORY: motivation (≥ 100w), formal hypothesis (≥ 50w,
+"mechanism" or "because"), numeric falsifier, multi-paper citations,
+mechanism (CNN-track AND LLM-track), predicted Δ table, 3-part
+experimental protocol, cross-references, ≥ 4 Committee Q&A,
+verification checklist, status journal. No padding; substantive depth.
+
+---
+
+## 2. Hardware contract
+
+- Target: **1× RTX 4090 Laptop, 16 GB VRAM, Windows 11**.
+- bf16 AMP + cosine LR + label smoothing + RandAugment.
+- Default batch 256.
+- `num_workers: 0` on Windows because spawn-start workers wedge.
+- Python 3.13 corp-cert SSL workaround: `curl.exe -kL` for CIFAR;
+  torchvision verifies MD5.
+- Background-task launches **always** preceded by `git push`
+  (per Rule 11).
 
 ---
 
@@ -121,153 +173,161 @@ The following are **non-negotiable** unless the user explicitly waives:
 
 ```
 nature_inspired_networks/
-├── README.md                       — master entry point
-├── IDEA_TABLE.md                   — 60-hypothesis design-space table
-├── ARCHITECTURE.md                 — module + shape tables
-├── AUTORESEARCH_PROCESS.md         — 7-step protocol ritual
-├── CLAUDE.md                       — this file
-├── PAPER.md                        — draft paper (auto-fills from runs)
-├── FINDINGS.md                     — campaign verdict
-├── RESULTS.md                      — auto-generated per-experiment narrative
-├── SOTA_COMPARISON.md              — honest literature comparison
-├── SETUP.md                        — bring-up steps
-├── MEDIUM.md                       — blog-style narrative
-├── paper_abstract.md
-├── sota_catalog.yaml               — prior-art (single source of truth)
+├── README.md               operator quick-start
+├── MINDMAP.md              one-page link map of every artifact
+├── MANIFESTO.md            research argument (committee-grade)
+├── CLAUDE.md               this file
+├── ARCHITECTURE.md         module + shape tables
+├── AUTORESEARCH_PROCESS.md 7-step ritual + gates
+├── IDEA_TABLE.md           75-hypothesis status table
+├── EXPERIMENT_LOG.md       master long-list (Tiers 0-6)
+├── EXPERIMENT_LEDGER.md    chunk-by-chunk audit of source docs
+├── PARADIGM_COMPARISON.md  8-chunk Liquid/JEPA/KAN/Transformer/GNN
+├── NATURE_INSPIRED_NETWORKS.md   state-of-the-field (May 2026)
+├── FINDINGS.md             campaign verdicts (incl. negatives)
+├── RESULTS.md              auto-generated per-run narratives
+├── SOTA_COMPARISON.md      honest map to the literature
+├── PAPER.md / paper_abstract.md
+├── SETUP.md / MEDIUM.md
+├── sota_catalog.yaml
 ├── pyproject.toml
-├── src/nature_inspired_networks/   — shared infra (training, eval,
-│                                     dashboard, gates, topology)
-├── ideas/                          — TAXONOMY: 60 hypothesis sub-projects
-│   ├── _TEMPLATE/                  — copy-and-fill scaffold
-│   │   ├── README.md               — idea statement
-│   │   ├── IDEA.md                 — formal claim + falsifier
-│   │   ├── implementation.py
-│   │   ├── tests.py
-│   │   ├── AUDIT.md
-│   │   ├── IMPROVEMENTS.md
-│   │   ├── VERIFY.md
-│   │   ├── experiment.py           — idea-specific experiment driver
-│   │   ├── configs/
-│   │   ├── experiments/            — PER-EXPERIMENT ARCHIVES
-│   │   │   └── exp001_<short>/
-│   │   │       ├── README.md       — very detailed
-│   │   │       ├── config.yaml
-│   │   │       ├── reasoning.json
-│   │   │       ├── run_seed0/{metrics.json,history.json,best.pt}
-│   │   │       ├── run_seed1/…
-│   │   │       └── dashboard/
-│   │   ├── results.md
-│   │   └── dashboard/
-│   ├── 01_phi_compound_scaling/    ← H01
-│   ├── 02_fib_depth_progression/   ← H02
-│   ├── … (H03–H60)
-│   └── 99_mix_all/                 ← composed hybrid
-├── skills/                         — REUSABLE / CONTENT-AGNOSTIC
-│   ├── autoresearch-experiment/
-│   ├── autoresearch-ablation-sweep/
-│   ├── autoresearch-dashboard/
-│   ├── autoresearch-reasoning-entry/
-│   ├── autoresearch-modular-block/
-│   ├── autoresearch-dataset-loader/
-│   ├── autoresearch-topology-metrics/
-│   ├── autoresearch-experiment-archive/
-│   └── autoresearch-idea-scaffold/
-├── configs/                        — shared config templates
-├── scripts/                        — top-level runners
-├── experiments/                    — LEGACY 11-run sweep (kept for
-│                                     historical comparison)
-├── dashboard/                      — latest aggregated dashboard
-├── docs/                           — GitHub Pages root
-└── memory/                         — checkpoint markdown
+├── hypotheses/             75 docs in 7 thematic group subdirs
+│   ├── _TEMPLATE.md
+│   ├── INDEX.md
+│   ├── g1_scaling_growth/
+│   ├── g2_layer_channel_neuron/
+│   ├── g3_topologies_graphs/
+│   ├── g4_kernels_attention_filters/
+│   ├── g5_optimization_init_reg_nas/
+│   ├── g6_topological_bridging/
+│   └── g7_cross_paradigm_hybrids/
+├── ideas/                  modular sub-projects (1 per impl. hypothesis)
+│   ├── _TEMPLATE/
+│   └── NN_<short>/
+│       ├── README.md
+│       ├── IDEA.md
+│       ├── implementation.py     ← imports from nature_inspired_networks
+│       ├── tests.py
+│       ├── AUDIT.md
+│       ├── IMPROVEMENTS.md
+│       ├── VERIFY.md
+│       ├── experiment.py
+│       ├── configs/<config>.yaml
+│       ├── experiments/expNNN_<short>/
+│       │   ├── README.md                ← very detailed
+│       │   ├── config.yaml
+│       │   ├── reasoning.json
+│       │   ├── run_seed0/{metrics, history, best.pt}
+│       │   └── dashboard/
+│       ├── results.md
+│       └── dashboard/
+├── src/nature_inspired_networks/   shared infrastructure
+├── scripts/                run_sweep / build_dashboard / build_report / compute_topology
+├── skills/                 11 content-agnostic auto-research skills
+├── tests/                  29 core + 68 idea-local unit tests
+├── configs/                shared YAML configs (smoke / quick / sota_smoke)
+├── experiments/            legacy CIFAR-10 archive
+├── dashboard/              latest aggregated dashboard
+├── docs/                   GitHub Pages root
+└── memory/                 project checkpoint markdown
 ```
 
 ---
 
-## 4. Hardware contract
+## 4. Adding an experiment — checklist (Rule 13 + 8 + 11)
 
-- Target: **1× RTX 4090 Laptop, 16 GB VRAM, Windows 11**.
-- Default batch 256 with bf16 AMP. If you change this, add a new
-  config file.
-- `num_workers: 0` on Windows because spawn-start workers wedge.
-- Python 3.13 corp-cert SSL: download CIFAR with `curl.exe -kL`;
-  torchvision's MD5 still verifies content.
-
----
-
-## 5. Adding an experiment — checklist
-
-For ANY new experiment, regardless of idea:
-
-1. Pick or create `ideas/<NN_idea>/` from `ideas/_TEMPLATE/`.
-2. Create `ideas/<NN_idea>/experiments/expNNN_<short_name>/` archive
-   dir.
-3. Write `experiments/expNNN_*/README.md`: hypothesis, mechanism,
+1. **Pre-flight SOTA smoke (Rule 13).** Run
+   `configs/cifar10_sota_smoke.yaml` (or the dataset-specific SOTA
+   smoke) and verify top-1 ≥ expected band. If not, STOP.
+2. Pick or create `ideas/<NN_idea>/` from `ideas/_TEMPLATE/`.
+3. Create `ideas/<NN_idea>/experiments/exp<NNN>_<short>/` archive dir.
+4. Write `experiments/exp<NNN>_*/README.md`: hypothesis, mechanism,
    prediction, dataset, config delta, expected verdict.
-4. Author `experiments/expNNN_*/reasoning.json` with the 4 pre-run
-   fields (`diagnosis`, `citations`, `hypothesis`, `prediction`);
-   validator must accept.
-5. Write or copy `experiments/expNNN_*/config.yaml`.
-6. Run:
+5. Author `experiments/exp<NNN>_*/reasoning.json` with the 4 pre-run
+   fields (`diagnosis`, `citations`, `hypothesis`, `prediction`).
+   Validator must accept (Rules 4 + 5).
+6. Run unit tests (Rule 12); confirm green.
+7. `git commit + push` BEFORE launch (Rule 11).
+8. Launch:
    ```powershell
    .\.venv\Scripts\python -m nature_inspired_networks.runner `
-     --config ideas\<NN>\experiments\expNNN_<short>\config.yaml `
-     --tag expNNN_<short> --seed 0 `
-     --root ideas\<NN>\experiments\expNNN_<short>\run
+     --config ideas\<NN>\configs\<config>.yaml `
+     --tag exp<NNN>_<short> --seed 0 `
+     --root ideas\<NN>\experiments\exp<NNN>_<short>\run
    ```
-7. Append post-run `verdict` + `learning` to `reasoning.json`.
-8. Regenerate dashboards: `scripts/build_dashboard.py` walks all
-   `ideas/**/experiments/**/run_seed*/metrics.json`.
+9. Append post-run `verdict` + `learning` to `reasoning.json`.
+10. Regenerate dashboards (`scripts/build_dashboard.py` +
+    `build_report.py`).
+11. `git commit + push` AFTER completion (Rule 11).
 
 ---
 
-## 6. When the runner refuses
+## 5. When the runner refuses
 
 | symptom | cause | fix |
 |---|---|---|
-| `ValueError: Reasoning entry rejected` | word-count / citation format | rewrite the failing field |
-| `CompositeFingerprintError` | someone edited composite formula | revert / new branch |
-| `MD5 mismatch on CIFAR tarball` | corp proxy injection | re-download w/ `curl.exe -kL` |
-| `CUDA out of memory` | over 16 GB | drop batch in a new config file |
+| `ValueError: Reasoning entry rejected` | word-count / citation format (Rule 4/5) | rewrite the failing field |
+| `CompositeFingerprintError` | composite formula edited (Rule 2) | revert / new branch |
+| `MD5 mismatch on CIFAR tarball` | corp proxy injection | re-download with `curl.exe -kL` |
+| `CUDA out of memory` | over 16 GB | drop batch in a new config (do NOT edit existing config — Rule 1) |
+| SOTA smoke below expected band | env drift / torch version / corrupted data | STOP, diagnose, do not run variants (Rule 13) |
 
 ---
 
-## 7. What may never go in this repo
+## 6. What may never go in this repo
 
 - Real-name PII or PHI.
-- Pre-trained ImageNet weights re-uploaded under our license (link upstream).
+- Pre-trained ImageNet weights re-uploaded under our license (link
+  upstream).
 - Closed datasets requiring registration; load at runtime only.
+- Secrets, `.env` files, API keys.
 
 ---
 
-## 8. Sister projects
+## 7. Sister projects
 
-- [`dlmastery/autoresearchimage`](https://github.com/dlmastery/autoresearchimage)
-  — protocol source-of-truth, OOD pathology.
-- [`dlmastery/autoresearch`](https://github.com/dlmastery/autoresearch)
-  — FX-prediction (the original).
-- [`dlmastery/autoresearchtabular`](https://github.com/dlmastery/autoresearchtabular)
-  — tabular ML autoresearch (Higgs UCI).
+- [`dlmastery/autoresearchimage`](https://github.com/dlmastery/autoresearchimage) — protocol source-of-truth
+- [`dlmastery/autoresearch`](https://github.com/dlmastery/autoresearch) — FX prediction
+- [`dlmastery/autoresearchtabular`](https://github.com/dlmastery/autoresearchtabular) — Higgs UCI
+- [`dlmastery/autoresearchspy`](https://github.com/dlmastery/autoresearchspy) — SPY ETF
+- [`dlmastery/autoresearchindexstock`](https://github.com/dlmastery/autoresearchindexstock) — QQQ
 
 If you change a gate or composite formula here, also open an issue on
 `autoresearchimage` explaining why.
 
 ---
 
-## 9. Operator quick-reference
+## 8. Operator quick-reference
 
 ```powershell
-# Smoke test (≤ 2 min)
+# SOTA smoke (≤ 2 min — Rule 13 pre-flight)
 .\.venv\Scripts\python -m nature_inspired_networks.runner `
-  --config configs\cifar10_smoke.yaml --tag smoke --seed 0
+  --config configs\cifar10_sota_smoke.yaml --tag smoke --seed 0
 
-# Curated 11-row ablation (~60 min)
+# Curated 13-row ablation (~90 min)
 .\.venv\Scripts\python scripts\run_sweep.py `
   --config configs\cifar10_quick.yaml --seeds 0 --skip-existing
 
-# Build full dashboard + RESULTS.md
+# Trained-feature Betti + dashboard + report
 .\.venv\Scripts\python scripts\compute_topology.py --seeds 0
 .\.venv\Scripts\python scripts\build_dashboard.py
 .\.venv\Scripts\python scripts\build_report.py
+
+# 3-seed re-sweep for error bars (~5 hr)
+.\.venv\Scripts\python scripts\run_sweep.py `
+  --config configs\cifar10_quick.yaml --seeds 0 1 2 --skip-existing
 ```
 
-The protocol is the deliverable. The model weights are secondary.
+---
+
+## 9. The protocol is the deliverable
+
+The model weights are secondary. The artifact pack — manifesto +
+75 hypothesis docs + 7-step protocol entries + dashboards + per-run
+archives + committed history — is what survives. Train fewer, document
+more. Negative results are first-class citizens
+(see `FINDINGS.md`).
+
+Every rule above is enforced. There are no exceptions.
+
+*Last updated: 2026-05-27. Rules 1–18 are normative invariants.*

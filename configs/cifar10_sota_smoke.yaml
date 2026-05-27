@@ -1,0 +1,32 @@
+# CIFAR-10 SOTA-smoke config.
+# Per CLAUDE.md rule #13: every experiment workflow runs this as a smoke
+# pre-flight before any nature-inspired variant. The recipe is the He
+# 2015 ResNet-20 CIFAR variant under the modern AdamW + cosine + label-
+# smoothing + RandAugment recipe.
+#
+# Expected: top-1 >= 80% at 12 epochs (smoke), >= 89% at 30 epochs
+# (quality), >= 91% at 164 epochs (full recipe target).
+
+dataset: cifar10
+data_root: ./data
+batch_size: 256
+num_workers: 0           # Windows-safe; raise to 4 on Linux/WSL
+
+epochs: 12               # smoke = 12; quality = 30; full = 164
+
+lr: 1.0e-3
+weight_decay: 5.0e-4
+label_smoothing: 0.1
+
+target_top1: 0.80        # the SOTA-smoke acceptance band lower bound
+use_bf16: true
+
+model: resnet20
+channel_mode: linear     # ResNet-20 uses 16-32-64 widths (linear)
+flags:                   # all sacred priors OFF for the SOTA baseline
+  hex: false
+  group: false
+  fractal: false
+  toroidal: false
+  cymatic_init: false
+  golden_modulate: false
