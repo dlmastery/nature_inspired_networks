@@ -1,0 +1,18 @@
+{
+  "tag": "sg_only_fib_stride",
+  "dataset": "cifar10",
+  "seed": 0,
+  "epochs": 12,
+  "top1": 0.7255,
+  "top5": 0.98,
+  "params": 259443,
+  "flops": 200431728.0,
+  "latency_ms": 22.516780000005383,
+  "rot_eq_err": 0.6716147375603517,
+  "composite": 0.6871725878943181,
+  "composite_fingerprint": "d65565e9c7b12d14cbce30a801ecc6753aea3eb148074256bfcc051fa61d0893",
+  "epochs_to_target": -1,
+  "train_seconds": 514.1618564,
+  "train_top1": 0.7396434294871795,
+  "generalization_gap": 0.014143429487179504
+}
