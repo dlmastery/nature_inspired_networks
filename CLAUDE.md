@@ -154,6 +154,30 @@ mechanism (CNN-track AND LLM-track), predicted Δ table, 3-part
 experimental protocol, cross-references, ≥ 4 Committee Q&A,
 verification checklist, status journal. No padding; substantive depth.
 
+### Rule 19 — Phased CIFAR-10 → CIFAR-100 progression
+Strict phase order. No hypothesis jumps phases.
+
+- **Phase 0** — Unit tests. `ideas/<NN>/tests.py` green
+  (≥ 4 assertions + at least one regression test).
+- **Phase 1** — CIFAR-10 SOTA-smoke pre-flight
+  (`configs/cifar10_sota_smoke.yaml`). ResNet-20 baseline must hit
+  ≥ 80 % top-1 at 12 ep. Failure → STOP, fix env.
+- **Phase 2** — CIFAR-10 hypothesis smoke for **ALL** hypotheses.
+  12-epoch ablation row per hypothesis. Commit + push after each.
+- **Phase 3** — Check-in dashboard + RESULTS + FINDINGS refresh.
+  Identify top-K performers by composite. Commit + push.
+- **Phase 4** — CIFAR-100 heavy hitters. **Only** the top-K from
+  Phase 3 graduate. ≥ 30 epochs (quality) or 100+ (convergence).
+  Each run carries its own `ideas/<NN>/experiments/expNNN_*_cifar100/`
+  archive.
+- **Phase 5** — 3-seed re-run on Phase-4 winners. Add error bars
+  before any external claim.
+
+The cheap broad scan precedes the expensive deep dive. CIFAR-100 GPU
+budget is too scarce to spend on hypotheses whose 12-epoch CIFAR-10
+number would have already disproved them.
+See [`memory/feedback_phased_workflow.md`](../.claude/projects/C--Users-evija-sacgeometry/memory/feedback_phased_workflow.md).
+
 ---
 
 ## 2. Hardware contract
