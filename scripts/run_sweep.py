@@ -81,6 +81,43 @@ def build_matrix(curated: bool = True) -> list[dict]:
             rows.append(dict(tag=f"sg_loo_no_{k}",
                              overrides=dict(model="NaturePrior",
                                             channel_mode="fib", flags=f)))
+
+    # ---------------------------------------------------------------
+    # Code-Agent-2 — H06, H07, H09, H17.pure rows.
+    # Each row is one config change vs. the baseline_resnet20 line
+    # (Rule 1). Models live in src/nature_inspired_networks/phi_scaling.py
+    # and are routed via the `phi_model` override key; the runner-side
+    # wiring is intentionally additive (a follow-up extends build_model
+    # to dispatch on phi_model when set). The rows are listed here as
+    # the documented sweep deltas; future wiring is purely additive.
+    # ---------------------------------------------------------------
+    # H06 — Golden Ratio Bottleneck: c -> c/phi -> c bottleneck stack.
+    rows.append(dict(tag="sg_only_golden_bottleneck",
+                     overrides=dict(model="golden_bottleneck",
+                                    phi_model="golden_bottleneck",
+                                    phi_inverted=False)))
+    # H07 — phi-Modulated Multi-Scale: feature pyramid with widths * phi^k.
+    rows.append(dict(tag="sg_only_phi_multiscale",
+                     overrides=dict(model="NaturePrior",
+                                    channel_mode="fib",
+                                    flags=base_flags.copy(),
+                                    phi_fpn=True,
+                                    phi_fpn_c0=16,
+                                    phi_fpn_levels=4)))
+    # H09 — Golden Proportion Parameter Budget: per-stage params in 1:phi:phi^2.
+    rows.append(dict(tag="sg_only_phi_budget",
+                     overrides=dict(model="phi_budget",
+                                    phi_model="phi_budget",
+                                    phi_budget_total=270_000,
+                                    phi_budget_n_stages=3,
+                                    phi_budget_mode="phi")))
+    # H17.pure — Golden Skip Connections: residual scaled by learnable
+    # alpha init=1/phi. Distinct from sg_only_golden_modulate (channel gate).
+    rows.append(dict(tag="sg_only_golden_skip",
+                     overrides=dict(model="golden_skip",
+                                    phi_model="golden_skip",
+                                    phi_skip_init=None,
+                                    phi_skip_trainable=True)))
     return rows
 
 

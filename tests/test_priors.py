@@ -14,6 +14,7 @@ from nature_inspired_networks.priors import (  # noqa: E402
     GroupConv2d,
     HexConv2d,
     chladni_modes,
+    chladni_modes_banded,
     cymatic_init_,
     fibonacci_channels,
     golden_angle_phases,
@@ -121,6 +122,97 @@ def test_group_conv_invalid_reduce_rejected():
     except AssertionError as exc:
         if "expected AssertionError" in str(exc):
             raise
+
+
+def test_h21v2_hex_conv_radius1_default_keeps_3x3_mask():
+    """H21.v2 (a): default hex_kernel_radius=1 → 3x3, 7-tap mask
+    (180-sym), preserving the legacy CIFAR-10 smoke row.
+    """
+    conv = HexConv2d(3, 8, kernel_size=3, padding=1, toroidal=False, bias=False)
+    assert conv.hex_kernel_radius == 1
+    assert conv.mask.shape == (3, 3)
+    assert conv.mask.sum().item() == 7
+    # Effective kernel corners zeroed (180-sym corners only)
+    eff = conv.conv.weight * conv.mask
+    for o in range(eff.shape[0]):
+        for i in range(eff.shape[1]):
+            assert eff[o, i, 0, 2].item() == 0.0
+            assert eff[o, i, 2, 0].item() == 0.0
+    y = conv(torch.randn(2, 3, 8, 8))
+    assert y.shape == (2, 8, 8, 8)
+
+
+def test_h21v2_hex_conv_radius2_activates_19_tap_isotropic_mask():
+    """H21.v2 (b): hex_kernel_radius=2 selects k=5, 19-tap radius-2 hex
+    mask (true 6-fold isotropic). Constructor must override kernel_size
+    and padding so the spatial shape is preserved at stride=1.
+    """
+    # Caller supplies kernel_size=3 but radius=2 must override to k=5.
+    conv = HexConv2d(3, 8, kernel_size=3, padding=1, toroidal=False, bias=False,
+                     hex_kernel_radius=2)
+    assert conv.hex_kernel_radius == 2
+    assert conv.mask.shape == (5, 5)
+    assert conv.mask.sum().item() == 19
+    # Symmetric padding=2 keeps stride=1 output shape == input shape.
+    y = conv(torch.randn(2, 3, 8, 8))
+    assert y.shape == (2, 8, 8, 8)
+
+
+def test_h21v2_hex_conv_rejects_unsupported_radius():
+    try:
+        HexConv2d(3, 8, hex_kernel_radius=3)
+        raise AssertionError("expected AssertionError for unsupported radius")
+    except AssertionError as exc:
+        if "expected AssertionError" in str(exc):
+            raise
+
+
+def test_h35v2_chladni_modes_banded_orthonormal():
+    """H35.v2 helper: chladni_modes_banded must return Gram-Schmidt
+    orthonormal modes (up to numerical QR precision).
+    """
+    basis = chladni_modes_banded(4, 5, band=(2, 4), seed=0)
+    assert basis.shape == (4, 5, 5)
+    flat = basis.reshape(4, -1)
+    flat = flat / (flat.norm(dim=1, keepdim=True) + 1e-8)
+    gram = flat @ flat.t()
+    off_diag = gram - torch.eye(4)
+    assert off_diag.abs().max().item() < 1e-4
+
+
+def test_h35v2_cymatic_init_default_legacy_path():
+    """H35.v2 (a): default ``cymatic_init_`` (no kwargs) reproduces the
+    legacy path bit-identical — two consecutive calls on a fresh conv
+    must produce the same weights because the legacy path is seeded
+    deterministically (Generator(0xC1A171C)).
+    """
+    conv1 = torch.nn.Conv2d(8, 16, 3, padding=1, bias=False)
+    conv2 = torch.nn.Conv2d(8, 16, 3, padding=1, bias=False)
+    cymatic_init_(conv1)
+    cymatic_init_(conv2)
+    assert torch.allclose(conv1.weight, conv2.weight)
+
+
+def test_h35v2_cymatic_init_orthonormalize_band_2_5_decorrelates_channels():
+    """H35.v2 (b): with ``orthonormalize=True, band=(2, 5)`` the per-input
+    filter bank across output channels must be near-orthogonal.
+    """
+    conv = torch.nn.Conv2d(4, 8, 3, padding=1, bias=False)
+    cymatic_init_(conv, orthonormalize=True, band=(2, 5), seed=0)
+    w = conv.weight  # (8, 4, 3, 3)
+    # Check pairwise output-channel orthogonality per input channel.
+    for i in range(w.shape[1]):
+        flat = w[:, i].reshape(w.shape[0], -1)
+        flat = flat / (flat.norm(dim=1, keepdim=True) + 1e-8)
+        gram = flat @ flat.t()
+        off_diag = gram - torch.eye(gram.shape[0])
+        # Per-input filters are signed copies of an orthonormal basis,
+        # so |off-diagonal| of normalised Gram should be small.
+        assert off_diag.abs().max().item() < 0.5, off_diag.abs().max().item()
+    # And it must produce *different* weights than the legacy path.
+    legacy = torch.nn.Conv2d(4, 8, 3, padding=1, bias=False)
+    cymatic_init_(legacy)
+    assert not torch.allclose(conv.weight, legacy.weight)
 
 
 def test_hex_conv_zero_corners_in_effective_kernel():

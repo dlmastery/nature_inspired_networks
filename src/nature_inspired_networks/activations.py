@@ -1,0 +1,77 @@
+"""φ-parameterised activations.
+
+H39 — :class:`PhiGELU` / :func:`phi_act`
+    A Swish/SiLU variant with the slope-at-origin coefficient fixed to
+    ``β = φ ≈ 1.618``:
+
+        PhiGELU(x) = x · sigmoid(x · φ)
+
+    This sits between Swish's ``β = 1`` and the next-larger value that
+    produces unstable activations, and (per H39's motivation) aligns
+    multiplicatively with the φ-scaled width / depth progressions used
+    elsewhere in the codebase. The activation is a drop-in replacement
+    for ``nn.ReLU`` / ``nn.GELU``: zero at zero, monotonic for ``x > 0``,
+    and gradient-continuous through the origin.
+
+A free function :func:`phi_act` and an ``nn.Module`` wrapper are
+provided so the call-site can choose between the two without rebinding
+the ``β`` buffer.
+"""
+from __future__ import annotations
+
+import torch
+import torch.nn as nn
+
+from .priors import PHI
+
+
+def phi_act(x: torch.Tensor, beta: float = PHI) -> torch.Tensor:
+    """Pure-functional φ-GELU / φ-Swish.
+
+    ``phi_act(x) = x · sigmoid(beta · x)``. With the default
+    ``beta = PHI`` this is Swish with β = φ; with ``beta = 1.0`` it is
+    the standard SiLU (a property used by
+    ``tests.test_activations.test_phi_act_reduces_to_swish``).
+    """
+    return x * torch.sigmoid(beta * x)
+
+
+class PhiGELU(nn.Module):
+    """φ-parameterised GELU/Swish-style activation.
+
+    Parameters
+    ----------
+    learnable : bool, default False
+        When True, ``beta`` is an ``nn.Parameter`` and gradients flow
+        through it during training. When False, ``beta`` is a frozen
+        buffer so the activation has zero learnable parameters.
+    beta_init : float, default :data:`PHI`
+        Initial value of ``beta``. Set ``learnable=True, beta_init=1.0``
+        to obtain a Swish module whose β can drift toward φ.
+    inplace : bool, default False
+        Accepted for API parity with ``nn.ReLU(inplace=True)`` — the
+        sigmoid path forbids true in-place execution, so this flag is
+        ignored and exists only to keep call-sites uniform.
+    """
+
+    def __init__(
+        self,
+        learnable: bool = False,
+        beta_init: float = PHI,
+        inplace: bool = False,
+    ) -> None:
+        super().__init__()
+        self.learnable = bool(learnable)
+        self.inplace = bool(inplace)  # noqa: parity-only
+        beta_t = torch.tensor(float(beta_init), dtype=torch.float32)
+        if learnable:
+            self.beta = nn.Parameter(beta_t)
+        else:
+            self.register_buffer("beta", beta_t)
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        return x * torch.sigmoid(self.beta * x)
+
+    def extra_repr(self) -> str:
+        b = self.beta.item() if self.beta.numel() == 1 else float("nan")
+        return f"beta={b:.6f}, learnable={self.learnable}"

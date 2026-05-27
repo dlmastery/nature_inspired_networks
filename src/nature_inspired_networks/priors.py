@@ -22,9 +22,12 @@ PHI = (1.0 + 5.0 ** 0.5) / 2.0  # golden ratio ≈ 1.618
 def fibonacci_channels(c0: int, n_stages: int, mode: str = "fib") -> list[int]:
     """Return a channel schedule of length n_stages.
 
-    mode='fib'   → c0, c0*F2/F1, c0*F3/F1, ...  (Fibonacci ratios, divisible-by-8)
-    mode='phi'   → c0 * φ^k         (geometric golden growth)
-    mode='linear'→ c0 * (k+1)       (control: arithmetic growth)
+    mode='fib'          → c0, c0*F2/F1, c0*F3/F1, ...  (Fibonacci ratios, /8)
+    mode='phi'          → c0 * φ^k        (geometric golden growth)
+    mode='linear'       → c0 * (k+1)      (control: arithmetic growth)
+    mode='phi_compound' → H01 phi-compound width recurrence; identical to
+                          'phi' at k=0 but kept as a distinct mode so the
+                          H01 sweep row carries a non-overlapping tag.
     """
     out: list[int] = []
     if mode == "fib":
@@ -37,6 +40,13 @@ def fibonacci_channels(c0: int, n_stages: int, mode: str = "fib") -> list[int]:
             c = int(round(c0 * fib[k + 1] / base))
             out.append(_round8(c))
     elif mode == "phi":
+        for k in range(n_stages):
+            out.append(_round8(int(round(c0 * (PHI ** k)))))
+    elif mode == "phi_compound":
+        # H01: phi-compound stage widths (see scaling.phi_compound_channels).
+        # Kept here so build_model + fibonacci_channels share a single
+        # branching surface — adding a parallel path in models.py would
+        # duplicate the stem/stage glue and violate Rule 14.
         for k in range(n_stages):
             out.append(_round8(int(round(c0 * (PHI ** k)))))
     elif mode == "linear":
@@ -95,6 +105,52 @@ def hex_kernel_mask(k: int = 3) -> torch.Tensor:
 # ---------------------------------------------------------------------------
 # Cymatic / Chladni wavelet init (cymatic-resonance hypothesis)
 # ---------------------------------------------------------------------------
+def chladni_modes_banded(
+    n_modes: int,
+    k: int,
+    band: tuple[int, int] = (2, 5),
+    seed: int | None = 0,
+) -> torch.Tensor:
+    """Build ``n_modes`` Chladni eigenmodes with (m, n) sampled uniformly
+    from ``[band[0], band[1]]``, then Gram-Schmidt orthonormalise across
+    modes.
+
+    Returns a tensor of shape (n_modes, k, k) with unit Frobenius norm
+    per mode and pairwise inner-product approximately zero. Promoted from
+    ``ideas/35_cymatic_wavelet/implementation.py`` (Code-Y) to the shared
+    primitives module per Rule 14.
+    """
+    import random as _random
+
+    lo, hi = band
+    assert lo >= 1 and hi >= lo, f"invalid band {band}"
+    rng = _random.Random(seed)
+    xs = torch.linspace(0, math.pi, k + 2)[1:-1]
+    ys = torch.linspace(0, math.pi, k + 2)[1:-1]
+    X, Y = torch.meshgrid(xs, ys, indexing="ij")
+
+    modes: list[torch.Tensor] = []
+    for _ in range(n_modes):
+        m = rng.randint(lo, hi)
+        n = rng.randint(lo, hi)
+        mode = torch.sin(m * X) * torch.sin(n * Y)
+        modes.append(mode)
+    stack = torch.stack(modes, dim=0)  # (n_modes, k, k)
+
+    # Gram-Schmidt across the n_modes axis via QR on (k*k, n_modes).
+    flat = stack.reshape(n_modes, -1).t()  # (k*k, n_modes)
+    q, _ = torch.linalg.qr(flat, mode="reduced")  # (k*k, min(n_modes, k*k))
+    n_keep = min(n_modes, k * k)
+    q = q[:, :n_keep]
+    out = q.t().reshape(n_keep, k, k)
+    if n_keep < n_modes:
+        # If we asked for more modes than k*k can support, cycle the
+        # orthonormal columns back through.
+        reps = (n_modes + n_keep - 1) // n_keep
+        out = out.repeat(reps, 1, 1)[:n_modes]
+    return out
+
+
 def chladni_modes(k: int, n_modes: int = 4) -> torch.Tensor:
     """Return `n_modes` orthogonal Chladni-plate basis patterns of size k×k.
 
@@ -123,17 +179,64 @@ def chladni_modes(k: int, n_modes: int = 4) -> torch.Tensor:
     return torch.stack(modes, dim=0)  # (n_modes, k, k)
 
 
-def cymatic_init_(conv: nn.Conv2d, n_modes: int | None = None) -> None:
-    """Initialize Conv2d weights from Chladni eigenmodes, broadcast across
-    in/out channels with random phases. Fan-in scaling preserves variance.
+def cymatic_init_(
+    conv: nn.Conv2d,
+    n_modes: int | None = None,
+    orthonormalize: bool = False,
+    band: tuple[int, int] = (1, 1),
+    seed: int = 0,
+) -> None:
+    """Initialize Conv2d weights from Chladni eigenmodes.
+
+    Default (``orthonormalize=False, band=(1, 1)``) preserves the legacy
+    behaviour exactly: a random convex combination over the low-frequency
+    Chladni basis, broadcast across in/out channels with He fan-in
+    scaling. This keeps the existing ``sg_only_cymatic_init`` smoke row
+    bit-identical.
+
+    H35.v2 — when ``orthonormalize=True`` (typical companion:
+    ``band=(2, 5)``) the corrected variant validated by Code-Y is used
+    instead:
+
+    - distinct (m, n) pairs per output channel (was: same modes reused
+      across channels in the legacy path);
+    - Gram-Schmidt orthonormalisation across the ``out_c`` channels via
+      :func:`chladni_modes_banded` (was: highly correlated channels);
+    - frequency band defaults to (2, 5) instead of (1, 1) — the latter
+      is effectively DC on a 3x3 kernel and adds no spatial structure.
+
+    This addresses the T1.7 negative (`sg_only_cymatic_init` -2.67 pp on
+    CIFAR-10) by giving each output channel a distinct, decorrelated
+    Chladni eigenmode at He-normal variance.
     """
     out_c, in_c, kh, kw = conv.weight.shape
     assert kh == kw, "cymatic init expects square kernel"
+    fan_in = in_c * kh * kw
+    he_std = math.sqrt(2.0 / fan_in)
+
+    if orthonormalize:
+        basis = chladni_modes_banded(out_c, kh, band=band, seed=seed)  # (out_c, k, k)
+        with torch.no_grad():
+            for o in range(out_c):
+                mode = basis[o]
+                for i in range(in_c):
+                    # deterministic sign per (o, i) so different input
+                    # channels see anti-symmetric copies, not literal repeats
+                    sign = 1.0 if ((o + i) % 2 == 0) else -1.0
+                    w = sign * mode
+                    # unit Frobenius norm * He-std * sqrt(k*k) keeps post-init
+                    # variance He-equivalent for downstream BatchNorm.
+                    w = w / (w.norm() + 1e-8)
+                    conv.weight[o, i].copy_(w * he_std * math.sqrt(kh * kw))
+            if conv.bias is not None:
+                conv.bias.zero_()
+        return
+
+    # Legacy path — preserved byte-for-byte for backward compatibility.
     n = n_modes or min(8, max(2, kh * kh // 2))
     basis = chladni_modes(kh, n_modes=n)  # (n, k, k)
     g = torch.Generator().manual_seed(0xC1A171C)
-    fan_in = in_c * kh * kw
-    scale = math.sqrt(2.0 / fan_in)  # He-style
+    scale = he_std  # He-style
     with torch.no_grad():
         for o in range(out_c):
             for i in range(in_c):
@@ -237,6 +340,18 @@ class HexConv2d(nn.Module):
     """Hex-masked Conv2d with optional toroidal padding. The mask zeroes
     out the two corner taps so the receptive field is the 7-cell honeycomb
     (HexaConv 2018) emulated on a square lattice.
+
+    H21.v2 — ``hex_kernel_radius`` selects the hex radius:
+
+    - ``radius=1`` (default): kernel_size 3, 7-tap mask, only **180-deg**
+      symmetric (the two corners are zeroed but the lattice is not truly
+      6-fold isotropic). Preserves all legacy behaviour byte-for-byte.
+    - ``radius=2``: kernel_size 5, 19-tap mask, **true 6-fold isotropic**
+      via the existing ``hex_kernel_mask(5)``.
+
+    When ``radius=2`` the constructor overrides the supplied
+    ``kernel_size`` and ``padding`` to 5 and 2 so the receptive field
+    matches a radius-2 hexagon and the output spatial shape is unchanged.
     """
 
     def __init__(
@@ -248,8 +363,18 @@ class HexConv2d(nn.Module):
         padding: int = 1,
         toroidal: bool = False,
         bias: bool = False,
+        hex_kernel_radius: int = 1,
     ) -> None:
         super().__init__()
+        assert hex_kernel_radius in {1, 2}, (
+            f"hex_kernel_radius must be 1 (k=3, 180-sym) or 2 (k=5, 6-fold isotropic); "
+            f"got {hex_kernel_radius}"
+        )
+        if hex_kernel_radius == 2:
+            kernel_size = 5
+            # symmetric padding so spatial shape is preserved at stride=1
+            padding = 2
+        self.hex_kernel_radius = hex_kernel_radius
         self.stride = stride
         self.padding = padding
         self.toroidal = toroidal

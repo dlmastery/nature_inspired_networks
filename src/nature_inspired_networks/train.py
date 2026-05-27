@@ -22,6 +22,7 @@ from .eval import (
     rotation_equivariance_error,
     topk_accuracy,
 )
+from .schedulers import PhiDecayLR
 
 
 @dataclass
@@ -34,6 +35,10 @@ class TrainConfig:
     target_top1: float = 0.85
     use_bf16: bool = True
     log_every: int = 50
+    # H10 — Scheduler dispatch. 'cosine' preserves the legacy behaviour;
+    # 'phi_decay' selects schedulers.PhiDecayLR with T_max=epochs.
+    scheduler: str = "cosine"
+    phi_lr_floor: float = 1e-6
 
 
 class Trainer:
@@ -49,7 +54,7 @@ class Trainer:
         self.on_epoch = on_epoch
         self.opt = AdamW(model.parameters(), lr=self.cfg.lr,
                          weight_decay=self.cfg.weight_decay)
-        self.sched = CosineAnnealingLR(self.opt, T_max=self.cfg.epochs)
+        self.sched = _build_scheduler(self.opt, self.cfg)
         self.history: list[dict] = []
 
     def _step(self, x, y) -> tuple[float, float]:

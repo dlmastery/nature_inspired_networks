@@ -13,7 +13,9 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 from .blocks import NaturePriorFlags, NaturePriorBlock
+from .multi_scale import GoldenSpiralResize
 from .priors import fibonacci_channels
+from .scaling import resolve_blocks_schedule
 
 
 # ---------------------------------------------------------------------------
@@ -89,12 +91,20 @@ class ResNet20(nn.Module):
 class NaturePriorConfig:
     num_classes: int = 10
     # Channel schedule mode for the three stages
-    channel_mode: str = "fib"     # 'fib' | 'phi' | 'linear'
+    channel_mode: str = "fib"     # 'fib' | 'phi' | 'phi_compound' | 'linear'
     base_channels: int = 16
     n_stages: int = 3
     blocks_per_stage: int = 3
     fractal_depth: int = 2
     flags: NaturePriorFlags = None       # type: ignore[assignment]
+    # H02 — Fibonacci depth progression. blocks_mode='uniform' (default)
+    # replicates the legacy scalar behaviour byte-for-byte; 'fib' selects
+    # per-stage Fibonacci block counts via scaling.fibonacci_depths.
+    blocks_mode: str = "uniform"     # 'uniform' | 'fib' | 'linear'
+    fib_start: int = 4               # offset into (1,1,2,3,5,8,13,21,...)
+    # H03 — Golden-spiral input resize. None preserves the legacy input
+    # resolution (no resize); an int wraps the stem with GoldenSpiralResize.
+    input_resolution: int | None = None
 
 
 class NaturePriorNet(nn.Module):
@@ -109,6 +119,18 @@ class NaturePriorNet(nn.Module):
         )
         self.widths = widths
 
+        # H02 — resolve per-stage block counts (uniform / fib / linear).
+        self.block_counts = resolve_blocks_schedule(
+            cfg.blocks_per_stage, cfg.n_stages,
+            mode=cfg.blocks_mode, fib_start=cfg.fib_start,
+        )
+
+        # H03 — optional input-resize wrapper. None preserves legacy.
+        if cfg.input_resolution is not None:
+            self.resize = GoldenSpiralResize(int(cfg.input_resolution))
+        else:
+            self.resize = None
+
         self.stem = nn.Sequential(
             nn.Conv2d(3, widths[0], 3, padding=1, bias=False),
             nn.BatchNorm2d(widths[0]),
@@ -119,11 +141,12 @@ class NaturePriorNet(nn.Module):
         c_in = widths[0]
         for i, c_out in enumerate(widths):
             stride = 1 if i == 0 else 2
+            n_blocks = self.block_counts[i]
             blocks: list[nn.Module] = [
                 NaturePriorBlock(c_in, c_out, stride=stride,
                                flags=cfg.flags, fractal_depth=cfg.fractal_depth)
             ]
-            for _ in range(cfg.blocks_per_stage - 1):
+            for _ in range(n_blocks - 1):
                 blocks.append(NaturePriorBlock(c_out, c_out, stride=1,
                                              flags=cfg.flags,
                                              fractal_depth=cfg.fractal_depth))
@@ -135,6 +158,8 @@ class NaturePriorNet(nn.Module):
         self.fc = nn.Linear(widths[-1], cfg.num_classes)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
+        if self.resize is not None:
+            x = self.resize(x)
         x = self.stem(x)
         for s in self.stages:
             x = s(x)
@@ -143,6 +168,8 @@ class NaturePriorNet(nn.Module):
 
     def stagewise_features(self, x: torch.Tensor) -> list[torch.Tensor]:
         feats: list[torch.Tensor] = []
+        if self.resize is not None:
+            x = self.resize(x)
         x = self.stem(x); feats.append(x)
         for s in self.stages:
             x = s(x); feats.append(x)
@@ -150,13 +177,21 @@ class NaturePriorNet(nn.Module):
 
 
 def build_model(name: str, num_classes: int, flags: NaturePriorFlags | None = None,
-                channel_mode: str = "fib") -> nn.Module:
+                channel_mode: str = "fib",
+                blocks_mode: str = "uniform",
+                blocks_per_stage: int = 3,
+                fib_start: int = 4,
+                input_resolution: int | None = None) -> nn.Module:
     # Accept any casing; canonicalize once.
     n = name.lower()
     if n == "resnet20":
         return ResNet20(num_classes=num_classes)
     if n in ("natureprior", "nature_prior", "sacredgeo"):  # legacy alias for old configs
         cfg = NaturePriorConfig(num_classes=num_classes, channel_mode=channel_mode,
-                                flags=flags)
+                                flags=flags,
+                                blocks_mode=blocks_mode,
+                                blocks_per_stage=blocks_per_stage,
+                                fib_start=fib_start,
+                                input_resolution=input_resolution)
         return NaturePriorNet(cfg)
     raise ValueError(f"unknown model '{name}'")
