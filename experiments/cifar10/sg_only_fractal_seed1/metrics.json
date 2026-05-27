@@ -1,0 +1,18 @@
+{
+  "tag": "sg_only_fractal",
+  "dataset": "cifar10",
+  "seed": 1,
+  "epochs": 12,
+  "top1": 0.817,
+  "top5": 0.9914,
+  "params": 259434,
+  "flops": 55742352.0,
+  "latency_ms": 15.272800000093412,
+  "rot_eq_err": 0.8979389096299807,
+  "composite": 0.7871027221815037,
+  "composite_fingerprint": "d65565e9c7b12d14cbce30a801ecc6753aea3eb148074256bfcc051fa61d0893",
+  "epochs_to_target": -1,
+  "train_seconds": 623.3819452000025,
+  "train_top1": 0.8352764423076923,
+  "generalization_gap": 0.01827644230769232
+}
