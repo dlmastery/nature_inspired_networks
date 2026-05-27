@@ -94,6 +94,19 @@ def post_build_mutators(model, cfg: dict):
         from .activations import swap_relu_with_phigelu
         swap_relu_with_phigelu(model)
 
+    # H81 (G8) — sinusoidal (SIREN-style) activation swap. Single-flag
+    # ablation: replace every nn.ReLU with SinusoidalActivation(sin(omega*x)).
+    if bool(cfg.get("sine_activation", False)):
+        from .sinusoidal_activation import swap_relu_with_sine
+        swap_relu_with_sine(model, omega_init=float(cfg.get("omega_init", 1.0)))
+
+    # H80 (G8) — constant-width (Reuleaux) kernel swap. Replaces every
+    # square Conv2d (kernel >= 3) with a weight-preserving ConstantWidthConv2d
+    # so the receptive field is near-isotropic. 1x1 skip convs are untouched.
+    if bool(cfg.get("constant_width_kernel", False)):
+        from .constant_width_kernel import apply_constant_width
+        apply_constant_width(model)
+
     # H31 — golden-spiral init. Applied per-Conv2d that matches the
     # kernel size; mismatched kernels keep their default He init.
     if bool(cfg.get("golden_spiral_init", False)):

@@ -145,6 +145,46 @@ neighbor `golden_modulate` (near-no-op).
 
 ---
 
+## Group G8 — Esoteric-Extension Priors (neutral recast of `bonus_hypothesis.md`) — H76–H84
+
+Source: `Downloads/bonus_hypothesis.md` (esoteric H171–H200). Filtered to the
+9 ideas with a concrete, citable, CIFAR-scale-implementable mechanism; the
+rest were rejected as redundant, mechanism-free, or unspecified (see journal
+below). Every artifact is neutral-named per Rule 16; the esoteric origin is
+acknowledged in one sentence inside each module/doc only.
+
+| # | ID | Bonus src | Neutral artifact | Idea (one line) | Status | Where in repo |
+|---|---|---|---|---|---|---|
+| 76 | **H76** | H171 Merkaba | `TetrahedralDualPathBlock` | dual opposing C4 group-conv paths (max vs mean pool), learnable convex merge | ✓ impl + tests; **smoke-wired** as part of dual-path study | `src/nature_inspired_networks/tetra_dualpath.py` |
+| 77 | **H77** | H173 Lotus | `RadialSymmetry12Attention` | 12-fold relative-position angular-bias MHA | ✓ impl + tests | `src/nature_inspired_networks/radial12_attention.py` |
+| 78 | **H78** | H174 Torus | `ToroidalLatent` | latent → 2-torus embedding (cosθ₁,sinθ₁,cosθ₂,sinθ₂) | ✓ impl + tests | `src/nature_inspired_networks/toroidal_latent.py` |
+| 79 | **H79** | H175 Jitterbug | `MorphingGraphLayer` | learnable cuboctahedron↔icosahedron adjacency interp | ✓ impl + tests | `src/nature_inspired_networks/morphing_adjacency.py` |
+| 80 | **H80** | H176 Reuleaux | `ConstantWidthConv2d` | constant-width (Reuleaux) isotropic kernel mask | ✓ impl + tests + **sweep row** `sg_only_constant_width` | `src/nature_inspired_networks/constant_width_kernel.py` |
+| 81 | **H81** | H177 Vibration | `SinusoidalActivation` | SIREN-style `sin(ωx)`, learnable ω (Sitzmann 2020) | ✓ impl + tests + **sweep row** `sg_only_sine_act` | `src/nature_inspired_networks/sinusoidal_activation.py` |
+| 82 | **H82** | H180/181 Masonry | `VoronoiSparseAttention` | irregular Voronoi/Delaunay tessellation sparse-attention mask | ✓ impl + tests | `src/nature_inspired_networks/voronoi_attention.py` |
+| 83 | **H83** | H182 Double-slit | `CollapseGatedAttention` | learnable softmax-temperature sharpening (entmax-family) | ✓ impl + tests | `src/nature_inspired_networks/collapse_attention.py` |
+| 84 | **H84** | H183 Crystal | `SpectralHopfieldMemory` | modern Hopfield retrieval in FFT eigenmode basis (Ramsauer 2020) | ✓ impl + tests | `src/nature_inspired_networks/spectral_hopfield.py` |
+
+**Rejected from the bonus list (kept here for audit completeness):**
+
+- **H172 Seed-of-Life 7-circle kernel** — redundant with H33 Vesica Piscis +
+  H40 Metatron kernel (both already overlapping-circle masked convs).
+- **H178 Yin-Yang dual-path** — generic dual-path, subsumed by H76.
+- **H179 Bioelectric field priors** — no concrete operational mechanism
+  ("voltage routers" is a metaphor, not a layer); not implementable as stated.
+- **H184–H200** (Mandala activation axis, Lightcode symbolic regression,
+  Geometric Router curriculum, Conscious Collapse reg, Quantum Harmonics loss,
+  Pineal Translator gate, …) — only named, never specified. Where a real
+  mechanism is implied it duplicates existing work (Quantum Harmonics ≈ H46
+  cymatic loss; Conscious Collapse ≈ H83 temperature gate).
+
+The two CNN-droppable members (H80, H81) are wired as Rule-1 atomic post-build
+mutators in `runner.post_build_mutators` (override keys `constant_width_kernel`
+and `sine_activation`) and carry sweep rows; the attention/latent/graph/memory
+members ship as standalone primitives (same convention as G2/G4/G7).
+
+---
+
 ## Cross-cutting datasets per the source files
 
 The four documents collectively call out these benchmarks. Tier ↔ feasibility ↔ which idea each dataset best tests:

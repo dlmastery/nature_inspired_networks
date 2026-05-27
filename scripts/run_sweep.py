@@ -267,6 +267,32 @@ def build_matrix(curated: bool = True) -> list[dict]:
                                     channel_mode="fib",
                                     scheduler="phi_decay",
                                     flags=base_flags.copy())))
+
+    # ---------------------------------------------------------------
+    # G8 esoteric-extension rows (bonus_hypothesis.md, neutral-recast).
+    # Only the two CNN-droppable G8 hypotheses get smoke rows; the rest
+    # (attention / latent / graph / memory modules) ship as standalone
+    # primitives without a ResNet-20 sweep row, matching how the G2/G4/G7
+    # attention modules ship. Both are post-build mutators (Rule 1 atomic),
+    # wired in runner.post_build_mutators via documented override keys.
+    # ---------------------------------------------------------------
+    # H80 — Constant-Width (Reuleaux) Kernel: every square Conv2d (k>=3)
+    # swapped for a weight-preserving ConstantWidthConv2d (near-isotropic
+    # receptive field). All priors off so the kernel mask is the only delta.
+    rows.append(dict(tag="sg_only_constant_width",
+                     overrides=dict(model="NaturePrior",
+                                    channel_mode="fib",
+                                    flags=base_flags.copy(),
+                                    constant_width_kernel=True)))
+    # H81 — Sinusoidal (SIREN-style) Activation: every nn.ReLU replaced
+    # with sin(omega*x), omega init 1.0 (near-identity start). All priors
+    # off so the activation swap is the only delta (Rule 1).
+    rows.append(dict(tag="sg_only_sine_act",
+                     overrides=dict(model="NaturePrior",
+                                    channel_mode="fib",
+                                    flags=base_flags.copy(),
+                                    sine_activation=True,
+                                    omega_init=1.0)))
     return rows
 
 

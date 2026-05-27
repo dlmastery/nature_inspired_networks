@@ -150,12 +150,46 @@ class ConstantWidthConv2d(nn.Module):
         return F.conv2d(x, w, self.conv.bias, stride=self.stride, padding=0)
 
 
-# TODO runner wiring:
-# To integrate without touching models.py / blocks.py here, the lead adds a
-# `channel_mode`-style branch (e.g. `flags: {constant_width_kernel: true}`) that
-# swaps the standard 3x3/5x5 stage conv for
-# `ConstantWidthConv2d(in_c, out_c, kernel_size=5, stride=stride)`. Because the
-# mask is a fixed buffer, the param count matches a same-size Conv2d (the masked
-# taps are simply held at zero by the multiply), so it is a clean one-flag
-# ablation (Rule 1). The `mask` buffer can be dumped to the dashboard as a small
-# heatmap to visualise the constant-width support.
+def apply_constant_width(model: nn.Module, min_kernel: int = 3,
+                         soft_mask: bool = True, sharpness: float = 4.0) -> nn.Module:
+    """Recursively replace every square ``nn.Conv2d`` (kernel ≥ ``min_kernel``)
+    with a weight-preserving :class:`ConstantWidthConv2d` of the same shape.
+
+    This is the H80 runner-wiring hook: it turns any CNN into its
+    constant-width-kernel ablation in place. 1×1 projection/skip convs
+    (kernel < ``min_kernel``) are left untouched so the residual contract is
+    preserved. The replaced conv's trained-from-scratch weight + bias are
+    copied verbatim, and the conv's own ``padding`` is forwarded so the spatial
+    shape is unchanged. Because the Reuleaux mask is a fixed buffer, the
+    trainable parameter count is identical to the original conv (masked taps
+    are simply held at zero), keeping this a clean one-flag ablation (Rule 1).
+
+    Operates in place and returns ``model`` for convenience.
+    """
+    for name, child in list(model.named_children()):
+        if isinstance(child, nn.Conv2d):
+            kh, kw = (child.kernel_size if isinstance(child.kernel_size, tuple)
+                      else (child.kernel_size, child.kernel_size))
+            sh = (child.stride if isinstance(child.stride, tuple)
+                  else (child.stride, child.stride))[0]
+            ph = (child.padding if isinstance(child.padding, tuple)
+                  else (child.padding, child.padding))[0]
+            # Only square kernels at/above the threshold, groups==1.
+            if kh == kw and kh >= min_kernel and child.groups == 1:
+                new = ConstantWidthConv2d(
+                    child.in_channels, child.out_channels, kernel_size=kh,
+                    stride=sh, padding=ph, bias=child.bias is not None,
+                    soft_mask=soft_mask, sharpness=sharpness,
+                )
+                with torch.no_grad():
+                    new.conv.weight.copy_(child.weight)
+                    if child.bias is not None:
+                        new.conv.bias.copy_(child.bias)
+                setattr(model, name, new)
+            else:
+                apply_constant_width(child, min_kernel=min_kernel,
+                                     soft_mask=soft_mask, sharpness=sharpness)
+        else:
+            apply_constant_width(child, min_kernel=min_kernel,
+                                 soft_mask=soft_mask, sharpness=sharpness)
+    return model
