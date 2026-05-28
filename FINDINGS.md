@@ -1,12 +1,56 @@
 ﻿# FINDINGS — nature_inspired_networks curated CIFAR-10 sweep (seed 0, 12 epochs)
 
-> **The headline:** at the 12-epoch / 127–272 k-parameter scale on
-> CIFAR-10, **the nature-inspired priors do *not* compound**. The full
-> hybrid (`sg_full_fib`, all six flags on) is the **worst** NaturePrior
-> variant in the sweep, not the best. This contradicts the source PDF's
-> "literature-compound" prediction (20–50 % efficiency gains).
-> The autoresearch protocol delivered exactly what it is supposed to:
-> a falsifiable negative result with clear single-prior decomposition.
+> ## ⚠ AUDIT NOTICE (2026-05-27)
+>
+> A dual-track audit (impl-critic + sci-critic, 8 + 8 parallel agents)
+> + 8-agent Fixer campaign just completed. **Three previously-stated
+> headlines in this document are NOW PROVISIONAL pending the post-fix
+> re-run** (queued, ~4.5 GPU h):
+>
+> 1. **H09 phi_budget cross-dataset positive (CIFAR-10 85.54 % /
+>    CIFAR-100 58.05 % 3-seed median, +1.53 pp).** The pre-fix
+>    network's realised stage-parameter ratio was 1:1.41:2.45, NOT
+>    the claimed 1:φ:φ²=1:1.618:2.618 — a 12.6 % drift. Fixer-PhiScaling
+>    (commit `519cdf3`) corrected the allocator; post-fix realised
+>    ratio is 1:1.623:2.629 (0.43 % max error). The architecture changed
+>    (widths `[40,48,64]` → `[37,48,61]`). The 85.54 / 58.05 numbers
+>    are NOT representative of the corrected network; the re-run is
+>    mandatory before any external claim is restated (Rule 21).
+> 2. **H41 GoldenRatioAdamW falsification at 51.96 % top-1.** The
+>    falsification was real but invalid as stated — `eps = 1/φ⁴ ≈ 0.146`
+>    dominated Adam's denominator at CIFAR gradient scales, making the
+>    effective LR ~6.85× nominal. The "β-only" experiment was never
+>    cleanly run. Fixer-Opt (`8aa0430`) restored stock eps=1e-8 as
+>    default; the β-only test runs as part of the post-fix campaign.
+> 3. **H48 GoldenMomentumScheduler.** β1 saturated to the 1/φ² floor
+>    after a single step — the "schedule" was one step long; CIFAR-100
+>    Phase-5 distribution overlap demoted it to neutral; the audit also
+>    found the implementation was non-monotonic. Fixer-Opt corrected to
+>    T_max-aware `× φ^(-1/T_max)` per step.
+>
+> **Cumulative audit defect tally:** 3 BROKEN + 15 MAJOR + 24 MINOR
+> impl-critic findings across 83 hypotheses (51 % non-PASS); 40
+> NUMEROLOGY + 3 EMPIRICALLY-FALSIFIED + 2 UNFALSIFIABLE sci-critic
+> verdicts across 81 hypotheses; ZERO NOVEL+TESTABLE sci verdicts on
+> any implemented + smoked hypothesis (H71 IcosaRoPE3D is NOVEL+TESTABLE
+> but has no CIFAR row). See [`AUDIT_SUMMARY.md`](AUDIT_SUMMARY.md) and
+> [`audits/G{1..8}_audit.md`](audits/) for the full account.
+>
+> Until the post-fix re-run lands, **the project has NO defensible
+> external accuracy claim**. The historical findings below remain as
+> the pre-audit record; the post-fix verdict will be added as a new
+> section after the orchestrator (`scripts/launch_postfix_campaign.sh`,
+> task #88) completes.
+
+> **The pre-audit headline (historical, preserved verbatim):** at the
+> 12-epoch / 127–272 k-parameter scale on CIFAR-10, the nature-inspired
+> priors do *not* compound. The full hybrid (`sg_full_fib`, all six
+> flags on) is the worst NaturePrior variant in the sweep, not the
+> best. The autoresearch protocol delivered exactly what it is supposed
+> to: a falsifiable negative result with clear single-prior
+> decomposition. [Above audit notice supersedes the H09 / H41 / H48
+> sub-claims within the expansion campaign + Phase-4 / Phase-5
+> sections.]
 
 ## Expansion campaign — 2026-05-27 — 20 new hypotheses smoked (seed 0, 12 ep)
 
