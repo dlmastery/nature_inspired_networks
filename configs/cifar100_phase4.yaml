@@ -1,0 +1,36 @@
+# Phase-4 CIFAR-100 heavy-hitter config (Rule 19 Phase 4).
+# 30 epochs = quality screen for the top-K CIFAR-10 graduates.
+# ResNet-20 on CIFAR-100 at 30 ep is expected ~0.60-0.66 top-1; if the
+# baseline_resnet20 rail (run first via --only ordering) falls well below
+# that band, STOP and diagnose the environment before trusting variants
+# (Rule 13 SOTA-smoke-first).
+#
+# Launch (shortlist = phi_budget H09, fib_depth H02, fractal H05,
+# golden_momentum H48, + baseline_resnet20 rail):
+#   .\.venv\Scripts\python -u scripts\run_sweep.py `
+#     --config configs\cifar100_phase4.yaml --seeds 0 --root experiments `
+#     --only baseline_resnet20 sg_only_phi_budget sg_only_fib_depth `
+#            sg_only_fractal sg_only_golden_momentum
+# Outputs land under experiments/cifar100/<tag>_seed0/ (dataset dir
+# disambiguates from the CIFAR-10 runs of the same tag).
+dataset: cifar100
+data_root: ./data
+batch_size: 256
+num_workers: 0
+epochs: 30
+lr: 1.0e-3
+weight_decay: 5.0e-4
+label_smoothing: 0.1
+target_top1: 0.60
+use_bf16: true
+# model/channel/flags are overridden per-row by run_sweep.build_matrix;
+# these defaults make a bare `runner` invocation a plain ResNet-20 rail.
+model: resnet20
+channel_mode: fib
+flags:
+  hex: false
+  group: false
+  fractal: false
+  toroidal: false
+  cymatic_init: false
+  golden_modulate: false
