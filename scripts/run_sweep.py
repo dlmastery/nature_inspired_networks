@@ -357,6 +357,127 @@ def build_matrix(curated: bool = True) -> list[dict]:
                                     fib_ensemble=dict(enabled=True, K=8),
                                     sine_activation=True, omega_init=1.0,
                                     prune_schedule="fibonacci", prune_length=5)))
+
+    # ---------------------------------------------------------------
+    # TIER-A POST-FIX LADDERS (combo elite selection, Rule 23 + 21).
+    # Three meaningful ladders selected by an elite-research-scientist
+    # filter from 8 candidates: (1) LOO subtractive from combo8 to
+    # decompose interaction-aware marginal effects; (2) two-at-a-time
+    # PAIR interaction matrix on the four most-promising axes
+    # {gm, pd, pdw, plr}; (3) mutually-exclusive SLOT ablation for
+    # activation + init slots. These are launched AFTER all fixers
+    # complete, so they measure post-fix code (phi_budget with the
+    # corrected 1:phi:phi^2 realized ratio, phi_dropout with per-epoch
+    # curriculum, golden_momentum with non-saturating schedule,
+    # golden_spiral_init with the true phi-growth and 137.5 deg step).
+    # 17 rows total ~= 2.3 GPU h on the 4090.
+    # ---------------------------------------------------------------
+
+    # Ladder 1 — LOO subtractive (7 rows). combo8 minus one axis at
+    # a time. The Δ vs combo8 = marginal contribution of the removed
+    # axis WHEN the other 7 priors are on (interaction-aware, distinct
+    # from the additive ladder's "added LAST" marginal).
+    rows.append(dict(tag="loo_no_gm",
+                     overrides=dict(**PB,
+                                    dropout="phi_dropout", dropout_cycle="fib",
+                                    dropout_length=5,
+                                    phi_decay_wd=True, phi_decay_base=5e-4,
+                                    scheduler="phi_decay",
+                                    fib_ensemble=dict(enabled=True, K=8),
+                                    sine_activation=True, omega_init=1.0,
+                                    prune_schedule="fibonacci", prune_length=5)))
+    rows.append(dict(tag="loo_no_pd",
+                     overrides=dict(**PB, momentum_schedule="golden",
+                                    phi_decay_wd=True, phi_decay_base=5e-4,
+                                    scheduler="phi_decay",
+                                    fib_ensemble=dict(enabled=True, K=8),
+                                    sine_activation=True, omega_init=1.0,
+                                    prune_schedule="fibonacci", prune_length=5)))
+    rows.append(dict(tag="loo_no_pdw",
+                     overrides=dict(**PB, momentum_schedule="golden",
+                                    dropout="phi_dropout", dropout_cycle="fib",
+                                    dropout_length=5,
+                                    scheduler="phi_decay",
+                                    fib_ensemble=dict(enabled=True, K=8),
+                                    sine_activation=True, omega_init=1.0,
+                                    prune_schedule="fibonacci", prune_length=5)))
+    rows.append(dict(tag="loo_no_plr",
+                     overrides=dict(**PB, momentum_schedule="golden",
+                                    dropout="phi_dropout", dropout_cycle="fib",
+                                    dropout_length=5,
+                                    phi_decay_wd=True, phi_decay_base=5e-4,
+                                    fib_ensemble=dict(enabled=True, K=8),
+                                    sine_activation=True, omega_init=1.0,
+                                    prune_schedule="fibonacci", prune_length=5)))
+    rows.append(dict(tag="loo_no_fe",
+                     overrides=dict(**PB, momentum_schedule="golden",
+                                    dropout="phi_dropout", dropout_cycle="fib",
+                                    dropout_length=5,
+                                    phi_decay_wd=True, phi_decay_base=5e-4,
+                                    scheduler="phi_decay",
+                                    sine_activation=True, omega_init=1.0,
+                                    prune_schedule="fibonacci", prune_length=5)))
+    rows.append(dict(tag="loo_no_sa",
+                     overrides=dict(**PB, momentum_schedule="golden",
+                                    dropout="phi_dropout", dropout_cycle="fib",
+                                    dropout_length=5,
+                                    phi_decay_wd=True, phi_decay_base=5e-4,
+                                    scheduler="phi_decay",
+                                    fib_ensemble=dict(enabled=True, K=8),
+                                    prune_schedule="fibonacci", prune_length=5)))
+    rows.append(dict(tag="loo_no_fp",
+                     overrides=dict(**PB, momentum_schedule="golden",
+                                    dropout="phi_dropout", dropout_cycle="fib",
+                                    dropout_length=5,
+                                    phi_decay_wd=True, phi_decay_base=5e-4,
+                                    scheduler="phi_decay",
+                                    fib_ensemble=dict(enabled=True, K=8),
+                                    sine_activation=True, omega_init=1.0)))
+
+    # Ladder 2 — PAIR interaction matrix (5 new rows). C(4,2)=6 pairs
+    # of {gm, pd, pdw, plr}; pair_gm_pd duplicates the existing
+    # combo3 so it is skipped. Each row tests whether a binary
+    # interaction is super-/sub-additive.
+    rows.append(dict(tag="pair_gm_pdw",
+                     overrides=dict(**PB, momentum_schedule="golden",
+                                    phi_decay_wd=True, phi_decay_base=5e-4)))
+    rows.append(dict(tag="pair_gm_plr",
+                     overrides=dict(**PB, momentum_schedule="golden",
+                                    scheduler="phi_decay")))
+    rows.append(dict(tag="pair_pd_pdw",
+                     overrides=dict(**PB,
+                                    dropout="phi_dropout", dropout_cycle="fib",
+                                    dropout_length=5,
+                                    phi_decay_wd=True, phi_decay_base=5e-4)))
+    rows.append(dict(tag="pair_pd_plr",
+                     overrides=dict(**PB,
+                                    dropout="phi_dropout", dropout_cycle="fib",
+                                    dropout_length=5,
+                                    scheduler="phi_decay")))
+    rows.append(dict(tag="pair_pdw_plr",
+                     overrides=dict(**PB,
+                                    phi_decay_wd=True, phi_decay_base=5e-4,
+                                    scheduler="phi_decay")))
+
+    # Ladder 3 — SLOT ablation (5 rows). On phi_budget vary ONLY one
+    # mutually-exclusive slot. Activation: ReLU (default = existing
+    # sg_only_phi_budget) vs sine vs PhiGELU. Init: He (default) vs
+    # post-fix golden_spiral (b=ln(phi)/(pi/2), 137.5 deg step) vs
+    # phi_init vs cymatic_init.
+    rows.append(dict(tag="slot_act_sine",
+                     overrides=dict(**PB,
+                                    sine_activation=True, omega_init=1.0)))
+    rows.append(dict(tag="slot_act_phi",
+                     overrides=dict(**PB, phi_activation=True)))
+    rows.append(dict(tag="slot_init_spiral",
+                     overrides=dict(**PB,
+                                    golden_spiral_init=True,
+                                    golden_spiral_kernel=5)))
+    rows.append(dict(tag="slot_init_phi",
+                     overrides=dict(**PB, phi_init=True)))
+    rows.append(dict(tag="slot_init_cymatic",
+                     overrides=dict(**PB,
+                                    flags=base_flags.copy() | dict(cymatic_init=True))))
     return rows
 
 
