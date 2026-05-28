@@ -83,6 +83,58 @@ def test_layer_learnable_edges_differs_from_fixed():
     assert learn.edge_gate.requires_grad
 
 
+def test_h23_metatron_outer_rim_weight_is_one_over_phi():
+    """Mechanism pin: per the H23 spec, the OUTER hexagon ring edges
+    (nodes 7..12) must carry weight ``1/φ``, while the INNER hexagon
+    ring edges (nodes 1..6) must carry weight ``1``.
+
+    The 13-vertex Metatron layout is: node 0 = centre, nodes 1..6 =
+    inner ring, nodes 7..12 = outer ring.
+
+    This test asserts the weight pattern exactly:
+      * inner-ring edges (i, (i+1)%6 within {1..6}) == 1.0
+      * outer-ring edges (i, (i+1)%6 within {7..12}) == 1/φ
+      * centre↔inner (0 ↔ {1..6}) == 1.0
+      * inner↔outer radial spokes (i ↔ i+6 for i in {1..6}) == 1/φ
+    All other entries (off-pattern) must be exactly zero.
+    """
+    A = metatron_cube_adjacency()
+    inv_phi = 1.0 / PHI
+
+    # Inner hex ring — all six undirected edges must be weight 1.0.
+    for i in range(6):
+        a = 1 + i
+        b = 1 + ((i + 1) % 6)
+        assert abs(A[a, b].item() - 1.0) < 1e-6, (a, b, A[a, b].item())
+        assert abs(A[b, a].item() - 1.0) < 1e-6, (a, b)
+
+    # Outer hex ring — all six undirected edges must be weight 1/φ.
+    for i in range(6):
+        a = 7 + i
+        b = 7 + ((i + 1) % 6)
+        assert abs(A[a, b].item() - inv_phi) < 1e-6, (a, b, A[a, b].item())
+        assert abs(A[b, a].item() - inv_phi) < 1e-6, (a, b)
+
+    # Centre↔inner spokes — weight 1.0.
+    for i in range(1, 7):
+        assert abs(A[0, i].item() - 1.0) < 1e-6, (i, A[0, i].item())
+        assert abs(A[i, 0].item() - 1.0) < 1e-6, i
+
+    # Inner↔outer radial spokes — weight 1/φ.
+    for i in range(6):
+        inner = 1 + i
+        outer = 7 + i
+        assert abs(A[inner, outer].item() - inv_phi) < 1e-6, (
+            inner, outer, A[inner, outer].item()
+        )
+        assert abs(A[outer, inner].item() - inv_phi) < 1e-6, (inner, outer)
+
+    # Cross-check: centre never connects to the outer ring.
+    for j in range(7, 13):
+        assert A[0, j].item() == 0.0, j
+        assert A[j, 0].item() == 0.0, j
+
+
 def test_layer_rejects_wrong_node_count():
     layer = MetatronGraphLayer(8, 16)
     bad = torch.randn(2, 12, 8)

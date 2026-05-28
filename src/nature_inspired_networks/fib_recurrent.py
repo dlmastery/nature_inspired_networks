@@ -31,6 +31,7 @@ References (Citation Rigor):
 """
 from __future__ import annotations
 
+import math
 from typing import Sequence
 
 import torch
@@ -40,6 +41,12 @@ from .priors import PHI
 
 
 PHI_RECIPROCAL: float = 1.0 / PHI  # 0.6180339...
+# Logit of 1/phi: log(p/(1-p)) where p = 1/phi ≈ 0.618. With p = 1/phi we
+# have 1 - p = 1/phi^2 = 2 - phi (because 1/phi + 1/phi^2 = 1), so
+# logit(1/phi) = log((1/phi) / (1/phi^2)) = log(phi) ≈ +0.4812.
+# This is the pre-sigmoid shift that makes sigmoid(b_z) average around 1/phi
+# at init — the canonical mechanism per H14 design doc sec. 5.1'.
+LOGIT_PHI_RECIPROCAL: float = math.log(PHI_RECIPROCAL / (1.0 - PHI_RECIPROCAL))
 
 
 # ---------------------------------------------------------------------------
@@ -70,19 +77,25 @@ class FibGRU(nn.Module):
           -> GRUCell(in=h_{L-2},  hid=h_{L-1})
           -> Linear(h_{L-1}, output_dim)     -> (B, T, output_dim)
 
-    When ``phi_gate=True`` the update equation of each GRUCell is
-    rescaled by ``1/phi``:
+    When ``phi_gate=True`` the update-gate's *pre-sigmoid bias* is
+    initialised to ``logit(1/phi) = log(phi) ≈ +0.4812``. Concretely,
+    each cell's ``bias_ih[hidden:2*hidden]`` slice (the slot
+    corresponding to the update-gate ``z`` in PyTorch's
+    ``[r | z | n]`` flattening) is filled with ``logit(1/phi)``. At
+    init, with zero inputs/hidden, the sigmoid of that bias yields
+    update probability ``≈ 1/phi``, encouraging longer memory retention
+    (the biological half-life motivation, H14 sec. 1).
 
-        h_t = (1 - z_t) * h_{t-1} + z_t * h_tilde_t
-            ->
-        h_t = (1 - z_t / phi) * h_{t-1} + (z_t / phi) * h_tilde_t
-
-    which moves the effective update probability into ``[0, 1/phi]``,
-    encouraging longer memory retention (the biological half-life
-    motivation, H14 sec. 1). This is implemented as a *forward-time*
-    rescaling on top of the standard GRUCell update so the cell's
-    parameter count is unchanged -- the prior is geometric, not
-    parametric.
+    **Logit-vs-multiplicative distinction.** A *bias init* (this code)
+    shifts the pre-sigmoid logit so the gate's average update
+    probability at init is ``1/phi``; the sigmoid is unbounded above
+    after training drifts. A *multiplicative rescale* (``z * 1/phi``,
+    rejected here) caps the post-sigmoid output at ``1/phi`` forever.
+    These are NOT equivalent: the bias-init can be undone by gradient
+    descent (it is just an init), whereas the multiplicative cap
+    permanently distorts the gate. The H14 design doc sec. 5.1'
+    prescribes the bias-init recipe, which is what this implementation
+    now does.
 
     Parameters
     ----------
@@ -130,38 +143,34 @@ class FibGRU(nn.Module):
         self.cells = nn.ModuleList(cells)
         self.head = nn.Linear(sizes[-1], output_dim)
 
+        # phi-gate bias init: per H14 sec. 5.1', the update-gate
+        # bias slice (bias_ih[hidden:2*hidden]) is initialised to
+        # logit(1/phi) so the sigmoid output averages around 1/phi at
+        # init. PyTorch's GRUCell flattens the gate biases as
+        # [b_ir | b_iz | b_in], hence the [h:2h] slice IS the
+        # update-gate input-to-hidden bias.
+        if self.phi_gate:
+            with torch.no_grad():
+                for cell in self.cells:
+                    h_size = cell.hidden_size
+                    cell.bias_ih.data[h_size:2 * h_size].fill_(
+                        LOGIT_PHI_RECIPROCAL
+                    )
+
     def _step(self, cell: nn.GRUCell, x_t: torch.Tensor,
               h_prev: torch.Tensor) -> torch.Tensor:
-        """One GRU step with optional phi-gating.
+        """One GRU step (delegates to the standard PyTorch GRUCell).
 
-        For the standard cell we delegate to ``cell(x_t, h_prev)``. For
-        ``phi_gate=True`` we re-derive the update gate ``z`` from the
-        cell's own weights and apply ``z / phi`` instead of ``z``. Doing
-        so via the cell weights ensures parameter parity with the
-        baseline; the only difference is the scalar 1/phi factor on the
-        update probability.
+        The phi-gate prior is realised by a one-shot **bias init** in
+        :meth:`__init__` (see :data:`LOGIT_PHI_RECIPROCAL`), not by a
+        forward-time rescale. Both phi_gate=True and phi_gate=False
+        therefore share the exact same forward path; the only
+        difference is that phi_gate=True wrote ``logit(1/phi)`` into
+        each cell's ``bias_ih[hidden:2*hidden]`` slot at construction
+        time so the update gate's sigmoid output averages ``1/phi``
+        at init.
         """
-        if not self.phi_gate:
-            return cell(x_t, h_prev)
-
-        # PyTorch's GRUCell flattens weights as [W_ir|W_iz|W_in], etc.
-        w_ih = cell.weight_ih  # (3*hidden, input)
-        w_hh = cell.weight_hh  # (3*hidden, hidden)
-        b_ih = cell.bias_ih
-        b_hh = cell.bias_hh
-        h_size = cell.hidden_size
-        gi = torch.nn.functional.linear(x_t, w_ih, b_ih)
-        gh = torch.nn.functional.linear(h_prev, w_hh, b_hh)
-        i_r, i_z, i_n = gi.chunk(3, dim=-1)
-        h_r, h_z, h_n = gh.chunk(3, dim=-1)
-        r = torch.sigmoid(i_r + h_r)
-        z = torch.sigmoid(i_z + h_z)
-        n = torch.tanh(i_n + r * h_n)
-        z_phi = z * PHI_RECIPROCAL  # rescale update prob into [0, 1/phi]
-        h_new = (1.0 - z_phi) * h_prev + z_phi * n
-        # Silence the unused h_size local
-        _ = h_size
-        return h_new
+        return cell(x_t, h_prev)
 
     def forward(self, x: torch.Tensor,
                 h0: list[torch.Tensor] | None = None) -> torch.Tensor:
