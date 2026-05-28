@@ -1,0 +1,18 @@
+{
+  "tag": "sg_only_fib_depth",
+  "dataset": "cifar100",
+  "seed": 0,
+  "epochs": 30,
+  "top1": 0.5178,
+  "top5": 0.8144,
+  "params": 184084,
+  "flops": 26719648.0,
+  "latency_ms": 5.216075999996974,
+  "rot_eq_err": 0.5192746557295322,
+  "composite": 0.5186820023386363,
+  "composite_fingerprint": "d65565e9c7b12d14cbce30a801ecc6753aea3eb148074256bfcc051fa61d0893",
+  "epochs_to_target": -1,
+  "train_seconds": 944.6033298999973,
+  "train_top1": 0.5579326923076923,
+  "generalization_gap": 0.04013269230769223
+}

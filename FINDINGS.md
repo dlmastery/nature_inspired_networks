@@ -98,6 +98,41 @@ without a CNN sweep row, matching the G2/G4/G7 convention.
 4. **H48 `golden_momentum`** — closest neutral to baseline (83.52).
 5. `baseline_resnet20` rail (always carried).
 
+## Phase 4 — CIFAR-100 graduation results (2026-05-27, seed 0, 30 ep)
+
+The 5-model shortlist trained on CIFAR-100 at 30 epochs (zero failures,
+4939 s total; `baseline_resnet20` ran first as the Rule-13 pre-flight and
+landed in-band at 56.15 % / 84.14 % top-5).
+
+| rank | tag | hyp | top-1 | top-5 | composite | params | Δ top-1 vs baseline |
+|---|---|---|---|---|---|---|---|
+| 1 | `sg_only_phi_budget` | H09 | **58.05 %** | 85.37 % | **0.5815** | 289 k | **+1.90 pp** |
+| 2 | `sg_only_golden_momentum` | H48 | **56.99 %** | 84.79 % | 0.5676 | 278 k | **+0.84 pp** |
+| 3 | `baseline_resnet20` | — | 56.15 % | 84.14 % | 0.5568 | 278 k | (ref) |
+| 4 | `sg_only_fib_depth` | H02 | 51.78 % | 81.44 % | 0.5187 | **184 k** | -4.37 pp (0.66× params) |
+| 5 | `sg_only_fractal` | H05 | 50.72 % | 81.09 % | 0.4881 | 263 k | -5.43 pp |
+
+**The cross-dataset verdict — H09 φ-Proportion Parameter Budget is a
+genuine, replicated positive.** It is the **only hypothesis that beats the
+ResNet-20 baseline on BOTH CIFAR-10 (85.54 % vs 84.78 %) and CIFAR-100
+(58.05 % vs 56.15 %)**. Allocating per-stage parameters in a `1 : φ : φ²`
+ratio rather than the uniform doubling of a stock ResNet consistently helps
+at this scale — the single most defensible result the project has produced.
+Pre-registered falsifier (≤ baseline on the harder dataset) is **not met**
+→ hypothesis survives a second, independent test.
+
+**H48 Golden-Momentum scheduler also graduates.** Neutral on CIFAR-10
+(83.52, -1.26 pp) but **+0.84 pp on CIFAR-100** — a φ-decayed β1 schedule
+appears to help more as task difficulty rises. Promoted to Phase 5.
+
+**H02 fib_depth / H05 fractal do NOT graduate on raw accuracy** (-4.4 /
+-5.4 pp). `fib_depth` retains its efficiency narrative (0.66× params) but
+the accuracy cost is real on CIFAR-100; both drop out of the headline track.
+
+**Phase-5 (3-seed error bars) shortlist:** `phi_budget`, `golden_momentum`,
++ `baseline_resnet20` rail. No external accuracy claim will be made until
+the 3-seed median ± spread confirms the phi_budget lead is outside noise.
+
 ---
 
 ## Final ranking (composite descending, single seed) — original 11-row campaign
