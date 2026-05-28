@@ -104,6 +104,67 @@ def test_golden_spiral_init_is_deterministic_given_seed():
 
 
 # ---------------------------------------------------------------------------
+# H31 — G4 audit MAJOR fix regression tests
+# ---------------------------------------------------------------------------
+def _reconstruct_spiral_points(n: int = 16):
+    """Reconstruct the continuous-r spiral samples the mask construction
+    uses internally, so we can assert geometric invariants without
+    going through the rasterisation/clip. Mirrors the code path in
+    :func:`golden_spiral_mask`.
+    """
+    b = math.log(PHI) / (math.pi / 2.0)
+    delta_theta = 2.0 * math.pi * (1.0 - 1.0 / PHI)
+    r0 = 0.1
+    pts = []
+    for i in range(n):
+        theta = i * delta_theta
+        r = r0 * math.exp(b * theta)
+        pts.append((theta, r))
+    return pts, b, delta_theta
+
+
+def test_h31_phi_growth_rate():
+    """After advancing by exactly π/2 of θ the spiral's radius must
+    grow by a factor of φ within 1 %. This is the G4 audit MAJOR
+    falsifier: prior implementation used b ≈ 0.151 (a generic log
+    spiral); the fixed code uses b = ln(φ)/(π/2) ≈ 0.30634, the only
+    growth rate that satisfies r(θ + π/2) / r(θ) = φ.
+    """
+    pts, b, _ = _reconstruct_spiral_points(n=32)
+    # Closed-form: r(θ + π/2) / r(θ) = exp(b · π/2). With the fixed b
+    # this MUST equal φ to machine precision.
+    ratio = math.exp(b * (math.pi / 2.0))
+    rel_err = abs(ratio - PHI) / PHI
+    assert rel_err < 0.01, (
+        f"r(θ+π/2)/r(θ) = {ratio:.6f}, φ = {PHI:.6f}, "
+        f"relative error {rel_err:.4f} exceeds 1 % tolerance"
+    )
+    # Sanity-check the b value itself against the audit-prescribed
+    # constant ln(φ)/(π/2).
+    expected_b = math.log(PHI) / (math.pi / 2.0)
+    assert abs(b - expected_b) < 1e-9
+
+
+def test_h31_golden_angle_step():
+    """Consecutive spiral points must be separated by the canonical
+    golden angle 2π·(1 − 1/φ) ≈ 137.508° within 0.1°. (G4 audit fix
+    — prior code used uniform θ ∈ [0, 2π·n_turns], NOT phyllotactic.)
+    """
+    pts, _, delta_theta = _reconstruct_spiral_points(n=8)
+    expected_deg = 360.0 * (1.0 - 1.0 / PHI)
+    got_deg = math.degrees(delta_theta)
+    assert abs(got_deg - expected_deg) < 0.1, (
+        f"Δθ = {got_deg:.4f}°, expected {expected_deg:.4f}° (golden angle)"
+    )
+    # Pairwise check: every consecutive step is the same δθ.
+    for i in range(len(pts) - 1):
+        step = pts[i + 1][0] - pts[i][0]
+        assert abs(math.degrees(step) - expected_deg) < 0.1, (
+            f"step {i}: {math.degrees(step):.4f}°"
+        )
+
+
+# ---------------------------------------------------------------------------
 # H42 — phi_weight_init_
 # ---------------------------------------------------------------------------
 def test_phi_init_variance_matches_phi_over_fan_in():

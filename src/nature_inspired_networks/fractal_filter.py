@@ -59,11 +59,17 @@ class FractalGoldenFilter(nn.Module):
         Conv2d channels.
     kernel_sizes : Sequence[int]
         Kernel sizes for each path. Default ``(3, 5, 8)``. Must be a
-        non-empty sequence of positive odd-or-even integers. For
-        ``kernel_size=8`` (even) we use ``padding=4`` and crop one
-        column / row of the output on the trailing axis so the spatial
-        shape is preserved at stride=1 (PyTorch lacks a true
-        ``padding='same'`` for even kernels - we emulate it).
+        non-empty sequence of positive odd-or-even integers. For an
+        odd kernel ``k`` we use the standard ``padding=k//2``. For an
+        even kernel ``k`` PyTorch has no native ``padding='same'``, and
+        the previous symmetric ``padding=k//2`` + trailing-crop trick
+        shifts the receptive field by **half a pixel** (G4 audit MINOR
+        finding). We therefore use asymmetric pre-padding via
+        :func:`torch.nn.functional.pad` with ``[k//2 - 1, k//2,
+        k//2 - 1, k//2]`` (i.e. one fewer pixel on the leading edge,
+        one more on the trailing edge) and a Conv2d with ``padding=0``,
+        so the receptive field for output ``(i, j)`` is centred on
+        input ``(i, j)`` for both even and odd ``k``.
     mid_channels : int | None
         Number of channels in the in-place small kernel before the
         1x1 projection. ``None`` (default) means ``mid_channels =
@@ -93,20 +99,32 @@ class FractalGoldenFilter(nn.Module):
         self.mid_channels = mid
 
         # Per-path small conv + 1x1 projection.
+        # For odd k → standard Conv2d(padding=k//2). For even k → Conv2d
+        # with padding=0 and an explicit asymmetric F.pad in forward()
+        # (left/top = k//2 - 1, right/bottom = k//2) to keep the
+        # receptive field centred on the input pixel (G4 audit fix).
         self.path_convs = nn.ModuleList()
         self.path_projs = nn.ModuleList()
-        self.path_paddings: list[int] = []
-        self.path_even_crops: list[bool] = []
+        # Per-path 4-tuple (left, right, top, bottom) for F.pad. For
+        # odd kernels this is zeros and we rely on Conv2d's own padding.
+        self.path_explicit_pads: list[tuple[int, int, int, int]] = []
+        self.path_is_even: list[bool] = []
         for k in kernel_sizes:
-            # 'same'-style padding: floor(k/2). For even k we will crop
-            # one pixel off the trailing axes after the conv to preserve
-            # input spatial shape.
-            pad = k // 2
-            self.path_paddings.append(pad)
-            self.path_even_crops.append(k % 2 == 0)
-            self.path_convs.append(
-                nn.Conv2d(in_channels, mid, k, padding=pad, bias=bias)
-            )
+            is_even = (k % 2 == 0)
+            self.path_is_even.append(is_even)
+            if is_even:
+                # Asymmetric pre-pad: left/top = k//2 - 1, right/bottom = k//2
+                pad_tuple = (k // 2 - 1, k // 2, k // 2 - 1, k // 2)
+                self.path_explicit_pads.append(pad_tuple)
+                self.path_convs.append(
+                    nn.Conv2d(in_channels, mid, k, padding=0, bias=bias)
+                )
+            else:
+                # Odd k → symmetric padding handled by Conv2d itself.
+                self.path_explicit_pads.append((0, 0, 0, 0))
+                self.path_convs.append(
+                    nn.Conv2d(in_channels, mid, k, padding=k // 2, bias=bias)
+                )
             self.path_projs.append(
                 nn.Conv2d(mid, out_channels, 1, bias=bias)
             )
@@ -122,11 +140,17 @@ class FractalGoldenFilter(nn.Module):
         B, _, H, W = x.shape
         out: torch.Tensor | None = None
         for i, (conv, proj) in enumerate(zip(self.path_convs, self.path_projs)):
-            y = conv(x)
-            # Crop one pixel on each trailing axis if the kernel was even
-            # (we used floor(k/2) padding, so the output is +1 too big).
-            if self.path_even_crops[i]:
-                y = y[..., :H, :W]
+            if self.path_is_even[i]:
+                # Centred asymmetric pad for even kernels (G4 audit fix).
+                xp = F.pad(x, list(self.path_explicit_pads[i]))
+                y = conv(xp)
+            else:
+                y = conv(x)
+            # Sanity: spatial shape preserved at stride=1.
+            assert y.shape[-2:] == (H, W), (
+                f"path {i} kernel={self.kernel_sizes[i]} produced "
+                f"{tuple(y.shape[-2:])}, expected {(H, W)}"
+            )
             y = proj(y)
             term = self.alpha[i] * y
             out = term if out is None else out + term

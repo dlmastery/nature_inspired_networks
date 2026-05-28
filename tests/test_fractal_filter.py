@@ -120,6 +120,76 @@ def test_h38_rejects_invalid_kernel_sizes():
             pass
 
 
+def test_h38_k8_path_is_pixel_aligned():
+    """G4 audit MINOR regression test.
+
+    Prior code used symmetric ``padding=k//2`` with a trailing crop,
+    which shifts the k=8 path's receptive field by half a pixel
+    relative to the k=3 path. Plant a unique-peak input centred on a
+    single pixel, set ALL conv weights to a centred Gaussian-ish kernel
+    that uniquely maximises at the kernel centre, and assert that the
+    k=3 path's argmax and the k=8 path's argmax both sit on the SAME
+    spatial index as the input peak — i.e. both receptive fields are
+    centred on the input pixel.
+
+    We bypass the 1x1 projection by setting it to identity, and we
+    bypass the per-path alpha mixing by using single-path filters.
+    """
+    import math as _math
+    H = W = 13
+    cy, cx = H // 2, W // 2
+
+    def _build_centred(k: int) -> FractalGoldenFilter:
+        flt = FractalGoldenFilter(1, 1, kernel_sizes=(k,), bias=False)
+        with torch.no_grad():
+            # Inner conv: weights that uniquely peak at the kernel
+            # anchor cell. For odd k this is (k//2, k//2). For even k
+            # under our asymmetric pad (left/top = k//2 − 1, right/bot
+            # = k//2) the kernel position that covers input pixel
+            # (i, j) when computing output (i, j) is (k//2 − 1,
+            # k//2 − 1) — that's the "lower" of the two candidate
+            # centres for the even kernel. Peak the kernel there.
+            anchor = (k - 1) // 2  # k=3 -> 1, k=8 -> 3
+            conv = flt.path_convs[0]
+            w = conv.weight  # shape (1, 1, k, k)
+            for i in range(k):
+                for j in range(k):
+                    di = i - anchor
+                    dj = j - anchor
+                    w[0, 0, i, j] = _math.exp(-(di * di + dj * dj))
+            # 1x1 projection: identity scalar.
+            flt.path_projs[0].weight.fill_(1.0)
+            # Alpha is a single-element vector that normalises to 1.
+            flt.alpha.data.fill_(1.0)
+        return flt
+
+    flt3 = _build_centred(3)
+    flt8 = _build_centred(8)
+
+    # Unique-peak input: a small Gaussian bump at (cy, cx).
+    x = torch.zeros(1, 1, H, W)
+    for i in range(H):
+        for j in range(W):
+            x[0, 0, i, j] = _math.exp(-((i - cy) ** 2 + (j - cx) ** 2) / 2.0)
+
+    y3 = flt3(x)
+    y8 = flt8(x)
+    assert y3.shape == (1, 1, H, W) and y8.shape == (1, 1, H, W)
+    flat3 = y3[0, 0].flatten().argmax().item()
+    flat8 = y8[0, 0].flatten().argmax().item()
+    r3, c3 = divmod(flat3, W)
+    r8, c8 = divmod(flat8, W)
+    assert (r3, c3) == (cy, cx), (
+        f"k=3 path argmax at ({r3},{c3}), expected centre ({cy},{cx})"
+    )
+    assert (r8, c8) == (cy, cx), (
+        f"k=8 path argmax at ({r8},{c8}), expected centre ({cy},{cx}) "
+        f"— G4 audit MINOR: half-pixel shift NOT fixed"
+    )
+    # Belt-and-braces: the two paths' argmax indices must match.
+    assert (r3, c3) == (r8, c8)
+
+
 def test_h38_gradient_flows_through_all_paths():
     """Backprop produces non-zero gradient on every path's conv weight
     and on the alpha vector.

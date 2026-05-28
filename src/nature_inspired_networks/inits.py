@@ -36,16 +36,34 @@ from .priors import PHI
 def golden_spiral_mask(k: int = 5, n_samples: int | None = None) -> torch.Tensor:
     """Return a ``(k, k)`` mask sampled along a logarithmic golden spiral.
 
-    The spiral is ``r(θ) = r0 * φ^(θ/(π/2))`` traced at golden-angle
-    increments ``Δθ = 2π·(1 − 1/φ)``. Each sample contributes a value
-    that decays linearly with index, so the centre-most early samples
-    dominate. Final mask is normalised so its sum equals ``k*k``,
-    ensuring the variance of a He-init weight multiplied by the mask is
-    preserved on average:
+    Geometry (post G4-audit fix, 2026-05-27)
+    ----------------------------------------
+    The spiral is the **true** φ-logarithmic spiral
 
-        E[(w · m)²] = m² · σ_He²
+        r(θ) = r0 · φ^(θ / (π/2)) = r0 · exp(b · θ),
+        b    = ln(φ) / (π/2) ≈ 0.30634
 
-    and ``mean(m²) ≈ 1`` after the rescale → He variance preserved.
+    Successive samples are placed at the **golden-angle** azimuthal
+    step (Vogel / phyllotaxis spacing)
+
+        Δθ = 2π · (1 − 1/φ) ≈ 137.508°
+
+    so consecutive points form the canonical Fibonacci sunflower lattice
+    (Vogel 1979 'A better way to construct the sunflower head';
+    Mandelbrot 1982). r0 is set so the spiral starts inside the central
+    cell; points whose rasterised (x, y) falls outside the ``k×k`` grid
+    are simply clipped — we deliberately do NOT rescale b to make the
+    spiral fit the kernel because that would destroy the φ-growth-rate
+    invariant the hypothesis tests for (G4 audit MAJOR finding: prior
+    implementation used b = ln(r_max/r0)/theta_max ≈ 0.151, which is
+    a generic log spiral, not a golden one).
+
+    Each sample contributes a value that decays linearly with index so
+    the centre-most early samples dominate. Final mask is renormalised
+    so ``mean(m²) ≈ 1`` → He-variance is preserved when the mask
+    multiplies a He-normal draw:
+
+        E[(w · m)²] = m² · σ_He²,  mean(m²) ≈ 1.
 
     Parameters
     ----------
@@ -53,7 +71,9 @@ def golden_spiral_mask(k: int = 5, n_samples: int | None = None) -> torch.Tensor
         Odd kernel size (≥ 3). Default 5 — the smallest grid on which
         the spiral has more than one φ-scaled turn.
     n_samples : int, optional
-        Number of points along the spiral. Default ``max(64, 8*k*k)``.
+        Number of points along the spiral. Default ``max(128, 16*k*k)``
+        — enough samples that the off-grid clip doesn't starve any
+        interior cell.
 
     Returns
     -------
@@ -65,30 +85,48 @@ def golden_spiral_mask(k: int = 5, n_samples: int | None = None) -> torch.Tensor
     if n_samples is None:
         n_samples = max(128, 16 * k * k)
     mask = torch.zeros(k, k, dtype=torch.float32)
-    # Parametrise the spiral so it makes ``n_turns`` full revolutions
-    # from a small inner radius ``r0`` to an outer radius covering the
-    # kernel's half-diagonal. This keeps every sample on-grid AND
-    # guarantees coverage scales with ``k``: a 3x3 kernel sees ~1 turn,
-    # a 5x5 sees ~3 turns, a 7x7 sees ~3 turns at larger radius.
-    n_turns = max(1, (k - 1) // 2)
-    theta_max = 2.0 * math.pi * n_turns
-    r_max = (k - 1) / 2.0          # half-diagonal in cell units
-    r0 = 0.3                       # always within the central cell
-    # Growth factor per sample so r(theta_max) ≈ r_max.
-    # r(θ) = r0 * exp(b * θ), b = ln(r_max/r0) / theta_max
-    b = math.log(r_max / r0) / theta_max
+    # --- φ-fixed spiral geometry --------------------------------------
+    # b is FIXED by the φ-growth invariant. r0 keeps the first sample
+    # within the central cell. The spiral's terminal radius is whatever
+    # it naturally reaches at the last golden-angle step — out-of-grid
+    # points are clipped by the bounds check below. (G4 audit fix.)
+    b = math.log(PHI) / (math.pi / 2.0)        # ≈ 0.30634
+    delta_theta = 2.0 * math.pi * (1.0 - 1.0 / PHI)  # ≈ 137.508° golden angle
+    # r0 small enough that early samples (which dominate via linear
+    # decay) cluster inside the central cell, then bilinear splatting
+    # spreads each sample's weight to its 4 surrounding integer cells
+    # so the mask covers a meaningful neighbourhood despite the true
+    # φ-spiral's fast radial escape from a small k×k grid.
+    r0 = 0.1
     cx = cy = (k - 1) / 2.0
     for i in range(n_samples):
-        theta = i * theta_max / max(1, n_samples - 1)
+        theta = i * delta_theta
         r = r0 * math.exp(b * theta)
-        # Cartesian → grid coordinates, bilinear "snap" via rounding.
-        x = int(round(cx + r * math.cos(theta)))
-        y = int(round(cy + r * math.sin(theta)))
-        if 0 <= x < k and 0 <= y < k:
-            # Decay weight: earliest points (inner turns) are loudest.
-            v = 1.0 - i / n_samples
-            if v > mask[y, x].item():
-                mask[y, x] = v
+        # Decay weight: earliest points (inner turns) are loudest.
+        v = 1.0 - i / n_samples
+        if v <= 0.0:
+            break
+        # Continuous Cartesian → bilinear splat over the 4 surrounding
+        # integer cells; "max-merge" so the brightest contribution per
+        # cell wins (matches the original nearest-neighbour semantics).
+        xc = cx + r * math.cos(theta)
+        yc = cy + r * math.sin(theta)
+        x0 = int(math.floor(xc))
+        y0 = int(math.floor(yc))
+        fx = xc - x0
+        fy = yc - y0
+        for dx, dy, w in (
+            (0, 0, (1.0 - fx) * (1.0 - fy)),
+            (1, 0, fx * (1.0 - fy)),
+            (0, 1, (1.0 - fx) * fy),
+            (1, 1, fx * fy),
+        ):
+            xi = x0 + dx
+            yi = y0 + dy
+            if 0 <= xi < k and 0 <= yi < k:
+                contrib = w * v
+                if contrib > mask[yi, xi].item():
+                    mask[yi, xi] = contrib
     # Renormalise so mean(mask²) ≈ 1 → He-variance preserved.
     sq = (mask * mask).mean().item()
     if sq > 0:
