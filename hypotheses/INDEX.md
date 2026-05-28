@@ -1,19 +1,40 @@
 # hypotheses/ — INDEX
 
-> 75 committee-grade hypothesis design documents organized into 7
+> 84 committee-grade hypothesis design documents organized into 8
 > thematic groups matching `../IDEA_TABLE.md`. Each file follows
 > `_TEMPLATE.md`. Every group has its own subdirectory so the flat
-> 75-file directory is no longer overwhelming.
+> directory is no longer overwhelming.
+>
+> **Implementation status (May 2026):** 83 of the 84 hypotheses now have
+> a shared src module + passing unit tests under
+> `../src/nature_inspired_networks/` and `../tests/`; only **H57**
+> (audio-cymatic cross-modal) is deferred with no module. 35 tags
+> additionally carry a seed-0 CIFAR-10 smoke result. Per-hypothesis
+> status lives in `../IDEA_TABLE.md`.
 
 ## File-naming convention
 
 `g<N>_<group_name>/H<NN>_<short>.md` where:
-- `g<N>` is the group ID 1-7
+- `g<N>` is the group ID 1-8
 - `H<NN>` is the zero-padded hypothesis ID
 - `<short>` is a kebab-case short name
 
 The full design space + status per hypothesis is in `../IDEA_TABLE.md`.
 The master experiment list is in `../EXPERIMENT_LOG.md`.
+
+## Group sizes at a glance
+
+| Group | Subdir | IDs | # docs |
+|---|---|---|---|
+| G1 Scaling & Growth | `g1_scaling_growth/` | H01–H10 | 10 |
+| G2 Layer/Channel/Neuron | `g2_layer_channel_neuron/` | H11–H20 | 10 |
+| G3 Topologies & Graphs | `g3_topologies_graphs/` | H21–H30 | 10 |
+| G4 Kernels/Attention/Filters | `g4_kernels_attention_filters/` | H31–H40 | 10 |
+| G5 Optimization/Init/Reg/NAS | `g5_optimization_init_reg_nas/` | H41–H50 | 10 |
+| G6 Topological & Bridging | `g6_topological_bridging/` | H51–H60 | 10 |
+| G7 Cross-Paradigm Hybrids | `g7_cross_paradigm_hybrids/` | H61–H75 | 15 |
+| G8 Esoteric Extensions | `g8_esoteric_extensions/` | H76–H84 | 9 |
+| **Total** | | **H01–H84** | **84** |
 
 ## Group G1 — Scaling & Growth (`g1_scaling_growth/`)
 
@@ -152,6 +173,28 @@ full Sacred-Liquid-JEPA-KAN-GNN-Transformer hybrid.
 | H73 | `g7_cross_paradigm_hybrids/H73_golden_spiral_metatron_pe.md` |
 | H74 | `g7_cross_paradigm_hybrids/H74_metatron_overlap_tying.md` |
 | H75 | `g7_cross_paradigm_hybrids/H75_harmonic_cymatic_swiglu.md` |
+
+## Group G8 — Esoteric Extensions (`g8_esoteric_extensions/`)
+
+9 hypotheses: neutral recast of the esoteric bonus list
+(`../IDEA_TABLE.md` Group G8). Tetrahedral dual-path, 12-fold radial
+attention, toroidal latent, morphing-polytope adjacency, constant-width
+(Reuleaux) kernel, sinusoidal (SIREN) activation, Voronoi sparse
+attention, collapse-gated attention, spectral Hopfield memory. The
+esoteric origin is acknowledged in one prose sentence per doc only
+(Rule 16); all artifacts are neutral-named.
+
+| ID | File |
+|---|---|
+| H76 | `g8_esoteric_extensions/H76_tetrahedral_dualpath.md` |
+| H77 | `g8_esoteric_extensions/H77_radial_symmetry_12_attention.md` |
+| H78 | `g8_esoteric_extensions/H78_toroidal_latent_embedding.md` |
+| H79 | `g8_esoteric_extensions/H79_morphing_polytope_adjacency.md` |
+| H80 | `g8_esoteric_extensions/H80_constant_width_kernel.md` |
+| H81 | `g8_esoteric_extensions/H81_sinusoidal_activation.md` |
+| H82 | `g8_esoteric_extensions/H82_voronoi_sparse_attention.md` |
+| H83 | `g8_esoteric_extensions/H83_collapse_attention.md` |
+| H84 | `g8_esoteric_extensions/H84_spectral_hopfield_memory.md` |
 
 ## How files are written
 
