@@ -1,0 +1,18 @@
+{
+  "tag": "sg_only_golden_momentum",
+  "dataset": "cifar100",
+  "seed": 1,
+  "epochs": 30,
+  "top1": 0.5676,
+  "top5": 0.8405,
+  "params": 278324,
+  "flops": 41224448.0,
+  "latency_ms": 4.119293000003381,
+  "rot_eq_err": 0.44026297455032665,
+  "composite": 0.5646313329393252,
+  "composite_fingerprint": "d65565e9c7b12d14cbce30a801ecc6753aea3eb148074256bfcc051fa61d0893",
+  "epochs_to_target": -1,
+  "train_seconds": 929.4191142999989,
+  "train_top1": 0.6315905448717949,
+  "generalization_gap": 0.0639905448717949
+}
