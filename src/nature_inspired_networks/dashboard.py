@@ -1,20 +1,15 @@
-"""Autoresearch-style static dashboard generator (autoresearchspy-rich edition).
+"""Autoresearch-style static dashboard generator (group-organised edition).
 
 Reads experiment_log.jsonl, per-experiment metrics.json + history.json,
 reasoning_annotations.json, betti.json, IDEA_TABLE.md, EXPERIMENT_LOG.md,
-hypotheses/INDEX.md + hypotheses/H<NN>_*.md, and FINDINGS.md to emit a
-single self-contained dark-theme HTML dashboard with rich detail panels.
+hypotheses/INDEX.md + hypotheses/g<N>_*/H<NN>_*.md, and FINDINGS.md to emit a
+single self-contained dark-theme HTML dashboard plus rich per-experiment
+pages.
 
-Style is modelled after dlmastery/autoresearchspy/docs/spy_dashboard:
-- dark GitHub-flavoured palette (#0d1117 / #161b22 / #58a6ff / #3fb950 / #f85149 / #d29922)
-- summary KPI cards
-- composite-formula chip with SHA-256 fingerprint
-- 71-cell hypothesis status grid (G1..G7) with click-to-load .md side panel
-- T0..T6 tier filter chips for the runs table
-- runs-table rows -> click pops a modal with the matching reasoning entry
-- per-row <details> expansion with training-curve sparkline + latency breakdown
-- findings ribbon under the title
-- existing PNG plot panels: pareto / ablation / curves / betti
+The 2026-05-27 rewrite (issue feedback) removes the modal entirely, sections
+the leaderboard by hypothesis group, and expands each per-experiment page
+with hypothesis digest, FINDINGS verdict, reasoning blob, configuration,
+metrics, composite breakdown, training curves, cross-references, and footer.
 """
 from __future__ import annotations
 
@@ -30,6 +25,151 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+
+
+# ---------------------------------------------------------------------------
+# Tag -> (hypothesis ID, group letter) mapping
+#
+# Canonical, exhaustive map covering every tag that has produced a sweep row
+# to date (see ``experiments/cifar10/*`` and ``experiments/cifar100/*``).
+# Unknown tags fall back to ("Uncategorised", "Uncategorized").
+# ---------------------------------------------------------------------------
+
+TAG_TO_HYP: dict[str, tuple[str | None, str]] = {
+    # Baselines (no hypothesis doc)
+    "baseline_resnet20": (None, "Baseline"),
+    "baseline_sg_vanilla": (None, "Baseline"),
+    # G1 Scaling & Growth
+    "sg_chan_fib": ("H04", "G1"),
+    "sg_chan_phi": ("H04", "G1"),
+    "sg_only_phi_compound": ("H01", "G1"),
+    "sg_only_fib_depth": ("H02", "G1"),
+    "sg_only_golden_resize": ("H03", "G1"),
+    "sg_only_fractal": ("H05", "G1"),
+    "sg_only_golden_bottleneck": ("H06", "G1"),
+    "sg_only_phi_multiscale": ("H07", "G1"),
+    "sg_only_phi_budget": ("H09", "G1"),
+    "sg_only_phi_lr": ("H10", "G1"),
+    # G2 Layer / Channel / Neuron
+    "sg_only_phi_sparse": ("H13", "G2"),
+    "sg_only_golden_skip": ("H17", "G2"),
+    "sg_only_fib_stride": ("H18", "G2"),
+    "sg_only_phi_relu": ("H19", "G2"),
+    "sg_only_fib_ensemble": ("H20", "G2"),
+    "sg_only_golden_modulate": ("H17", "G2"),
+    # G3 Topologies / Graphs
+    "sg_only_hex": ("H21", "G3"),
+    "sg_only_toroidal": ("H22", "G3"),
+    # G4 Kernels / Attention
+    "sg_only_golden_spiral_init": ("H31", "G4"),
+    "sg_only_cymatic_init": ("H35", "G4"),
+    "sg_only_phi_activation": ("H39", "G4"),
+    # G5 Optimisation / Init / Regularisation
+    "sg_only_golden_adam": ("H41", "G5"),
+    "sg_only_phi_init": ("H42", "G5"),
+    "sg_only_fib_prune": ("H43", "G5"),
+    "sg_only_phi_decay": ("H44", "G5"),
+    "sg_only_phi_dropout": ("H47", "G5"),
+    "sg_only_golden_momentum": ("H48", "G5"),
+    "sg_full_fib": ("H50", "G5"),
+    "sg_full_fib_avg": ("H50", "G5"),
+    # G6 Topological & Bridging
+    "sg_only_group": ("H58", "G6"),
+    "sg_only_group_avg": ("H58", "G6"),
+    # G8 Esoteric Extensions
+    "sg_only_constant_width": ("H80", "G8"),
+    "sg_only_sine_act": ("H81", "G8"),
+}
+
+
+GROUP_ORDER: list[str] = [
+    "Baseline", "G1", "G2", "G3", "G4", "G5", "G6", "G7", "G8", "Uncategorized",
+]
+
+GROUP_HEADERS: dict[str, tuple[str, str]] = {
+    "Baseline": (
+        "Baselines",
+        "Stock ResNet-20 plus the all-priors-off NaturePriorNet scaffold — "
+        "the controls every hypothesis is judged against.",
+    ),
+    "G1": (
+        "G1 — Scaling & Growth",
+        "φ / Fibonacci growth laws applied to depth, width, resolution, "
+        "parameter budgets, and learning-rate schedulers (H01–H10).",
+    ),
+    "G2": (
+        "G2 — Layer / Channel / Neuron",
+        "Fibonacci-sized MLPs, channel counts, neuron connectivity, "
+        "skip scaling, head diversity, activation thresholds, ensembles "
+        "(H11–H20).",
+    ),
+    "G3": (
+        "G3 — Topologies & Graphs",
+        "Hexagonal lattices, toroidal closures, Platonic / icosahedral / "
+        "dodecahedral equivariance, fractal toroidal, cymatic-hex resonance "
+        "(H21–H30).",
+    ),
+    "G4": (
+        "G4 — Kernels / Attention / Filters",
+        "Golden-spiral kernels, Fibonacci dilation, vesica-piscis filters, "
+        "golden-angle rotary, cymatic wavelets, harmonic activations "
+        "(H31–H40).",
+    ),
+    "G5": (
+        "G5 — Optimisation / Init / Regularisation / NAS",
+        "Golden-ratio AdamW, φ-weight init, Fibonacci pruning, φ-dropout, "
+        "golden-momentum schedulers, full-hybrid stacks (H41–H50).",
+    ),
+    "G6": (
+        "G6 — Topological & Bridging",
+        "Persistent-homology losses, drop-path anytime nets, icosa-unfold "
+        "bridges, C4-group avg-pool, trained-feature Betti probes "
+        "(H51–H60).",
+    ),
+    "G7": (
+        "G7 — Cross-Paradigm Hybrids",
+        "Liquid / JEPA / KAN / Transformer / GNN cross-paradigm hybrids "
+        "(H61–H75). No CIFAR sweep rows yet — placeholder section.",
+    ),
+    "G8": (
+        "G8 — Esoteric Extensions",
+        "Reuleaux constant-width kernels, SIREN sinusoidal activations, "
+        "tetrahedral dual paths, radial-12 attention, spectral Hopfield "
+        "(H76–H84).",
+    ),
+    "Uncategorized": (
+        "Uncategorised",
+        "Tags whose hypothesis mapping is not yet wired into "
+        "TAG_TO_HYP — please update dashboard.py.",
+    ),
+}
+
+
+def hyp_file_for(hid: str) -> str | None:
+    """Resolve ``H<NN>`` to its ``g<N>_*/H<NN>_*.md`` filename (relative).
+
+    Returns ``None`` if the docs cannot be located.
+    """
+    if not hid:
+        return None
+    try:
+        n = int(hid[1:])
+    except Exception:
+        return None
+    group_idx = (n - 1) // 10 + 1
+    if n >= 76:
+        group_idx = 8
+    subdirs = {
+        1: "g1_scaling_growth",
+        2: "g2_layer_channel_neuron",
+        3: "g3_topologies_graphs",
+        4: "g4_kernels_attention_filters",
+        5: "g5_optimization_init_reg_nas",
+        6: "g6_topological_bridging",
+        7: "g7_cross_paradigm_hybrids",
+        8: "g8_esoteric_extensions",
+    }
+    return f"{subdirs.get(group_idx, '')}/{hid}_*.md"
 
 
 # ---------------------------------------------------------------------------
@@ -82,7 +222,7 @@ def load_betti(betti_path: str | Path) -> list[dict]:
 
 
 # ---------------------------------------------------------------------------
-# Markdown helpers (extract hypothesis status + tier maps from EXPERIMENT_LOG.md)
+# Markdown helpers — hypothesis index + experiment-log tiers + findings
 # ---------------------------------------------------------------------------
 
 _STATUS_GLYPH_MAP = {
@@ -104,11 +244,10 @@ def parse_hypothesis_index(index_md: str | Path) -> list[dict]:
         if m:
             current_group = m.group(1)
             continue
-        m = re.match(r"\|\s*(H\d{2})\s*\|\s*`([^`]+)`\s*\|\s*(.+?)\s*\|", line)
+        m = re.match(r"\|\s*(H\d{2})\s*\|\s*`([^`]+)`\s*\|", line)
         if m and current_group:
             hid = m.group(1)
             fname = m.group(2)
-            idea = m.group(3).strip()
             try:
                 idx_in_group = int(hid[1:]) - (int(current_group[1:]) - 1) * 10
             except Exception:
@@ -118,17 +257,12 @@ def parse_hypothesis_index(index_md: str | Path) -> list[dict]:
                 "group": current_group,
                 "idx": idx_in_group,
                 "file": fname,
-                "idea": idea,
+                "idea": "",
             })
     return rows
 
 
 def parse_experiment_log_tiers(log_md: str | Path) -> dict[str, dict]:
-    """Parse EXPERIMENT_LOG.md and return {tag: {tier, status, idea}}.
-
-    Also detects pure 'planned-row' tags (`*_cifar100` etc.) which we treat as
-    placeholder rows in their tier.
-    """
     p = Path(log_md)
     out: dict[str, dict] = {}
     if not p.exists():
@@ -145,7 +279,6 @@ def parse_experiment_log_tiers(log_md: str | Path) -> dict[str, dict]:
             cells = [c.strip() for c in line.strip().strip("|").split("|")]
             if len(cells) < 4:
                 continue
-            # Find first backtick-wrapped token in any cell -- that's the tag
             tag = None
             for c in cells:
                 bm = re.search(r"`([^`]+)`", c)
@@ -154,7 +287,6 @@ def parse_experiment_log_tiers(log_md: str | Path) -> dict[str, dict]:
                     break
             if not tag:
                 continue
-            # Status glyph search across cells
             status = "planned"
             for c in cells:
                 for g, s in _STATUS_GLYPH_MAP.items():
@@ -169,7 +301,6 @@ def parse_experiment_log_tiers(log_md: str | Path) -> dict[str, dict]:
 
 
 def parse_findings_headline(findings_md: str | Path, max_chars: int = 600) -> str:
-    """Extract the headline blockquote (the negative finding) from FINDINGS.md."""
     p = Path(findings_md)
     if not p.exists():
         return ""
@@ -187,10 +318,6 @@ def parse_findings_headline(findings_md: str | Path, max_chars: int = 600) -> st
 
 
 def parse_findings_metrics(findings_md: str | Path) -> list[tuple[str, str, str]]:
-    """Pull a handful of headline numeric metrics from FINDINGS.md.
-
-    Returns list of (label, value, mood) where mood in {"neutral", "positive", "negative"}.
-    """
     p = Path(findings_md)
     out: list[tuple[str, str, str]] = []
     if not p.exists():
@@ -220,8 +347,146 @@ def parse_findings_metrics(findings_md: str | Path) -> list[tuple[str, str, str]
     return out
 
 
+def parse_hypothesis_doc(md_path: Path) -> dict[str, str]:
+    """Extract a digest from a committee-grade hypothesis Markdown file.
+
+    Returns a dict with keys: ``title``, ``oneline``, ``motivation``,
+    ``formal``, ``falsifier``, ``mechanism``, ``citation``, ``predicted``.
+    Each value is best-effort; missing sections come back as empty strings.
+    """
+    out = {
+        "title": "", "oneline": "", "motivation": "", "formal": "",
+        "falsifier": "", "mechanism": "", "citation": "", "predicted": "",
+    }
+    if not md_path or not md_path.exists():
+        return out
+    text = md_path.read_text(encoding="utf-8", errors="ignore")
+    lines = text.splitlines()
+
+    # Title (first H1)
+    for ln in lines:
+        m = re.match(r"#\s+(.+)", ln)
+        if m:
+            out["title"] = m.group(1).strip()
+            break
+
+    # One-line claim: first blockquote with "One-line claim:"
+    m = re.search(
+        r">\s*\*\*One-line claim:\*\*\s*(.+?)(?:\n>\s*\n|\n\n)",
+        text, re.DOTALL,
+    )
+    if m:
+        oneline = re.sub(r"\n>\s*", " ", m.group(1)).strip()
+        out["oneline"] = re.sub(r"\s+", " ", oneline)
+
+    # Section helper: from a heading regex to the next ## heading.
+    def section(pattern: str) -> str:
+        m = re.search(
+            rf"##\s+\d*\.?\s*{pattern}.*?\n(.+?)(?=\n##\s|\Z)",
+            text, re.DOTALL | re.IGNORECASE,
+        )
+        if not m:
+            return ""
+        body = m.group(1).strip()
+        # Strip code fences
+        body = re.sub(r"```.*?```", "", body, flags=re.DOTALL)
+        return body.strip()
+
+    motivation = section(r"Motivation")
+    if motivation:
+        # First paragraph only
+        first_para = motivation.split("\n\n", 1)[0]
+        out["motivation"] = re.sub(r"\s+", " ", first_para).strip()
+
+    formal = section(r"Formal hypothesis")
+    if formal:
+        first_para = formal.split("\n\n", 1)[0]
+        out["formal"] = re.sub(r"\s+", " ", first_para).strip()
+
+    falsifier = section(r"Falsifier")
+    if falsifier:
+        first_para = falsifier.split("\n\n", 1)[0]
+        out["falsifier"] = re.sub(r"\s+", " ", first_para).strip()
+
+    citations = section(r"Citations")
+    if citations:
+        # Take the first arXiv reference
+        m = re.search(
+            r"([A-Z][^.\n]+?\(arXiv:\d{4}\.\d{4,5}\)[^.\n]*(?:\.|--)[^.\n]*)",
+            citations,
+        )
+        if m:
+            out["citation"] = re.sub(r"\s+", " ", m.group(1)).strip()
+        else:
+            # Fallback: first non-empty line
+            for ln in citations.splitlines():
+                ln = ln.strip()
+                if ln and not ln.startswith("```"):
+                    out["citation"] = ln
+                    break
+
+    mechanism = section(r"Mechanism")
+    if mechanism:
+        # First paragraph
+        for para in mechanism.split("\n\n"):
+            cleaned = re.sub(r"\s+", " ", para).strip()
+            if cleaned and not cleaned.startswith("###"):
+                out["mechanism"] = cleaned[:600]
+                break
+
+    # Predicted Δ section can be named various things — try a few.
+    for pat in (r"Predicted\s*Δ", r"Predicted Delta", r"Predictions?"):
+        body = section(pat)
+        if body:
+            first_para = body.split("\n\n", 1)[0]
+            out["predicted"] = re.sub(r"\s+", " ", first_para).strip()
+            break
+
+    return out
+
+
+def find_hypothesis_path(repo_root: Path, hid: str) -> Path | None:
+    """Locate ``hypotheses/g<N>_*/H<NN>_*.md`` for a given hypothesis ID."""
+    if not hid:
+        return None
+    base = repo_root / "hypotheses"
+    for sub in sorted(base.glob("g*_*/")):
+        for f in sub.glob(f"{hid}_*.md"):
+            return f
+    return None
+
+
+def parse_findings_for_tag(findings_md: Path, tag: str) -> str:
+    """Extract a short verdict blurb for the given tag from FINDINGS.md."""
+    if not findings_md.exists() or not tag:
+        return ""
+    text = findings_md.read_text(encoding="utf-8", errors="ignore")
+    # Strategy: find each paragraph (separated by blank lines) that mentions
+    # the tag, then return the first one that includes verdict-y language.
+    # Wrap-around: also accept the tag without the leading ``sg_only_`` prefix.
+    short = tag.replace("sg_only_", "").replace("sg_", "")
+    paragraphs = re.split(r"\n\s*\n", text)
+    candidates: list[str] = []
+    for para in paragraphs:
+        if f"`{tag}`" in para or short in para:
+            cleaned = re.sub(r"\s+", " ", para).strip()
+            if len(cleaned) > 30:
+                candidates.append(cleaned)
+    if not candidates:
+        return ""
+    # Prefer ones with verdict markers.
+    verdict_terms = (
+        "verdict", "DISCARD", "SURVIVES", "DEMOTED", "graduate", "neutral",
+        "falsified", "winner", "lead", "negative", "positive",
+    )
+    for c in candidates:
+        if any(t.lower() in c.lower() for t in verdict_terms):
+            return c[:1200]
+    return candidates[0][:1200]
+
+
 # ---------------------------------------------------------------------------
-# PNG plots (existing four, kept as-is so PNG remains PNG per constraint)
+# PNG plots (unchanged from previous edition)
 # ---------------------------------------------------------------------------
 
 def plot_pareto(df: pd.DataFrame, out_png: Path) -> None:
@@ -328,7 +593,7 @@ def plot_betti(betti_rows: list[dict], out_png: Path) -> None:
 
 
 # ---------------------------------------------------------------------------
-# Inline SVG sparkline (per-row training curve)
+# Inline SVG sparkline
 # ---------------------------------------------------------------------------
 
 def _sparkline_svg(history: list[dict] | None, w: int = 220, h: int = 36) -> str:
@@ -364,17 +629,7 @@ def _sparkline_svg(history: list[dict] | None, w: int = 220, h: int = 36) -> str
     )
 
 
-# ---------------------------------------------------------------------------
-# Per-experiment page (independent, self-contained, inline SVG line charts)
-# ---------------------------------------------------------------------------
-
-def run_page_filename(run_dir_name: str) -> str:
-    """Map a run-directory basename (``<tag>_seed<N>``) to its HTML filename."""
-    return f"{run_dir_name}.html"
-
-
 def _esc(s: object) -> str:
-    """HTML-escape an arbitrary value for safe text insertion."""
     out = str(s)
     for a, b in (("&", "&amp;"), ("<", "&lt;"), (">", "&gt;"),
                  ('"', "&quot;"), ("'", "&#39;")):
@@ -386,12 +641,6 @@ def _line_chart_svg(series: list[tuple[str, list[float], list[float], str]],
                     title: str, y_label: str,
                     w: int = 460, h: int = 240,
                     y_as_pct: bool = False) -> str:
-    """Render multiple (label, xs, ys, color) series as one inline SVG line chart.
-
-    Axes, gridlines, a legend, and end-point value labels are drawn purely with
-    SVG primitives — no JS, no external assets — so the file is self-contained
-    and renders identically from ``file://`` or GitHub Pages.
-    """
     series = [s for s in series if s[1] and s[2] and len(s[1]) == len(s[2])]
     if not series:
         return f"<div style='color:#8b949e'><i>No data for {_esc(title)}.</i></div>"
@@ -422,7 +671,6 @@ def _line_chart_svg(series: list[tuple[str, list[float], list[float], str]],
         f"<text x='{ml}' y='16' fill='#c9d1d9' font-size='12' "
         f"font-weight='600'>{_esc(title)}</text>",
     ]
-    # Horizontal gridlines + y tick labels (5 ticks)
     for i in range(5):
         yv = ymin + (ymax - ymin) * i / 4
         yy = sy(yv)
@@ -435,7 +683,6 @@ def _line_chart_svg(series: list[tuple[str, list[float], list[float], str]],
             f"<text x='{ml - 6}' y='{yy + 3:.1f}' fill='#8b949e' font-size='9' "
             f"text-anchor='end'>{lbl}</text>"
         )
-    # X axis ticks (first / last epoch)
     parts.append(
         f"<text x='{sx(xmin):.1f}' y='{h - 8}' fill='#8b949e' font-size='9' "
         f"text-anchor='middle'>{int(xmin)}</text>"
@@ -453,7 +700,6 @@ def _line_chart_svg(series: list[tuple[str, list[float], list[float], str]],
         f"text-anchor='middle' transform='rotate(-90 12 {mt + ph / 2:.1f})'>"
         f"{_esc(y_label)}</text>"
     )
-    # Series polylines + legend
     legend_x = ml + 6
     for li, (label, xs, ys, color) in enumerate(series):
         pts = " ".join(f"{sx(x):.1f},{sy(y):.1f}" for x, y in zip(xs, ys))
@@ -476,17 +722,44 @@ def _line_chart_svg(series: list[tuple[str, list[float], list[float], str]],
     return "".join(parts)
 
 
+# ---------------------------------------------------------------------------
+# Per-experiment page
+# ---------------------------------------------------------------------------
+
+def run_page_filename(run_dir_name: str, dataset: str | None = None) -> str:
+    """Return ``<dataset>__<run_dir_name>.html`` so cifar10 + cifar100 don't collide.
+
+    Older callers that only know ``run_dir_name`` get a plain ``<name>.html``;
+    that path is only used for cross-references discovered via globbing the
+    experiments directory.
+    """
+    if dataset:
+        return f"{dataset}__{run_dir_name}.html"
+    return f"{run_dir_name}.html"
+
+
 _EXP_PAGE_CSS = """
  *{margin:0;padding:0;box-sizing:border-box;}
  body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:#0d1117;
-      color:#c9d1d9;padding:24px 28px;line-height:1.5;}
+      color:#c9d1d9;padding:24px 28px;line-height:1.55;max-width:1180px;margin:0 auto;}
  a{color:#58a6ff;text-decoration:none;} a:hover{text-decoration:underline;}
- h1{color:#58a6ff;font-size:1.5em;margin-bottom:4px;}
- .sub{color:#8b949e;font-size:0.9em;margin-bottom:18px;}
+ h1{color:#58a6ff;font-size:1.6em;margin-bottom:4px;}
+ h2{color:#58a6ff;font-size:1.05em;margin-bottom:12px;font-weight:600;
+    letter-spacing:0.3px;}
+ .sub{color:#8b949e;font-size:0.95em;margin-bottom:18px;}
+ .pill{display:inline-block;background:#21262d;border:1px solid #30363d;
+       border-radius:10px;padding:2px 10px;font-size:0.78em;color:#c9d1d9;
+       font-family:Consolas,monospace;margin-right:6px;}
+ .pill.hyp{background:#1f3a5f;border-color:#58a6ff;color:#cfe6ff;}
+ .pill.grp{background:#2c1e3a;border-color:#a371f7;color:#dbc9f7;}
  .back{display:inline-block;margin-bottom:14px;font-size:0.9em;}
  .card{background:#161b22;border:1px solid #30363d;border-radius:8px;
-       padding:16px 18px;margin-bottom:18px;}
+       padding:18px 22px;margin-bottom:18px;}
  .card h2{color:#58a6ff;font-size:1.05em;margin-bottom:12px;font-weight:600;}
+ .card h3{color:#c9d1d9;font-size:0.92em;margin:14px 0 6px 0;font-weight:600;
+          text-transform:uppercase;letter-spacing:0.5px;}
+ .card p{margin-bottom:10px;font-size:0.92em;}
+ .card ul{margin-left:22px;font-size:0.9em;}
  table{width:100%;border-collapse:collapse;font-size:0.86em;}
  th{background:#0d1117;color:#8b949e;text-align:left;padding:7px 10px;
     border-bottom:2px solid #30363d;font-size:0.74em;text-transform:uppercase;
@@ -496,30 +769,286 @@ _EXP_PAGE_CSS = """
  td.v{color:#c9d1d9;font-family:Consolas,monospace;}
  .formula-chip{background:#0d1117;border:1px solid #30363d;border-radius:6px;
                padding:10px 12px;font-family:Consolas,monospace;font-size:0.82em;
-               margin-bottom:12px;}
+               margin-bottom:12px;color:#c9d1d9;word-break:break-all;}
  .breakdown td.term{font-family:Consolas,monospace;}
  .pos{color:#3fb950;} .neg{color:#f85149;} .mut{color:#8b949e;}
  .charts{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
  @media(max-width:980px){.charts{grid-template-columns:1fr;}}
- .meta{font-size:0.78em;color:#484f58;margin-top:18px;}
- code{background:#0d1117;padding:1px 5px;border-radius:3px;font-size:0.92em;}
+ .meta{font-size:0.78em;color:#484f58;margin-top:18px;line-height:1.6;}
+ code{background:#0d1117;padding:1px 5px;border-radius:3px;font-size:0.92em;
+      font-family:Consolas,monospace;}
+ pre{background:#0d1117;border:1px solid #30363d;border-radius:6px;
+     padding:12px;overflow-x:auto;font-family:Consolas,monospace;
+     font-size:0.84em;color:#c9d1d9;white-space:pre-wrap;line-height:1.5;}
+ .reason-section{margin-bottom:14px;}
+ .reason-section .lbl{color:#3fb950;font-size:0.72em;text-transform:uppercase;
+                      letter-spacing:0.6px;margin-bottom:4px;font-weight:600;}
+ .reason-section .body{font-size:0.9em;color:#c9d1d9;white-space:pre-wrap;}
+ .quote{border-left:3px solid #d29922;padding:8px 14px;background:#0d1117;
+        border-radius:0 6px 6px 0;font-size:0.9em;color:#c9d1d9;
+        margin:8px 0;}
+ .verdict-label{color:#d29922;font-weight:600;}
+ .empty{color:#8b949e;font-style:italic;font-size:0.88em;}
+ .xrefs li{margin:4px 0;font-size:0.9em;font-family:Consolas,monospace;}
 """
 
 
+def _render_hypothesis_section(hid: str | None, group: str,
+                               repo_root: Path) -> str:
+    """Build the inline hypothesis digest block for a per-experiment page."""
+    if not hid:
+        return (
+            "<div class='card'><h2>Hypothesis</h2>"
+            "<p class='empty'>No matching hypothesis document — this row "
+            "is a baseline reference.</p></div>"
+        )
+    md = find_hypothesis_path(repo_root, hid)
+    if md is None:
+        return (
+            f"<div class='card'><h2>Hypothesis {_esc(hid)}</h2>"
+            f"<p class='empty'>(hypothesis doc not located on disk for "
+            f"{_esc(hid)})</p></div>"
+        )
+    digest = parse_hypothesis_doc(md)
+    rel = md.relative_to(repo_root).as_posix()
+    gh_url = f"https://github.com/dlmastery/nature_inspired_networks/blob/main/{rel}"
+    parts: list[str] = [
+        f"<div class='card'><h2>Hypothesis {_esc(hid)} — {_esc(digest['title'] or hid)}</h2>"
+    ]
+    if digest["oneline"]:
+        parts.append(
+            f"<p><b style='color:#d29922'>One-line claim:</b> "
+            f"<i>{_esc(digest['oneline'])}</i></p>"
+        )
+    if digest["motivation"]:
+        parts.append(
+            f"<h3>Motivation</h3><p>{_esc(digest['motivation'])}</p>"
+        )
+    if digest["formal"]:
+        parts.append(
+            f"<h3>Formal hypothesis</h3><p>{_esc(digest['formal'])}</p>"
+        )
+    if digest["mechanism"]:
+        parts.append(
+            f"<h3>Mechanism (because…)</h3><p>{_esc(digest['mechanism'])}</p>"
+        )
+    if digest["falsifier"]:
+        parts.append(
+            f"<h3>Numeric falsifier</h3><p>{_esc(digest['falsifier'])}</p>"
+        )
+    if digest["predicted"]:
+        parts.append(
+            f"<h3>Predicted Δ</h3><p>{_esc(digest['predicted'])}</p>"
+        )
+    if digest["citation"]:
+        parts.append(
+            f"<h3>Primary citation</h3><p style='font-family:Consolas,"
+            f"monospace;font-size:0.85em'>{_esc(digest['citation'])}</p>"
+        )
+    parts.append(
+        f"<p style='margin-top:14px'>"
+        f"<a href='{_esc(gh_url)}'>Full design doc on GitHub →</a> · "
+        f"<a href='../../{_esc(rel)}'>local: {_esc(rel)}</a></p>"
+    )
+    parts.append("</div>")
+    return "".join(parts)
+
+
+def _render_verdict_section(repo_root: Path, tag: str) -> str:
+    findings_md = repo_root / "FINDINGS.md"
+    blurb = parse_findings_for_tag(findings_md, tag)
+    gh_url = (
+        "https://github.com/dlmastery/nature_inspired_networks/blob/main/"
+        "FINDINGS.md"
+    )
+    if not blurb:
+        return (
+            "<div class='card'><h2>Verdict (FINDINGS.md)</h2>"
+            "<p class='empty'>No paragraph in FINDINGS.md mentions this tag "
+            "yet.</p>"
+            f"<p><a href='{gh_url}'>Browse FINDINGS.md →</a></p></div>"
+        )
+    return (
+        "<div class='card'><h2>Verdict (FINDINGS.md)</h2>"
+        f"<div class='quote'>{_esc(blurb)}</div>"
+        f"<p style='margin-top:10px'><a href='{gh_url}'>Full FINDINGS.md →</a> · "
+        f"<a href='../../FINDINGS.md'>local: FINDINGS.md</a></p></div>"
+    )
+
+
+def _render_reasoning_section(reasoning_path: Path | None) -> str:
+    if reasoning_path is None or not reasoning_path.exists():
+        return (
+            "<div class='card'><h2>Reasoning blob</h2>"
+            "<p class='empty'>No <code>reasoning.json</code> for this run "
+            "directory.</p></div>"
+        )
+    try:
+        data = json.loads(reasoning_path.read_text(encoding="utf-8"))
+    except Exception as exc:
+        return (
+            "<div class='card'><h2>Reasoning blob</h2>"
+            f"<p class='empty'>Failed to parse: {_esc(exc)}.</p></div>"
+        )
+    if isinstance(data, list):
+        # Could be a list of entries; take the first.
+        data = data[0] if data else {}
+    parts = ["<div class='card'><h2>Reasoning blob</h2>"]
+    fields = [
+        ("diagnosis", "Diagnosis"),
+        ("citations", "Citations"),
+        ("hypothesis", "Hypothesis"),
+        ("prediction", "Prediction"),
+        ("verdict", "Verdict"),
+        ("learning", "Learning"),
+    ]
+    for key, label in fields:
+        v = data.get(key)
+        if not v:
+            continue
+        if isinstance(v, list):
+            body = "<ul>" + "".join(f"<li>{_esc(x)}</li>" for x in v) + "</ul>"
+        else:
+            body = f"<div class='body'>{_esc(v)}</div>"
+        parts.append(
+            f"<div class='reason-section'><div class='lbl'>{label}</div>{body}</div>"
+        )
+    parts.append("</div>")
+    return "".join(parts)
+
+
+def _render_configuration_section(run_dir: Path, metrics: dict) -> str:
+    cfg_yaml = run_dir / "config.yaml"
+    if cfg_yaml.exists():
+        try:
+            text = cfg_yaml.read_text(encoding="utf-8")
+        except Exception:
+            text = "(failed to read config.yaml)"
+        return (
+            "<div class='card'><h2>Configuration</h2>"
+            f"<pre>{_esc(text)}</pre></div>"
+        )
+    # Fallback: reconstruct from metrics.json fields.
+    inferred = {}
+    for k in ("model", "dataset", "channel_mode", "n_stages", "n_blocks",
+              "epochs", "batch_size", "lr", "optimizer", "weight_decay",
+              "scheduler", "seed", "flags"):
+        if k in metrics:
+            inferred[k] = metrics[k]
+    if not inferred:
+        return (
+            "<div class='card'><h2>Configuration</h2>"
+            "<p class='empty'>No <code>config.yaml</code> in run directory "
+            "and metrics.json carries no recoverable config overrides.</p>"
+            "</div>"
+        )
+    return (
+        "<div class='card'><h2>Configuration (inferred from metrics.json)</h2>"
+        f"<pre>{_esc(json.dumps(inferred, indent=2))}</pre></div>"
+    )
+
+
+def _render_cross_refs(run_dir_name: str, tag: str, dataset: str,
+                       results_dir: Path) -> str:
+    """Discover other seeds / datasets for the same tag."""
+    items: list[str] = []
+    # Other seeds, same dataset
+    same_ds_dir = results_dir / dataset
+    if same_ds_dir.exists():
+        for sib in sorted(same_ds_dir.iterdir()):
+            if not sib.is_dir():
+                continue
+            if not sib.name.startswith(f"{tag}_seed"):
+                continue
+            if sib.name == run_dir_name:
+                continue
+            href = f"../experiments/{run_page_filename(sib.name, dataset=dataset)}"
+            items.append(
+                f"<li><a href='{_esc(href)}'>{_esc(sib.name)}</a> "
+                f"<span class='mut'>(same tag, different seed)</span></li>"
+            )
+    # Same tag on other dataset(s)
+    for ds_dir in sorted(results_dir.iterdir()):
+        if not ds_dir.is_dir() or ds_dir.name == dataset:
+            continue
+        for sib in sorted(ds_dir.iterdir()):
+            if not sib.is_dir():
+                continue
+            if not sib.name.startswith(f"{tag}_seed"):
+                continue
+            href = f"../experiments/{run_page_filename(sib.name, dataset=ds_dir.name)}"
+            items.append(
+                f"<li><a href='{_esc(href)}'>{_esc(sib.name)}</a> "
+                f"<span class='mut'>(same tag on "
+                f"<code>{_esc(ds_dir.name)}</code>)</span></li>"
+            )
+    if not items:
+        body = "<p class='empty'>No companion runs found.</p>"
+    else:
+        body = "<ul class='xrefs'>" + "".join(items) + "</ul>"
+    return f"<div class='card'><h2>Cross-references</h2>{body}</div>"
+
+
+def _render_footer(metrics: dict, run_dir: Path) -> str:
+    fp = metrics.get("composite_fingerprint", "")
+    epochs = metrics.get("epochs", "?")
+    train_s = metrics.get("train_seconds", "?")
+    gen_gap = metrics.get("generalization_gap", "")
+    try:
+        gen_gap_disp = f"{float(gen_gap)*100:.2f} pp"
+    except Exception:
+        gen_gap_disp = str(gen_gap) if gen_gap != "" else "—"
+    try:
+        train_s_disp = f"{float(train_s):.1f} s"
+    except Exception:
+        train_s_disp = str(train_s)
+    return (
+        "<div class='meta'>"
+        f"composite formula SHA-256: <code>{_esc(fp)}</code> &nbsp;·&nbsp; "
+        f"epochs run: <b>{_esc(epochs)}</b> &nbsp;·&nbsp; "
+        f"train wall-clock: <b>{train_s_disp}</b> &nbsp;·&nbsp; "
+        f"generalisation gap (train − test top-1): <b>{gen_gap_disp}</b> "
+        f"&nbsp;·&nbsp; run directory: <code>{_esc(run_dir.name)}</code>"
+        "<br>Generated by "
+        "<code>nature_inspired_networks.dashboard.render_experiment_page</code>"
+        " · self-contained inline SVG; no external assets."
+        "</div>"
+    )
+
+
 def render_experiment_page(metrics: dict, history: list[dict] | None,
-                           run_dir_name: str, out_html: Path) -> None:
+                           run_dir_name: str, out_html: Path,
+                           run_dir: Path | None = None,
+                           results_dir: Path | None = None,
+                           repo_root: Path | None = None) -> dict[str, bool]:
     """Write a single self-contained per-experiment HTML page.
 
-    Sections: metrics table, composite-formula term breakdown, and inline-SVG
-    per-epoch training curves (loss + top-1). Falls back gracefully when
-    history.json is missing. ``out_html`` is assumed to live one directory
-    below the central dashboard (``dashboard/experiments/``) so the back link
-    is ``../dashboard.html``.
+    Returns a dict of section presence flags so callers can build coverage
+    statistics (which sections rendered with real content vs. fallback).
     """
     tag = metrics.get("tag", run_dir_name)
     seed = metrics.get("seed", "")
     dataset = metrics.get("dataset", "")
-    title = f"{tag} · seed {seed}"
+    title = f"{tag} · seed {seed} · {dataset}"
+
+    hid, group = TAG_TO_HYP.get(tag, (None, "Uncategorized"))
+    grp_header, grp_desc = GROUP_HEADERS.get(group, (group, ""))
+
+    if repo_root is None:
+        repo_root = Path.cwd()
+    if results_dir is None:
+        results_dir = repo_root / "experiments"
+    if run_dir is None:
+        run_dir = results_dir / dataset / run_dir_name
+
+    flags = {
+        "hypothesis": False,
+        "verdict": False,
+        "reasoning": False,
+        "config": False,
+        "history": history is not None and len(history) > 0,
+        "cross_refs": False,
+    }
 
     # ---- metrics table -------------------------------------------------
     def _fmt(key: str) -> str:
@@ -559,7 +1088,7 @@ def render_experiment_page(metrics: dict, history: list[dict] | None,
         ("dataset", "Dataset"), ("seed", "Seed"), ("epochs", "Epochs"),
         ("top1", "Top-1 accuracy"), ("top5", "Top-5 accuracy"),
         ("train_top1", "Train top-1"),
-        ("generalization_gap", "Generalization gap (train−test)"),
+        ("generalization_gap", "Generalisation gap (train − test)"),
         ("params", "Parameters"), ("flops", "FLOPs"),
         ("latency_ms", "Latency (batch=1)"), ("rot_eq_err", "Rot-eq error"),
         ("epochs_to_target", "Epochs-to-target"),
@@ -658,9 +1187,44 @@ def render_experiment_page(metrics: dict, history: list[dict] | None,
         )
     else:
         charts_html = (
-            "<div style='color:#8b949e'><i>history.json absent for this run — "
-            "no per-epoch curves available.</i></div>"
+            "<div class='empty'>history.json absent for this run — no "
+            "per-epoch curves available.</div>"
         )
+
+    # ---- hypothesis / verdict / reasoning / config / cross-refs --------
+    hyp_html = _render_hypothesis_section(hid, group, repo_root)
+    if hid is not None and find_hypothesis_path(repo_root, hid) is not None:
+        flags["hypothesis"] = True
+
+    verdict_html = _render_verdict_section(repo_root, tag)
+    if parse_findings_for_tag(repo_root / "FINDINGS.md", tag):
+        flags["verdict"] = True
+
+    reasoning_path = run_dir / "reasoning.json"
+    reasoning_html = _render_reasoning_section(
+        reasoning_path if reasoning_path.exists() else None
+    )
+    flags["reasoning"] = reasoning_path.exists()
+
+    config_html = _render_configuration_section(run_dir, metrics)
+    if (run_dir / "config.yaml").exists():
+        flags["config"] = True
+
+    xrefs_html = _render_cross_refs(run_dir_name, tag, dataset, results_dir)
+    # Count cross-refs as "filled" if more than the placeholder
+    if "<li>" in xrefs_html:
+        flags["cross_refs"] = True
+
+    footer_html = _render_footer(metrics, run_dir)
+
+    # ---- header pills --------------------------------------------------
+    hyp_pill = (
+        f"<span class='pill hyp'>{_esc(hid)}</span>"
+        if hid else "<span class='pill'>baseline</span>"
+    )
+    grp_pill = f"<span class='pill grp'>{_esc(grp_header)}</span>"
+    ds_pill = f"<span class='pill'>{_esc(dataset)}</span>"
+    seed_pill = f"<span class='pill'>seed {_esc(seed)}</span>"
 
     page = (
         "<!doctype html>\n"
@@ -669,31 +1233,42 @@ def render_experiment_page(metrics: dict, history: list[dict] | None,
         f"<style>{_EXP_PAGE_CSS}</style></head><body>\n"
         "<a class='back' href='../dashboard.html'>&larr; back to dashboard</a>\n"
         f"<h1>{_esc(tag)}</h1>\n"
-        f"<div class='sub'>seed {_esc(seed)} · {_esc(dataset)} · "
-        f"run directory <code>{_esc(run_dir_name)}</code></div>\n"
+        f"<div class='sub'>{hyp_pill}{grp_pill}{ds_pill}{seed_pill}"
+        f" &nbsp;·&nbsp; run directory <code>{_esc(run_dir_name)}</code></div>\n"
+        f"{hyp_html}\n"
+        f"{verdict_html}\n"
+        f"{reasoning_html}\n"
+        f"{config_html}\n"
         f"<div class='card'><h2>Metrics</h2>{metrics_table}</div>\n"
         f"<div class='card'><h2>Composite-score breakdown</h2>{breakdown_html}</div>\n"
         f"<div class='card'><h2>Per-epoch training curves</h2>{charts_html}</div>\n"
-        "<div class='meta'>Generated by "
-        "<code>nature_inspired_networks.dashboard.render_experiment_page</code> · "
-        "self-contained inline SVG; no external assets.</div>\n"
+        f"{xrefs_html}\n"
+        f"{footer_html}\n"
         "</body></html>\n"
     )
     out_html.parent.mkdir(parents=True, exist_ok=True)
     out_html.write_text(page, encoding="utf-8")
+    return flags
 
 
 def render_all_experiment_pages(results_dir: str | Path,
-                                out_dir: str | Path) -> list[str]:
+                                out_dir: str | Path,
+                                repo_root: str | Path | None = None,
+                                ) -> tuple[list[str], dict[str, int]]:
     """Render one per-experiment page per run dir holding a ``metrics.json``.
 
-    Returns the sorted list of HTML filenames written under ``out_dir`` (which
-    should be ``<dashboard>/experiments``). Idempotent — rewrites stable output.
+    Returns (sorted filename list, section-coverage counts) so the build
+    script can report how many of the 60+ pages got each section filled.
     """
     rp = Path(results_dir)
     od = Path(out_dir)
     od.mkdir(parents=True, exist_ok=True)
+    root = Path(repo_root) if repo_root else rp.parent
     written: list[str] = []
+    coverage = {
+        "hypothesis": 0, "verdict": 0, "reasoning": 0, "config": 0,
+        "history": 0, "cross_refs": 0,
+    }
     for mj in sorted(rp.glob("**/metrics.json")):
         run_dir = mj.parent
         try:
@@ -707,14 +1282,21 @@ def render_all_experiment_pages(results_dir: str | Path,
                 hist = json.loads(hj.read_text(encoding="utf-8"))
             except Exception:
                 hist = None
-        fname = run_page_filename(run_dir.name)
-        render_experiment_page(metrics, hist, run_dir.name, od / fname)
+        dataset = metrics.get("dataset") or run_dir.parent.name
+        fname = run_page_filename(run_dir.name, dataset=dataset)
+        flags = render_experiment_page(
+            metrics, hist, run_dir.name, od / fname,
+            run_dir=run_dir, results_dir=rp, repo_root=root,
+        )
+        for k, present in flags.items():
+            if present:
+                coverage[k] += 1
         written.append(fname)
-    return sorted(written)
+    return sorted(written), coverage
 
 
 # ---------------------------------------------------------------------------
-# Static HTML head (dark theme, all CSS+JS inline)
+# Main dashboard HTML head + sortable JS (NO MODAL anywhere)
 # ---------------------------------------------------------------------------
 
 HTML_HEAD = """<!doctype html>
@@ -727,10 +1309,12 @@ HTML_HEAD = """<!doctype html>
       color:#c9d1d9;padding:20px;line-height:1.45;}
  a{color:#58a6ff;text-decoration:none;} a:hover{text-decoration:underline;}
  h1{color:#58a6ff;margin-bottom:4px;font-size:1.7em;font-weight:700;}
- h2{color:#58a6ff;font-size:1.15em;margin:24px 0 10px 0;font-weight:600;
+ h2{color:#58a6ff;font-size:1.15em;margin:30px 0 6px 0;font-weight:600;
     letter-spacing:0.3px;}
  h3{color:#c9d1d9;font-size:0.95em;margin-bottom:10px;font-weight:600;}
  .sub{color:#8b949e;margin-bottom:14px;font-size:0.92em;}
+ .group-desc{color:#8b949e;font-size:0.88em;margin:2px 0 10px 0;
+             max-width:980px;line-height:1.55;}
  .ribbon{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));
          gap:10px;margin:10px 0 14px 0;}
  .kpi{background:#161b22;border:1px solid #30363d;border-radius:8px;padding:12px 14px;}
@@ -749,37 +1333,26 @@ HTML_HEAD = """<!doctype html>
  .card img{max-width:100%;height:auto;border-radius:4px;
            background:#fff;padding:4px;}
  .panel-2col{grid-column:1 / 3;}
- table{width:100%;border-collapse:collapse;font-size:0.83em;}
- th{background:#161b22;color:#8b949e;text-align:right;padding:8px 10px;
+ table.runs{width:100%;border-collapse:collapse;font-size:0.83em;
+            background:#161b22;border:1px solid #30363d;border-radius:8px;
+            overflow:hidden;}
+ table.runs th{background:#0d1117;color:#8b949e;text-align:right;padding:8px 10px;
     border-bottom:2px solid #30363d;font-weight:600;text-transform:uppercase;
-    font-size:0.72em;letter-spacing:0.4px;cursor:pointer;position:sticky;top:0;
-    z-index:6;}
- th:first-child{text-align:left;}
- td{padding:7px 10px;border-bottom:1px solid #21262d;text-align:right;
+    font-size:0.72em;letter-spacing:0.4px;cursor:pointer;}
+ table.runs th:first-child{text-align:left;}
+ table.runs td{padding:7px 10px;border-bottom:1px solid #21262d;text-align:right;
     color:#c9d1d9;}
- td:first-child{text-align:left;}
- tr:hover{background:#1c2128;}
- tr.clickable{cursor:pointer;}
- tr.best-row{background:#0d2818!important;border-left:4px solid #00d26a;}
- tr.best-row td{font-weight:600;}
+ table.runs td:first-child{text-align:left;}
+ table.runs tr.row-link{cursor:pointer;}
+ table.runs tr.row-link:hover{background:#1c2128;}
+ table.runs tr.best-row{background:#0d2818;border-left:4px solid #00d26a;}
+ table.runs tr.best-row td{font-weight:600;}
  .tag-pill{display:inline-block;background:#21262d;border:1px solid #30363d;
            border-radius:10px;padding:1px 8px;font-size:0.75em;color:#c9d1d9;
            font-family:Consolas,monospace;}
- .tier-chip,.chip{display:inline-block;background:#21262d;border:1px solid #30363d;
-                  border-radius:14px;padding:3px 11px;margin:2px 4px 2px 0;
-                  font-size:0.78em;cursor:pointer;color:#c9d1d9;
-                  user-select:none;}
- .tier-chip:hover,.chip:hover{background:#30363d;border-color:#58a6ff;}
- .tier-chip.active{background:#1f6feb;border-color:#58a6ff;color:#fff;
-                   font-weight:600;}
- .filter{padding:6px 10px;margin:6px 0;border:1px solid #30363d;border-radius:6px;
-         width:280px;background:#0d1117;color:#c9d1d9;font-size:0.85em;}
- .detail-row td{background:#0d1117;padding:14px 16px;border-bottom:2px solid #21262d;}
- .detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:6px;}
- .detail-block{background:#161b22;border:1px solid #30363d;border-radius:6px;
-               padding:10px 12px;font-size:0.83em;}
- .detail-block .lbl{color:#8b949e;font-size:0.72em;text-transform:uppercase;
-                    letter-spacing:0.5px;margin-bottom:4px;}
+ .chip{display:inline-block;background:#21262d;border:1px solid #30363d;
+       border-radius:14px;padding:3px 11px;margin:2px 4px 2px 0;
+       font-size:0.78em;color:#c9d1d9;}
  .meta{font-size:0.78em;color:#484f58;margin-top:18px;}
  .status-done{background:#3fb950;}
  .status-running{background:#d29922;animation:pulse 1.5s infinite;}
@@ -788,21 +1361,14 @@ HTML_HEAD = """<!doctype html>
  .status-failed{background:#f85149;}
  .status-superseded{background:#6e7681;}
  @keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.45;}}
- /* hypothesis grid */
- .hyp-grid-row{display:flex;align-items:center;margin-bottom:4px;
-               font-family:Consolas,monospace;font-size:0.78em;}
- .hyp-grid-row .gid{width:34px;color:#8b949e;}
- .hyp-grid-row .cell{width:26px;height:22px;margin-right:3px;border-radius:3px;
-                     display:inline-flex;align-items:center;justify-content:center;
-                     font-size:0.7em;color:#fff;cursor:pointer;
-                     border:1px solid #21262d;}
- .hyp-grid-row .cell:hover{outline:2px solid #58a6ff;}
- .hyp-grid-row .cell.empty{background:#21262d;color:#484f58;cursor:default;
-                            border-color:transparent;}
- .legend-row{margin:8px 0 12px 0;font-size:0.78em;color:#8b949e;}
- .legend-row .swatch{display:inline-block;width:12px;height:12px;border-radius:2px;
-                     vertical-align:middle;margin:0 4px 0 10px;}
- /* side panel + modal */
+ .group-section{margin-top:26px;background:#161b22;border:1px solid #30363d;
+                border-radius:10px;padding:14px 18px;}
+ .group-section h2{margin-top:0;color:#58a6ff;font-size:1.1em;}
+ .group-empty{color:#8b949e;font-style:italic;font-size:0.88em;
+              padding:6px 0;}
+ .hyp-link{color:#58a6ff;font-family:Consolas,monospace;font-size:0.78em;
+           white-space:nowrap;}
+ /* side panel (hypothesis quick-open) */
  #side-panel{position:fixed;top:0;right:-560px;width:540px;height:100vh;
              background:#0d1117;border-left:1px solid #30363d;
              box-shadow:-4px 0 24px rgba(0,0,0,0.6);
@@ -817,27 +1383,19 @@ HTML_HEAD = """<!doctype html>
             padding:4px 12px;border-radius:4px;cursor:pointer;font-size:0.82em;
             float:right;}
  .close-btn:hover{background:#30363d;color:#c9d1d9;}
- #modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,0.6);display:none;
-                 z-index:40;}
- #modal-backdrop.open{display:block;}
- #modal{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);
-        width:min(820px,92vw);max-height:84vh;overflow-y:auto;
-        background:#0d1117;border:1px solid #30363d;border-radius:10px;
-        padding:24px 26px;z-index:60;display:none;
-        box-shadow:0 12px 40px rgba(0,0,0,0.7);}
- #modal.open{display:block;}
- #modal h3{color:#58a6ff;font-size:1.1em;margin-bottom:6px;}
- #modal .meta{color:#8b949e;font-size:0.8em;margin-bottom:14px;}
- #modal section{margin-bottom:14px;}
- #modal section .lbl{color:#3fb950;font-size:0.75em;text-transform:uppercase;
-                     letter-spacing:0.6px;margin-bottom:4px;font-weight:600;}
- #modal section .body{font-size:0.88em;line-height:1.5;color:#c9d1d9;
-                      white-space:pre-wrap;}
- #modal section ul{margin-left:18px;font-size:0.85em;}
- details{margin-top:8px;}
- details > summary{cursor:pointer;color:#58a6ff;font-size:0.8em;font-weight:600;
-                   padding:2px 0;}
- details > summary:hover{text-decoration:underline;}
+ .legend-row{margin:8px 0 12px 0;font-size:0.78em;color:#8b949e;}
+ .legend-row .swatch{display:inline-block;width:12px;height:12px;border-radius:2px;
+                     vertical-align:middle;margin:0 4px 0 10px;}
+ .hyp-grid-row{display:flex;align-items:center;margin-bottom:4px;
+               font-family:Consolas,monospace;font-size:0.78em;}
+ .hyp-grid-row .gid{width:34px;color:#8b949e;}
+ .hyp-grid-row .cell{width:26px;height:22px;margin-right:3px;border-radius:3px;
+                     display:inline-flex;align-items:center;justify-content:center;
+                     font-size:0.7em;color:#fff;cursor:pointer;
+                     border:1px solid #21262d;}
+ .hyp-grid-row .cell:hover{outline:2px solid #58a6ff;}
+ .hyp-grid-row .cell.empty{background:#21262d;color:#484f58;cursor:default;
+                            border-color:transparent;}
 </style>
 </head><body>
 """
@@ -845,86 +1403,21 @@ HTML_HEAD = """<!doctype html>
 
 HTML_JS = r"""
 <script>
-function sortTable(n){
-  var t=document.getElementById('runs');
-  var rs=Array.from(t.tBodies[0].rows).filter(function(r){return !r.classList.contains('detail-row');});
-  var pairs=rs.map(function(r){
-    var d=r.nextElementSibling && r.nextElementSibling.classList.contains('detail-row')?r.nextElementSibling:null;
-    return [r,d];
-  });
+function sortTable(tableId, n){
+  var t=document.getElementById(tableId);
+  if(!t) return;
+  var rs=Array.from(t.tBodies[0].rows);
   var d=t.dataset.dir==='asc'?-1:1;t.dataset.dir=d===1?'asc':'desc';
-  pairs.sort(function(a,b){
-    var x=a[0].cells[n].dataset.v||a[0].cells[n].textContent;
-    var y=b[0].cells[n].dataset.v||b[0].cells[n].textContent;
+  rs.sort(function(a,b){
+    var x=a.cells[n].dataset.v||a.cells[n].textContent;
+    var y=b.cells[n].dataset.v||b.cells[n].textContent;
     var nx=parseFloat(x),ny=parseFloat(y);
     if(!isNaN(nx)&&!isNaN(ny)) return d*(nx-ny);
     return d*x.localeCompare(y);
   });
-  pairs.forEach(function(p){t.tBodies[0].appendChild(p[0]);if(p[1])t.tBodies[0].appendChild(p[1]);});
+  rs.forEach(function(r){t.tBodies[0].appendChild(r);});
 }
 
-var activeTier='ALL';
-function setTier(name,btn){
-  activeTier=name;
-  document.querySelectorAll('.tier-chip').forEach(function(c){c.classList.remove('active');});
-  btn.classList.add('active');
-  applyFilters();
-}
-function applyFilters(){
-  var q=(document.getElementById('q').value||'').toLowerCase();
-  Array.from(document.querySelectorAll('#runs tbody tr')).forEach(function(r){
-    if(r.classList.contains('detail-row')) return;
-    var tier=r.dataset.tier||'';
-    var matchTier=(activeTier==='ALL')||(tier===activeTier);
-    var matchQ=r.textContent.toLowerCase().includes(q);
-    var show=matchTier && matchQ;
-    r.style.display=show?'':'none';
-    var det=r.nextElementSibling;
-    if(det && det.classList.contains('detail-row')) det.style.display='none';
-  });
-}
-
-/* row click -> open modal with reasoning entry */
-function openReasoning(tag){
-  var entry=window._REASONING_BY_TAG[tag];
-  var m=document.getElementById('modal'),b=document.getElementById('modal-backdrop');
-  if(!entry){
-    document.getElementById('modal-body').innerHTML=
-     '<section><div class="body">No reasoning entry found for <code>'+tag+'</code> in reasoning_annotations.json.</div></section>';
-    document.getElementById('modal-title').textContent=tag;
-    document.getElementById('modal-meta').textContent='';
-  } else {
-    document.getElementById('modal-title').textContent=entry.title||tag;
-    document.getElementById('modal-meta').textContent=
-      'experiment_id: '+(entry.experiment_id||'(n/a)')+
-      '  ·  composite_fp: '+(entry.composite_fingerprint||'').slice(0,12);
-    var sections=[
-      ['diagnosis','Diagnosis'],['hypothesis','Hypothesis'],
-      ['prediction','Prediction'],['verdict','Verdict'],['learning','Learning'],
-    ];
-    var html='';
-    sections.forEach(function(p){
-      var txt=entry[p[0]];
-      if(txt){
-        html+='<section><div class="lbl">'+p[1]+'</div><div class="body">'+
-              escapeHtml(txt)+'</div></section>';
-      }
-    });
-    if(entry.citations && entry.citations.length){
-      html+='<section><div class="lbl">Citations</div><ul>';
-      entry.citations.forEach(function(c){html+='<li>'+escapeHtml(c)+'</li>';});
-      html+='</ul></section>';
-    }
-    document.getElementById('modal-body').innerHTML=html;
-  }
-  m.classList.add('open');b.classList.add('open');
-}
-function closeModal(){
-  document.getElementById('modal').classList.remove('open');
-  document.getElementById('modal-backdrop').classList.remove('open');
-}
-
-/* hypothesis-cell click -> open side panel with hypotheses/H<NN>_*.md */
 function openHypothesis(hid,fname){
   var sp=document.getElementById('side-panel');
   document.getElementById('side-panel-title').textContent=hid+' — '+fname;
@@ -938,79 +1431,46 @@ function openHypothesis(hid,fname){
     document.getElementById('side-panel-body').textContent=
       'Could not fetch hypotheses/'+fname+' ('+e.message+').\n'+
       'When opened via file:// many browsers block fetch; serve via\n'+
-      '`python -m http.server` from the repo root and reload, or open the file directly\n'+
-      'at hypotheses/'+fname+'.';
+      '`python -m http.server` from the repo root and reload.';
   });
   sp.classList.add('open');
 }
 function closeSide(){document.getElementById('side-panel').classList.remove('open');}
 
-/* per-row <details> expansion — populates the lazy panel on first open */
-function toggleDetail(btn,tag){
-  var det=btn.closest('tr').nextElementSibling;
-  if(!det || !det.classList.contains('detail-row')) return;
-  det.style.display=det.style.display==='none' || det.style.display===''? 'table-row':'none';
-}
-
-function escapeHtml(s){
-  if(s===null || s===undefined) return '';
-  return String(s).replace(/[&<>"']/g,function(c){
-    return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c];
-  });
-}
-
 document.addEventListener('keydown',function(e){
-  if(e.key==='Escape'){closeModal();closeSide();}
+  if(e.key==='Escape'){closeSide();}
 });
 </script>
 """
 
 
 # ---------------------------------------------------------------------------
-# HTML fragment builders
+# HTML fragment builders (hypothesis grid + ribbons + group sections)
 # ---------------------------------------------------------------------------
 
 def _hypothesis_grid_html(index_rows: list[dict],
-                          tag_status: dict[str, dict],
-                          reasoning_by_tag: dict[str, dict]) -> str:
-    """Build the 71-cell heatmap (7 rows × ~10 cols).
-
-    Status precedence for a hypothesis cell:
-      done if any tag tied to this hypothesis has status done in EXPERIMENT_LOG.md,
-      else running/queued/failed as recorded, else 'planned'.
-    Since tag<->hypothesis mapping is sparse, we use a couple of heuristic
-    bindings driven by EXPERIMENT_LOG.md cells that contain 'H<NN>'.
-    """
+                          tag_status: dict[str, dict]) -> str:
     if not index_rows:
         return "<i style='color:#8b949e'>hypotheses/INDEX.md not found.</i>"
 
-    # Build hypothesis status map. Default: 'planned' until evidence says
-    # otherwise.
     status_for: dict[str, str] = {h["id"]: "planned" for h in index_rows}
-    # Scan tag_status for ideas containing H<NN> references.
+    order = ["done", "running", "queued", "failed", "superseded", "planned"]
     for tag, meta in tag_status.items():
         idea = meta.get("idea", "")
         for m in re.finditer(r"H(\d{2})", idea):
             hid = "H" + m.group(1)
             if hid in status_for:
-                # Done > running > queued > failed > superseded > planned.
-                order = ["done", "running", "queued", "failed", "superseded", "planned"]
                 cur = status_for[hid]
                 new = meta["status"]
                 if order.index(new) < order.index(cur):
                     status_for[hid] = new
 
-    # H05/H17/H21/H22/H24/H34/H35/H50/H58 are exercised by the canonical
-    # Tier-1 sweep tags — promote those to 'done' if at least one matching
-    # tag has status done.
     direct = {
         "H04": ["sg_chan_fib", "sg_chan_phi"],
         "H05": ["sg_only_fractal"],
         "H17": ["sg_only_golden_modulate"],
         "H21": ["sg_only_hex"],
         "H22": ["sg_only_toroidal"],
-        "H24": ["sg_only_group"],
-        "H34": ["sg_only_golden_modulate"],
         "H35": ["sg_only_cymatic_init"],
         "H50": ["sg_full_fib"],
         "H58": ["sg_only_group_avg"],
@@ -1024,10 +1484,7 @@ def _hypothesis_grid_html(index_rows: list[dict],
                 continue
             if meta["status"] == "done" and status_for[hid] != "done":
                 status_for[hid] = "done"
-            elif meta["status"] == "running" and status_for[hid] == "planned":
-                status_for[hid] = "running"
 
-    # Group rows
     by_group: dict[str, list[dict]] = {}
     for h in index_rows:
         by_group.setdefault(h["group"], []).append(h)
@@ -1050,10 +1507,9 @@ def _hypothesis_grid_html(index_rows: list[dict],
             st = status_for.get(c["id"], "planned")
             hid = c["id"]
             fname = c["file"]
-            idea = c["idea"].replace("'", "&#39;").replace('"', "&quot;")
             row_html.append(
-                "<span class='cell status-" + st + "' title='" + hid + " — "
-                + idea + " (status: " + st + ")' "
+                "<span class='cell status-" + st + "' title='" + hid
+                + " (status: " + st + ")' "
                 + "onclick=\"openHypothesis('" + hid + "','" + fname + "')\">"
                 + hid[1:] + "</span>"
             )
@@ -1061,15 +1517,6 @@ def _hypothesis_grid_html(index_rows: list[dict],
         out.append("".join(row_html))
     out.append("</div>")
     return "\n".join(out)
-
-
-def _tier_chips_html(tiers_present: list[str]) -> str:
-    chips = ["<span class='tier-chip active' onclick=\"setTier('ALL',this)\">ALL</span>"]
-    for t in sorted(tiers_present):
-        chips.append(
-            f"<span class='tier-chip' onclick=\"setTier('{t}',this)\">{t}</span>"
-        )
-    return "".join(chips)
 
 
 def _ribbon_html(metrics: list[tuple[str, str, str]]) -> str:
@@ -1103,6 +1550,125 @@ def _composite_formula_chip(df: pd.DataFrame) -> str:
     )
 
 
+_RUNS_COLS = [
+    ("tag", "Tag"),
+    ("dataset", "Dataset"),
+    ("seed", "Seed"),
+    ("epochs", "Epochs"),
+    ("top1", "Top-1"),
+    ("top5", "Top-5"),
+    ("params", "Params"),
+    ("flops", "FLOPs"),
+    ("latency_ms", "Latency"),
+    ("composite", "Composite"),
+]
+
+
+def _format_cell(k: str, v) -> tuple[str, str]:
+    """Return (data-v string, display string) for a runs-table cell."""
+    if v is None or v == "":
+        return "", "—"
+    try:
+        if k == "params":
+            return str(v), f"{float(v)/1e6:.3f}M"
+        if k == "flops":
+            return str(v), f"{float(v)/1e6:.1f}M"
+        if k in ("top1", "top5"):
+            return str(v), f"{float(v)*100:.2f}%"
+        if k == "latency_ms":
+            return str(v), f"{float(v):.2f} ms"
+        if k == "composite":
+            return str(v), f"{float(v):.4f}"
+        if isinstance(v, float):
+            return str(v), f"{v:.4f}"
+        return str(v), str(v)
+    except Exception:
+        return str(v), str(v)
+
+
+def _group_section_html(group_letter: str,
+                        rows: list[pd.Series],
+                        best_idx: set,
+                        table_id: str) -> str:
+    """Render one ``<section>`` for a hypothesis-group block."""
+    header, desc = GROUP_HEADERS.get(group_letter, (group_letter, ""))
+    n = len(rows)
+    parts = [
+        f"<section class='group-section'>",
+        f"<h2>{_esc(header)} <span style='color:#8b949e;"
+        f"font-weight:400;font-size:0.78em'>({n} run{'s' if n != 1 else ''})"
+        f"</span></h2>",
+        f"<div class='group-desc'>{_esc(desc)}</div>",
+    ]
+    if not rows:
+        parts.append(
+            "<div class='group-empty'>No sweep rows yet in this group.</div>"
+        )
+        parts.append("</section>")
+        return "".join(parts)
+    parts.append(f"<table class='runs' id='{table_id}' data-dir='asc'><thead><tr>")
+    for i, (_k, label) in enumerate(_RUNS_COLS):
+        parts.append(
+            f"<th onclick=\"sortTable('{table_id}', {i})\">{label}</th>"
+        )
+    parts.append("<th>Hypothesis</th>")
+    parts.append("</tr></thead><tbody>")
+
+    for r in rows:
+        run_dir_path = str(r.get("_run_dir", ""))
+        run_dir_name = run_dir_path.split("/")[-1]
+        ds = r.get("dataset")
+        if not ds and "/" in run_dir_path:
+            ds = run_dir_path.split("/")[0]
+        page_href = (
+            f"experiments/{run_page_filename(run_dir_name, dataset=ds)}"
+            if run_dir_name else ""
+        )
+        klass = "row-link" + (" best-row" if r.name in best_idx else "")
+        if page_href:
+            row_attrs = (
+                f"class='{klass}' "
+                f"onclick=\"window.location.href='{page_href}'\""
+            )
+        else:
+            row_attrs = f"class='{klass}'"
+        parts.append(f"<tr {row_attrs}>")
+        for k, _label in _RUNS_COLS:
+            v = r.get(k, "")
+            dv, disp = _format_cell(k, v)
+            if k == "tag":
+                tag_html = (
+                    f"<a href='{page_href}' class='tag-pill' "
+                    f"onclick='event.stopPropagation()' "
+                    f"style='color:#58a6ff'>{_esc(disp)}</a>"
+                    if page_href else
+                    f"<span class='tag-pill'>{_esc(disp)}</span>"
+                )
+                parts.append(
+                    f"<td data-v='{_esc(dv)}' style='text-align:left'>{tag_html}</td>"
+                )
+            else:
+                parts.append(
+                    f"<td data-v='{_esc(dv)}'>{_esc(disp)}</td>"
+                )
+        # Hypothesis link cell
+        tag = r.get("tag", "")
+        hid, _grp = TAG_TO_HYP.get(tag, (None, "Uncategorized"))
+        if hid:
+            parts.append(
+                f"<td style='text-align:left'>"
+                f"<span class='hyp-link'>{_esc(hid)}</span></td>"
+            )
+        else:
+            parts.append(
+                "<td style='text-align:left'><span class='mut'>—</span></td>"
+            )
+        parts.append("</tr>")
+    parts.append("</tbody></table>")
+    parts.append("</section>")
+    return "".join(parts)
+
+
 # ---------------------------------------------------------------------------
 # Render entry point
 # ---------------------------------------------------------------------------
@@ -1115,8 +1681,9 @@ def render_dashboard(results_dir: str | Path,
                      repo_root: str | Path | None = None) -> None:
     """Render the rich dark-theme dashboard.
 
-    `repo_root` defaults to the parent of `results_dir`; it is used to locate
-    EXPERIMENT_LOG.md, hypotheses/INDEX.md, FINDINGS.md.
+    Now organised by hypothesis group: instead of one mega-leaderboard, every
+    group (Baseline + G1..G8 + Uncategorised) gets its own sortable section.
+    Rows link to the per-experiment page; no modal.
     """
     df = load_runs(results_dir)
     extra_sections = extra_sections or []
@@ -1136,42 +1703,36 @@ def render_dashboard(results_dir: str | Path,
         betti_rows = load_betti(bj)
         plot_betti(betti_rows, betti_png)
 
-    reasoning = load_reasoning(p / "reasoning_annotations.json")
-    history = load_history(results_dir)
     tag_to_tier = parse_experiment_log_tiers(root / "EXPERIMENT_LOG.md")
     index_rows = parse_hypothesis_index(root / "hypotheses" / "INDEX.md")
     findings_blurb = parse_findings_headline(root / "FINDINGS.md")
     findings_metrics = parse_findings_metrics(root / "FINDINGS.md")
 
-    # Map reasoning by tag (use experiment_id suffix or title match)
-    reasoning_by_tag: dict[str, dict] = {}
-    for entry in reasoning:
-        eid = entry.get("experiment_id", "")
-        # experiment_id form: exp01_baseline_resnet20 -> tag baseline_resnet20
-        m = re.match(r"exp\d+_(.+)$", eid)
-        if m:
-            reasoning_by_tag[m.group(1)] = entry
-
-    # rank rows by composite, mark best per dataset
     if not df.empty:
         df = df.sort_values(["dataset", "composite"], ascending=[True, False])
-        best_idx = df.groupby("dataset")["composite"].idxmax().tolist()
+        df["__group"] = df["tag"].map(
+            lambda t: TAG_TO_HYP.get(t, (None, "Uncategorized"))[1]
+        )
+        best_idx = set(df.groupby("dataset")["composite"].idxmax().tolist())
     else:
-        best_idx = []
+        df["__group"] = pd.Series(dtype=str)
+        best_idx = set()
 
     html = [HTML_HEAD]
     html.append(f"<h1>{title}</h1>")
-    html.append(f"<div class='sub'>{subtitle} · "
-                f"<a href='https://github.com/dlmastery/nature_inspired_networks'>"
-                f"GitHub</a> · "
-                f"<a href='../FINDINGS.md'>FINDINGS.md</a> · "
-                f"<a href='../EXPERIMENT_LOG.md'>EXPERIMENT_LOG</a></div>")
+    html.append(
+        f"<div class='sub'>{subtitle} · "
+        f"<a href='https://github.com/dlmastery/nature_inspired_networks'>"
+        f"GitHub</a> · "
+        f"<a href='../FINDINGS.md'>FINDINGS.md</a> · "
+        f"<a href='../EXPERIMENT_LOG.md'>EXPERIMENT_LOG</a></div>"
+    )
     if findings_blurb:
         html.append(
             "<div style='background:#161b22;border-left:4px solid #d29922;"
             "border:1px solid #30363d;border-radius:6px;padding:12px 16px;"
             "margin:6px 0 10px 0;font-size:0.92em;color:#c9d1d9'>"
-            f"<b style='color:#d29922'>Headline negative finding · </b>"
+            f"<b style='color:#d29922'>Headline finding · </b>"
             f"{findings_blurb}</div>"
         )
     html.append(_composite_formula_chip(df))
@@ -1201,178 +1762,52 @@ def render_dashboard(results_dir: str | Path,
             f"<div class='card panel-2col'><h3>{sec_title}</h3>{body}</div>"
         )
 
-    # Hypothesis status grid (71-cell heatmap)
     html.append(
-        "<div class='card panel-2col'><h3>Hypothesis ledger — 71-cell status grid "
-        "(G1..G7 × hypothesis index; click to view the spec)</h3>"
-        + _hypothesis_grid_html(index_rows, tag_to_tier, reasoning_by_tag)
+        "<div class='card panel-2col'><h3>Hypothesis ledger — status grid "
+        "(G1..G8 × hypothesis index; click a cell to view the spec)</h3>"
+        + _hypothesis_grid_html(index_rows, tag_to_tier)
         + "</div>"
     )
     html.append("</div>")  # end .grid
 
     # ------------------------------------------------------------------
-    # Runs table with tier chips, filter, click-modal, <details> rows
+    # Runs sections by hypothesis group (NO modal anywhere)
     # ------------------------------------------------------------------
-    html.append("<h2 style='margin-top:30px'>Runs — click a row for reasoning ledger; "
-                "▸ for per-run training-curve + latency breakdown</h2>")
-
-    tiers_present = sorted({m["tier"] for m in tag_to_tier.values()})
-    html.append("<div>" + _tier_chips_html(tiers_present) + "</div>")
     html.append(
-        "<input id='q' class='filter' placeholder='filter runs (tag/dataset/seed)…' "
-        "oninput='applyFilters()'/>"
+        "<h2 style='margin-top:34px'>Runs by hypothesis group "
+        "<span style='color:#8b949e;font-weight:400;font-size:0.78em'>"
+        "— click any row for the full per-experiment page</span></h2>"
     )
 
-    cols = [
-        ("tag", "Tag", False),
-        ("dataset", "Dataset", False),
-        ("seed", "Seed", True),
-        ("epochs", "Epochs", True),
-        ("top1", "Top-1", True),
-        ("top5", "Top-5", True),
-        ("params", "Params", True),
-        ("flops", "FLOPs", True),
-        ("latency_ms", "Latency", True),
-        ("rot_eq_err", "Rot-eq err", True),
-        ("composite", "Composite", True),
-        ("epochs_to_target", "ET(target)", True),
-        ("train_seconds", "Train (s)", True),
-    ]
-    html.append("<table id='runs' data-dir='asc'><thead><tr>")
-    html.append("<th style='width:24px'></th>")
-    for i, (_k, label, _n) in enumerate(cols):
-        html.append(f"<th onclick='sortTable({i + 1})'>{label}</th>")
-    html.append("<th>Tier</th>")
-    html.append("</tr></thead><tbody>")
+    rows_by_group: dict[str, list[pd.Series]] = {g: [] for g in GROUP_ORDER}
+    if not df.empty:
+        for _, r in df.iterrows():
+            g = r.get("__group", "Uncategorized")
+            rows_by_group.setdefault(g, []).append(r)
+        for g in rows_by_group:
+            rows_by_group[g].sort(
+                key=lambda r: float(r.get("composite", 0) or 0), reverse=True,
+            )
 
-    for _, r in df.iterrows():
-        tag = r.get("tag", "")
-        klass = "best-row" if r.name in best_idx else ""
-        tier_meta = tag_to_tier.get(tag, {})
-        tier = tier_meta.get("tier", "")
-        status = tier_meta.get("status", "")
+    for g in GROUP_ORDER:
+        rows = rows_by_group.get(g, [])
         html.append(
-            f"<tr class='clickable {klass}' data-tier='{tier}' "
-            f"onclick=\"openReasoning('{tag}')\">"
+            _group_section_html(
+                g, rows, best_idx,
+                table_id=f"runs-{g.lower()}",
+            )
         )
-        html.append(
-            f"<td onclick='event.stopPropagation();toggleDetail(this,\"{tag}\")' "
-            f"style='cursor:pointer;color:#58a6ff;font-weight:600;text-align:center'>▸</td>"
-        )
-        run_dir_name = str(r.get("_run_dir", "")).split("/")[-1]
-        page_href = f"experiments/{run_page_filename(run_dir_name)}" if run_dir_name else ""
-        for k, _l, _n in cols:
-            v = r.get(k, "")
-            if k == "tag":
-                pill = f"<span class='tag-pill'>{v}</span>"
-                if page_href:
-                    pill = (
-                        f"<a href='{page_href}' title='open per-experiment page' "
-                        f"onclick='event.stopPropagation()'>{pill}</a>"
-                    )
-                disp = pill
-                if status:
-                    disp = (
-                        f"<span class='swatch status-{status}' "
-                        f"style='display:inline-block;width:8px;height:8px;"
-                        f"border-radius:50%;margin-right:6px;vertical-align:middle'>"
-                        f"</span>" + disp
-                    )
-                html.append(f"<td data-v='{v}'>{disp}</td>")
-                continue
-            if k == "params":
-                try:
-                    disp = f"{float(v)/1e6:.3f}M"
-                except Exception:
-                    disp = str(v)
-            elif k == "flops":
-                try:
-                    disp = f"{float(v)/1e6:.1f}M"
-                except Exception:
-                    disp = str(v)
-            elif k in ("top1", "top5"):
-                try:
-                    disp = f"{float(v)*100:.2f}%"
-                except Exception:
-                    disp = str(v)
-            elif k == "latency_ms":
-                try:
-                    disp = f"{float(v):.2f} ms"
-                except Exception:
-                    disp = str(v)
-            elif isinstance(v, float):
-                disp = f"{v:.4f}"
-            else:
-                disp = str(v)
-            html.append(f"<td data-v='{v}'>{disp}</td>")
-        html.append(
-            f"<td data-v='{tier}'><span class='chip'>{tier or '—'}</span></td>"
-        )
-        html.append("</tr>")
-
-        # Detail row (lazy-on-DOM; hidden by default)
-        hist = history.get(tag) or history.get(r.get("_run_dir", "").split("/")[-1])
-        spark = _sparkline_svg(hist)
-        flags = r.get("flags") or {}
-        flag_chips = ""
-        if isinstance(flags, dict):
-            for fk, fv in flags.items():
-                color = "#3fb950" if fv else "#484f58"
-                flag_chips += (
-                    f"<span class='chip' style='border-color:{color};color:{color}'>"
-                    f"{fk}={fv}</span>"
-                )
-        try:
-            lat = float(r.get("latency_ms", 0))
-            train_s = float(r.get("train_seconds", 0))
-        except Exception:
-            lat, train_s = 0.0, 0.0
-        gen_gap = r.get("generalization_gap", "")
-        try:
-            gen_gap_disp = f"{float(gen_gap)*100:.2f} pp"
-        except Exception:
-            gen_gap_disp = str(gen_gap)
-
-        html.append(
-            "<tr class='detail-row' style='display:none'>"
-            f"<td colspan='{len(cols) + 2}'>"
-            "<div class='detail-grid'>"
-            "<div class='detail-block'>"
-            "<div class='lbl'>Training curve (epoch → test top-1)</div>"
-            f"<div>{spark or '<i style=\"color:#8b949e\">no history.json</i>'}</div>"
-            "</div>"
-            "<div class='detail-block'>"
-            "<div class='lbl'>Latency / compute breakdown</div>"
-            f"<div>latency (batch=1): <b>{lat:.3f} ms</b><br>"
-            f"train wall-clock: <b>{train_s:.1f} s</b><br>"
-            f"generalisation gap (train−test top1): <b>{gen_gap_disp}</b><br>"
-            f"model: <b>{r.get('model','?')}</b> · channel_mode: <b>{r.get('channel_mode','?')}</b></div>"
-            "</div>"
-            "<div class='detail-block panel-2col' style='grid-column:1/3'>"
-            "<div class='lbl'>Prior flags</div>"
-            f"<div>{flag_chips or '<i style=\"color:#8b949e\">no flags recorded</i>'}</div>"
-            "</div>"
-            "</div>"
-            "</td></tr>"
-        )
-    html.append("</tbody></table>")
 
     html.append(
         "<div class='meta'>Generated by "
         "<code>nature_inspired_networks.dashboard.render_dashboard</code> · "
         "dark theme adapted from dlmastery/autoresearchspy/docs/spy_dashboard · "
-        "all CSS+JS inline; no external CDN; PNG plots kept as PNG.</div>"
+        "all CSS+JS inline; no external CDN; PNG plots kept as PNG; "
+        "leaderboard organised by hypothesis group; rows link to per-experiment pages.</div>"
     )
 
-    # Modal + side panel HTML
+    # Side panel (kept — hypothesis-cell quick-open; NOT a modal)
     html.append("""
-<div id='modal-backdrop' onclick='closeModal()'></div>
-<div id='modal'>
-  <button class='close-btn' onclick='closeModal()'>close · Esc</button>
-  <h3 id='modal-title'>—</h3>
-  <div class='meta' id='modal-meta'></div>
-  <div id='modal-body'></div>
-</div>
 <div id='side-panel'>
   <button class='close-btn' onclick='closeSide()'>close · Esc</button>
   <h3 id='side-panel-title'>Hypothesis spec</h3>
@@ -1380,11 +1815,6 @@ def render_dashboard(results_dir: str | Path,
 </div>
 """)
 
-    # Embed reasoning_by_tag as a JS literal so click-handler is offline-safe
-    reasoning_js = json.dumps(reasoning_by_tag, ensure_ascii=False)
-    html.append(
-        f"<script>window._REASONING_BY_TAG = {reasoning_js};</script>"
-    )
     html.append(HTML_JS)
     html.append("</body></html>")
     out_html.parent.mkdir(parents=True, exist_ok=True)

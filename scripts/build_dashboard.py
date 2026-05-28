@@ -149,8 +149,21 @@ def main(argv=None) -> int:
 
     # Per-experiment independent pages (one .html per <tag>_seed<N> run dir).
     exp_out = out_dir / "experiments"
-    exp_pages = render_all_experiment_pages(results, exp_out)
+    exp_pages, coverage = render_all_experiment_pages(
+        results, exp_out, repo_root=repo_root,
+    )
     print(f"[ok] {len(exp_pages)} per-experiment pages written to {exp_out}")
+    if exp_pages:
+        n = len(exp_pages)
+        print(
+            "[ok] section coverage (real content vs. fallback): "
+            f"hypothesis={coverage['hypothesis']}/{n}, "
+            f"verdict={coverage['verdict']}/{n}, "
+            f"reasoning={coverage['reasoning']}/{n}, "
+            f"config={coverage['config']}/{n}, "
+            f"history={coverage['history']}/{n}, "
+            f"cross_refs={coverage['cross_refs']}/{n}"
+        )
 
     # Mirror PNG plots into docs/dashboard/ and copy reasoning + betti so the
     # docs mirror is self-contained.
