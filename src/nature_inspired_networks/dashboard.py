@@ -365,6 +365,355 @@ def _sparkline_svg(history: list[dict] | None, w: int = 220, h: int = 36) -> str
 
 
 # ---------------------------------------------------------------------------
+# Per-experiment page (independent, self-contained, inline SVG line charts)
+# ---------------------------------------------------------------------------
+
+def run_page_filename(run_dir_name: str) -> str:
+    """Map a run-directory basename (``<tag>_seed<N>``) to its HTML filename."""
+    return f"{run_dir_name}.html"
+
+
+def _esc(s: object) -> str:
+    """HTML-escape an arbitrary value for safe text insertion."""
+    out = str(s)
+    for a, b in (("&", "&amp;"), ("<", "&lt;"), (">", "&gt;"),
+                 ('"', "&quot;"), ("'", "&#39;")):
+        out = out.replace(a, b)
+    return out
+
+
+def _line_chart_svg(series: list[tuple[str, list[float], list[float], str]],
+                    title: str, y_label: str,
+                    w: int = 460, h: int = 240,
+                    y_as_pct: bool = False) -> str:
+    """Render multiple (label, xs, ys, color) series as one inline SVG line chart.
+
+    Axes, gridlines, a legend, and end-point value labels are drawn purely with
+    SVG primitives — no JS, no external assets — so the file is self-contained
+    and renders identically from ``file://`` or GitHub Pages.
+    """
+    series = [s for s in series if s[1] and s[2] and len(s[1]) == len(s[2])]
+    if not series:
+        return f"<div style='color:#8b949e'><i>No data for {_esc(title)}.</i></div>"
+    ml, mr, mt, mb = 46, 14, 30, 28
+    pw, ph = w - ml - mr, h - mt - mb
+    all_x = [x for _, xs, _, _ in series for x in xs]
+    all_y = [y for _, _, ys, _ in series for y in ys]
+    xmin, xmax = min(all_x), max(all_x)
+    ymin, ymax = min(all_y), max(all_y)
+    if xmax == xmin:
+        xmax = xmin + 1
+    if ymax == ymin:
+        ymax = ymin + (1e-6 if ymax == 0 else abs(ymax) * 0.1)
+    yspan = ymax - ymin
+    ymin -= yspan * 0.06
+    ymax += yspan * 0.06
+
+    def sx(x: float) -> float:
+        return ml + pw * (x - xmin) / (xmax - xmin)
+
+    def sy(y: float) -> float:
+        return mt + ph * (1 - (y - ymin) / (ymax - ymin))
+
+    parts: list[str] = [
+        f"<svg width='{w}' height='{h}' viewBox='0 0 {w} {h}' "
+        f"xmlns='http://www.w3.org/2000/svg' "
+        f"style='background:#0d1117;border:1px solid #30363d;border-radius:6px'>",
+        f"<text x='{ml}' y='16' fill='#c9d1d9' font-size='12' "
+        f"font-weight='600'>{_esc(title)}</text>",
+    ]
+    # Horizontal gridlines + y tick labels (5 ticks)
+    for i in range(5):
+        yv = ymin + (ymax - ymin) * i / 4
+        yy = sy(yv)
+        parts.append(
+            f"<line x1='{ml}' y1='{yy:.1f}' x2='{ml + pw}' y2='{yy:.1f}' "
+            f"stroke='#21262d' stroke-width='1'/>"
+        )
+        lbl = f"{yv * 100:.1f}%" if y_as_pct else f"{yv:.3f}"
+        parts.append(
+            f"<text x='{ml - 6}' y='{yy + 3:.1f}' fill='#8b949e' font-size='9' "
+            f"text-anchor='end'>{lbl}</text>"
+        )
+    # X axis ticks (first / last epoch)
+    parts.append(
+        f"<text x='{sx(xmin):.1f}' y='{h - 8}' fill='#8b949e' font-size='9' "
+        f"text-anchor='middle'>{int(xmin)}</text>"
+    )
+    parts.append(
+        f"<text x='{sx(xmax):.1f}' y='{h - 8}' fill='#8b949e' font-size='9' "
+        f"text-anchor='middle'>{int(xmax)}</text>"
+    )
+    parts.append(
+        f"<text x='{ml + pw / 2:.1f}' y='{h - 8}' fill='#8b949e' font-size='9' "
+        f"text-anchor='middle'>epoch</text>"
+    )
+    parts.append(
+        f"<text x='12' y='{mt + ph / 2:.1f}' fill='#8b949e' font-size='9' "
+        f"text-anchor='middle' transform='rotate(-90 12 {mt + ph / 2:.1f})'>"
+        f"{_esc(y_label)}</text>"
+    )
+    # Series polylines + legend
+    legend_x = ml + 6
+    for li, (label, xs, ys, color) in enumerate(series):
+        pts = " ".join(f"{sx(x):.1f},{sy(y):.1f}" for x, y in zip(xs, ys))
+        parts.append(
+            f"<polyline points='{pts}' fill='none' stroke='{color}' "
+            f"stroke-width='1.8'/>"
+        )
+        lx, ly = sx(xs[-1]), sy(ys[-1])
+        parts.append(f"<circle cx='{lx:.1f}' cy='{ly:.1f}' r='2.6' fill='{color}'/>")
+        ly_txt = mt + 12 + li * 14
+        parts.append(
+            f"<rect x='{legend_x}' y='{ly_txt - 8}' width='10' height='10' "
+            f"fill='{color}' rx='2'/>"
+        )
+        parts.append(
+            f"<text x='{legend_x + 15}' y='{ly_txt}' fill='#c9d1d9' "
+            f"font-size='10'>{_esc(label)}</text>"
+        )
+    parts.append("</svg>")
+    return "".join(parts)
+
+
+_EXP_PAGE_CSS = """
+ *{margin:0;padding:0;box-sizing:border-box;}
+ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:#0d1117;
+      color:#c9d1d9;padding:24px 28px;line-height:1.5;}
+ a{color:#58a6ff;text-decoration:none;} a:hover{text-decoration:underline;}
+ h1{color:#58a6ff;font-size:1.5em;margin-bottom:4px;}
+ .sub{color:#8b949e;font-size:0.9em;margin-bottom:18px;}
+ .back{display:inline-block;margin-bottom:14px;font-size:0.9em;}
+ .card{background:#161b22;border:1px solid #30363d;border-radius:8px;
+       padding:16px 18px;margin-bottom:18px;}
+ .card h2{color:#58a6ff;font-size:1.05em;margin-bottom:12px;font-weight:600;}
+ table{width:100%;border-collapse:collapse;font-size:0.86em;}
+ th{background:#0d1117;color:#8b949e;text-align:left;padding:7px 10px;
+    border-bottom:2px solid #30363d;font-size:0.74em;text-transform:uppercase;
+    letter-spacing:0.4px;}
+ td{padding:7px 10px;border-bottom:1px solid #21262d;}
+ td.k{color:#8b949e;width:42%;}
+ td.v{color:#c9d1d9;font-family:Consolas,monospace;}
+ .formula-chip{background:#0d1117;border:1px solid #30363d;border-radius:6px;
+               padding:10px 12px;font-family:Consolas,monospace;font-size:0.82em;
+               margin-bottom:12px;}
+ .breakdown td.term{font-family:Consolas,monospace;}
+ .pos{color:#3fb950;} .neg{color:#f85149;} .mut{color:#8b949e;}
+ .charts{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+ @media(max-width:980px){.charts{grid-template-columns:1fr;}}
+ .meta{font-size:0.78em;color:#484f58;margin-top:18px;}
+ code{background:#0d1117;padding:1px 5px;border-radius:3px;font-size:0.92em;}
+"""
+
+
+def render_experiment_page(metrics: dict, history: list[dict] | None,
+                           run_dir_name: str, out_html: Path) -> None:
+    """Write a single self-contained per-experiment HTML page.
+
+    Sections: metrics table, composite-formula term breakdown, and inline-SVG
+    per-epoch training curves (loss + top-1). Falls back gracefully when
+    history.json is missing. ``out_html`` is assumed to live one directory
+    below the central dashboard (``dashboard/experiments/``) so the back link
+    is ``../dashboard.html``.
+    """
+    tag = metrics.get("tag", run_dir_name)
+    seed = metrics.get("seed", "")
+    dataset = metrics.get("dataset", "")
+    title = f"{tag} · seed {seed}"
+
+    # ---- metrics table -------------------------------------------------
+    def _fmt(key: str) -> str:
+        v = metrics.get(key)
+        if v is None:
+            return "<span class='mut'>—</span>"
+        if key in ("top1", "top5", "train_top1", "generalization_gap"):
+            try:
+                return f"{float(v) * 100:.2f}%"
+            except Exception:
+                return _esc(v)
+        if key == "params":
+            try:
+                return f"{int(v):,} ({float(v) / 1e6:.3f} M)"
+            except Exception:
+                return _esc(v)
+        if key == "flops":
+            try:
+                return f"{float(v) / 1e6:.1f} M MACs"
+            except Exception:
+                return _esc(v)
+        if key == "latency_ms":
+            try:
+                return f"{float(v):.3f} ms"
+            except Exception:
+                return _esc(v)
+        if key == "train_seconds":
+            try:
+                return f"{float(v):.1f} s"
+            except Exception:
+                return _esc(v)
+        if isinstance(v, float):
+            return f"{v:.6f}"
+        return _esc(v)
+
+    metric_keys = [
+        ("dataset", "Dataset"), ("seed", "Seed"), ("epochs", "Epochs"),
+        ("top1", "Top-1 accuracy"), ("top5", "Top-5 accuracy"),
+        ("train_top1", "Train top-1"),
+        ("generalization_gap", "Generalization gap (train−test)"),
+        ("params", "Parameters"), ("flops", "FLOPs"),
+        ("latency_ms", "Latency (batch=1)"), ("rot_eq_err", "Rot-eq error"),
+        ("epochs_to_target", "Epochs-to-target"),
+        ("train_seconds", "Train wall-clock"),
+        ("composite", "Composite score"),
+        ("composite_fingerprint", "Composite fingerprint (SHA-256)"),
+    ]
+    rows = "".join(
+        f"<tr><td class='k'>{_esc(lbl)}</td><td class='v'>{_fmt(k)}</td></tr>"
+        for k, lbl in metric_keys if k in metrics
+    )
+    metrics_table = f"<table><tbody>{rows}</tbody></table>"
+
+    # ---- composite-formula breakdown -----------------------------------
+    import math
+    formula = metrics.get(
+        "composite_formula",
+        "top1 - 0.05*log10(params_M) - 0.05*log10(latency_ms)",
+    )
+    breakdown_html = ""
+    try:
+        top1 = float(metrics["top1"])
+        params_m = float(metrics["params"]) / 1e6
+        lat = float(metrics["latency_ms"])
+        t_params = -0.05 * math.log10(params_m) if params_m > 0 else 0.0
+        t_lat = -0.05 * math.log10(lat) if lat > 0 else 0.0
+        total = top1 + t_params + t_lat
+        reported = float(metrics.get("composite", total))
+
+        def _term(name: str, expr: str, val: float) -> str:
+            cls = "pos" if val >= 0 else "neg"
+            sign = "+" if val >= 0 else "−"
+            return (
+                f"<tr><td class='term'>{_esc(name)}</td>"
+                f"<td class='term mut'>{_esc(expr)}</td>"
+                f"<td class='term {cls}' style='text-align:right'>"
+                f"{sign}{abs(val):.5f}</td></tr>"
+            )
+
+        breakdown_html = (
+            f"<div class='formula-chip'>composite ≔ <code>{_esc(formula)}</code></div>"
+            "<table class='breakdown'><thead><tr><th>Term</th><th>Expression</th>"
+            "<th style='text-align:right'>Contribution</th></tr></thead><tbody>"
+            + _term("top-1", f"{top1:.5f}", top1)
+            + _term("params penalty", f"-0.05·log10({params_m:.4f} M)", t_params)
+            + _term("latency penalty", f"-0.05·log10({lat:.3f} ms)", t_lat)
+            + "<tr style='border-top:2px solid #30363d'>"
+            f"<td class='term' colspan='2'><b>Σ (recomputed)</b></td>"
+            f"<td class='term' style='text-align:right'><b>{total:.5f}</b></td></tr>"
+            f"<tr><td class='term mut' colspan='2'>reported composite</td>"
+            f"<td class='term mut' style='text-align:right'>{reported:.5f}</td></tr>"
+            "</tbody></table>"
+        )
+    except Exception:
+        breakdown_html = (
+            f"<div class='formula-chip'>composite ≔ <code>{_esc(formula)}</code></div>"
+            "<div style='color:#8b949e'><i>Insufficient fields to break the "
+            "composite down term-by-term.</i></div>"
+        )
+
+    # ---- training curves (inline SVG) ----------------------------------
+    if history:
+        epochs = [r.get("epoch") for r in history]
+        train_loss = [r.get("train_loss") for r in history]
+        train_top1 = [r.get("train_top1") for r in history]
+        test_top1 = [r.get("test_top1") for r in history]
+        test_top5 = [r.get("test_top5") for r in history]
+
+        def _clean(xs, ys):
+            px, py = [], []
+            for x, y in zip(xs, ys):
+                if x is not None and y is not None:
+                    px.append(x)
+                    py.append(y)
+            return px, py
+
+        lx, ly = _clean(epochs, train_loss)
+        loss_chart = _line_chart_svg(
+            [("train loss", lx, ly, "#f85149")],
+            "Loss", "loss", y_as_pct=False,
+        )
+        acc_series = []
+        ax, ay = _clean(epochs, train_top1)
+        if ay:
+            acc_series.append(("train top-1", ax, ay, "#d29922"))
+        bx, by = _clean(epochs, test_top1)
+        if by:
+            acc_series.append(("test top-1", bx, by, "#58a6ff"))
+        cx, cy = _clean(epochs, test_top5)
+        if cy:
+            acc_series.append(("test top-5", cx, cy, "#3fb950"))
+        acc_chart = _line_chart_svg(acc_series, "Accuracy", "accuracy", y_as_pct=True)
+        charts_html = (
+            f"<div class='charts'><div>{loss_chart}</div>"
+            f"<div>{acc_chart}</div></div>"
+        )
+    else:
+        charts_html = (
+            "<div style='color:#8b949e'><i>history.json absent for this run — "
+            "no per-epoch curves available.</i></div>"
+        )
+
+    page = (
+        "<!doctype html>\n"
+        "<html lang='en'><head><meta charset='utf-8'>\n"
+        f"<title>{_esc(title)} — experiment page</title>\n"
+        f"<style>{_EXP_PAGE_CSS}</style></head><body>\n"
+        "<a class='back' href='../dashboard.html'>&larr; back to dashboard</a>\n"
+        f"<h1>{_esc(tag)}</h1>\n"
+        f"<div class='sub'>seed {_esc(seed)} · {_esc(dataset)} · "
+        f"run directory <code>{_esc(run_dir_name)}</code></div>\n"
+        f"<div class='card'><h2>Metrics</h2>{metrics_table}</div>\n"
+        f"<div class='card'><h2>Composite-score breakdown</h2>{breakdown_html}</div>\n"
+        f"<div class='card'><h2>Per-epoch training curves</h2>{charts_html}</div>\n"
+        "<div class='meta'>Generated by "
+        "<code>nature_inspired_networks.dashboard.render_experiment_page</code> · "
+        "self-contained inline SVG; no external assets.</div>\n"
+        "</body></html>\n"
+    )
+    out_html.parent.mkdir(parents=True, exist_ok=True)
+    out_html.write_text(page, encoding="utf-8")
+
+
+def render_all_experiment_pages(results_dir: str | Path,
+                                out_dir: str | Path) -> list[str]:
+    """Render one per-experiment page per run dir holding a ``metrics.json``.
+
+    Returns the sorted list of HTML filenames written under ``out_dir`` (which
+    should be ``<dashboard>/experiments``). Idempotent — rewrites stable output.
+    """
+    rp = Path(results_dir)
+    od = Path(out_dir)
+    od.mkdir(parents=True, exist_ok=True)
+    written: list[str] = []
+    for mj in sorted(rp.glob("**/metrics.json")):
+        run_dir = mj.parent
+        try:
+            metrics = json.loads(mj.read_text(encoding="utf-8"))
+        except Exception:
+            continue
+        hist: list[dict] | None = None
+        hj = run_dir / "history.json"
+        if hj.exists():
+            try:
+                hist = json.loads(hj.read_text(encoding="utf-8"))
+            except Exception:
+                hist = None
+        fname = run_page_filename(run_dir.name)
+        render_experiment_page(metrics, hist, run_dir.name, od / fname)
+        written.append(fname)
+    return sorted(written)
+
+
+# ---------------------------------------------------------------------------
 # Static HTML head (dark theme, all CSS+JS inline)
 # ---------------------------------------------------------------------------
 
@@ -910,10 +1259,18 @@ def render_dashboard(results_dir: str | Path,
             f"<td onclick='event.stopPropagation();toggleDetail(this,\"{tag}\")' "
             f"style='cursor:pointer;color:#58a6ff;font-weight:600;text-align:center'>▸</td>"
         )
+        run_dir_name = str(r.get("_run_dir", "")).split("/")[-1]
+        page_href = f"experiments/{run_page_filename(run_dir_name)}" if run_dir_name else ""
         for k, _l, _n in cols:
             v = r.get(k, "")
             if k == "tag":
-                disp = f"<span class='tag-pill'>{v}</span>"
+                pill = f"<span class='tag-pill'>{v}</span>"
+                if page_href:
+                    pill = (
+                        f"<a href='{page_href}' title='open per-experiment page' "
+                        f"onclick='event.stopPropagation()'>{pill}</a>"
+                    )
+                disp = pill
                 if status:
                     disp = (
                         f"<span class='swatch status-{status}' "
