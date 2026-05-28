@@ -181,3 +181,43 @@ T1.8 (`sg_only_golden_modulate`) on CIFAR-10 was a CNN-track channel-wise multip
 ## 12. Status journal
 
 - 2026-05-27 — Created from template by Doc-Agent-B. Notes T1.8 near-no-op CNN proxy as evidence that golden-angle priors must touch a structure-sensitive operator (RoPE) to matter.
+
+---
+
+## Addendum: Research-Scientist Critique (2026-05-27)
+
+*Reviewer: SciCritic-G4 (elite-research-scientist critic). Critiquing the IDEA, not the implementation (audit at `audits/G4_audit.md`).*
+
+### Prior plausibility (LOW/MED/HIGH + why)
+
+**LOW.** The proposed frequency progression is `θ_k = GA · k / (d/2)` — i.e., LINEAR in k, capped at the golden angle. Standard RoPE uses `θ_k = base^(-2k/d)` — i.e., GEOMETRIC, spanning many orders of magnitude (frequencies from 1 to 10⁻⁴ across the d/2 dims). The proposed RoPE-φ has ALL frequencies ≤ 2.4 rad/token, which means EVERY dimension oscillates at ≈ token-scale — no slow channels for long-range coherence, no fast channels for local discrimination. This is the OPPOSITE of what makes RoPE work. The author has misunderstood RoPE: the "base" in `10000^(-2k/d)` controls the MULTI-SCALE FREQUENCY SPREAD, not the angular spacing per token.
+
+### Mechanism scrutiny
+
+The "most irrational angular spacing" argument applies to A SINGLE FREQUENCY's behavior across MANY tokens (i.e., it would matter if a single ω·k mod 2π is uniformly distributed for k = 1, …, N). But RoPE uses MULTIPLE frequencies indexed by k = dimension index, and EACH frequency is applied at EVERY token position. The aliasing-period argument applies per-frequency: ω = GA means aliasing period ∞ (irrational), but ω = 0.001 (RoPE's slow channels) also has aliasing period 6283 tokens. Both are "non-aliasing within practical context length". The golden-angle argument provides ZERO MARGINAL BENEFIT over RoPE's base-10000 multi-scale design.
+
+Moreover, the LLM literature has converged on LARGER bases (Llama-3 uses base=500000, Qwen uses base up to 1M) for long-context — Xiong 2023 (arXiv:2309.16039) "Effective Long-Context Scaling" shows that the right intervention is BASE INCREASE, not different angle progression. The proposed change moves in the OPPOSITE direction (compressing all frequencies into [0, 2.4] rad).
+
+### Confounds (≥2)
+
+1. **Frequency range confound.** RoPE-φ's `θ_k = GA·k/(d/2)` ranges θ over [0, GA], whereas standard RoPE ranges over [10⁻⁴, 1]. The behavior difference may come ENTIRELY from "all-fast vs multi-scale" frequencies, not from the φ-specificity. Control: linear progression `θ_k = π·k/(d/2)` (no golden angle, same range).
+2. **Training-length aliasing confound.** At 2k context, even base=10000 has zero aliasing for any irrational ω. The benefit of irrational angle only kicks in at extrapolation > training-period. The pre-registered metric "Q·K aliasing autocorr" is suspect — it measures something with no clear link to perplexity.
+
+### Numerology / specificity check
+
+The golden angle GA = 2π(1 − 1/φ) ≈ 2.3998 is "the most irrational angle" by continued-fraction expansion (Hurwitz 1891). But ANY irrational multiple of 2π is non-periodic; √2·π, e·π/2, etc., all give non-aliasing frequencies. Vogel 1979 is about 2-D phyllotaxis spacing where successive rotations need to AVOID nearby past rotations on a packed disk — this geometric setting is irrelevant to a 1-D rotation phase for a single frequency dimension. **The Vogel-1979 citation is misapplied; the "most-irrational" claim does not transfer to 1-D RoPE.**
+
+### Literature precedent — kernel/attention design is a crowded field
+
+RoPE base modulation has been extensively studied: NTK-aware scaling (bloc97 2023 reddit, then Peng 2023 arXiv:2309.00071 YaRN), Position Interpolation (Chen 2023 arXiv:2306.15595), ABF (Xiong 2023 arXiv:2309.16039), LongRoPE (Ding 2024 arXiv:2402.13753). The consensus is INCREASE base for long context, not change to a different angle progression. ALiBi (Press 2022 arXiv:2108.12409) uses linear distance penalties (not rotations).
+
+### Expected effect size (90% CI a priori)
+
+At training length 2k: [-0.3, +0.1] perplexity (likely DEGRADATION because all-fast frequencies hurt local discrimination). At 8k extrapolation: [-0.5, +2.0] perplexity (uniformly worse than base=10000 if the all-fast design is broken). The author's [-0.7, -0.3] is wrong-signed.
+
+### Minimum-distinguishing experiment
+
+At 124M, train 100k steps at 2k context, evaluate 2k/4k/8k/16k. Compare: (a) RoPE base=10000 (baseline), (b) RoPE base=500000 (Llama-3 recipe), (c) RoPE-φ as proposed, (d) RoPE with linear progression `θ_k = π·k/(d/2)` (same range as φ, NO golden angle). If (c) > (d) by ≥ 0.2 perplexity at 8k, GA is non-null. If (c) ≈ (d), the "irrational angle" is null. Likely outcome: both (c) and (d) lose to (a) and (b) at all lengths.
+
+### Verdict
+NUMEROLOGY — misunderstanding of RoPE's design (base controls multi-scale frequency spread, not aliasing). The proposed change compresses all frequencies into [0, GA], which is the OPPOSITE direction from what long-context literature has converged on (larger bases). Vogel 1979 is misapplied (2-D disk packing → 1-D rotation phase).

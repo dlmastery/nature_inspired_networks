@@ -194,3 +194,41 @@ WikiText-103 at 124 M with Fibottention MHA. Train 100 k steps at 2 k context, e
 ## 11. Status journal
 
 - 2026-05-27 — Created from template by Doc-Agent-B.
+
+---
+
+## Addendum: Research-Scientist Critique (2026-05-27)
+
+*Reviewer: SciCritic-G4 (elite-research-scientist critic). Critiquing the IDEA, not the implementation (audit at `audits/G4_audit.md`).*
+
+### Prior plausibility (LOW/MED/HIGH + why)
+
+**MED.** Sparse attention works (Beltagy 2020 Longformer arXiv:2004.05150; Zaheer 2020 BigBird arXiv:2007.14062; Child 2019 Sparse Transformer arXiv:1904.10509 all demonstrate that strided/window/global patterns recover ~95% of dense accuracy at 5-10% density). Rajagopalan 2024 Fibottention (arXiv:2406.19391) provides direct precedent. The MED rating reflects "sparse attention works in general" + "Fibonacci-specific claim is unproven beyond one paper".
+
+### Mechanism scrutiny
+
+The Wythoff-non-overlap argument is overstated. The Wythoff array partitions positive integers into non-overlapping rows (Beatty sequences with irrational density φ⁻¹, φ⁻²). But the proposed mechanism uses `F_k = {1, 2, 3, 5, 8, ...}` as DILATIONS — heads 0 and 1 attend at strides 1 and 2, and at L=256, head-0 attends to ALL positions (stride 1 covers every offset), so the union has NO overlap with head-1 not because of Wythoff but because head-0 already covers everything. The non-overlap property of Wythoff rows is a number-theoretic fact about INTEGERS, not about head-dilation MASKS. The implementation's `mask[i, i+d·F] = True` for d ∈ [1, L/F] produces strided masks that mostly OVERLAP across heads (head 1 at stride 2 = {2,4,6,8,…} contains head 2's stride 3 = {3,6,9,…} at offset 6, 12, …). The Wythoff-non-overlap claim is a marketing artifact.
+
+### Confounds (≥2)
+
+1. **Density confound.** Head k=0 has F=1 (full density!) → this is NOT sparse for the lowest head. The "2-6% per head" claim averages across heads but head-0 alone is 100% density. The actual sparsity comes from heads with large F (F=21, 34, …), which contribute almost nothing. A control with uniform stride-S sparse-attention at matched aggregate FLOPs is mandatory.
+2. **Local-window confound.** Most attention gain comes from LOCAL tokens (within ~16 positions). Fibottention's heads 0-2 (F=1,2,3) capture this; the larger-F heads contribute little. Compare to a single local-window head + global-token head (BigBird's `block + global` recipe) at matched FLOPs.
+
+### Numerology / specificity check
+
+If you replace Fibonacci with ANY non-overlapping set of strides {s_k} with similar density coverage (e.g., powers of 2: {1, 2, 4, 8, 16, 32, 64, 128} = the dyadic stride pattern used in dilated CNNs since WaveNet 2016), do you get the same accuracy? Almost certainly yes. The Fibottention paper itself does not show that φ-growth specifically beats geometric growth. The Wythoff argument is irrelevant once head-0 is dense. The committee Q&A acknowledges this control ("Run a stride-S sparse-attention baseline") — but the hypothesis pre-commits no comparator strides, so the Fibonacci-specificity is not falsifiable.
+
+### Literature precedent — kernel/attention design is a crowded field
+
+This is direct follow-up of Rajagopalan 2024 (arXiv:2406.19391). The field has Longformer (Beltagy 2020 arXiv:2004.05150) sliding window + global; BigBird (Zaheer 2020 arXiv:2007.14062) sparse block + global + random; Sparse Transformer (Child 2019 arXiv:1904.10509) strided/fixed; Reformer (Kitaev 2020 arXiv:2001.04451) LSH; Routing Transformer (Roy 2020 arXiv:2003.05997). All achieve similar accuracy/density trade-offs. Fibottention is one point in this design space, not a paradigm shift.
+
+### Expected effect size (90% CI a priori)
+
+Accuracy retention [92%, 96%] at 6% density — matches Rajagopalan and matches all other sparse-attention work. The claim of ≥ 95% retention is plausible. The Fibonacci-specificity claim is null with > 80% prior probability.
+
+### Minimum-distinguishing experiment
+
+At matched aggregate density (sum of per-head densities), compare: (a) Fibottention {1,2,3,5,8,13,21,34}, (b) geometric {1,2,4,8,16,32,64,128}, (c) Wythoff-array rows (strict Beatty partition, NOT Fibonacci), (d) random non-overlapping strides. If (a) ≠ (b), (c), (d) by ≥ 0.3 pp at 3-seed median on Tiny-ImageNet, Fibonacci is non-null. Otherwise the gain is "sparse attention works".
+
+### Verdict
+DERIVATIVE+TESTABLE — re-implementation of Rajagopalan 2024 with no novel mechanism; the Wythoff-non-overlap argument is marketing (head-0 density is 100%); falsifiable only via the missing stride-baseline control.

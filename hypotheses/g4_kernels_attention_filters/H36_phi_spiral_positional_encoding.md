@@ -183,3 +183,43 @@ Combination with H34 (RoPE-φ): some tasks may benefit from BOTH golden-angle fr
 ## 11. Status journal
 
 - 2026-05-27 — Created from template by Doc-Agent-B.
+
+---
+
+## Addendum: Research-Scientist Critique (2026-05-27)
+
+*Reviewer: SciCritic-G4 (elite-research-scientist critic). Critiquing the IDEA, not the implementation (audit at `audits/G4_audit.md`).*
+
+### Prior plausibility (LOW/MED/HIGH + why)
+
+**LOW.** The proposed PE is a 3-D trajectory embedded in a d-dim space, with d−3 dims LEFT AS LEARNABLE GAUSSIAN. For d=768 (124M GPT-2-small), the φ-spiral occupies 3 of 768 dims (0.4%) — the other 99.6% is just learnable PE. Whatever effect occurs is dominated by the learnable-PE component, NOT by the spiral trajectory. Learnable absolute PE is known to UNDERPERFORM sinusoidal/RoPE at extrapolation (Press 2022 ALiBi arXiv:2108.12409 documents this). So the proposed mechanism is "tiny spiral signal + mostly-learnable PE" — which should extrapolate WORSE than sinusoidal.
+
+### Mechanism scrutiny
+
+Standard sinusoidal PE encodes position via `d/2` frequency channels, each spanning [0, 2π] over different periods (10000^(2k/d) tokens). The proposed PE uses 3 channels: (cos(k·GA), sin(k·GA), k/N). The first 2 are a single frequency = GA rad/token, period = 2π/GA ≈ 2.62 tokens — i.e., this is a VERY HIGH-FREQUENCY rotation that aliases every ~3 tokens for any model that needs to distinguish them. The 3rd channel `k/N` is a linear ramp (i.e., ALiBi-like positional bias without the bias-into-attention machinery). This is structurally MUCH WEAKER than sinusoidal multi-scale encoding.
+
+Furthermore: DNA helix pitch-to-diameter ratio is NOT 1.618. The DNA-B helix has pitch ≈ 34Å and diameter ≈ 20Å → 1.7:1 (close to φ but not "exactly mean across organisms"). DNA-A is 28.2/23 ≈ 1.23 and DNA-Z is 45.6/18 ≈ 2.5. The claim "DNA has approximately golden-spiral pitch-to-diameter" is a numerological artifact — DNA-B happens to be near φ but DNA-A and DNA-Z are not. The Watson-Crick 1953 citation does not support this claim.
+
+### Confounds (≥2)
+
+1. **Learnable-PE confound.** With d=768 and the spiral occupying 3 dims, "learnable correction" is initialized at small Gaussian (std=0.02) but TRAINS to whatever PE minimizes loss. After 100k steps, the spiral may be entirely overwritten. Control: freeze the 3 spiral dims to NOT train.
+2. **Range-incommensurate confound.** First 2 dims have range [-1, +1]; 3rd dim has range [0, 1]; learnable dims have std=0.02. Token embeddings have std ≈ 0.02 (default Gaussian). The spiral dims DOMINATE the embedding by factor ~50×. Adding `pe[:, :3]` with magnitude O(1) to token embeddings with magnitude O(0.02) MASKS the token content for 3 dims — but those happen to be dims 0,1,2 of the embedding, which are NOT special. This is a magnitude mis-match that the impl does not address.
+
+### Numerology / specificity check
+
+The golden-angle k·GA mod 2π is "the most uniform discrete coverage of the circle" by continued-fractions (Hurwitz 1891). But the relevant property for PE is DISCRIMINABILITY between positions, which requires `|sin(k_i·ω) − sin(k_j·ω)| > ε` for `|k_i − k_j| ≥ 1`. The GOLDEN angle gives MAXIMUM min-distance between any two of N consecutive tokens, but ANY irrational ω gives this property asymptotically. The Vogel 1979 sunflower argument applies to 2-D PACKED disks, not 1-D position discrimination. **The "most-uniform-coverage" property is irrelevant to the actual PE discriminability problem.**
+
+### Literature precedent — kernel/attention design is a crowded field
+
+PE literature: sinusoidal (Vaswani 2017 arXiv:1706.03762), learned absolute (BERT, Devlin 2018), RoPE (Su 2021 arXiv:2104.09864), ALiBi (Press 2022 arXiv:2108.12409), T5-relative (Raffel 2020 arXiv:1910.10683), KERPLE (Chi 2022 arXiv:2205.09921), Position Interpolation (Chen 2023 arXiv:2306.15595), YaRN (Peng 2023 arXiv:2309.00071), LongRoPE (Ding 2024 arXiv:2402.13753). The field has CONVERGED on RoPE-base-modulation as the long-context recipe; no precedent for 3-D spiral PE.
+
+### Expected effect size (90% CI a priori)
+
+At training length (2k): [-0.3, +0.1] perplexity (likely DEGRADATION due to magnitude mismatch). At 8k extrapolation: [-1.0, +3.0] (high variance, depending on whether the spiral helps or hurts — most likely uniformly worse than sinusoidal). The author's [-1.0, -0.4] is wrong-signed.
+
+### Minimum-distinguishing experiment
+
+Compare at 124M / 100k steps / WikiText-103: (a) sinusoidal PE, (b) RoPE, (c) phi-spiral PE as proposed, (d) phi-spiral PE with spiral dims FROZEN (not trainable), (e) random-3-dim trajectory + learnable. Eval at 2k/4k/8k. If (c) > (a) and (c) > (e) by ≥ 0.2 perplexity at 8k, the spiral structure is non-null. If (c) ≈ (d) ≈ (e), the gain is "learnable PE adapts".
+
+### Verdict
+NUMEROLOGY — the spiral occupies 3/768 dims while 765/768 are learnable, so any effect is dominated by the learnable component; magnitude mismatch (spiral O(1) vs token-emb O(0.02)) is unaddressed; DNA-helix and Vogel-1979 citations are misapplied.

@@ -182,3 +182,43 @@ T1.7 (`sg_only_cymatic_init`) on upright CIFAR-10 yielded top-1 77.44 % vs the `
 ## 12. Status journal
 
 - 2026-05-27 — Created from template by Doc-Agent-B. Documents T1.7 negative result, root-cause analysis, and corrected experiment plan.
+
+---
+
+## Addendum: Research-Scientist Critique (2026-05-27)
+
+*Reviewer: SciCritic-G4 (elite-research-scientist critic). Critiquing the IDEA, not the implementation (audit at `audits/G4_audit.md`).*
+
+### Prior plausibility (LOW/MED/HIGH + why)
+
+**LOW.** Chladni modes are eigenfunctions of the BIHARMONIC operator (`∇⁴ψ = ω²ψ`) on a 2-D plate with FREE-EDGE boundary conditions and SPECIFIC mass-loading. CNN conv filters are linear correlation kernels with NO boundary, NO temporal dynamics, NO eigenmode structure. The mathematical analogy is purely AESTHETIC: both are "2-D oscillatory patterns". This is the same category of unjustified analogy that gave us "neural networks are like the brain" — superficial visual similarity with no functional correspondence. The CIFAR-10 result already disconfirmed this: **-2.67 pp** is far outside the noise band.
+
+### Mechanism scrutiny
+
+The proposed correction (Gram-Schmidt orthonormalize across N output channels; use (2,5) frequency band) replaces the cymatic-eigenmode prior with a GENERIC ORTHONORMAL-INIT prior at a chosen frequency band. Once Gram-Schmidt is applied across N=64+ output channels with K²=9-25 spatial DOFs, the columns of Q are forced to span the column space of the input matrix — which means the "cymatic structure" is washed out and Q becomes effectively a random orthonormal basis (since Gram-Schmidt of correlated vectors produces a basis indistinguishable from random orthonormal after the first few steps). **The proposed fix DESTROYS the cymatic prior in the name of saving it.**
+
+The (2,5) band is a post-hoc rationalization. Natural-image power spectra are 1/f² (Field 1987), not band-limited; "the (2,5) band matches natural-image statistics" has no support — Olshausen-Field learned RFs have a BROADBAND oriented-Gabor structure, not concentrated at any specific (m,n).
+
+### Confounds (≥2)
+
+1. **Orthonormal-init confound.** Once Q is orthonormalized across channels, the init becomes a known-good orthogonal-init (Saxe 2014 arXiv:1312.6120). Any improvement may come ENTIRELY from "orthogonal init", not from the cymatic basis. Control: random orthonormal init at the SAME frequency band, no cymatic structure.
+2. **Dataset alignment confound.** Switching the primary benchmark from CIFAR-10 to AudioMNIST IS confounding the hypothesis: the original claim was "cymatic init works on images"; the corrected claim is "on audio". This is goalpost-shifting after a refutation. A clean test must still report CIFAR-10 with the corrected init to show the orthonormalization fix is the variable, not the dataset.
+
+### Numerology / specificity check
+
+The Chladni-mode mathematics produces eigenmodes of form `sin(mπx/L)·sin(nπy/L)` on a square plate. This is IDENTICAL to the DCT-II basis (used in JPEG compression) and the 2-D Fourier basis sampled on a unit square. **There is nothing "cymatic" about sin·sin products** — it's just the 2-D Fourier basis at integer wavenumbers. Calling it "cymatic" is rebranding the Fourier basis. **Pure numerology with no novel mathematical content.**
+
+### Literature precedent — kernel/attention design is a crowded field
+
+Fourier-basis init has been studied: Worrall 2017 Harmonic Networks (arXiv:1612.04642), Trockman 2022 ConvMixer (arXiv:2201.09792 — uses fixed patches), Liu 2018 Scattering Networks (Mallat-wavelet kernels). DCFNet (Qiu 2018 arXiv:1802.04145) explicitly uses fixed DCT-like basis. All these methods do NOT outperform learnable He-init at matched params — the LITERATURE CONSENSUS is that fixed structured init underperforms learnable. The author has not addressed this consensus.
+
+### Expected effect size (90% CI a priori)
+
+On AudioMNIST: [-0.5 pp, +0.5 pp] vs He init (likely null). On CIFAR with the orthonormalization "fix": [-1.5 pp, +0.3 pp] (likely smaller negative than T1.7 but still negative). The EMPIRICAL REFUTATION at T1.7 (-2.67 pp) is strong evidence against, and the proposed "fix" doesn't address the core mechanism issue.
+
+### Minimum-distinguishing experiment
+
+At 3-seed on AudioMNIST: (a) He init baseline, (b) random orthonormal init at (2,5) band, (c) cymatic init at (2,5) with orthonormalization, (d) DCT-basis init at (2,5) band. If (c) > (b) and (c) > (d) by ≥ 0.3 pp, cymatic specificity is non-null. Otherwise the "cymatic" framing is rebranding. The DOC SHOULD STATE THE EMPIRICAL REFUTATION (T1.7 = -2.67 pp) in the abstract, not bury it in § 11.
+
+### Verdict
+NUMEROLOGY — Chladni modes on a square plate ARE the 2-D Fourier basis, rebranded with mystical framing; the proposed orthonormalization "fix" destroys whatever cymatic structure existed; the empirical T1.7 result (-2.67 pp on CIFAR-10) is strong prior evidence of refutation that the doc should foreground.

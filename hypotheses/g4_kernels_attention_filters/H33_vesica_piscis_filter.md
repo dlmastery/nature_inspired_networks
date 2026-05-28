@@ -187,3 +187,41 @@ WikiText-103 124 M with Vesica-window MHA. 50 k steps, perplexity + latency at m
 ## 11. Status journal
 
 - 2026-05-27 — Created from template by Doc-Agent-B.
+
+---
+
+## Addendum: Research-Scientist Critique (2026-05-27)
+
+*Reviewer: SciCritic-G4 (elite-research-scientist critic). Critiquing the IDEA, not the implementation (audit at `audits/G4_audit.md`).*
+
+### Prior plausibility (LOW/MED/HIGH + why)
+
+**LOW-MED.** Multi-scale Inception-style filters work (Szegedy 2015 arXiv:1409.4842), but the specific claim — that CIRCULAR masks with φ-spaced radii outperform parameter-matched Inception square kernels — has no precedent. The "rotation isotropy of natural-image statistics" argument is wrong (natural images have STRONG horizontal/vertical bias from gravity-aligned scenes; oriented Gabor RFs reflect this — Olshausen 1996). Multi-scale works for SCALE coverage, not for "rotation isotropy".
+
+### Mechanism scrutiny
+
+The φ-spaced radii {1, 1.618, 2.618, 4.236} rasterized to integer-pixel circular masks become {radius-1 disc = 5 pixels, radius-φ disc = 9 pixels, radius-φ² disc = 21 pixels, radius-φ³ disc = 57 pixels}. The φ-spacing is ENTIRELY destroyed by integer rasterization: a disc of radius 1.618 contains the same 9 pixels as a disc of radius 1.5 or radius 1.9. The "continuous-radius" claim is false at any practical kernel size. To meaningfully discriminate φ from non-φ radii, the kernel must be ≥ 16×16 (where radius 4.236 vs 4.5 differ by 1-2 pixels in disc area). At k=9 (the implementation's largest), the φ-spacing degenerates to coarse {tiny, small, medium, large} discs — same as ANY 4-stage radius progression.
+
+### Confounds (≥2)
+
+1. **Channel split confound.** `C_out // n_paths` per branch reduces each branch's expressive capacity. A dense `(C_in, C_out, 5, 5)` conv has more capacity than 4× `(C_in, C_out/4, 9, 9)` masked convs at matched params, depending on the mask sparsity. Any measured Δ may come from channel-grouping effects (similar to ResNeXt cardinality; Xie 2017 arXiv:1611.05431) rather than from the radius progression.
+2. **Mask-zeroed-weight confound.** The implementation re-applies the mask at every forward (`c.weight * self.masks[i]`), which means the gradient through the masked positions is zero — those weights never update from their He init. This is a known failure mode in masked-conv literature (the weights drift due to weight decay even though their masked output is zero, then the mask suddenly applies and the kernel changes shape over training). Control: hard-prune masked positions at init only, do NOT re-apply mask.
+
+### Numerology / specificity check
+
+{1, φ, φ², φ³} ≈ {1, 1.6, 2.6, 4.2} is a φ-geometric progression. Compare to {1, 2, 3, 4} arithmetic, {1, 2, 4, 8} powers-of-2, {1, √2, 2, 2√2}, {1, e, e², e³}. At k=9 raster grid, all of these produce the SAME 4 discrete disc areas (small, medium, large, max). The φ-specificity is undetectable at any kernel size used in practice. **High numerology score.**
+
+### Literature precedent — kernel/attention design is a crowded field
+
+Multi-branch / multi-scale conv designs include: Inception (Szegedy 2015 arXiv:1409.4842), Inception-ResNet (Szegedy 2016 arXiv:1602.07261), ResNeXt (Xie 2017 arXiv:1611.05431), Big-Little Net (Wang 2019 arXiv:1807.03848), OctConv (Chen 2019 arXiv:1904.05049), HRNet (Sun 2019 arXiv:1908.07919), Res2Net (Gao 2021 arXiv:1904.01169). None use circular masks; all use square kernels at different sizes. The literature consensus is that "circular vs square" is a third-order effect; the first-order effect is scale coverage.
+
+### Expected effect size (90% CI a priori)
+
+[-0.2 pp, +0.6 pp] CIFAR-100 top-1 vs parameter-matched Inception. The author's [+0.8, +2.5] is too optimistic. Most likely outcome: ~match Inception within 0.3 pp.
+
+### Minimum-distinguishing experiment
+
+Compare: (a) Vesica Piscis circular {1, φ, φ², φ³}, (b) circular {1, 2, 3, 4} arithmetic, (c) circular {1, 2, 4, 8} geometric, (d) Inception square {1, 3, 5, 7}, all at matched params and FLOPs. If (a) > (b), (c) by ≥ 0.3 pp, φ-spacing is non-null. If (a) ≈ (d), the "circular vs square" claim is null.
+
+### Verdict
+NUMEROLOGY — at any rasterization grid k ≤ 16, the φ-spaced radii {1, 1.6, 2.6, 4.2} discretize to the same disc set as ANY 4-step monotonic radius progression. The "circular = rotation isotropic" argument misrepresents natural-image statistics (Olshausen RFs are oriented Gabors, NOT isotropic).

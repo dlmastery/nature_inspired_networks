@@ -171,3 +171,43 @@ LLM-track: WikiText-103 124 M with PhiGLU instead of SwiGLU; 50 k steps; perplex
 ## 11. Status journal
 
 - 2026-05-27 — Created from template by Doc-Agent-B.
+
+---
+
+## Addendum: Research-Scientist Critique (2026-05-27)
+
+*Reviewer: SciCritic-G4 (elite-research-scientist critic). Critiquing the IDEA, not the implementation (audit at `audits/G4_audit.md`).*
+
+### Prior plausibility (LOW/MED/HIGH + why)
+
+**LOW-MED.** β=φ ≈ 1.618 sits between Swish (β=1) and GELU (effectively β ≈ 1.702 if approximated as σ(1.702·x); Hendrycks 2016 arXiv:1606.08415 explicitly notes this). The relevant question is whether the activation landscape is sensitive to β in [1.5, 1.7]. Ramachandran 2017 (Swish, arXiv:1710.05941) Table 4 reports a Neural-Architecture-Search sweep that found β=1.0 optimal on CIFAR-10 ResNet, with β=1.5 producing a 0.1 pp loss. The "Goldilocks" claim is unsupported — the sweep showed monotone or flat behavior, not a peak at φ. Furthermore, β-Swish at β > 1 is approximately ReLU-like (sharper transition), which the field has moved AWAY from (toward smoother GELU).
+
+### Mechanism scrutiny
+
+The claim "φ Goldilocks the gradient between vanishing and exploding" is not derivable from the activation's properties. Both Swish (β=1) and GELU have BOUNDED derivatives (sup |f'| < 1.1 for both), so neither vanishes nor explodes. The activation choice contributes O(1%) to gradient-norm variance vs init/normalization (BN/LN dominate). Wang 2024 (arXiv:2407.06405) "Activation Function Survey" shows β-Swish, GELU, ReLU all within 0.3 pp on CIFAR at matched training.
+
+The "φ aligns with φ-scaled width/depth priors (H04, H05)" argument is metaphysical, not mechanical. Width/depth scaling factors (`d → d·φ`) operate on TENSOR SHAPES; activation β operates on POINTWISE NONLINEARITY. These two are orthogonal — there is no signal-magnitude conservation law that links them. The hypothesis conflates the WORD "φ" appearing in both, not a shared mechanism.
+
+### Confounds (≥2)
+
+1. **Variance-shift confound.** Different β values change the effective output variance of the activation (β=1 has lower variance than β=φ at the same input). Without re-tuning BN/LN, this variance shift propagates through the network and can produce a small accuracy delta unrelated to "Goldilocks gradient". Control: re-tune BN momentum / LN epsilon for each β.
+2. **Initialization-coupling confound.** He init assumes ReLU-like (β → ∞) variance recipe. Swish/GELU/PhiAct deviate from this; β-Swish at higher β is closer to ReLU, so He init is more correct. Any measured Δ may come from "init matches activation slope better", not from a Goldilocks effect.
+
+### Numerology / specificity check
+
+The committee Q&A explicitly admits: "What if β-sweep shows β=2 is better than β=φ?" → "we file and move on". This is CORRECT scientific practice but it ALSO admits that the φ value is not pre-registered as the unique optimum. The pre-registered comparator set {1.0, π/2, 2.0} is reasonable but does not include β=1.7 (close to GELU). Without β ∈ [1.5, 1.7] sweep at fine resolution, the φ vs 1.7 question is undecidable. **Moderate numerology — the value is suspiciously meaningful only via the name "φ"; the same arithmetic gain could be claimed for π/2 ≈ 1.571 or 5/3 ≈ 1.667.**
+
+### Literature precedent — kernel/attention design is a crowded field
+
+Activation literature: ReLU (Glorot 2010), ELU (Clevert 2015 arXiv:1511.07289), SELU (Klambauer 2017 arXiv:1706.02515), Swish/SiLU (Ramachandran 2017 arXiv:1710.05941), GELU (Hendrycks 2016 arXiv:1606.08415), Mish (Misra 2019 arXiv:1908.08681), SwiGLU (Shazeer 2020 arXiv:2002.05202). All differ by <0.5 pp on standard CIFAR/ImageNet at matched training. The activation choice is THIRD-ORDER vs normalization, init, and training recipe.
+
+### Expected effect size (90% CI a priori)
+
+CIFAR-100 top-1 vs GELU: [-0.2 pp, +0.2 pp] (likely null). vs SiLU (β=1): [-0.1 pp, +0.3 pp] (slight chance of small positive). Author's [+0.3, +1.5] is too optimistic. Gradient-norm variance reduction is probably real but small (<5%) due to slope difference, not "Goldilocks".
+
+### Minimum-distinguishing experiment
+
+3-seed CIFAR-100 sweep β ∈ {0.8, 1.0, 1.3, 1.5, φ, 1.7, 2.0, 2.5} with FIXED everything else, plot top-1 vs β. If a peak at β=φ with ≥ 0.2 pp margin over β=1.7 (closest GELU-equivalent), the φ-specificity is non-null. Otherwise it's a flat curve and the choice is null. The doc's protocol § 7.2 ("β sweep") is good, but it should be the PRIMARY experiment, not secondary.
+
+### Verdict
+DERIVATIVE+TESTABLE — β-Swish at β=φ is a well-defined point in a known design space; the falsifier (fine-grained β sweep) is correctly pre-registered. The "Goldilocks gradient" mechanism is unsupported but the empirical test is sound. Most likely outcome: null (flat curve over β ∈ [1.0, 2.0]).

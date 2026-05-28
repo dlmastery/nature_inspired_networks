@@ -179,3 +179,45 @@ LLM-track on a 3-D-spatial benchmark (ARC-3D-mini) at 124 M with pentagonal MHA.
 ## 11. Status journal
 
 - 2026-05-27 — Created from template by Doc-Agent-B.
+
+---
+
+## Addendum: Research-Scientist Critique (2026-05-27)
+
+*Reviewer: SciCritic-G4 (elite-research-scientist critic). Critiquing the IDEA, not the implementation (audit at `audits/G4_audit.md`).*
+
+### Prior plausibility (LOW/MED/HIGH + why)
+
+**LOW.** The proposed mechanism applies a CONSTANT 10×10 mixing matrix (`A·(1/φ) + I·(1 − 1/φ)`) after attention softmax. This mixing is a LINEAR head-recombination — equivalent to a fixed orthogonal-projection layer between attention and output proj. It is exactly the kind of "linear-mixing-doesn't-help" intervention that the literature has tested and rejected (head pruning, head importance studies — Voita 2019 arXiv:1905.09418 found that heads are largely redundant; explicit linear mixing layers are SUBSUMED by the existing output projection W_O). The Petersen-graph structure is COSMETIC since the mixing is then projected by a dense `proj` Linear that can undo any mixing.
+
+### Mechanism scrutiny
+
+The Petersen mixing is a CONSTANT matrix `M` applied as `out_mixed[g] = sum_h M[g,h] · out[h]`, then `output = W_O · out_mixed`. By matrix associativity, this is equivalent to using `W'_O = W_O · M` as the output projection — i.e., the Petersen mixing IS ABSORBED INTO W_O during training. The model can learn ANY 10×10 mixing through W_O alone; pre-multiplying by the Petersen matrix is a no-op once W_O has trained. The "structural prior" is a deception.
+
+The 3-D / molecular-task claim is unsupported: text and natural images do NOT have 5-fold rotational symmetry. Natural images have approximate horizontal-flip symmetry (Olshausen 1996) and small in-plane rotation tolerance (RandRotation augmentation). Imposing 5-fold mixing on heads buys nothing on data without 5-fold structure. The T1.4 group-conv negative result (−10 pp) is direct evidence; the rebuttal that "head mixing differs from orbit reduction" is true but irrelevant: BOTH impose symmetry that the data does not have.
+
+### Confounds (≥2)
+
+1. **Absorption-into-W_O confound.** As above, the fixed Petersen mixing is annihilated by the trainable output projection W_O during training. After training, the model is INDISTINGUISHABLE from a standard 10-head MHA with a different W_O init. Control: train without Petersen mixing but with the same W_O init.
+2. **10-vs-8 head confound.** The baseline uses 8 heads; the variant uses 10. With d=192 and 10 heads, head_dim = 19.2 (NON-INTEGER!) — the implementation must use d=190 or d=200. This is a structural change unrelated to pentagonal symmetry. Control: 10-head dense MHA WITHOUT Petersen mixing, matched d.
+
+### Numerology / specificity check
+
+The φ-edge weighting is a single scalar `1/φ ≈ 0.618` on off-diagonal entries. This is one number. Replace 0.618 with 0.5, 0.7, 0.3, or any value in [0.3, 0.9] and the mixing matrix has identical RANK and similar conditioning — the φ-specificity is undetectable. The Petersen graph is the relevant structural choice; φ-edge-weight is decoration. Furthermore, the Petersen graph is NOT the dodecahedron's edge graph — the dodecahedron has 20 vertices and 30 edges; the Petersen graph has 10 vertices and 15 edges. The Petersen graph is the KNESER GRAPH KG(5,2), with NO direct geometric correspondence to the dodecahedron. The author has conflated different objects. **High numerology score.**
+
+Beyond numerology: 5-fold rotational symmetry is NOT a property of CIFAR-10 or text data. Imposing it as a head-mixing structure is data-misaligned. The pre-existing T1.4 group-conv result (−10 pp) is strong prior evidence that symmetry constraints HURT on data without that symmetry.
+
+### Literature precedent — kernel/attention design is a crowded field
+
+Head-mixing / head-importance literature: Voita 2019 (arXiv:1905.09418) "Analyzing Multi-Head Self-Attention" — many heads can be pruned; Michel 2019 (arXiv:1905.10650) "Are Sixteen Heads Really Better than One?" — head redundancy. Talking-Heads Attention (Shazeer 2020 arXiv:2003.02436) does learnable head-mixing — the closest precedent — and finds marginal gains (~0.5 pp). The Petersen-fixed-mixing variant is a SPECIAL CASE of Talking-Heads with a fixed pre-attention matrix and is dominated by the learnable case.
+
+### Expected effect size (90% CI a priori)
+
+On rotated-CIFAR-10: [-1.5 pp, +0.5 pp] (likely negative or null vs 8-head baseline; the 10-head + Petersen change is a structural noise). On upright CIFAR: [-1.0 pp, +0.5 pp]. The author's [+1.0, +3.0] is implausibly large.
+
+### Minimum-distinguishing experiment
+
+Train 3 seeds on rotated-CIFAR-10 ViT-Tiny: (a) 8-head dense MHA, (b) 10-head dense MHA (no mixing), (c) 10-head + Petersen-1/φ mixing, (d) 10-head + RANDOM 3-regular 10-vertex mixing, (e) 10-head + Talking-Heads LEARNABLE mixing. If (c) > (b), (d) by ≥ 0.3 pp at matched FLOPs, the Petersen-pentagonal claim is non-null. If (c) ≈ (b) or (e) dominates, it is null. The doc's existing committee Q&A predicts (b) and "12-head uniform" as controls but does not pre-register them in § 7.
+
+### Verdict
+NUMEROLOGY — the Petersen mixing is absorbed into W_O during training (matrix associativity); φ-edge-weight is a single scalar that any value in [0.3, 0.9] could replace; Petersen graph is NOT the dodecahedron edge graph (it's Kneser KG(5,2)); data has no 5-fold symmetry. The T1.4 group-conv −10 pp negative is direct refuting evidence the doc dismisses.

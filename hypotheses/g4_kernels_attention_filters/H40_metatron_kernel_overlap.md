@@ -186,3 +186,45 @@ LLM-track: WikiText-103 124 M with Metatron-basis QKV. 50 k steps; perplexity vs
 ## 11. Status journal
 
 - 2026-05-27 — Created from template by Doc-Agent-B.
+
+---
+
+## Addendum: Research-Scientist Critique (2026-05-27)
+
+*Reviewer: SciCritic-G4 (elite-research-scientist critic). Critiquing the IDEA, not the implementation (audit at `audits/G4_audit.md`).*
+
+### Prior plausibility (LOW/MED/HIGH + why)
+
+**LOW.** Kernel-basis factorization works (DCFNet: Qiu 2018 arXiv:1802.04145; basis decomposition in pruning literature) but the consistent finding is that LEARNED bases (PCA, low-rank) match or beat FIXED bases. Fixing the basis to 13 Metatron circles is a HARD CONSTRAINT that can only HURT vs a 13-dim learned basis. The hypothesis must outperform PCA-13 to be non-trivial — the doc acknowledges this as a control but does not pre-commit to the comparison.
+
+### Mechanism scrutiny
+
+The "13-element basis" derives from Metatron's-Cube SACRED-GEOMETRY symbolism (1 center + 6 inner + 6 outer Fruit-of-Life circles). The number 13 has no mathematical/geometric significance for 2-D image filtering. The dimension of the optimal kernel basis on natural images is empirically ~3-5 PCA modes for 3×3 kernels and ~8-12 for 5×5 (per DCFNet's analysis). Choosing 13 because of sacred-geometry tradition is a NUMEROLOGICAL constraint, not a data-driven choice.
+
+The basis kernels are CONE-DISTANCE functions `max(0, 1 − d/r)` centered at 13 hex-lattice positions — these are LINEAR RAMPS, which are NOT the optimal local basis for natural-image kernels (which favor oriented gratings; Olshausen 1996). After Gram-Schmidt, the 13 ramps become an orthonormal basis spanning approximately the SUBSPACE OF SMOOTH FUNCTIONS in a 5×5 grid — i.e., a LOW-PASS basis. This explicitly BLOCKS the network from learning high-frequency edge detectors, which are the dominant V1-like features. **The basis is structurally low-pass and will hurt edge-detection capacity.**
+
+### Confounds (≥2)
+
+1. **PCA-control confound.** A 13-dim learned PCA basis on a random sample of natural-image patches will MATCH OR BEAT the Metatron basis at 5×5. The hypothesis cannot distinguish "fixed basis works" from "Metatron is special". Control: PCA-13 of natural-image patches, learned-orthonormal-13.
+2. **Sparsity-vs-low-pass confound.** The 13-basis (vs 25-dense) achieves params reduction by RANK REDUCTION (rank ≤ 13 vs rank ≤ 25), but for 5×5 kernels the effective rank in trained networks is often ≤ 10 (Denil 2013 arXiv:1306.0543 — Predicting Parameters in Deep Learning). So the param savings come from "kernels are intrinsically low-rank", not from "Metatron basis is special". Control: random orthonormal 13-basis (no structure) at matched params.
+
+### Numerology / specificity check
+
+13 is the count of circles in the Fruit-of-Life pattern (1 + 6 + 6). This count is a GEOMETRIC INVARIANT of the hex-vertex pattern, but it is not a NEURAL-NETWORK INVARIANT. There is no theory predicting that 13-dim basis is uniquely good for 5×5 conv. The implementation uses K = 13 mixing coefficients per (C_in, C_out) pair, saving (25 - 13)/25 = 48% of weights — but the optimal K is task-dependent and likely in [5, 12] for CIFAR-100 (per DCFNet's experiments). **Pure numerology in the basis size choice; 13 is sacred-geometry tradition, not optimal.**
+
+The "Platonic-solid projections in Metatron's Cube" claim from the motivation is also dubious: the projected vertices of the 5 Platonic solids do NOT all appear in the 2-D Metatron projection. This is sacred-geometry folklore (popularized by Drunvalo Melchizedek 1990s) without mathematical foundation. The doc cites no mathematical reference for this projection claim.
+
+### Literature precedent — kernel/attention design is a crowded field
+
+Kernel-basis factorization: DCFNet (Qiu 2018 arXiv:1802.04145), MobileNet (Howard 2017 arXiv:1704.04861) depthwise separable, ShuffleNet (Zhang 2018 arXiv:1707.01083), GhostNet (Han 2020 arXiv:1911.11907), Predicting Parameters (Denil 2013 arXiv:1306.0543). All these methods learn the basis or use 1×1 + 3×3 factorization. Fixed geometric bases (Scattering Networks: Bruna-Mallat 2013 arXiv:1203.1513) underperform learnable on CIFAR/ImageNet.
+
+### Expected effect size (90% CI a priori)
+
+CIFAR-100 top-1 retention: [-2 pp, +0.5 pp] at -30% params (likely SMALL NEGATIVE — fixed low-pass basis costs edge-detection capacity). The author's [-0.5, +1.5] is too optimistic. Most likely outcome: 97-99% retention at -30% params (i.e., AT the falsifier threshold of "≥ 98% retention").
+
+### Minimum-distinguishing experiment
+
+3-seed CIFAR-100 at matched param count (13-rank): (a) dense 5×5 baseline, (b) Metatron-13-basis fixed, (c) PCA-13-basis fixed (computed from CIFAR train patches), (d) learnable-13-basis (orthonormalized), (e) random-orthonormal-13. If (b) > (c), (d), (e) by ≥ 0.3 pp, Metatron specificity is non-null. If (b) ≈ (e), the gain (if any) is "rank-13 is enough". The doc's § 7.2 lists PCA-13 as a control but does not pre-commit numerically.
+
+### Verdict
+NUMEROLOGY — the basis size 13 comes from sacred-geometry tradition (Fruit-of-Life count), not from natural-image basis dimensionality (typically 5-12 PCA modes). Cone-distance basis kernels are structurally LOW-PASS and block edge detection. The "Platonic-solid projections in Metatron's Cube" motivation is unsourced folklore. The PCA-13 control will likely match or beat the Metatron-fixed basis.

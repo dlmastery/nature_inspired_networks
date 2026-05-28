@@ -180,3 +180,45 @@ LLM-track: WikiText-103 124 M with FractalGoldenFFN. 50 k steps.
 ## 11. Status journal
 
 - 2026-05-27 — Created from template by Doc-Agent-B.
+
+---
+
+## Addendum: Research-Scientist Critique (2026-05-27)
+
+*Reviewer: SciCritic-G4 (elite-research-scientist critic). Critiquing the IDEA, not the implementation (audit at `audits/G4_audit.md`).*
+
+### Prior plausibility (LOW/MED/HIGH + why)
+
+**MED.** Multi-scale conv is a WELL-ESTABLISHED idea (Inception, OctConv, HRNet) that consistently shows modest gains. {3, 5, 8} kernel sizes are a reasonable multi-scale set. The MED rating reflects "multi-scale works" + "the Fibonacci/φ-specificity is unjustified" + "8×8 kernels are expensive enough to dominate latency".
+
+### Mechanism scrutiny
+
+The 8×8 kernel is the dominant FLOPs contributor (8² = 64 vs 3² + 5² = 34; the 8×8 branch alone exceeds the other two combined). The author's table predicts FLOPs [+10%, +40%] and latency [×1.3, ×1.7] — substantial costs. The matched-parameter comparison is against a "single-scale 5×5 baseline" (which has 25 FLOPs/pixel), but the variant uses 3²+5²+8² = 98 FLOPs/pixel summed across branches. THIS IS NOT FLOP-MATCHED. To match FLOPs, the baseline must be a 9×9 or larger single-kernel — at which point the comparison becomes "deep multi-scale vs deep wide single-scale", and the literature consensus is that single-scale wide kernels (ConvNeXt: Liu 2022 arXiv:2201.03545 uses 7×7) MATCH multi-scale on CIFAR/ImageNet.
+
+The φ-decaying weight ratio `{1, 1/φ, 1/φ²}` ≈ `{0.62, 0.24, 0.14}` after normalization. This means the 3×3 branch contributes 62% of the output, 5×5 contributes 24%, 8×8 contributes 14%. The 8×8 branch is paying 64 FLOPs/pixel for 14% of output mass — a TERRIBLE compute/output ratio. The φ-decay PUNISHES the high-FLOPs branch. The hypothesis predicts gains but the mechanism actively SUPPRESSES the most expensive branch — internally inconsistent.
+
+### Confounds (≥2)
+
+1. **Channel-split confound.** `C_out // 3` per branch reduces each branch's capacity. The 8×8 branch with `C_out/3` channels is comparable to a 1/3-width conv. Total params depend on the C_out/3 split; small deviations from "matched params" can be misleading.
+2. **Branch-weight confound.** The fixed `{1, 1/φ, 1/φ²}` weights cannot be undone by a downstream layer because the channels are CONCATENATED (not added). Any subsequent BatchNorm scales-per-channel, but the cross-branch ratio is fixed by the concat order. Control: equal weights {1/3, 1/3, 1/3} or learnable weights.
+
+### Numerology / specificity check
+
+{3, 5, 8} are Fibonacci numbers but they are ALSO {odd, odd, even} = {small, medium, large} — any 3 ascending kernel sizes (e.g., {3, 5, 7} as in Inception-v3, {3, 5, 9} arithmetic) would test "multi-scale" equally. The Fibonacci specificity is undetectable. The φ-decaying weights {1, 0.62, 0.38} are also unfalsifiable: any weights with monotonic decay produce similar mixing. The combination "Fibonacci kernels + φ decay" stacks TWO numerological choices, neither individually justified. **High numerology score.**
+
+The Larsson 2017 FractalNet (arXiv:1605.07648) citation is misapplied: FractalNet is about FRACTAL DEPTH RECURSION (block self-similarity), NOT about Fibonacci kernel sizes inside a single block. The "fractal" framing is rebranding.
+
+### Literature precedent — kernel/attention design is a crowded field
+
+Multi-scale conv: Inception-v1/v2/v3 (Szegedy 2015 arXiv:1409.4842, 2016 arXiv:1512.00567), Inception-ResNet (Szegedy 2016 arXiv:1602.07261), Res2Net (Gao 2021 arXiv:1904.01169), HRNet (Sun 2019 arXiv:1908.07919), Big-Little Net (Wang 2019 arXiv:1807.03848). FractalNet (Larsson 2017 arXiv:1605.07648) is about depth recursion. Recent work on LARGE kernels (ConvNeXt: Liu 2022 arXiv:2201.03545; RepLKNet: Ding 2022 arXiv:2203.06717 uses 31×31) finds wide single-kernel often matches multi-scale. No precedent for Fibonacci-sized multi-scale.
+
+### Expected effect size (90% CI a priori)
+
+On CIFAR-100 at matched FLOPs (not matched params!): [-0.3 pp, +0.8 pp] top-1 vs Inception {1,3,5} or ConvNeXt-7. The author's [+1.0, +3.0] is too optimistic by ~3×. Latency cost [×1.3, ×1.7] is the major issue.
+
+### Minimum-distinguishing experiment
+
+3-seed CIFAR-100 at matched FLOPs: (a) single 5×5, (b) single 7×7, (c) Inception {1,3,5} equal-weight, (d) fractal {3,5,8} with {1, 1/φ, 1/φ²}, (e) fractal {3,5,8} with EQUAL weights, (f) {3,5,7} arithmetic with φ-decay. If (d) > (e), (f) by ≥ 0.3 pp, the Fibonacci+φ combo is non-null. Most likely (d) ≈ (e) ≈ (f) ≈ (c) within 0.5 pp.
+
+### Verdict
+DERIVATIVE+TESTABLE — multi-scale conv works and the design is implementable, but the Fibonacci kernel sizes and φ-weight decay are NOT pre-registered as falsifiable against equal-weight + arithmetic-progression controls. The 8×8 branch with 14% output weight is internally inconsistent (paying full FLOPs for fractional contribution). FractalNet citation is misapplied (FractalNet is depth recursion, not kernel scale).

@@ -168,3 +168,41 @@ WikiText-103 124 M with golden-spiral embedding init. Train 50 k steps; compare 
 ## 11. Status journal
 
 - 2026-05-27 — Created from template by Doc-Agent-B.
+
+---
+
+## Addendum: Research-Scientist Critique (2026-05-27)
+
+*Reviewer: SciCritic-G4 (elite-research-scientist critic). Critiquing the IDEA, not the implementation (audit at `audits/G4_audit.md`).*
+
+### Prior plausibility (LOW/MED/HIGH + why)
+
+**LOW.** Init schemes that DEVIATE from the He/Glorot variance recipe almost always cost early-epoch accuracy unless they are themselves variance-preserving (orthogonal init: Saxe 2014 arXiv:1312.6120; LSUV: Mishkin 2016 arXiv:1511.06422). The author's "scale by mask sum to preserve variance to within 5%" is a hand-wave: the mask zeroes ~60-70% of a 5×5 grid (a spiral occupies a 1-D sub-manifold of the 2-D grid), so the EFFECTIVE fan-in collapses from 25 to ~6-8. He variance assumes fan-in dictates `std = sqrt(2/fan_in)`; multiplying a He draw by a sparse mask DOES NOT recover this — it reduces the effective variance per active position. Either the rescale corrects this (in which case the active weights are ~2-3× larger than He, which is itself a perturbation), or it does not (in which case the activations decay). This is the SAME critique that killed sparse-init schemes before LSUV.
+
+### Mechanism scrutiny
+
+The "Olshausen 1996 sparse-code basis has log-spiral support" claim is misrepresented. Olshausen-Field receptive fields are oriented GABOR-like edge detectors (oriented sinusoidal gratings under a Gaussian envelope; Marĉelja 1980), NOT log-spirals. The phrase "approximately log-spiral support" appears nowhere in Olshausen 1996; the author retrofitted the citation. The actual finding is that learned V1-like RFs have ORIENTED-BAR structure, which is INCOMPATIBLE with a rotationally-asymmetric spiral mask. Furthermore, the claim of "scale-invariance" requires the kernel size to grow logarithmically with the spiral pitch — a 5×5 grid can resolve at most ~1.5 turns of a φ-growth spiral, far too few to be scale-invariant in any non-trivial sense.
+
+### Confounds (≥2)
+
+1. **Variance shift.** Any measured Δ may come purely from the rescale not matching He variance exactly — the same effect as scaling He weights by 0.5 or 2.0 (which is a known way to tune early-epoch loss curves; Mishkin 2016). Control: He init with weights post-multiplied by a RANDOM binary mask of identical density.
+2. **Rotational symmetry break.** The spiral is chiral (handed). CIFAR/ImageNet have approximate horizontal-flip symmetry that He preserves in expectation. Spiral init injects per-kernel chirality that may help/hurt depending on data augmentation policy (HFlip is on by default). Control: 4 random orientations of the spiral mask.
+
+### Numerology / specificity check
+
+The φ-growth-rate is unfalsifiable inside a 5×5 grid. Successive points at r·φ^(θ/(π/2)) for θ ∈ [0, 2π] cover radii ∈ [r, r·φ^4] ≈ [r, 6.85r]; with r=0.2 this is [0.2, 1.37] inside the 5×5 grid. The integer rasterization (`int(round(...))`) collapses many spiral points to the same pixel — so the actual mask has at most 5-9 nonzero pixels and the φ structure is largely undetectable at the rasterization grid. Replacing φ with √2 ≈ 1.414, e ≈ 2.718, or any growth rate in [1.3, 2.0] would produce the same set of active pixels. **Numerology with no testable specificity at k=5.**
+
+### Literature precedent — kernel/attention design is a crowded field
+
+Structured init schemes have been extensively studied: orthogonal (Saxe 2014 arXiv:1312.6120), LSUV (Mishkin 2016 arXiv:1511.06422), Fixup (Zhang 2019 arXiv:1901.09321), Delta-orthogonal (Xiao 2018 arXiv:1806.05393), MetaInit (Dauphin 2019). None of these have a spatial-structure prior; they all target variance/orthogonality. The closest precedent is structured-sparsity init in pruning literature (Frankle 2019 arXiv:1803.03635 Lottery Ticket), which finds that random-structured masks are usually as good as designed ones at modest sparsities.
+
+### Expected effect size (90% CI a priori)
+
+[-0.5 pp, +0.2 pp] CIFAR-100 top-1. The most likely outcome is small negative (variance shift) or null. The author's [+0.5, +2.0] range is **too optimistic by ~3-5×**.
+
+### Minimum-distinguishing experiment
+
+Run THREE inits at matched effective sparsity (~10/25 nonzeros): (a) golden-spiral, (b) random binary mask of equal density, (c) Archimedean spiral (linear growth, not φ-growth). All three rescaled to He variance. If golden-spiral ≠ random and golden-spiral ≠ Archimedean by ≥ 0.3 pp at 3-seed median, the φ-specificity is non-null. Otherwise it's variance-shift.
+
+### Verdict
+NUMEROLOGY — the φ-growth structure is unresolvable at k=5 grid rasterization, the Olshausen citation is misapplied, and the variance argument has a known counterexample. The "He variance preserved to within 5%" claim hides a substantial weight-magnitude perturbation that is the actual mechanism (if any).
