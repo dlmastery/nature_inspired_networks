@@ -75,11 +75,21 @@ GOLDEN_MOMENTUM_FLOOR: float = 1.0 / (PHI ** 2)    # ≈ 0.3819660113
 
 
 class GoldenMomentumScheduler:
-    """Multiplicative φ-decay scheduler for Adam β1 (or SGD momentum).
+    """Gentle φ-decay scheduler for Adam β1 (or SGD momentum).
 
     On each :meth:`step` call the current β1 (or momentum) is updated
-    via ``new = max(floor, current * (1/φ))``. After enough steps the
-    value asymptotes to ``floor`` and further calls are no-ops.
+    via ``new = max(floor, current * φ^(-1/T_max))``. Over exactly
+    ``T_max`` steps the cumulative decay multiplier is ``1/φ`` (so β1
+    drops from ``1/φ`` to ``1/φ²`` end-to-end), then the floor clamps.
+
+    Rationale
+    ---------
+    The original release applied ``× 1/φ`` per step, which saturated to
+    the ``1/φ²`` floor after a single step — making β1 constant from
+    epoch 2 onward and degenerating the curriculum to a one-shot
+    overwrite. The per-``T_max`` decay yields a smooth curve over the
+    full training horizon, preserving the φ-character without instant
+    saturation.
 
     The scheduler is stateless on the optimizer side: it reads/writes
     ``param_groups[i]['betas'][0]`` for Adam-family optimizers, or
@@ -99,6 +109,11 @@ class GoldenMomentumScheduler:
         ``None`` the optimizer's current value is preserved; otherwise
         every param-group is overwritten so the schedule starts cleanly
         from the φ-derived initial point.
+    T_max
+        Number of :meth:`step` invocations expected over the full
+        training run (typically ``epochs``). Each step multiplies β1 by
+        ``φ^(-1/T_max)`` so the cumulative decay over ``T_max`` steps
+        equals exactly ``1/φ``. Must be >= 1.
     """
 
     def __init__(
@@ -106,14 +121,21 @@ class GoldenMomentumScheduler:
         optimizer: torch.optim.Optimizer,
         floor: float = GOLDEN_MOMENTUM_FLOOR,
         init: float | None = GOLDEN_MOMENTUM_INIT,
+        T_max: int = 30,
     ) -> None:
         if not isinstance(optimizer, torch.optim.Optimizer):
             raise TypeError(
                 "optimizer must be a torch.optim.Optimizer; got "
                 f"{type(optimizer)!r}"
             )
+        if T_max < 1:
+            raise ValueError(f"T_max must be >= 1, got {T_max}")
         self.optimizer = optimizer
         self.floor = float(floor)
+        self.T_max = int(T_max)
+        # Per-step multiplicative factor. Over T_max steps this composes
+        # to exactly 1/φ, matching the design-doc end-to-end decay.
+        self._decay = PHI ** (-1.0 / float(T_max))
         # Detect the field name (betas[0] for Adam-family, momentum for SGD).
         self._uses_betas = "betas" in optimizer.param_groups[0]
         if init is not None:
@@ -138,9 +160,9 @@ class GoldenMomentumScheduler:
                 g["momentum"] = float(value)
 
     def step(self) -> float:
-        """Apply one φ-decay step; returns the new β1 / momentum."""
+        """Apply one gentle φ-decay step; returns the new β1 / momentum."""
         cur = self._read()
-        new = max(self.floor, cur / PHI)
+        new = max(self.floor, cur * self._decay)
         self._write(new)
         self._step_count += 1
         self._history.append(new)
@@ -156,6 +178,7 @@ class GoldenMomentumScheduler:
             "step_count": self._step_count,
             "history": list(self._history),
             "uses_betas": self._uses_betas,
+            "T_max": self.T_max,
         }
 
     def load_state_dict(self, state: dict) -> None:  # pragma: no cover
@@ -163,6 +186,9 @@ class GoldenMomentumScheduler:
         self._step_count = int(state["step_count"])
         self._history = list(state["history"])
         self._uses_betas = bool(state.get("uses_betas", self._uses_betas))
+        if "T_max" in state:
+            self.T_max = int(state["T_max"])
+            self._decay = PHI ** (-1.0 / float(self.T_max))
 
 
 def golden_momentum_curve(epochs: int, tau: float = 5.0) -> list[float]:

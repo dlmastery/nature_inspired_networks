@@ -3,7 +3,7 @@
 PhiDropout
 ----------
 Drop-in replacement for :class:`torch.nn.Dropout` whose rate ``p``
-cycles through a Fibonacci-normalised sequence over the course of
+follows a Fibonacci- or φ-derived curriculum over the course of
 training. The hypothesis (H47 design doc) is that early-training noise
 should be high (≈ 1/φ ≈ 0.618) and late-training noise low (≈ 1/φ⁴ ≈
 0.146), matching the curriculum-noise prescription of Bengio 2009 and
@@ -11,17 +11,24 @@ the φ-decay seen in biological synaptic stochasticity.
 
 Two cycle modes are supported:
 
-  * ``cycle='fib'`` — at internal step ``t`` the rate is
-    ``Fib(t mod L) / sum(Fib[:L])``, i.e. the normalised Fibonacci
+  * ``cycle='fib'`` — at epoch index ``e`` the rate is
+    ``Fib(e mod L) / sum(Fib[:L])``, i.e. the normalised Fibonacci
     fractions. ``L`` defaults to 5 → {1/19, 2/19, 3/19, 5/19, 8/19} ≈
     {0.053, 0.105, 0.158, 0.263, 0.421}.
-  * ``cycle='phi'`` — ``p(t) = 1/φ^(1 + (t mod L))`` cycles through
+  * ``cycle='phi'`` — ``p(e) = 1/φ^(1 + (e mod L))`` cycles through
     {0.618, 0.382, 0.236, 0.146, 0.090} (the H47 design-doc default).
 
-The module increments its internal step counter once per forward pass
-during training (and only during training). Eval mode is identity, as
-with standard dropout. Counter state is exposed as a buffer so
-checkpointing round-trips it.
+**Epoch-keyed, not step-keyed.** The original release incremented the
+internal counter once per forward pass; with batch=256/CIFAR-10 that
+cycled the 5-entry schedule ~39× per epoch, contradicting the design
+doc's "early high noise, late low noise" curriculum (which oscillated
+rapidly instead). The schedule is now indexed by ``epoch`` — callers
+(typically the Trainer) must invoke :meth:`set_epoch` once per epoch.
+If :meth:`set_epoch` is never called the module stays at epoch 0 (the
+first schedule entry), which is the most-noise / safest default.
+
+Eval mode is identity, as with standard dropout. The epoch buffer is
+checkpointed.
 """
 from __future__ import annotations
 
@@ -52,7 +59,14 @@ def _fib_dropout_schedule(length: int) -> list[float]:
 
 
 class PhiDropout(nn.Module):
-    """Dropout whose rate cycles through Fibonacci / φ-derived values.
+    """Dropout whose rate follows an epoch-keyed Fibonacci / φ curriculum.
+
+    The schedule is indexed by the current training epoch (set via
+    :meth:`set_epoch`), not by per-forward-pass step count. Within a
+    single epoch the dropout rate is constant; between epochs the rate
+    advances along the schedule (wrapping mod ``length``). This matches
+    the H47 design-doc curriculum: early epochs see the highest noise,
+    later epochs see lower noise.
 
     Parameters
     ----------
@@ -63,12 +77,20 @@ class PhiDropout(nn.Module):
     cycle
         ``'fib'`` (normalised Fibonacci) or ``'phi'`` (φ⁻ⁿ decay).
     length
-        Length of the cycle. The internal step counter wraps mod
-        ``length`` so training of any duration sees the full cycle
-        repeatedly.
+        Length of the cycle. The epoch index wraps mod ``length`` so
+        training longer than ``length`` epochs cycles repeatedly.
     inplace
         Forwarded to :func:`F.dropout`. Off by default to keep
         backward-graph debugging easy.
+
+    Notes
+    -----
+    Callers MUST drive the curriculum by invoking :meth:`set_epoch` once
+    per epoch (the runner's :class:`Trainer` does this automatically when
+    a model contains any ``PhiDropout`` modules). If never called the
+    module remains pinned at epoch 0 (the first / highest-noise entry).
+    The internal ``step_counter`` buffer is retained for checkpoint
+    round-trip compatibility but is no longer mutated by ``forward``.
     """
 
     def __init__(
@@ -104,24 +126,41 @@ class PhiDropout(nn.Module):
         self.register_buffer(
             "schedule", torch.tensor(schedule, dtype=torch.float32)
         )
+        # ``epoch`` is the live curriculum index used by ``current_p``.
+        # ``step_counter`` is retained as a legacy buffer for backward
+        # checkpoint compatibility but is no longer mutated by forward().
+        self.register_buffer(
+            "epoch", torch.zeros(1, dtype=torch.long)
+        )
         self.register_buffer(
             "step_counter", torch.zeros(1, dtype=torch.long)
         )
 
+    def set_epoch(self, epoch: int) -> None:
+        """Advance the curriculum to the given training epoch.
+
+        Called by the Trainer once per epoch; the dropout rate stays
+        constant within each epoch interval. Negative epochs are clamped
+        to 0.
+        """
+        e = max(0, int(epoch))
+        self.epoch.fill_(e)
+
     @property
     def current_p(self) -> float:
-        """The dropout probability that *would* be used on the next
-        training forward pass. Read-only convenience for tests / logs.
+        """The dropout probability used in the current epoch interval.
+
+        Indexed by ``self.epoch % self.length``; constant within each
+        epoch (unlike the previous step-keyed implementation which
+        oscillated ~39× per epoch at batch=256/CIFAR-10).
         """
-        idx = int(self.step_counter.item()) % self.length
+        idx = int(self.epoch.item()) % self.length
         return float(self.schedule[idx].item())
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         if not self.training:
             return x
         p = self.current_p
-        # advance counter AFTER reading so step 0 sees schedule[0]
-        self.step_counter += 1
         return F.dropout(x, p=p, training=True, inplace=self.inplace)
 
     def extra_repr(self) -> str:

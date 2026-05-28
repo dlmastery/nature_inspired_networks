@@ -22,14 +22,14 @@ from nature_inspired_networks.regularizers import (  # noqa: E402
 
 def test_h47_fib_schedule_normalised():
     """Regression test for H47: 'fib' cycle visits the normalised
-    Fibonacci ratios in order."""
+    Fibonacci ratios in order (driven by set_epoch, G5 audit fix)."""
     mod = PhiDropout(cycle="fib", length=5)
     expected = [1 / 19, 2 / 19, 3 / 19, 5 / 19, 8 / 19]
     visited = []
     mod.train()
-    for _ in range(5):
+    for e in range(5):
+        mod.set_epoch(e)
         visited.append(mod.current_p)
-        # advance the counter by running a forward pass.
         _ = mod(torch.zeros(2, 4))
     for a, b in zip(visited, expected):
         assert math.isclose(a, b, abs_tol=1e-6), (a, b)
@@ -46,7 +46,8 @@ def test_h47_phi_schedule_matches_design_doc():
         assert math.isclose(a, b, abs_tol=1e-12)
     mod.train()
     visited = []
-    for _ in range(5):
+    for e in range(5):
+        mod.set_epoch(e)
         visited.append(mod.current_p)
         _ = mod(torch.zeros(2, 4))
     for a, b in zip(visited, expected):
@@ -60,24 +61,60 @@ def test_h47_eval_mode_is_identity():
     x = torch.randn(4, 8)
     y = mod(x)
     assert torch.equal(x, y)
-    # And the step counter does NOT advance in eval mode.
-    assert int(mod.step_counter.item()) == 0
 
 
 def test_h47_cycle_wraps_and_stays_in_range():
-    """Run many forwards; rate must stay in [0, 1) and the cycle must
-    wrap (so a long-running training never escapes the schedule)."""
+    """Drive across many epochs; rate must stay in [0, 1) and wrap so
+    that long-running training never escapes the schedule."""
     mod = PhiDropout(cycle="fib", length=5)
     mod.train()
     rates = []
-    for _ in range(20):  # 4 full cycles
+    for e in range(20):  # 4 full cycles
+        mod.set_epoch(e)
         rates.append(mod.current_p)
         _ = mod(torch.randn(4, 8))
     for r in rates:
         assert 0.0 <= r < 1.0, r
-    # Step 0 and step 5 (one cycle later) read the same rate.
+    # Epoch 0 and epoch 5 (one cycle later) read the same rate.
     assert math.isclose(rates[0], rates[5], abs_tol=1e-9)
     assert math.isclose(rates[1], rates[6], abs_tol=1e-9)
+
+
+def test_h47_curriculum_changes_only_on_set_epoch():
+    """G5 audit fix: PhiDropout's rate must be constant within an epoch
+    and only change when ``set_epoch`` is invoked.
+
+    The original step-keyed implementation advanced once per forward
+    pass, cycling the 5-entry schedule ~39× per epoch at batch=256.
+    Curriculum must be epoch-driven now.
+    """
+    mod = PhiDropout(cycle="fib", length=5)
+    mod.train()
+    # 100 forward passes with no set_epoch call -> rate must stay at
+    # schedule[0].
+    expected0 = mod.current_p
+    rates_e0 = []
+    for _ in range(100):
+        rates_e0.append(mod.current_p)
+        _ = mod(torch.randn(4, 8))
+    for r in rates_e0:
+        assert math.isclose(r, expected0, abs_tol=1e-12), r
+    # Now advance to epoch 1; rate must change to schedule[1].
+    mod.set_epoch(1)
+    expected1 = float(mod.schedule[1].item())
+    assert math.isclose(mod.current_p, expected1, abs_tol=1e-12)
+    assert not math.isclose(expected1, expected0, abs_tol=1e-6)
+    # And rate is again constant across many forwards within epoch 1.
+    for _ in range(50):
+        assert math.isclose(mod.current_p, expected1, abs_tol=1e-12)
+        _ = mod(torch.randn(4, 8))
+    # Advance through several epochs; track the per-epoch rate.
+    seen = []
+    for e in range(5):
+        mod.set_epoch(e)
+        seen.append(mod.current_p)
+    # Should be 5 distinct values (the full fib schedule).
+    assert len(set(round(v, 9) for v in seen)) == 5
 
 
 def test_h47_rejects_invalid_args():

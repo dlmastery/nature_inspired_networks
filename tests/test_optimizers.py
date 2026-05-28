@@ -19,6 +19,7 @@ from nature_inspired_networks.optimizers import (  # noqa: E402
     GOLDEN_BETA1,
     GOLDEN_BETA2,
     GOLDEN_EPS,
+    STOCK_ADAM_EPS,
     GoldenRatioAdamW,
     build_optimizer,
 )
@@ -32,17 +33,46 @@ def _tiny_model() -> nn.Module:
 
 
 def test_h41_default_betas_are_phi_derived():
-    """Regression test for H41: defaults must be (1/φ, 1/φ²)."""
+    """Regression test for H41: defaults must be (1/φ, 1/φ²) for betas;
+    eps stays at the standard Adam 1e-8 (G5 audit fix)."""
     opt = GoldenRatioAdamW(_tiny_model().parameters(), lr=1e-3)
     b1, b2 = opt.defaults["betas"]
     assert math.isclose(b1, 1.0 / PHI, abs_tol=1e-12), b1
     assert math.isclose(b2, 1.0 / (PHI ** 2), abs_tol=1e-12), b2
-    # eps is 1/φ^4 by design (see optimizers.py docstring).
-    assert math.isclose(opt.defaults["eps"], 1.0 / (PHI ** 4), abs_tol=1e-12)
-    # And the module-level constants stay in sync.
+    # Module-level β constants stay in sync.
     assert GOLDEN_BETA1 == 1.0 / PHI
     assert GOLDEN_BETA2 == 1.0 / (PHI ** 2)
+    # GOLDEN_EPS is still exported (for the opt-in phi_eps=True path).
     assert GOLDEN_EPS == 1.0 / (PHI ** 4)
+
+
+def test_h41_default_eps_is_stock_not_phi():
+    """G5 audit fix: default eps must be the standard 1e-8, NOT 1/φ⁴.
+
+    The original ``eps = 1/φ⁴ ≈ 0.146`` dominated the Adam denominator
+    at CIFAR gradient magnitudes (~1e-3) and was the conflating cause of
+    the -32.82 pp falsification. Default must now be stock Adam eps so
+    the β-only experiment is clean.
+    """
+    opt = GoldenRatioAdamW(_tiny_model().parameters(), lr=1e-3)
+    assert opt.defaults["eps"] == 1e-8, opt.defaults["eps"]
+    assert STOCK_ADAM_EPS == 1e-8
+    # And it is definitely NOT the legacy phi value.
+    assert not math.isclose(opt.defaults["eps"], 1.0 / (PHI ** 4),
+                            abs_tol=1e-6)
+
+
+def test_h41_phi_eps_flag_opts_in():
+    """G5 audit fix: phi_eps=True must restore the legacy 1/φ⁴ eps for
+    backward-compat reproducibility of the original falsification run."""
+    opt = GoldenRatioAdamW(_tiny_model().parameters(), lr=1e-3,
+                           phi_eps=True)
+    assert math.isclose(opt.defaults["eps"], 1.0 / (PHI ** 4),
+                        abs_tol=1e-12), opt.defaults["eps"]
+    # Explicit eps still wins over phi_eps.
+    opt2 = GoldenRatioAdamW(_tiny_model().parameters(), lr=1e-3,
+                            phi_eps=True, eps=2.5e-9)
+    assert math.isclose(opt2.defaults["eps"], 2.5e-9, abs_tol=1e-15)
 
 
 def test_h41_step_updates_params():

@@ -37,7 +37,7 @@ def _tiny_params() -> list[torch.nn.Parameter]:
 def test_h48_initial_beta_is_phi_inverse():
     """Regression test for H48: β1 is seeded at 1/φ on construction."""
     opt = torch.optim.AdamW(_tiny_params(), lr=1e-3)
-    sched = GoldenMomentumScheduler(opt)
+    sched = GoldenMomentumScheduler(opt, T_max=10)
     b1, b2 = opt.param_groups[0]["betas"]
     assert math.isclose(b1, 1.0 / PHI, abs_tol=1e-12), b1
     # β2 must be untouched by the scheduler.
@@ -48,12 +48,12 @@ def test_h48_initial_beta_is_phi_inverse():
 
 
 def test_h48_beta_monotonically_decays_toward_floor():
-    """Each step() reduces β1 by factor 1/φ until the floor."""
+    """Each step() multiplies β1 by φ^(-1/T_max) until the floor."""
     opt = torch.optim.AdamW(_tiny_params(), lr=1e-3)
-    sched = GoldenMomentumScheduler(opt)
+    sched = GoldenMomentumScheduler(opt, T_max=10)
     prev = sched.get_last()
     seen = [prev]
-    for _ in range(20):
+    for _ in range(40):
         new = sched.step()
         # monotonic non-increasing
         assert new <= prev + 1e-12, (prev, new)
@@ -61,39 +61,65 @@ def test_h48_beta_monotonically_decays_toward_floor():
         assert new >= GOLDEN_MOMENTUM_FLOOR - 1e-12, new
         prev = new
         seen.append(new)
-    # The last value must equal the floor (we will have decayed past it
-    # in fewer than 20 steps because 1/φ → 1/φ² takes exactly one step).
+    # After many steps past T_max the value must be at the floor.
     assert math.isclose(seen[-1], GOLDEN_MOMENTUM_FLOOR, abs_tol=1e-9)
 
 
-def test_h48_one_step_hits_phi_squared():
-    """β1 starts at 1/φ; after one step it equals 1/φ² (the floor)."""
+def test_h48_schedule_takes_more_than_one_step_to_floor():
+    """G5 audit fix: the schedule must NOT saturate in a single step.
+
+    The original ``× 1/φ`` per step decayed β1 from 1/φ straight to the
+    1/φ² floor in one shot, making the schedule degenerate. With the
+    gentler ``× φ^(-1/T_max)`` per step the schedule must produce many
+    distinct intermediate values before hitting the floor.
+    """
     opt = torch.optim.AdamW(_tiny_params(), lr=1e-3)
-    sched = GoldenMomentumScheduler(opt)
-    new = sched.step()
-    assert math.isclose(new, 1.0 / (PHI ** 2), abs_tol=1e-9), new
-    # The optimizer's actual betas[0] must reflect the new value.
-    assert math.isclose(opt.param_groups[0]["betas"][0],
-                        1.0 / (PHI ** 2), abs_tol=1e-9)
+    sched = GoldenMomentumScheduler(opt, T_max=10)
+    # After 1 step β1 should equal 1/φ × φ^(-1/10), strictly above the
+    # 1/φ² floor.
+    after_one = sched.step()
+    expected_one = (1.0 / PHI) * (PHI ** (-1.0 / 10.0))
+    assert math.isclose(after_one, expected_one, abs_tol=1e-9), after_one
+    assert after_one > GOLDEN_MOMENTUM_FLOOR + 1e-3, (
+        f"single step already at/near floor: {after_one}"
+    )
+    # Collect the distinct values produced across T_max steps; require
+    # at least 5 distinct ones strictly above the floor (per audit spec).
+    distinct = {round(after_one, 9)}
+    for _ in range(9):  # 9 more steps -> 10 total = T_max
+        distinct.add(round(sched.step(), 9))
+    above_floor = [v for v in distinct
+                   if v > GOLDEN_MOMENTUM_FLOOR + 1e-9]
+    assert len(above_floor) >= 5, (
+        f"expected >= 5 distinct above-floor values, got {sorted(distinct)}"
+    )
+    # After T_max steps, β1 should be at or very near the floor.
+    # Drain a few more steps to ensure approach.
+    for _ in range(5):
+        sched.step()
+    assert math.isclose(sched.get_last(), GOLDEN_MOMENTUM_FLOOR,
+                        abs_tol=1e-9)
 
 
 def test_h48_works_with_sgd_momentum():
     """Edge case: SGD param-groups carry ``momentum``, not ``betas``."""
     opt = torch.optim.SGD(_tiny_params(), lr=1e-3, momentum=0.9)
-    sched = GoldenMomentumScheduler(opt, init=GOLDEN_MOMENTUM_INIT)
+    sched = GoldenMomentumScheduler(opt, init=GOLDEN_MOMENTUM_INIT, T_max=10)
     assert "momentum" in opt.param_groups[0]
     assert math.isclose(opt.param_groups[0]["momentum"], 1.0 / PHI,
                         abs_tol=1e-12)
     new = sched.step()
-    assert math.isclose(new, 1.0 / (PHI ** 2), abs_tol=1e-9)
-    assert math.isclose(opt.param_groups[0]["momentum"], 1.0 / (PHI ** 2),
+    # After one step momentum drops by φ^(-1/10), still above the floor.
+    expected = (1.0 / PHI) * (PHI ** (-1.0 / 10.0))
+    assert math.isclose(new, expected, abs_tol=1e-9)
+    assert math.isclose(opt.param_groups[0]["momentum"], expected,
                         abs_tol=1e-9)
 
 
 def test_h48_floor_clamp_is_idempotent():
     """Many step() calls past the floor must not push β below it."""
     opt = torch.optim.AdamW(_tiny_params(), lr=1e-3)
-    sched = GoldenMomentumScheduler(opt)
+    sched = GoldenMomentumScheduler(opt, T_max=5)
     for _ in range(50):
         sched.step()
     assert math.isclose(sched.get_last(), GOLDEN_MOMENTUM_FLOOR,

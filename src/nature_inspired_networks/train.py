@@ -53,6 +53,13 @@ class TrainConfig:
     prune_length: int = 5
     momentum_schedule: str = ""
     fib_ensemble: object = None  # dict {enabled: bool, K: int} or None
+    # H64 — Dynamic Growth + Pruning schedule. When True, the Trainer
+    # invokes ``GrowthPruningSchedule.step(epoch, model)`` at the end of
+    # each epoch. The pre-constructed schedule object is attached via
+    # ``growth_pruning_schedule_obj`` so the caller controls the
+    # ``model_factory``; the Trainer just owns the per-epoch step.
+    growth_pruning_schedule: bool = False
+    growth_pruning_schedule_obj: object = None  # GrowthPruningSchedule or None
 
 
 def _build_scheduler(opt: torch.optim.Optimizer, cfg: "TrainConfig"):
@@ -93,7 +100,18 @@ class Trainer:
             "golden", "phi", "golden_momentum",
         ):
             from .schedulers import GoldenMomentumScheduler
-            self.momentum_sched = GoldenMomentumScheduler(self.opt)
+            # Pass T_max=epochs so the gentle per-step decay composes to
+            # 1/φ over the full training horizon (fixes the H48 single-
+            # step saturation reported in the G5 audit).
+            self.momentum_sched = GoldenMomentumScheduler(
+                self.opt, T_max=int(self.cfg.epochs)
+            )
+        # H47 — collect PhiDropout modules so fit() can advance their
+        # epoch-keyed curriculum once per epoch.
+        from .regularizers import PhiDropout as _PhiDropout
+        self._phi_dropouts = [
+            m for m in self.model.modules() if isinstance(m, _PhiDropout)
+        ]
         # H20 — optional FibEnsemble averager. Off by default; when on,
         # state-dict snapshots are pushed once per epoch and the final
         # averaged weights are loaded into ``self.model`` at the end of
@@ -110,6 +128,24 @@ class Trainer:
             (getattr(self.cfg, "prune_schedule", "") or "").lower()
             in ("fibonacci", "fib")
         )
+        # H64 — Dynamic Growth + Pruning schedule wiring. The schedule
+        # object is constructed by the caller (so the model_factory is
+        # caller-controlled) and the Trainer owns the per-epoch step.
+        self.growth_pruning_schedule = None
+        if bool(getattr(self.cfg, "growth_pruning_schedule", False)):
+            obj = getattr(self.cfg, "growth_pruning_schedule_obj", None)
+            if obj is None:
+                # Build a default schedule using the current model as the
+                # factory output. The factory returns the SAME model
+                # instance each call -- the DynamicGrowthCallback will
+                # store this reference but step() mutates the model in
+                # place so it stays in sync.
+                from .hybrid_growth_pruning import GrowthPruningSchedule
+                obj = GrowthPruningSchedule(
+                    model_factory=lambda m=self.model: m,
+                )
+            self.growth_pruning_schedule = obj
+            self._growth_pruning_step_calls = 0
 
     @staticmethod
     def _build_optimizer(model: nn.Module, cfg: "TrainConfig") -> torch.optim.Optimizer:
@@ -169,6 +205,11 @@ class Trainer:
         train_top1_final = 0.0
         for epoch in range(self.cfg.epochs):
             self.model.train()
+            # H47 — advance every PhiDropout's curriculum to this epoch
+            # BEFORE the first forward pass so the rate is correct for
+            # the entire epoch interval.
+            for _pd in self._phi_dropouts:
+                _pd.set_epoch(epoch)
             losses, accs = [], []
             for it, (x, y) in enumerate(self.train_loader):
                 lo, ac = self._step(x, y)
@@ -185,6 +226,22 @@ class Trainer:
                     schedule_length=int(getattr(self.cfg, "prune_length", 5)),
                     make_permanent=False,
                 )
+            # H64 — Dynamic Growth + Pruning schedule step. Invoked at
+            # the end of every epoch; the schedule's internal logic
+            # decides whether ``epoch`` is a grow / prune / none event.
+            # When a grow event fires, the optimizer is rebuilt from
+            # scratch so the newly added parameters are tracked.
+            if self.growth_pruning_schedule is not None:
+                new_model, event = self.growth_pruning_schedule.step(
+                    epoch=epoch, model=self.model,
+                )
+                self._growth_pruning_step_calls += 1
+                if event == "grow":
+                    # The model may have been mutated in place or replaced.
+                    self.model = new_model.to(self.device)
+                    self.opt = self._build_optimizer(self.model, self.cfg)
+                    # Rebuild the LR scheduler too so it tracks the new opt.
+                    self.sched = _build_scheduler(self.opt, self.cfg)
             tr_loss = sum(losses) / len(losses)
             tr_acc = sum(accs) / len(accs)
             train_top1_final = tr_acc
