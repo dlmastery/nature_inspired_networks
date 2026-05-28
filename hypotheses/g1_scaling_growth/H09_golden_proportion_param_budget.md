@@ -269,3 +269,52 @@ coefficient?**
 ## 11. Status journal
 
 - 2026-05-27 -- Created from template by Doc-Agent-A.
+
+---
+
+## Addendum: Research-Scientist Critique (2026-05-27)
+
+*Reviewer: SciCritic-G1 (elite-research-scientist critic). Critiquing the IDEA, not the implementation (that audit lives at `audits/G1_audit.md`). **Hardest scrutiny applied — this is the CIFAR-10/100 cross-dataset survivor.***
+
+### Prior plausibility (independent of nature-inspired framing)
+**LOW for the φ-mechanism, but the *positive empirical result* must be taken seriously and re-explained.** This is the only hypothesis with a verified cross-dataset positive in the campaign. That fact is a *constraint* on the critique, not a license to accept the φ-mechanism — it forces me to find a *better* explanation than "phi works."
+
+### Mechanism scrutiny — does the claimed mechanism predict the effect?
+The "because" clause: *"each stage's capacity to be the sum of the two prior stages."* This is *not* what the proposed allocation does. The allocation is **geometric** (stage k gets B · φ^k / Σφ^k), not Fibonacci-additive. The closed form makes stage_3 = stage_2 · φ, not stage_3 = stage_2 + stage_1. The doc conflates the Fibonacci *limit ratio* with the Fibonacci *recurrence*; only the ratio is implemented. The "biological resource inheritance" prose is therefore unsupported by the actual implementation.
+
+### Confounds — what else could explain a positive (or negative) result?
+**This is the critical section.** Here are five alternative explanations the doc does not address:
+
+1. **Stage-3 shrinkage as implicit regularisation.** Per user's special instruction: 1:φ:φ² ≈ 1:1.6:2.6 vs canonical ResNet 1:2:4 doubling. The φ-ratio gives a **smaller stage-3 channel count** (2.6×base vs 4×base). At 12-30 epoch budgets, smaller stage-3 channels = less over-fitting capacity at the most-abstract stage = implicit regularisation. This is the **most likely true mechanism** and it has *nothing to do with φ* — any ratio in [1.5, 2.8] would likely produce the same regularising effect.
+
+2. **Spatial-resolution × channel-count product.** At c0=64 with stride-2 between stages, stage-3 features are 4×4×128 (φ) vs 4×4×512 (doubling) — the φ variant has 4× fewer parameters at the bottleneck, which is exactly the lottery-ticket prediction (Frankle & Carbin 2019, arXiv:1803.03635) for over-parameterised CIFAR networks: prune the late stages.
+
+3. **FLOPs-per-stage redistribution.** Late-stage stride-2 means each stage costs FLOPs ∝ c_k² × (H/2^k)². The doubling rule (c_k=2^k·c0) keeps stage FLOPs constant; the φ rule (c_k=φ^k·c0) gives *decreasing* stage FLOPs (φ²/4 < 1), shifting compute earlier. *Early-compute-heavy* networks are known to converge faster at small epoch budgets (Hoffmann et al 2022 *Chinchilla* arXiv:2203.15556 makes the analogous argument for LLMs).
+
+4. **Mod-8 quantisation alignment**: at c0=64, the schedule [64, 104, 168, 272] happens to align with mod-8 better than [64, 128, 256, 512] in fewer cases — irrelevant on tensor cores but possibly different on the 4090's specific kernel selection heuristic.
+
+5. **Composite-formula weight on params.** The project's composite penalises params; reducing total params by ~15% from doubling to φ-budget gives a "free" composite boost independent of top-1.
+
+### Numerology check — does φ specifically matter?
+**This is the key kill-or-confirm.** Per user's instruction:
+
+**Three-way ablation, CIFAR-100, 30 epochs, 3 seeds:**
+- **A**: 1:1.6:2.6 (≈ 1:φ:φ²) at iso-total-params
+- **B**: 1:1.6:4 (same stage-1/2 as A, doubled stage-3) — *isolates whether stage-3 shrinkage is the win*
+- **C**: 1:2:4 (canonical doubling) at iso-total-params
+
+If A and C are within 0.3pp but B regresses by ≥0.5pp, the win is *stage-3 shrinkage* (mechanism #1 above). If A beats both B and C by ≥0.5pp, then the *whole schedule shape* matters but still not φ specifically. If A ≈ B ≈ C, the entire H09 result is noise.
+
+**Additional control**: replace ratio φ (1.618) with 1.5, 1.7, 1.8, 1.9 — if any ratio in [1.5, 1.9] matches φ within 0.3pp, φ-specificity dies.
+
+### Literature: precedent or rediscovery?
+**Direct precedent**: RegNet (Radosavovic et al 2020, arXiv:2003.13678) explicitly parameterises *per-stage width progression* w_k = c_0 · u·k + c_0 (linear) and *quantised* variants. Their NAS search found optimal "width slope" parameters that imply per-stage ratios of ~1.5-2.5 depending on FLOPs budget — *exactly* the range where 1:φ:φ² sits. **H09 is functionally a single point in RegNet's design space, located in its empirically-discovered Pareto-optimal region.** Lin et al 2017 *Focal Loss / RetinaNet* implicitly use similar non-doubling channel schedules. Compound scaling (Tan & Le 2019) is the parent.
+
+### Expected effect size — skeptical a-priori re-prediction
+The CIFAR-10/100 win is real. **My re-prediction with the correct controls**: the win is *not* φ-specific. Any per-stage ratio in [1.5, 1.9] will produce the same composite gain to within ±0.3pp. At strictly iso-(total-params, total-FLOPs, depth), Δ(top-1) vs the best non-φ schedule ∈ [−0.2, +0.2] pp (90% CI).
+
+### Minimum-distinguishing experiment
+**The four-way ablation above**: {1:1.5:2.25, 1:φ:φ², 1:1.7:2.89, 1:1.9:3.61, 1:2:4}, all at iso-total-params, CIFAR-100, 30 epochs, 3 seeds. Cost: 5 configs × 3 seeds × ~10 min = ~150 min. **If the φ row does not Pareto-dominate the {1.5, 1.7, 1.9} rows by ≥0.5pp top-1 or ≥0.005 composite, the H09 verdict moves from NOVEL to NUMEROLOGY-with-real-mechanism-elsewhere.**
+
+### Verdict
+**DERIVATIVE+TESTABLE** (provisionally) — The empirical result is real, but it is *almost certainly* explained by stage-3 shrinkage acting as implicit regularisation at small epoch budgets (mechanism #1) and FLOPs-redistribution to early stages (mechanism #3), not by φ. The hypothesis as currently stated should be **re-framed as "test whether per-stage ratio in [1.5, 2.0] generally beats doubling at small epoch budgets"** — for which there is already RegNet precedent. The user's recommended kill-or-confirm ablation (1:1.6:2.6 vs 1:1.6:4 vs 1:2:4) is exactly the right test; until that ablation is run, the φ-specificity claim is unsupported by data that the doc *claims* supports it.

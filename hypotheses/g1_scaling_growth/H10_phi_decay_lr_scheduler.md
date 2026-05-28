@@ -252,3 +252,37 @@ Budget: ~5 hours.
 ## 11. Status journal
 
 - 2026-05-27 -- Created from template by Doc-Agent-A.
+
+---
+
+## Addendum: Research-Scientist Critique (2026-05-27)
+
+*Reviewer: SciCritic-G1 (elite-research-scientist critic). Critiquing the IDEA, not the implementation (that audit lives at `audits/G1_audit.md`).*
+
+### Prior plausibility (independent of nature-inspired framing)
+**LOW.** LR-schedule literature is enormous (cosine, step, polynomial, exponential, cyclic, OneCycle, inverse-sqrt). Smith 2017, Loshchilov 2017, Liu 2020 *On the Variance of the Adaptive Learning Rate*, He 2019 *Bag of Tricks*, all explored decay shapes. The empirical winner is cosine for most vision tasks and inverse-sqrt-with-warmup for LMs. There is no theoretical reason a φ-base exponential should outperform a tuned cosine — and the doc's claim is the weaker "match within 0.2pp," i.e., a non-claim.
+
+### Mechanism scrutiny — does the claimed mechanism predict the effect?
+The "because" clause: *"LR_k = LR_0 · φ^(-k) is the unique decay rule that satisfies the additive recurrence LR_k/LR_{k-1} + LR_k/LR_{k+1} = constant."* This is **false**. The identity LR_k/LR_{k-1} = LR_{k+1}/LR_k = 1/φ holds for *any* geometric decay (any base b gives a constant ratio); the "constant" being claimed is trivially true for *every* exponential. The φ-specific property invoked (additive recurrence) requires *summation*, not *multiplication* — and exponential decay multiplies. The mechanism is mathematically incorrect.
+
+Also: "biological synaptic plasticity decay rates follow a phi-like rule" is unsourced and false — plasticity decay timescales in cortex are dominated by a mixture of fast (~minutes, NMDA-dependent) and slow (~hours, protein-synthesis-dependent) processes; the ratio of these timescales is ~10²-10³, not φ.
+
+### Confounds — what else could explain a positive (or negative) result?
+1. **All exponential decays look similar**: at 12 epochs, φ^(-k) decays from 1.0 → 5e-3 over 12 steps; exp(−k/4) decays from 1.0 → 5e-2 over 12 steps; both effectively reach the LR floor by epoch 10. The model spends most of its training at the floor LR — which one you chose barely matters.
+2. **No-warmup claim**: the doc claims φ-decay "needs no warmup." But cosine also doesn't *require* warmup — warmup is a separate intervention for stabilising large-batch training (Goyal 2017 arXiv:1706.02677). The "ergonomic gain" is a strawman.
+3. **LR_0 confound**: any LR schedule's success depends critically on LR_0 tuning. Tuned cosine vs untuned φ-decay is unfair; tuned φ-decay vs tuned cosine is exactly the comparison the doc avoids quantifying.
+
+### Numerology check — does φ specifically matter?
+**No.** Per user's special instruction: φ^(−k/T_max) vs cosine — both decay to near-zero. The distinguishing property of φ-decay is its *specific curvature*, which differs only marginally from base-1.5 or base-1.8 exponentials. **Kill-or-confirm**: at fixed LR_0 and 12 epochs, compare exp-decay with bases {1.5, 1.618 (φ), 1.8, 2.0, e ≈ 2.718}, plus cosine and step-decay, all with 3 seeds CIFAR-10. If φ does not strictly Pareto-dominate by ≥0.2pp top-1, φ-specificity is unsupported.
+
+### Literature: precedent or rediscovery?
+Exponential decay with various bases has been the default in TensorFlow (`tf.keras.optimizers.schedules.ExponentialDecay`) and PyTorch (`torch.optim.lr_scheduler.ExponentialLR`) for years. The standard `gamma` parameter is typically tuned to 0.95-0.99 per epoch (not per *step*) — base ~ 1.01-1.05. φ^(-1) = 0.618 corresponds to base ≈ 1.618 per epoch, which is *aggressive* exponential decay, comparable to legacy step-decay schedules. There is no novelty in this design space.
+
+### Expected effect size — skeptical a-priori re-prediction
+Doc predicts [−0.2, +0.2] pp vs cosine — i.e., the doc itself does not predict a win. My prior: at tuned LR_0 for both schedules, Δ(top-1) ∈ [−0.5, +0.1] pp (90% CI), with φ-decay losing slightly because its aggressive early decay reaches LR-floor too quickly at 12 epochs. The "ergonomic gain" (no warmup, no eta_min) is a fiction since cosine also works without warmup.
+
+### Minimum-distinguishing experiment
+**Seven configs, CIFAR-10, 12 epochs, 3 seeds**: tuned cosine, step-decay-30%-per-3-epochs, exp-decay bases {1.5, 1.618 (φ), 1.8, 2.0, e}. If φ does not produce a *Pareto-distinct* point (i.e., differs from {1.5, 1.8} by ≥0.2pp top-1), φ-decay is reduced to "pick-any-exponential-base."
+
+### Verdict
+**NUMEROLOGY** — The claimed mechanism (additive recurrence for LR ratios) is mathematically incorrect; the claim is weak (match cosine within 0.2pp, i.e., a non-claim); the design space (exponential decay) is fully explored and φ is not a known sweet spot.

@@ -259,3 +259,35 @@ epoch of WikiText-103. Compare ppl at training-step budget to static
 ## 11. Status journal
 
 - 2026-05-27 -- Created from template by Doc-Agent-A.
+
+---
+
+## Addendum: Research-Scientist Critique (2026-05-27)
+
+*Reviewer: SciCritic-G1 (elite-research-scientist critic). Critiquing the IDEA, not the implementation (that audit lives at `audits/G1_audit.md`).*
+
+### Prior plausibility (independent of nature-inspired framing)
+**MEDIUM for the dynamic-growth concept, LOW for Fibonacci-spacing.** Net2Net (Chen 2016, arXiv:1511.05641) and progressive growth (Karras 2018 *Progressive GAN* arXiv:1710.10196) are real techniques. But the specific Fibonacci epoch schedule {1, 2, 3, 5, 8, 13, 21} has zero biological evidence: the "stereotyped synaptogenesis-pruning-myelination cycle whose layer-addition timing follows a Fibonacci-like recurrence" is **not in any developmental-neuroscience paper I can cite**. The Rakic 1974 *Neurons in rhesus monkey visual cortex* foundational paper and Huttenlocher's synaptic density studies show roughly *sigmoidal* growth curves, not Fibonacci.
+
+### Mechanism scrutiny — does the claimed mechanism predict the effect?
+The "because" clause: *"each new layer inherits the maturation of the two prior layers."* This anthropomorphises layer growth — there is no formal notion of "maturation" for a deep-net layer; the Net2Net identity-init plus noise procedure is *function-preserving*, meaning the new layer starts as a no-op. The Fibonacci-recurrence claim that "epoch_k_growth contains the sum of epoch_{k-1} and epoch_{k-2} training" is also wrong arithmetically: training is *cumulative*, not additive in the Fibonacci sense.
+
+### Confounds — what else could explain a positive (or negative) result?
+1. **Cumulative-FLOPs metric is bespoke**: the composite formula in §7.1 introduces `(1 - cum_flops/30G)` as a new term — *Rule 2 violation*. This bespoke metric is built to flatter the hypothesis.
+2. **Any monotone growth schedule** that spends more compute later achieves the same headline result. Progressive growing (Karras 2018) used doubling, GoogLeNet's auxiliary-classifier deep-supervision (Szegedy 2015) effectively grew supervision depth — all yield cumulative-compute savings.
+3. **Function-preserving init = lottery-ticket interaction**: Frankle & Carbin 2019 (arXiv:1803.03635) showed pruned networks retain much of their accuracy; Net2Net is the dual operation and inherits the same uncertainty about whether the gain is the *schedule* or the *init scheme*.
+
+### Numerology check — does φ specifically matter?
+**No.** Growth at epochs {1, 2, 3, 5, 8, 13, 21} vs {1, 3, 6, 10, 15, 21, 28} (triangular) vs {2, 4, 8, 16, 32} (doubling) — all spend more compute later. **Kill-or-confirm**: 3 schedules at iso-final-architecture and iso-total-FLOPs, CIFAR-100 50 epochs, 3 seeds. If Fibonacci does not beat triangular by ≥0.5pp top-1 OR ≥5% cumulative-FLOPs reduction, φ is decorative.
+
+### Literature: precedent or rediscovery?
+**Direct precedent**: Karras et al 2018 *Progressive Growing of GANs* (arXiv:1710.10196), Chen et al 2016 *Net2Net* (arXiv:1511.05641), Wei et al 2016 *Network Morphism* (arXiv:1603.01670). The "*when* to grow" question has been studied — Gong et al 2019 *Efficient Training of BERT by Progressively Stacking* (arXiv:1903.04694) used linear and doubling schedules; Yang et al 2020 *Tensor Programs and Width Limit* (arXiv:2011.14522) addresses dynamic-width theory. None of these found Fibonacci optimal.
+
+### Expected effect size — skeptical a-priori re-prediction
+Doc predicts 20-35% cumulative-FLOPs reduction. My prior: any sensible progressive-growth schedule yields 15-25% cumulative-FLOPs reduction at iso-top-1 (well-established); Fibonacci-specific advantage Δ ∈ [−5%, +5%] of cumulative-FLOPs (90% CI). The headline 20-35% is a *progressive-growth* effect, not a Fibonacci effect.
+
+### Minimum-distinguishing experiment
+**Three schedules, CIFAR-100, iso-final-arch, 50 epochs, 3 seeds**: Fibonacci {1,2,3,5,8,13,21}, doubling {1,2,4,8,16,32}, linear {3,6,9,12,15,18,21}. If Fibonacci is not strictly Pareto-dominant on (cum-FLOPs, top-1), the φ-claim dies.
+
+### Verdict
+**DERIVATIVE+TESTABLE** — Progressive growth (a real effect) re-labelled as Fibonacci. The composite-formula manipulation is a Rule 2 violation. Worth running as part of a broader growth-schedule study but the φ-content is decorative.

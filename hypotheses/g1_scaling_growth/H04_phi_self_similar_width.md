@@ -284,3 +284,35 @@ constant-width 124M. Budget: ~5 hours.
   vanilla baseline.
 - (planned) -- exp002 with c0=32 / n_stages=4 to separate the two
   width schedules under 3-seed regime.
+
+---
+
+## Addendum: Research-Scientist Critique (2026-05-27)
+
+*Reviewer: SciCritic-G1 (elite-research-scientist critic). Critiquing the IDEA, not the implementation (that audit lives at `audits/G1_audit.md`).*
+
+### Prior plausibility (independent of nature-inspired framing)
+**LOW.** The doc itself documents that the prior already failed at single seed: T1.1 and T1.2 both produced top-1=80.11% (vs 82.16% vanilla), a **−2.05pp regression**. The author's response is to claim the mod-8 rounding collapsed phi and Fib to the same widths, which is true — but the deeper finding is that *neither* schedule beat linear doubling, even before the collapse mattered. The honest read is: at c0=16 the prior has been tested and lost.
+
+### Mechanism scrutiny — does the claimed mechanism predict the effect?
+The "because" clause: *"finer per-stage capacity granularity (ratio 1.618 vs 2.0) and better matching of effective rank growth to the data manifold's intrinsic-dimension increase."* The "effective rank growth" claim is unsupported — there is no measurement of effective rank in the protocol, no prediction of the manifold intrinsic dimension at each stage, and no theoretical reason the manifold dimension should grow by φ (Pope et al 2021 *Intrinsic Dimension of Images and Its Impact on Learning* arXiv:2104.08894 found ID is roughly constant or decreasing across CNN stages, not growing).
+
+### Confounds — what else could explain a positive (or negative) result?
+1. **Param-count drop**: T1.1/T1.2 used 127k vs 186k vanilla (−32%); the top-1 regression is largely a capacity loss confound.
+2. **Mod-8 alignment**: at small c0 the φ and Fib schedules quantise to identical channels — the prior is operationally invisible.
+3. **Stage-count interaction**: with only 3 stages the φ-ratio compounds twice (16 → 26 → 42); the geometric mean ratio (42/16)^(1/2) ≈ 1.62 — *exactly* φ in the limit but with only 2 transitions, statistical power is near zero.
+
+### Numerology check — does φ specifically matter?
+**The experiment already says no**: mod-8 rounding collapsed φ and Fib to identical configurations and both lost. **Kill-or-confirm**: at c0=64, n_stages=4, run {linear-2, φ, 1.5, 1.7, Fib} all with mod-8 rounding *and* a separate set with mod-1 (no rounding) to see if rounding is what matters. If mod-1 still gives Δ < 0.3pp across {1.5, φ, 1.7}, φ is decorative.
+
+### Literature: precedent or rediscovery?
+**Direct precedent**: Howard et al 2019 *Searching for MobileNetV3* (arXiv:1905.02244) and Radosavovic et al 2020 *Designing Network Design Spaces — RegNet* (arXiv:2003.13678) explicitly parametrise width-progression and empirically find non-power-of-two width schedules optimal — but the optimal exponents found by RegNet are **2.5 to 2.9**, not φ ≈ 1.618. The RegNet finding is essentially the falsifier the doc dodges.
+
+### Expected effect size — skeptical a-priori re-prediction
+Doc predicts +0.5 to +1.5 pp at iso-params. Observed data says −2.05 pp at non-iso-params. My prior at *strictly iso-params* with separated widths: Δ(top-1) ∈ [−0.4, +0.4] pp (90% CI). RegNet's finding of width-exponent ~2.6 actively argues against φ.
+
+### Minimum-distinguishing experiment
+**Already half-done — finish it**: c0=64, n_stages=4, mod-8 widths {[64,128,256,512], [64,104,168,272], [64,96,144,216], [64,112,192,328]} corresponding to ratios {2.0, φ, 1.5, 1.7}, at iso-param via depth-tuning, 12 epochs, 3 seeds. If any of {1.5, 1.7} matches or beats φ, the φ-specificity claim dies.
+
+### Verdict
+**NUMEROLOGY** — Already disconfirmed at single seed and the disconfirmation is consistent with RegNet's literature finding that width-exponents ~2.5-2.9 (not φ) dominate. The "mod-8 collapse" excuse is technically valid but irrelevant: the prior loses at every config tested so far.

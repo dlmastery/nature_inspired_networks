@@ -302,3 +302,35 @@ GPT-2-medium-style). Budget: ~12 hours single seed for the three points.
 (Append-only timeline of what changed when.)
 
 - 2026-05-27 -- Created from template by Doc-Agent-A.
+
+---
+
+## Addendum: Research-Scientist Critique (2026-05-27)
+
+*Reviewer: SciCritic-G1 (elite-research-scientist critic). Critiquing the IDEA, not the implementation (that audit lives at `audits/G1_audit.md`).*
+
+### Prior plausibility (independent of nature-inspired framing)
+**LOW-to-MEDIUM.** EfficientNet (arXiv:1905.11946) already grid-searched α=1.2, β=1.1, γ=1.15 — the *empirical* compound exponents are deliberately close to but distinctly *below* φ. Their constraint is α·β²·γ² ≈ 2, which the φ-substitution explicitly violates (the doc concedes "φ²·⁵ ≈ 3.33 ... calibrate to 2 via φ^(k·0.4)" — at which point the φ-content of the exponent has been numerically tuned away). A prior whose first step is to recalibrate the magic constant to fit the existing empirical answer is *not* a novel prior, it is a re-parameterisation.
+
+### Mechanism scrutiny — does the claimed mechanism predict the effect?
+The "because" clause reads: *"phi-spaced scaling minimises destructive aliasing between successive stages, just as it does between successive phyllotactic primordia."* This is a quoted analogy, not a mechanism. Phyllotactic non-overlap concerns angular packing of point primordia on a 2D meristem disk — it has *zero* formal correspondence to receptive-field eigenmode interference between successive CNN stages. The doc never defines "receptive-field eigenmode" nor demonstrates that successive RFs are ever in "self-occlusion" in the relevant sense. The mechanism is post-hoc rhetoric.
+
+### Confounds — what else could explain a positive (or negative) result?
+1. **Recalibration confound**: any 5-tuple of (d,w,r) satisfying d·w²·r²≈2 will trace a similar Pareto front; the φ-recipe collapses to "EfficientNet with a slightly different operating point" once the φ^(k·0.4) calibration is applied.
+2. **Mod-8 rounding**: at small k, φ^(k/2) and 1.1^k both round to identical channel counts under tensor-core alignment — see H04's already-observed mod-8 collapse.
+3. **Resolution rounding to 16-pixel multiples** discretises r so coarsely that φ^(k/4) and 1.15^k differ by <1 pixel until k≥4.
+
+### Numerology check — does φ specifically matter?
+**No control proposed.** Would (α,β,γ) = (1.6, 1.27, 1.13) work the same as (φ, √φ, φ^¼)? Almost certainly yes — these are numerically near-identical. **Suggested kill-or-confirm ablation**: run (1.5, 1.22, 1.10), (φ, √φ, φ^¼)≈(1.618, 1.272, 1.128), and (1.7, 1.30, 1.15) at iso-FLOPs on CIFAR-100. If all three lie within 0.5pp at 3-seed median, φ is decorative — what matters is "compound scaling with exponents in this neighbourhood" which is *already* EfficientNet's published finding.
+
+### Literature: precedent or rediscovery?
+**Direct rediscovery.** This is functionally equivalent to EfficientNet (Tan & Le 2019, arXiv:1905.11946) with the substitution (α,β,γ) → (φ^a, φ^b, φ^c) where a,b,c are themselves tuned to recover their original constraint. Related: Bello et al 2021 *Revisiting ResNets* (arXiv:2103.07579) showed compound scaling is surprisingly insensitive to exponent choice within ±20%; their finding directly predicts the φ-variant will be within noise of the grid-tuned variant.
+
+### Expected effect size — skeptical a-priori re-prediction
+The doc predicts [-15, -8]% FLOPs at iso-accuracy. My prior: Δ(top-1) ∈ [-0.4, +0.4] pp at iso-FLOPs (90% CI), Δ(FLOPs at iso-acc) ∈ [-5, +5]% (90% CI). The asymmetric claim of "−15 to −8% FLOPs" with no probability of loss is over-confident given Bello 2021's sensitivity analysis.
+
+### Minimum-distinguishing experiment
+**Two configs, CIFAR-100, 30 epochs, 3 seeds**: (i) EfficientNet-B0 exponents (α=1.2, β=1.1, γ=1.15); (ii) φ-exponents (φ, √φ, φ^¼) at the same FLOPs operating point. Total cost ~3h on a 4090. If |Δtop-1| < 0.3pp the hypothesis is reduced to a re-parameterisation.
+
+### Verdict
+**DERIVATIVE+TESTABLE** — A φ-substitution into EfficientNet's already-tuned exponents that the doc itself admits requires a recalibrating factor of φ^(k·0.4) to satisfy the EfficientNet constraint. Testable, but expected to be a sensitivity-region of an existing solved problem.

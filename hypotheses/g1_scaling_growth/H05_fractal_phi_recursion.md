@@ -289,3 +289,35 @@ Budget: ~5 hours.
 - (planned) -- T2.5 sg_fractal_phi_shrink: add explicit 1/phi depth
   and width shrink per recursion level; expected to retain the +2.35 pp
   lift while reducing param overhead by ~40 pct.
+
+---
+
+## Addendum: Research-Scientist Critique (2026-05-27)
+
+*Reviewer: SciCritic-G1 (elite-research-scientist critic). Critiquing the IDEA, not the implementation (that audit lives at `audits/G1_audit.md`).*
+
+### Prior plausibility (independent of nature-inspired framing)
+**MEDIUM for the fractal-recursion part, LOW for the φ-specificity.** FractalNet (Larsson et al 2017, arXiv:1605.07648) is real and the +2.35pp T1.5 result is genuinely interesting — but that result was obtained with the *partial* implementation that *does not yet have the 1/φ shrink rule*. So the only experimental evidence cited supports the *non-φ* version. The doc admits this in §11 ("FractalNet at depth=2, no 1/phi shrink rule yet"). The hypothesis as stated is therefore *unsupported by the data presented as supporting it*.
+
+### Mechanism scrutiny — does the claimed mechanism predict the effect?
+The "because" clause: *"recursive fractal sub-blocks whose depth d_k and width w_k each shrink by 1/phi at recursion level k impose the Murray-law branching ratio."* This is incorrect: Murray's law (1926) gives radius ratio 2^(−1/3) ≈ 0.794 for bifurcations satisfying minimum-work; the doc concedes this and then *redefines* "more general than" to silently substitute 0.618. The "biological precedent" of "1/phi = 0.618 for coronary arteries" is unsourced — actual measured coronary branching ratios cluster around 0.7-0.8 (Kassab 2006 *Scaling laws of vascular trees*).
+
+### Confounds — what else could explain a positive (or negative) result?
+1. **Multi-depth ensemble**: averaging paths of different depths *is* a known regulariser (cf. Veit et al 2016 arXiv:1605.06431); the +2.35pp may be the *ensemble* effect, not the φ-recursion.
+2. **2× param count**: T1.5 had 259k vs 127k for sg_chan_fib — half the top-1 lift could be capacity.
+3. **Drop-path interaction**: FractalNet's original gains come largely from drop-path regularisation, not the fractal topology itself.
+
+### Numerology check — does φ specifically matter?
+**The user-supplied special instruction is exactly right**: fractal nets work; any sub-1 shrink ratio should work; the φ specificity is unverified. **Kill-or-confirm**: 4 levels of fractal recursion with shrink ratios {0.5, 0.618 (=1/φ), 0.707 (=1/√2), 0.794 (Murray)}, iso-param via base-width tuning, 12 epochs, 3 seeds CIFAR-10. If φ does not win by ≥0.5pp over both 0.5 and 0.794, the φ-component is decorative.
+
+### Literature: precedent or rediscovery?
+FractalNet (Larsson 2017) is the direct precedent and explicitly uses ratio-2 (the doc concedes this). What is novel here is *non-2 shrink ratios* in a fractal CNN — but this is a one-line modification of a 2017 paper, not a new mechanism. The closest neighbour is Huang et al 2017 *Multi-Scale Dense Networks* (arXiv:1703.09844) which uses irregular shrink schedules. Han et al 2020 *ResNeSt: Split-Attention Networks* (arXiv:2004.08955) explores multi-path averaging effects.
+
+### Expected effect size — skeptical a-priori re-prediction
+Doc predicts retaining +2.35pp lift while cutting params ~40%. My prior: with iso-param control vs FractalNet-ratio-2, Δ(top-1) for any sub-1 ratio ∈ [−0.3, +0.3] pp (90% CI). The +2.35pp is the *fractal-vs-non-fractal* effect, almost entirely independent of the ratio choice.
+
+### Minimum-distinguishing experiment
+**Four configs at strictly iso-param, 12 epochs, 3 seeds, CIFAR-10**: ratios {0.5, 0.618, 0.707, 0.794}. If no ratio dominates by ≥0.5pp, the hypothesis collapses to "FractalNet at any sensible ratio."
+
+### Verdict
+**DERIVATIVE+TESTABLE** — Fractal recursion is real and the T1.5 evidence is real, but the +2.35pp is FractalNet's effect (Larsson 2017), not φ's. The φ-shrink-ratio modification is a one-line tweak that should be tested against other sub-1 ratios; current evidence does not distinguish it from numerology.

@@ -275,3 +275,35 @@ epoch (1.5B tokens, ~5 hours on 4090).
 ## 11. Status journal
 
 - 2026-05-27 -- Created from template by Doc-Agent-A.
+
+---
+
+## Addendum: Research-Scientist Critique (2026-05-27)
+
+*Reviewer: SciCritic-G1 (elite-research-scientist critic). Critiquing the IDEA, not the implementation (that audit lives at `audits/G1_audit.md`).*
+
+### Prior plausibility (independent of nature-inspired framing)
+**LOW.** ResNet-50's 3-4-6-3 schedule was empirically optimised; ResNet-101 uses 3-4-23-3 and ResNet-152 uses 3-8-36-3 — none of these are Fibonacci, none are even monotone within stage. The "3-5-8-13" schedule increases total depth from 16 (ResNet-18) or 50 (ResNet-50) to a regime where stage-4 (13 blocks) is doing the bulk of representational work; this contradicts the empirical finding (He 2016, arXiv:1512.03385) that stage-3 of ResNet-50 (6 blocks) is *already* doing most of the representational work.
+
+### Mechanism scrutiny — does the claimed mechanism predict the effect?
+The "because" clause: *"each new stage receives an expressive-capacity budget equal to the sum of the two prior stages (matching biological somite resource inheritance) per Larsson et al 2017."* This is wrong on two counts: (i) Larsson 2017 (FractalNet) uses **doubling**, not Fibonacci summation — the citation is being conscripted to support the opposite recurrence; (ii) "expressive-capacity budget = block count" is a category error — capacity in residual networks does not add linearly with depth (cf. Veit et al 2016, arXiv:1605.06431 *"Residual Networks Behave Like Ensembles of Relatively Shallow Networks"*).
+
+### Confounds — what else could explain a positive (or negative) result?
+1. **Param-count drift**: doc admits 0.95M vs ResNet-32's 0.46M (~2×); any positive result is confounded with raw capacity.
+2. **Stage-4 dominance**: putting 13 blocks at stage-4 with the smallest spatial resolution may simply mean the test set fits better — small spatial maps + many blocks ≈ over-parameterised classifier head.
+3. **Composite-formula gaming**: the doc introduces a new composite term `0.15 * (1 - epochs_to_72/50)` that is *bespoke to this hypothesis*, violating Rule 2 (composite formula is fingerprinted). This is a methodological red flag.
+
+### Numerology check — does φ specifically matter?
+The discrete Fibonacci sequence converges to φ only in the *ratio limit*. At the proposed indices [3,5,8,13] the ratios are 1.67, 1.60, 1.625 — none are φ to better than 3%. **Kill-or-confirm**: compare [3,5,8,13] vs [3,5,9,14] (slightly off-Fibonacci, ratios [1.67, 1.80, 1.56]) vs [4,5,8,13] vs [3,6,9,12] (linear). If [3,5,8,13] does not win by ≥0.5pp at 3-seed, Fibonacci-specificity is unsupported.
+
+### Literature: precedent or rediscovery?
+**Direct rediscovery, mislabelled**. This is functionally equivalent to *trying a deeper stage-4 ResNet variant*, which has been done many times (e.g., ResNet-101's 3-4-23-3, EfficientNet's progressive depth scaling). The "Fibonacci" framing adds no testable content beyond "more blocks in stage-4 helps small datasets." Liu et al 2018 *Progressive Neural Architecture Search* (arXiv:1712.00559) explored this space exhaustively; Fibonacci is in their hypothesis space and was *not* discovered by NAS as optimal.
+
+### Expected effect size — skeptical a-priori re-prediction
+Doc claims 30-50% reduction in epochs-to-72%-top-1. My prior: Δ(epochs) ∈ [−10%, +20%] (90% CI), dominated by the param-count confound. The fairer comparison — iso-param Fibonacci vs iso-param uniform — will show |Δtop-1| < 0.3pp.
+
+### Minimum-distinguishing experiment
+**Two configs, CIFAR-100, 50 epochs, 3 seeds at strictly iso-param (±2%) and iso-FLOPs (±5%)**: (i) [3,5,8,13] Fibonacci; (ii) uniform [7,7,7,8] with channel-widths *adjusted* to match params. If Δ(epochs-to-72%) < 15%, the hypothesis is reduced to "redistribute params to stage-4 (a known finding)."
+
+### Verdict
+**DERIVATIVE+TESTABLE** — Re-labelling of the known "deeper-stage-3/4 is good" finding as a Fibonacci recurrence. The composite-formula manipulation in §7.1 is a Rule 2 violation that should be flagged separately to the audit agent.

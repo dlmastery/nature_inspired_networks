@@ -256,3 +256,35 @@ epoch. Compare ppl + params + latency. Budget: ~5 hours.
 ## 11. Status journal
 
 - 2026-05-27 -- Created from template by Doc-Agent-A.
+
+---
+
+## Addendum: Research-Scientist Critique (2026-05-27)
+
+*Reviewer: SciCritic-G1 (elite-research-scientist critic). Critiquing the IDEA, not the implementation (that audit lives at `audits/G1_audit.md`).*
+
+### Prior plausibility (independent of nature-inspired framing)
+**LOW.** The doc *itself* exhibits the hypothesis crumbling under its own arithmetic in §5.1: it computes that the original "1/φ:1:φ" formulation produces *more* parameters than the 4:1 baseline, and then silently *reformulates* the hypothesis mid-doc to be "expand by φ²=2.618 instead of 6" (MobileNetV2-style). This is hypothesis-after-the-result: the claim shifted from "contract to 1/φ then expand by φ" to "expand by φ²" because the original arithmetic didn't support the parameter-reduction claim.
+
+### Mechanism scrutiny — does the claimed mechanism predict the effect?
+The "because" clause invokes Vesica Piscis geometric construction. The Vesica Piscis has *no* mechanistic connection to channel-bottleneck expansion ratios. Even the biological analogy ("eye iris constricting the pupil, the cochlear duct narrowing") is a *geometric* analogy, not a computational one — bottlenecks in neural nets are about *information channels*, not physical conduits, and the analogy provides no quantitative prediction about why 2.618 vs 6 vs 4 should be optimal.
+
+### Confounds — what else could explain a positive (or negative) result?
+1. **Param-count reduction**: dropping FFN expansion from 6 to 2.618 cuts 35% of FFN params — any "positive" composite result is mostly a Pareto-trade-off, not a φ-specific gain.
+2. **Capacity loss**: doc concedes WikiText-103 ppl regresses by 0.3-0.6 — this is the *expected* trade-off, not a φ benefit.
+3. **MobileNetV2 has already explored this region**: the MobileNetV3 paper (Howard 2019, arXiv:1905.02244) tuned expansion ratios *per block* and ended up around 2.4-6.0, with the 2.5-3.0 range chosen for cheap blocks. So "2.618" sits squarely in the empirical optimum range *that was already found by NAS*.
+
+### Numerology check — does φ specifically matter?
+**No.** Expansion ratio 2.618 is operationally indistinguishable from 2.5 or 2.7 at mod-8 rounding (e.g., for c_in=32, mid = 88, 80, 88 respectively). **Kill-or-confirm**: t ∈ {2.0, 2.5, 2.618, 3.0, 4.0, 6.0} on CIFAR-10 + MobileNetV2 backbone, 12 epochs, 3 seeds. If any of {2.5, 3.0} matches φ² within 0.3pp, the φ-specificity dies.
+
+### Literature: precedent or rediscovery?
+**Direct rediscovery**. MobileNetV3 (arXiv:1905.02244) and EfficientNet-Lite both already use per-block expansion ratios in the 2-6 range with the small-cost blocks tuned to ~2.5. φ² ≈ 2.618 sits inside their empirical optimum. The Howard 2019 paper *literally found this empirically without invoking φ*.
+
+### Expected effect size — skeptical a-priori re-prediction
+Doc predicts [−15, −8]% params with Δtop-1 ∈ [−0.3, +0.3]. My prior agrees on the params direction (it's arithmetic) but rejects the "natural-constant" framing. Δ(top-1) ∈ [−0.5, +0.2] (90% CI) — MobileNetV2's t=6 was tuned for a reason; reducing expansion costs a small amount of capacity.
+
+### Minimum-distinguishing experiment
+**Six configs, MobileNetV2 backbone, CIFAR-10, 12 epochs, 3 seeds**: t ∈ {2.0, 2.5, 2.618 (φ²), 3.0, 4.0, 6.0}. If composite-Pareto front does not show a φ²-specific peak (i.e., 2.5 or 3.0 are equally good), the hypothesis collapses to "explore expansion-ratio space" — a problem solved by NAS.
+
+### Verdict
+**NUMEROLOGY** — Hypothesis mutated mid-doc when the original arithmetic didn't fit; the final claim places φ² inside MobileNetV3's already-discovered empirical optimum range with no novel mechanism.
