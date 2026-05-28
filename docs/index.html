@@ -6,67 +6,131 @@
  body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:#0d1117;
       color:#c9d1d9;padding:40px 32px;line-height:1.55;}
  a{color:#58a6ff;text-decoration:none;} a:hover{text-decoration:underline;}
- .container{max-width:880px;margin:0 auto;}
- h1{color:#58a6ff;font-size:2em;margin-bottom:6px;}
+ .container{max-width:960px;margin:0 auto;}
+ h1{color:#58a6ff;font-size:2.1em;margin-bottom:6px;}
  .sub{color:#8b949e;font-size:0.95em;margin-bottom:24px;}
  .ribbon{background:#161b22;border:1px solid #30363d;border-radius:8px;
          border-left:4px solid #d29922;padding:18px 22px;margin:18px 0 24px 0;}
  .ribbon b{color:#d29922;}
+ .audit{background:#241a14;border:1px solid #6d4720;border-radius:8px;
+        border-left:4px solid #f0883e;padding:18px 22px;margin:18px 0 24px 0;}
+ .audit b{color:#f0883e;}
+ .audit code{background:#0d1117;padding:1px 6px;border-radius:3px;color:#c9d1d9;
+             font-size:0.92em;}
  .map{background:#161b22;border:1px solid #30363d;border-radius:8px;
        padding:18px 22px;margin-bottom:24px;}
  .map li{margin:6px 0 6px 22px;}
- .map code{background:#0d1117;padding:1px 6px;border-radius:3px;
-           color:#c9d1d9;font-size:0.92em;}
+ .map code{background:#0d1117;padding:1px 6px;border-radius:3px;color:#c9d1d9;
+           font-size:0.92em;}
  .cta{display:inline-block;background:#1f6feb;color:#fff;padding:12px 24px;
       border-radius:8px;font-weight:600;font-size:1em;border:1px solid #58a6ff;
-      box-shadow:0 4px 12px rgba(31,111,235,0.3);transition:transform 0.15s;}
- .cta:hover{transform:translateY(-1px);text-decoration:none;
-             background:#388bfd;}
+      box-shadow:0 4px 12px rgba(31,111,235,0.3);transition:transform 0.15s;
+      margin-right:10px;margin-bottom:8px;}
+ .cta:hover{transform:translateY(-1px);text-decoration:none;background:#388bfd;}
+ .cta-secondary{background:#21262d;color:#c9d1d9;border:1px solid #30363d;
+                box-shadow:none;}
+ .cta-secondary:hover{background:#30363d;color:#fff;}
+ .verdict-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;
+               margin:14px 0;}
+ .verdict-cell{background:#0d1117;border:1px solid #30363d;border-radius:6px;
+               padding:10px 12px;text-align:center;}
+ .verdict-cell .n{font-size:1.6em;font-weight:700;color:#58a6ff;}
+ .verdict-cell .lbl{font-size:0.74em;color:#8b949e;text-transform:uppercase;
+                    letter-spacing:0.04em;}
  .meta{color:#484f58;font-size:0.78em;margin-top:32px;}
  h2{color:#58a6ff;font-size:1.15em;margin:24px 0 8px 0;}
 </style>
 </head><body><div class='container'>
 <h1>nature_inspired_networks</h1>
-<div class='sub'>Nature-inspired neural backbones — φ-scaling, hex/group conv, fractal recursion,
-toroidal padding, cymatic init, golden-angle channel gating — evaluated under an
-autoresearch protocol on CIFAR-10. ·
+<div class='sub'>An autoresearch repository housing 84 nature-inspired neural-network
+hypotheses (φ-scaling, hex/Platonic equivariance, fractal recursion, toroidal
+closure, Chladni cymatic init, golden-angle modulation, cross-paradigm hybrids,
+neutral re-casts of esoteric motifs) — audited adversarially by a dual-track
+elite-research critic team and patched by an 8-agent Fixer campaign. ·
 <a href='https://github.com/dlmastery/nature_inspired_networks'>GitHub</a> ·
-<a href='https://dlmastery.github.io/nature_inspired_networks/'>GitHub Pages</a></div>
+<a href='https://dlmastery.github.io/nature_inspired_networks/'>Pages</a></div>
 
-<div class='ribbon'><b>Headline negative finding · </b>**The headline:** at the 12-epoch / 127–272 k-parameter scale on CIFAR-10, **the nature-inspired priors do *not* compound**. The full hybrid (`sg_full_fib`, all six flags on) is the **worst** NaturePrior variant in the sweep, not the best. This contradicts the source PDF's "literature-compound" prediction (20–50 % efficiency gains). The autoresearch protocol delivered exactly what it is supposed to: a falsifiable negative result with clear single-prior decomposition.</div>
+<div class='audit'><b>⚠ AUDIT IN-PROGRESS · 2026-05-28 ·</b> A dual-track
+audit (impl-critic + sci-critic, 8 + 8 parallel agents) just completed.
+<b>51 % of 83 implementations landed non-PASS</b>; <b>only 1 of 81 hypotheses
+rated NOVEL+TESTABLE</b> (H71 IcosaRoPE3D). The pre-audit headline (H09
+φ-budget cross-dataset positive at <code>85.54 % / 58.05 %</code>) was on
+broken code — realised stage-param ratio was <code>1:1.41:2.45</code>, not
+<code>1:φ:φ²</code>. Fixer-PhiScaling corrected it to <code>1:1.623:2.629</code>
+(0.43 % max error); a 31-run post-fix re-run is in flight (~4 h ETA). All
+H09/H41/H48 claims are PROVISIONAL until the post-fix numbers land.
+<a href='https://github.com/dlmastery/nature_inspired_networks/blob/main/AUDIT_SUMMARY.md'>
+Read the full audit summary →</a></div>
 
-<a class='cta' href='dashboard/dashboard.html'>Live dashboard &rarr;</a>
+<h2>Audit verdict at a glance</h2>
+<div class='verdict-grid'>
+ <div class='verdict-cell'><div class='n'>41</div><div class='lbl'>impl PASS</div></div>
+ <div class='verdict-cell'><div class='n'>24</div><div class='lbl'>impl MINOR</div></div>
+ <div class='verdict-cell'><div class='n'>15</div><div class='lbl'>impl MAJOR</div></div>
+ <div class='verdict-cell'><div class='n'>3</div><div class='lbl'>impl BROKEN</div></div>
+ <div class='verdict-cell'><div class='n'>1</div><div class='lbl'>sci NOVEL</div></div>
+ <div class='verdict-cell'><div class='n'>30</div><div class='lbl'>sci DERIVATIVE</div></div>
+ <div class='verdict-cell'><div class='n'>40</div><div class='lbl'>sci NUMEROLOGY</div></div>
+ <div class='verdict-cell'><div class='n'>5</div><div class='lbl'>sci FALSIFIED+</div></div>
+</div>
+
+<a class='cta' href='dashboard/dashboard.html'>📊 Live dashboard &rarr;</a>
+<a class='cta cta-secondary'
+ href='https://github.com/dlmastery/nature_inspired_networks/blob/main/PAPER.md'>📄 PAPER.md</a>
+<a class='cta cta-secondary'
+ href='https://github.com/dlmastery/nature_inspired_networks/blob/main/AUDIT_SUMMARY.md'>🔎 AUDIT_SUMMARY.md</a>
+<a class='cta cta-secondary'
+ href='https://github.com/dlmastery/nature_inspired_networks/blob/main/REVIEWER_CHECKLIST.md'>✅ Reviewer checklist</a>
 
 <h2>What is in this repo</h2>
 <div class='map'><ul>
 <li><b><a href='https://github.com/dlmastery/nature_inspired_networks/blob/main/README.md'>
 README.md</a></b> — quick-start, reproduction commands, project orientation.</li>
-<li><b><a href='https://github.com/dlmastery/nature_inspired_networks/blob/main/MANIFESTO.md'>
-MANIFESTO.md</a></b> — research-strict protocol: every claim is hypothesis +
-prediction + verdict + learning, signed by composite-formula SHA-256.</li>
+<li><b><a href='https://github.com/dlmastery/nature_inspired_networks/blob/main/PAPER.md'>
+PAPER.md</a></b> — post-audit paper draft. <i>The contribution is the protocol,
+not the priors.</i></li>
+<li><b><a href='https://github.com/dlmastery/nature_inspired_networks/blob/main/AUDIT_SUMMARY.md'>
+AUDIT_SUMMARY.md</a></b> — paper-grade synthesis of impl-critic + sci-critic +
+Fixer campaign outputs.</li>
+<li><b><a href='https://github.com/dlmastery/nature_inspired_networks/blob/main/REVIEWER_CHECKLIST.md'>
+REVIEWER_CHECKLIST.md</a></b> — 42-item paper-acceptance gate; <b>39 PASS, 3
+gated</b> on the post-fix re-run.</li>
+<li><b><a href='https://github.com/dlmastery/nature_inspired_networks/blob/main/FINDINGS.md'>
+FINDINGS.md</a></b> — curated CIFAR-10/-100 verdicts with the AUDIT NOTICE
+prefix marking provisional H09/H41/H48 claims.</li>
+<li><b><a href='https://github.com/dlmastery/nature_inspired_networks/blob/main/CLAUDE.md'>
+CLAUDE.md</a></b> — 25 normative rules. Rules 20-25 added during this campaign
+codify auto-checkpoint loops, post-fix re-run, dual-track audit, orthogonal-
+axes compounds, dashboard discipline, and Q&A-test correspondence.</li>
 <li><b><a href='https://github.com/dlmastery/nature_inspired_networks/blob/main/IDEA_TABLE.md'>
-IDEA_TABLE.md</a></b> — full 71-hypothesis design space (G1..G7 groups) distilled
-from the four source documents.</li>
+IDEA_TABLE.md</a></b> — full 84-hypothesis design space (G1..G8 groups).</li>
 <li><b><a href='https://github.com/dlmastery/nature_inspired_networks/tree/main/hypotheses'>
-hypotheses/</a></b> — one committee-grade <code>H&lt;NN&gt;_*.md</code> spec per
-row in <code>IDEA_TABLE.md</code>. The dashboard's 71-cell grid links here.</li>
-<li><b><a href='dashboard/dashboard.html'>dashboard/</a></b> — the live
-autoresearch dashboard: Pareto plots, ablation matrix, training curves,
-persistent-homology Betti collapse, hypothesis status heatmap, reasoning-ledger
-modal, T0..T6 tier filters.</li>
+hypotheses/</a></b> — committee-grade <code>H&lt;NN&gt;_*.md</code> spec per
+hypothesis with the sci-critic addendum appended.</li>
+<li><b><a href='https://github.com/dlmastery/nature_inspired_networks/tree/main/audits'>
+audits/</a></b> — per-group impl-critic audit reports (<code>G1_audit.md</code> …
+<code>G8_audit.md</code>) with PASS/MINOR/MAJOR/BROKEN verdicts.</li>
+<li><b><a href='https://github.com/dlmastery/nature_inspired_networks/tree/main/skills'>
+skills/</a></b> — 17 content-agnostic auto-research skills (the 7 audit-aware
+ones — multi-agent-dispatch, critic-team, scicritic-team, fixer-campaign,
+combo-ladder, per-experiment-page, auto-checkpoint-loop — were added during
+this campaign).</li>
+<li><b><a href='dashboard/dashboard.html'>dashboard/</a></b> — live dashboard
+sectioned by hypothesis group; every leaderboard row links to a comprehensive
+per-experiment page with hypothesis digest, FINDINGS verdict, reasoning,
+config, metrics, composite breakdown, and inline-SVG training curves.</li>
 </ul></div>
 
 <h2>Reproduce</h2>
 <div class='map' style='font-family:Consolas,monospace;font-size:0.85em;
                        white-space:pre-line;color:#c9d1d9'>
-$env:SSL_CERT_FILE = ".\.venv\Lib\site-packages\certifi\cacert.pem"
+$env:KMP_DUPLICATE_LIB_OK = "TRUE"
 .\.venv\Scripts\python -u scripts\run_sweep.py `
    --config configs\cifar10_quick.yaml --seeds 0 --skip-existing
-.\.venv\Scripts\python scripts\compute_topology.py --seeds 0
 .\.venv\Scripts\python scripts\build_dashboard.py
 start dashboard\dashboard.html
 </div>
 
-<div class='meta'>Generated by <code>scripts/build_dashboard.py</code> · dark theme adapted from
-dlmastery/autoresearchspy.</div>
+<div class='meta'>Generated by <code>scripts/build_dashboard.py</code> · audit-
+aware landing v2 · dashboard theme adapted from dlmastery/autoresearchspy.</div>
 </div></body></html>
