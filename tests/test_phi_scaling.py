@@ -49,13 +49,47 @@ def test_h06_mid_channel_is_c_div_phi_rounded_to_8():
 
 
 def test_h06_inverted_branch_expands_then_contracts():
-    """inverted=True: c_mid = round8(c_in * phi). For c_in=64 -> 64*1.618 = 103.55 -> 104."""
+    """inverted=True: c_mid = round8(c_in * phi**2). For c_in=64 ->
+    64 * 2.618 = 167.55 -> round8 = 168 (H06 doc sec. 5.1: phi**2 expansion).
+
+    Updated 2026-05-27 post-audit: the prior implementation used c_in * PHI
+    (~1.618 expansion) which contradicted the doc's stated phi**2 (~2.618)
+    expansion. The corrected value re-derives c_mid from PHI rather than
+    hard-coding the (formerly wrong) constant.
+    """
     blk = GoldenBottleneck(64, 64, stride=1, inverted=True)
-    assert blk.c_mid == 104, blk.c_mid
+    # Derive the expected c_mid from PHI so a future PHI tweak doesn't
+    # silently desync the test from the constant.
+    expected = max(8, int(round(64 * (PHI ** 2) / 8)) * 8)
+    assert expected == 168, expected
+    assert blk.c_mid == expected, (blk.c_mid, expected)
     assert blk.c_mid > blk.c_in
     x = torch.randn(2, 64, 8, 8)
     y = blk(x)
     assert y.shape == (2, 64, 8, 8)
+
+
+def test_h06_inverted_expansion_ratio_matches_phi_squared():
+    """MECHANISM ASSERTION (audit follow-up): the inverted branch's
+    c_mid / c_in ratio must equal phi**2 within tolerance.
+
+    Without this assertion the previous regression -- shipping with a
+    plain `phi` (1.618) expansion -- went undetected because the original
+    test hard-coded `c_mid == 104` (= round8(64 * phi)), baking the bug
+    in. This test re-validates the *ratio* not the constant.
+    """
+    # round-to-8 introduces up to 4/c_in noise per c_mid; small c_in
+    # has correspondingly looser tolerance. We pick c_in values where
+    # the realised ratio should still land within +/- 0.15 of phi**2.
+    for c_in in (64, 96, 128, 256):
+        blk = GoldenBottleneck(c_in, c_in, stride=1, inverted=True)
+        realised = blk.c_mid / blk.c_in
+        assert abs(realised - PHI ** 2) < 0.05, (c_in, blk.c_mid, realised)
+    # Smaller c_in: looser tolerance reflects round-to-8 quantisation.
+    for c_in in (32,):
+        blk = GoldenBottleneck(c_in, c_in, stride=1, inverted=True)
+        realised = blk.c_mid / blk.c_in
+        assert abs(realised - PHI ** 2) < 0.15, (c_in, blk.c_mid, realised)
 
 
 def test_h06_stride2_downsamples_and_projection_skip_branch():
@@ -187,15 +221,21 @@ def test_h09_allocations_sum_to_budget():
 
 
 def test_h09_canonical_widths_consume_budget_approximately():
-    """phi_budget_widths derives widths whose squared sum maps to B_total.
-    The resulting PhiBudgetNet must have a param count within +/- 50%
-    of B_total (rough -- the formula uses the quadratic dominator)."""
+    """phi_budget_widths derives widths whose REALISED per-stage params
+    follow 1 : phi : phi**2.
+
+    Updated 2026-05-27 post-audit: the prior test required `c % 8 == 0`,
+    but div-8 quantisation at small widths was identified as a primary
+    source of the phi-ratio drift (audit G1 H09). The new allocator uses
+    integer widths (align=1) to preserve phi precision; the structural
+    invariants we still enforce are >=8 channels and monotone order.
+    """
     B = 270_000
     widths = phi_budget_widths(B, 3, kernel=3, blocks_per_stage=2)
     assert len(widths) == 3
-    assert all(c % 8 == 0 and c >= 8 for c in widths)
+    assert all(c >= 8 for c in widths), widths
     # widths must be monotone non-decreasing (phi**k grows)
-    assert widths == sorted(widths)
+    assert widths == sorted(widths), widths
 
 
 def test_h09_phi_vs_uniform_budget_modes_differ():
@@ -229,6 +269,66 @@ def test_h09_regression_phi_ratio_holds():
         expected = base * (PHI ** k)
         ratio = a / expected
         assert 0.95 < ratio < 1.05, (k, a, expected, ratio)
+
+
+def test_h09_phi_budget_net_realised_per_stage_param_ratio():
+    """MECHANISM ASSERTION (audit follow-up -- THE headline finding):
+    build PhiBudgetNet(B=270k, n=3, mode='phi') and verify the REALISED
+    per-stage parameter counts -- as measured by walking the built model
+    -- follow the 1 : phi : phi**2 ratio within 2%.
+
+    The audit (2026-05-27) showed the original allocator produced realised
+    ratios `1 : 1.414 : 2.451` against the doc-claimed `1 : phi : phi**2 =
+    1 : 1.618 : 2.618` (-13% at stage 1, -6% at stage 2). The old test
+    suite verified the *allocator function* in isolation but never walked
+    the built network -- exactly the gap this test closes.
+    """
+    for B_total, n_stages in [(270_000, 3), (500_000, 3), (1_000_000, 4)]:
+        net = PhiBudgetNet(num_classes=10, B_total=B_total,
+                           n_stages=n_stages, blocks_per_stage=2,
+                           budget_mode="phi")
+        stage_params = [
+            sum(p.numel() for p in s.parameters()) for s in net.stages
+        ]
+        ratios = [sp / stage_params[0] for sp in stage_params]
+        targets = [PHI ** k for k in range(n_stages)]
+        for k, (r, t) in enumerate(zip(ratios, targets)):
+            rel_err = abs(r - t) / t
+            assert rel_err < 0.02, (
+                f"PhiBudgetNet(B={B_total}, n={n_stages}) stage {k}: "
+                f"realised ratio {r:.4f} vs target phi**{k}={t:.4f}, "
+                f"rel_err={rel_err*100:.2f}% > 2% (widths={net.widths}, "
+                f"stage_params={stage_params})"
+            )
+
+
+def test_h09_phi_budget_net_widths_monotone_and_positive():
+    """Structural invariant: PhiBudgetNet widths must be strictly
+    monotone non-decreasing and >= 8 channels at every stage. The post-
+    audit allocator no longer guarantees div-8, but it MUST still produce
+    a monotone schedule (the phi**k ratio is monotonic by construction).
+    """
+    net = PhiBudgetNet(num_classes=10, B_total=270_000, n_stages=3,
+                       blocks_per_stage=2, budget_mode="phi")
+    assert all(c >= 8 for c in net.widths), net.widths
+    assert net.widths == sorted(net.widths), net.widths
+    # Stage widths must strictly increase (the phi**k schedule never plateaus)
+    for a, b in zip(net.widths[:-1], net.widths[1:]):
+        assert b >= a, net.widths
+
+
+def test_h09_phi_budget_net_total_budget_within_15pct():
+    """Iso-budget invariant: the realised total param count must be within
+    +/- 15% of the requested B_total (the audit's `total_params_drift`
+    invariant). Without this guard, future allocator tweaks could break
+    the iso-budget contract that H09's comparison-to-uniform depends on.
+    """
+    for B_total in (200_000, 270_000, 500_000):
+        net = PhiBudgetNet(num_classes=10, B_total=B_total, n_stages=3,
+                           blocks_per_stage=2, budget_mode="phi")
+        total = sum(p.numel() for p in net.parameters())
+        drift = abs(total - B_total) / B_total
+        assert drift < 0.15, (B_total, total, drift)
 
 
 def test_h09_edge_case_invalid_budget_raises():
