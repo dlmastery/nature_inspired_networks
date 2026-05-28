@@ -1,0 +1,18 @@
+{
+  "tag": "sg_only_golden_adam",
+  "dataset": "cifar10",
+  "seed": 0,
+  "epochs": 12,
+  "top1": 0.8394,
+  "top5": 0.9915,
+  "params": 272474,
+  "flops": 41218688.0,
+  "latency_ms": 4.83752000000095,
+  "rot_eq_err": 0.6021999642252922,
+  "composite": 0.8334026079539937,
+  "composite_fingerprint": "d65565e9c7b12d14cbce30a801ecc6753aea3eb148074256bfcc051fa61d0893",
+  "epochs_to_target": -1,
+  "train_seconds": 465.24736649999977,
+  "train_top1": 0.85625,
+  "generalization_gap": 0.01684999999999992
+}
