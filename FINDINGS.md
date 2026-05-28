@@ -133,6 +133,59 @@ the accuracy cost is real on CIFAR-100; both drop out of the headline track.
 + `baseline_resnet20` rail. No external accuracy claim will be made until
 the 3-seed median ± spread confirms the phi_budget lead is outside noise.
 
+## Phase 5 — 3-seed CIFAR-100 error bars (2026-05-27, 30 ep)
+
+| tag | s0 | s1 | s2 | **median** | mean | std | range |
+|---|---|---|---|---|---|---|---|
+| `baseline_resnet20` | 56.15 | 56.52 | 56.62 | **56.52** | 56.43 | 0.20 | 0.47 |
+| **`sg_only_phi_budget`** | 58.05 | 58.63 | 57.00 | **58.05** | 57.89 | 0.67 | **1.63** |
+| `sg_only_golden_momentum` | 56.99 | 56.76 | 56.43 | **56.76** | 56.73 | 0.23 | 0.56 |
+
+### Decisive seed-noise test (Phase-5 gate before any external claim)
+
+The protocol's gate: **does the lead survive the seed-noise envelope?**
+Specifically, is the leader's WORST seed still above the baseline's BEST
+seed? (A weaker formulation: do the per-tag {min, max} intervals fail to
+overlap?)
+
+- **`phi_budget` min = 57.00 % > `baseline_resnet20` max = 56.62 %**.
+  Even the worst phi_budget seed beats the best baseline seed by +0.38 pp.
+  Median advantage: **+1.53 pp** (58.05 vs 56.52). Mean advantage: +1.46 pp.
+  Phi_budget's seed-std (0.67) is larger than baseline's (0.20) — the
+  φ-allocation amplifies the seed-to-seed spread — but the floor still
+  clears the baseline ceiling. **The lead is outside seed noise. ✓**
+- **`golden_momentum` min = 56.43 % < `baseline_resnet20` max = 56.62 %**.
+  The seed distributions overlap; the Phase-4 +0.84 pp seed-0 advantage
+  shrinks to **+0.24 pp at the median** and the worst momentum seed
+  underperforms two of three baseline seeds. **Within noise. Demoted.**
+
+### Final verdicts
+
+- **H09 φ-Proportion Parameter Budget — SURVIVES Phase 5.** The only
+  prior in the project that beats the ResNet-20 baseline on *both* CIFAR-10
+  (85.54 vs 84.78, single seed) *and* CIFAR-100 (58.05 vs 56.52, 3-seed
+  median, lead outside noise). The "1 : φ : φ²" per-stage parameter
+  allocation is a real, replicated, seed-robust positive at this scale.
+  This is the project's first defensible single-prior win.
+- **H48 Golden-Momentum Scheduler — DEMOTED.** Phase-4 seed-0 win was
+  within seed noise. Recorded as neutral; further investigation would need
+  longer training or a different scheduler interaction to be revisited.
+- **All other hypotheses tested at Phase-5 depth:** unchanged from earlier
+  verdicts (H02 fib_depth efficiency-only, H05 fractal neutral-positive on
+  C10 only, H41 golden_adam falsified, etc.).
+
+### What Phase 5 proved
+
+The 6-phase autoresearch pipeline (unit tests → SOTA smoke → 35-tag C10
+smoke → top-K selection → C100 graduation → 3-seed error bars) ran
+end-to-end through 35 + 5 + 6 = **46 GPU runs** spanning two datasets and
+produced exactly one externally defensible accuracy claim plus several
+documented falsifications. **The protocol is the deliverable** — and it
+worked exactly as designed: most "golden-ratio fixes everything" claims
+died (H41 catastrophically, H48 quietly), and the one survivor was made
+to prove it twice on independent data and three times on independent
+seeds before earning the headline.
+
 ---
 
 ## Final ranking (composite descending, single seed) — original 11-row campaign
