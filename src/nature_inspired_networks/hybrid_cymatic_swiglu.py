@@ -59,12 +59,21 @@ def _cymatic_init_linear_(
 
     The Conv2d proxy lets us reuse the existing initialiser unchanged.
     We use a 5×5 kernel (>= band's max frequency) so the Chladni basis
-    has genuine 2-D structure. After init we take the **central tap**
-    (the spatial centre of each filter) and L2-normalise rows back to
-    a He-equivalent norm. The central-tap reduction preserves all
-    output channels (averaging risks collapsing channels whose modes
-    are anti-symmetric in space) while collapsing the spatial dimension
-    that Linear lacks.
+    has genuine 2-D structure. The post-fix ``chladni_modes_banded``
+    (Fixer-Priors `253dc94`) emits properly-deduplicated modes whose
+    central tap can be exactly zero for antisymmetric eigenmodes — so
+    using `proxy.weight[:, :, centre, centre]` produces zero-rows that
+    collapse the He-equivalent-norm rescale via the clamp-min path.
+
+    Instead we use **mean-spatial reduction**: ``w2d = proxy.weight.mean(dim=(2, 3))``
+    is the L2-projection of each filter onto the constant mode, which
+    is numerically robust (the mean is exactly zero only if the
+    Chladni eigenmode is balanced antisymmetric across the entire grid,
+    which is rare; we still guard with a Kaiming fallback per zero-row
+    to never produce a zero-norm row).
+    After the reduction we L2-normalise each row and rescale to
+    ``he_std × sqrt(in_f)`` so each row's L2 norm matches the
+    He-equivalent init exactly.
     """
     out_f = linear.out_features
     in_f = linear.in_features
@@ -73,15 +82,24 @@ def _cymatic_init_linear_(
         k_proxy += 1
     proxy = nn.Conv2d(in_f, out_f, k_proxy, padding=k_proxy // 2, bias=False)
     cymatic_init_(proxy, orthonormalize=True, band=band, seed=seed)
-    centre = k_proxy // 2
     with torch.no_grad():
-        # Central-tap reduction → (out_f, in_f).
-        w2d = proxy.weight[:, :, centre, centre].clone()
+        # Mean-spatial reduction → (out_f, in_f). Robust to antisymmetric
+        # cymatic modes whose central tap is exactly zero.
+        w2d = proxy.weight.mean(dim=(2, 3)).clone()
         fan_in = in_f
         he_std = math.sqrt(2.0 / fan_in)
-        # Per-row normalise then rescale to He-std × sqrt(fan_in) so the
-        # row's L2 ≈ He-norm.
-        row_norm = w2d.norm(dim=-1, keepdim=True).clamp(min=1e-8)
+        # Detect any row whose reduction collapsed to ~zero and replace
+        # with a Kaiming-style random row of the same target norm so the
+        # rescale below produces a non-zero output for every row.
+        row_norm = w2d.norm(dim=-1, keepdim=True)
+        zero_mask = row_norm.squeeze(-1) < 1e-6
+        if zero_mask.any():
+            g = torch.Generator(device=w2d.device).manual_seed(seed + 1)
+            for i in torch.nonzero(zero_mask, as_tuple=False).flatten().tolist():
+                w2d[i] = torch.randn(in_f, generator=g, device=w2d.device) * he_std
+            row_norm = w2d.norm(dim=-1, keepdim=True)
+        row_norm = row_norm.clamp(min=1e-8)
+        # Per-row normalise then rescale so the row's L2 = he_std × sqrt(in_f).
         w2d = w2d / row_norm * he_std * math.sqrt(in_f)
         linear.weight.copy_(w2d)
         if linear.bias is not None:
