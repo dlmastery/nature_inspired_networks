@@ -282,3 +282,35 @@ settings. Targeted experiment:
 ## 11. Status journal
 
 - 2026-05-27 — Created from template by Doc-Agent-C.
+
+---
+
+## Addendum: Research-Scientist Critique (2026-05-27)
+
+*Reviewer: SciCritic-G6 (elite-research-scientist critic). Critiquing the IDEA, not the implementation (audit at `audits/G6_audit.md`).*
+
+### Prior plausibility (LOW/MED/HIGH + why)
+HIGH (for the mechanism) but LOW (for novelty). Drop-path with anytime evaluation IS demonstrably effective in the canonical FractalNet paper (Larsson et al. 2017 ICLR 'FractalNet: Ultra-Deep Neural Networks without Residuals' arXiv:1605.07648). Stochastic depth (Huang et al. 2016 ECCV arXiv:1603.09382) and DropBlock (Ghiasi et al. 2018 NeurIPS arXiv:1810.12890) are also long-established. The mechanism is real; the predicted effect-size band (+0.3 to +1.5 pp lift) is exactly what the literature reports.
+
+### Mechanism scrutiny
+The mechanism described is *exactly* Larsson et al.'s drop-path verbatim — per-path Bernoulli mask with at-least-one-path-survives constraint, then full-paths at inference. The "anytime evaluation" claim is identical to FractalNet's "deeply supervised paths" property. Where is the novel contribution? The doc claims integration with "sacred-geometry NaturePriorBlock framework" but framework-integration ≠ scientific hypothesis. The mechanism is sound but unoriginal.
+
+### Confounds (≥2)
+1. **FractalNet baseline already includes drop-path**: comparing "fractal + drop-path" to "fractal − drop-path" is not testing a novel hypothesis; it is reproducing a 2017 ablation. If the baseline T1.5 `sg_only_fractal` claim (+2.35 pp) used FractalNet without drop-path, the *positive* number is itself suspect since canonical FractalNet uses drop-path.
+2. **Drop-path interacts with batch-norm running stats**: per-path zero-outs cause BN to see different effective batch sizes per path, biasing running mean/var. Without GroupNorm or BN-recompute at eval, the anytime curve will be confounded by BN drift.
+3. **"Anytime" via `force_depth` requires depth-1 forward to use the SAME BN statistics trained under depth-N**: this typically degrades by 10-30 pp, contradicting the claimed "≤8 pp depth-1 floor".
+
+### Numerology / specificity check
+p=0.15 is plausible (Larsson used 0.15-0.5) but is one knob across a continuous range with no ablation. "≥5 distinct operating points" is arbitrary for depth=3 (which only offers 3 natural points).
+
+### Literature precedent
+Beyond Larsson 2017 + Huang 2016: Wang et al. 2020 "DropPath" (arXiv:1605.07648 — same paper), Yu et al. 2019 "Slimmable Networks" (arXiv:1812.08928 — width version), Cai et al. 2020 "Once-For-All" (arXiv:1908.09791) all cover this design space. The hypothesis adds nothing new.
+
+### Expected effect size (90% CI a priori)
+Δ top-1 (full depth) ∈ [-0.2 pp, +1.0 pp] vs. no-drop-path; literature-supported. Anytime depth-1 will degrade [-15 pp, -5 pp], not the optimistic [-8 pp, -3 pp].
+
+### Minimum-distinguishing experiment
+Two arms: fractal + drop-path p=0.15 vs. fractal + drop-path p=0, both at depth=3, 25 ep × 3 seeds. Test (a) full-depth top-1 CI excluding 0 AND (b) depth-1 evaluation is non-trivially above random (10% on CIFAR). Mandatory: recompute BN statistics per inference depth before claiming "anytime".
+
+### Verdict
+DERIVATIVE+TESTABLE — pure FractalNet re-implementation with no novel claim; testable but should be reframed as a *reproduction*, not a hypothesis.

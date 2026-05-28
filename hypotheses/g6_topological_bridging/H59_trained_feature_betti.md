@@ -246,3 +246,35 @@ trained Betti at every transformer layer. Map the staircase.
 
 - 2026-05-27 — Created from template by Doc-Agent-C. Status remains
   `⏸ queued`; depends on H58 producing first `best.pt` checkpoints.
+
+---
+
+## Addendum: Research-Scientist Critique (2026-05-27)
+
+*Reviewer: SciCritic-G6 (elite-research-scientist critic). Critiquing the IDEA, not the implementation (audit at `audits/G6_audit.md`).*
+
+### Prior plausibility (LOW/MED/HIGH + why)
+HIGH (for the methodology) but the "hypothesis" framing is wrong. Computing Betti curves on *trained* features rather than *fresh-init* features is straightforward methodology hygiene — Naitzat et al. 2020 JMLR (arXiv:2004.06093), Hofer 2017 NeurIPS (arXiv:1707.04041), and every PH-on-NN paper computes Betti on trained features. The original CIFAR sweep using fresh-init Betti was a bug, not a baseline; fixing it is correct but is not a *hypothesis*. This is infrastructure / methodology work mislabeled as a falsifiable scientific claim.
+
+### Mechanism scrutiny
+The doc claims "≥40% faster β₀-collapse for fractal arm vs. reference" — but the comparison is between *priors* via their *trained-feature Betti rate*. This means H59 is actually proposing a new evaluation metric (rate-of-β₀-collapse), then predicting that the metric ranks priors in a specific order. The mechanism for *why* fractal recursion would yield faster β₀-collapse is missing — fractal recursion is about parameter sharing across depth, which is orthogonal to feature-cluster topology. Why would shared weights produce simpler trained Betti? No mechanism given.
+
+### Confounds (≥2)
+1. **Trained-feature Betti depends on n_samples**: 512 samples → high variance in β₀ estimate; need to report CI. Comparing prior-A at 512-sample β₀ to prior-B at 512-sample β₀ confounds the topology with the sample noise.
+2. **Penultimate-feature scale varies by prior**: cymatic-init produces high-norm features early; fractal produces variable-norm. Persistence threshold ε is feature-scale-coupled (same as H51 confound), so cross-prior Betti comparisons are not normalized.
+3. **The hypothesis depends on H58 producing checkpoints — but H58 was empirically falsified** (T2.1 -4.46 pp), so the trained-feature analysis is now on a checkpoint of a regression, not a recovery.
+
+### Numerology / specificity check
+"≥40% faster for fractal, ≥20% faster for cymatic" — arbitrary thresholds with no derivation. Why 40% vs 20%? Why not 50/30 or 25/15?
+
+### Literature precedent
+Naitzat 2020 (arXiv:2004.06093); Hofer 2017 (arXiv:1707.04041); Moor 2020 "Topological Autoencoders" (arXiv:1906.00722). Trained-feature Betti is standard; the methodology is real and reproducible.
+
+### Expected effect size (90% CI a priori)
+Trained Betti curves WILL differ from fresh-init Betti curves by >20% (high confidence — this is well established). Whether fractal-prior specifically yields 40% faster collapse than reference: [-30%, +30%], i.e., null is well within CI.
+
+### Minimum-distinguishing experiment
+Already specified: compute trained Betti on all 11 archived checkpoints + report 3-seed CI on collapse-rate. The discriminating test is whether priors *order differently* under trained-Betti vs. top-1 — if order is identical, trained-Betti adds no information.
+
+### Verdict
+INFRASTRUCTURE-NOT-HYPOTHESIS — should be reclassified as a tooling/methodology fix (replace fresh-init Betti with trained-feature Betti in `compute_topology.py`) rather than a falsifiable hypothesis. The downstream prediction (40% / 20%) is unmotivated numerology layered on top of a sensible methodology fix.

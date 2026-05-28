@@ -252,3 +252,35 @@ For LLM track, see H71 (icosahedral RoPE for 3D spatial reasoning):
 ## 11. Status journal
 
 - 2026-05-27 — Created from template by Doc-Agent-C.
+
+---
+
+## Addendum: Research-Scientist Critique (2026-05-27)
+
+*Reviewer: SciCritic-G6 (elite-research-scientist critic). Critiquing the IDEA, not the implementation (audit at `audits/G6_audit.md`).*
+
+### Prior plausibility (LOW/MED/HIGH + why)
+HIGH for the mechanism, LOW for novelty. Icosahedral planar unfold + standard 2D conv is exactly what Cohen et al. 2019 ICML 'Gauge Equivariant CNNs and Icosahedral CNN' (arXiv:1902.04615) and Jiang et al. 2019 ICLR 'Spherical CNNs on Unstructured Grids' (arXiv:1901.02039) already do. DeepSphere (Defferrard et al. 2020 ICLR arXiv:2012.15000) uses HEALPix-based pixelization to reuse 2D conv on the sphere. The trick is established.
+
+### Mechanism scrutiny
+The doc claims GICOPix is from "Górski 2005 + Yu 2019". Górski 2005 is HEALPix (ApJ 622, astro-ph/0409513), NOT GICOPix — those are different pixelization schemes. HEALPix has 12 base diamonds (one per icosa face pair), not 5 rhomboids. The 5-rhomboid tiling described looks more like Cohen 2019's "atlas of 5 charts via 72° rotational symmetry" — but Cohen unfolds into 5 parallelograms of size 2L×L, not GICOPix. The literature citation is muddled. Furthermore, the "single 2D conv on flat rectangle" claim hand-waves the *seam* problem: at chart boundaries the vertex-neighbor topology of the icosa does NOT map to rectilinear (h,w) adjacency, so a 3×3 conv kernel near a seam reads wrong neighbors. Cohen 2019 explicitly handles this via padding and parallel-transport gauge corrections — not a "single Conv2d call".
+
+### Confounds (≥2)
+1. **Seam padding bug**: without explicit gauge-aware padding at the 5 rhomboid boundaries, the 2D conv is silently wrong at the seams; this degrades equivariance and accuracy in ways that may *look* like the predicted "≥80% of e2cnn" but for the wrong reason.
+2. **Spherical MNIST is too easy**: 2D CNN with rotation-augmentation already reaches >97% on Spherical MNIST (Cohen 2018 arXiv:1801.10130); the "≥80% of e2cnn at <30% FLOPs" claim doesn't differentiate from plain CNN+augment.
+3. **FLOPs comparison apples-to-oranges**: e2cnn at 60-element group is the "lifted" feature-map regime; the *natural* baseline is e2cnn's `gated` variant or steerable-equivalent that's already cost-optimized — not full 60× lift.
+
+### Numerology / specificity check
+"≥80% of e2cnn accuracy at <30% FLOPs" — both thresholds are arbitrary with no derivation. "5 rhomboid patches" is one of several valid unfold geometries (1, 5, or 10 patches all work).
+
+### Literature precedent
+Cohen 2019 arXiv:1902.04615; Jiang 2019 arXiv:1901.02039; Esteves 2018 arXiv:1711.06721; Defferrard 2020 arXiv:2012.15000. The trick exists; this is a re-implementation.
+
+### Expected effect size (90% CI a priori)
+GICOPix vs. e2cnn-icosa: top-1 -5 to -2 pp at 25-40% FLOPs; if seam-handling implemented properly, the prediction is plausible. If naive (single Conv2d), expect -15 pp.
+
+### Minimum-distinguishing experiment
+Spherical MNIST, three arms: (A) e2cnn icosa-equiv, (B) GICOPix-unfold + 2D conv WITHOUT seam padding, (C) GICOPix + seam-aware gauge padding. If (B) and (C) differ by >2 pp, the seam handling matters; if not, the "weight sharing" claim is what drives gains.
+
+### Verdict
+DERIVATIVE+TESTABLE — established trick mis-cited (HEALPix vs GICOPix vs Cohen-icosa-atlas conflation); should be reframed as "evaluate seam-aware vs seam-naive icosa-unfold".

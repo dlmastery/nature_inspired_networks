@@ -343,3 +343,35 @@ fix:
 - (pending) — T2.1 result; if predicted lift hits, update
   `FINDINGS.md` and refresh dashboard; trigger H59 trained-feature
   Betti on saved `best.pt`.
+
+---
+
+## Addendum: Research-Scientist Critique (2026-05-27)
+
+*Reviewer: SciCritic-G6 (elite-research-scientist critic). Critiquing the IDEA, not the implementation (audit at `audits/G6_audit.md`).*
+
+### Prior plausibility (LOW/MED/HIGH + why)
+LOW (now FALSIFIED empirically). The hypothesis was that `amax(dim=1)` → `mean(dim=1)` orbit reduction would recover ≥+8 pp top-1. The actual T2.1 result reported in `FINDINGS.md`: `sg_only_group_avg` = 65.38% vs. baseline `sg_only_group` = 69.84% — i.e., the "fix" made performance WORSE by -4.46 pp. This is a stark empirical refutation. The status section should NOW say "DISCARDED — predicted +8 pp lift, observed -4.46 pp degradation".
+
+### Mechanism scrutiny
+The motivating mechanism (max-pool "discards 75% of the signal") is itself sloppy. Max-pool does not discard signal randomly; it preserves the *strongest* response across orbit elements — which has a different statistical character than the mean. In fact, max-pool over rotated orbit elements is what enables *robust feature detection* under arbitrary rotation: you want the feature to fire when ANY orbit element matches. Mean-pool averages over rotational poses, which can wash out features at any single pose. The literature is more nuanced than the doc admits: Cohen 2016 G-CNN (arXiv:1602.07576) discusses both reductions; Worrall 2017 "Harmonic Networks" (arXiv:1612.04642) uses *complex-valued magnitude* (akin to L2 norm); Weiler 2018 "3D Steerable CNNs" (arXiv:1807.02547) uses ELU + linear combinations.
+
+### Confounds (≥2)
+1. **Mean-pool reduces effective non-linearity**: averaging *before* ReLU squashes the activation distribution toward zero, reducing gradient signal. The -4.46 pp degradation is consistent with this — fewer active channels per spatial location after averaging.
+2. **Equivariance ≠ accuracy**: even granting equivariance preservation under both reductions, equivariance is a *constraint*, not a performance booster on non-rotation-augmented CIFAR-10. The task does not benefit from rotational equivariance; the constraint costs capacity.
+3. **The "75% signal loss" framing confuses signal energy with information**: max-pool's argmax encodes WHICH orbit element fired strongest — that index is itself informative if heads are interpreted as oriented filter banks.
+
+### Numerology / specificity check
+"≥8 pp lift" was a confident point prediction; the actual result of -4.46 pp shows the prediction was off by ~12.5 pp — far outside any reasonable a priori 90% CI. This is a calibration failure.
+
+### Literature precedent
+Cohen 2016 arXiv:1602.07576 actually uses *sum* pooling for orbit reduction in feature-space group conv; max-pool is used when projecting back to base-space (last layer). The H58 framing of "max is bugged, mean is standard" was simply wrong — the literature uses both depending on layer position.
+
+### Expected effect size (90% CI a priori, retrospective)
+Given the calibration failure: should have been [-5 pp, +2 pp]. The actual -4.46 pp is consistent with this corrected band.
+
+### Minimum-distinguishing experiment
+ALREADY RUN — T2.1 `sg_only_group_avg` = 65.38%; the experiment-falsifier (+5 pp floor at 95% CI) was crossed in the wrong direction. The hypothesis is empirically refuted.
+
+### Verdict
+DERIVATIVE+TESTABLE (empirically FALSIFIED) — the doc was written pre-result with confident +8 pp prediction; the actual -4.46 pp regression shows the "single-line fix" was a single-line REGRESSION. The doc MUST be updated with a `## 12. Falsification record` section stating: "Predicted: +8 pp. Observed: -4.46 pp. Hypothesis DISCARDED. Mean-pool over C4 orbit is empirically worse than max-pool on CIFAR-10 12-ep at this scale."

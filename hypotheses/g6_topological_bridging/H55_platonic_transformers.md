@@ -251,3 +251,35 @@ Strongest demonstration on rotated test sets:
 ## 11. Status journal
 
 - 2026-05-27 — Created from template by Doc-Agent-C.
+
+---
+
+## Addendum: Research-Scientist Critique (2026-05-27)
+
+*Reviewer: SciCritic-G6 (elite-research-scientist critic). Critiquing the IDEA, not the implementation (audit at `audits/G6_audit.md`).*
+
+### Prior plausibility (LOW/MED/HIGH + why)
+MED-HIGH. Islam 2025 IS a real paper — verified: Islam, Mohammad Mohaiminul et al. 2025 arXiv 'Platonic Transformers: A Solid Choice For Equivariance' (arXiv:2510.03511). The H55 doc cites it as "Islam, M. and others 2025 (forthcoming)" with no arXiv ID — this is a Rule-4 citation violation that should be FIXED immediately. The actual Islam 2025 method uses Platonic-solid reference frames (tetra/cube/octa) with weight-sharing across frames assigned to distinct attention heads — confirmed legitimate.
+
+### Mechanism scrutiny
+Islam 2025's actual mechanism: reference frames from Platonic symmetry groups parameterize separate attention heads with shared parameters via principled weight tying; RoPE is reused per-frame. The H55 doc's description ("heads correspond to vertices of icosahedron") is a paraphrase but the *icosahedron-12-heads* claim is questionable — Islam 2025 emphasizes tetra (12 rotations) and cube/octa (24 rotations) as the practical solids; icosahedron's rotation group has 60 elements, not 12 (12 is the vertex count). Conflating "12 heads = 12 icosa vertices" with "12 group elements" is a category error.
+
+### Confounds (≥2)
+1. **Continuous-translation + discrete-rotation equivariance is not free**: Islam 2025 keeps standard self-attention cost but the *gains* concentrate on 3D-symmetric data (QM9, ScanObjectNN); on 2D CIFAR-10, where there is no natural 3D symmetry, the equivariance constraint may *hurt* (over-restricts representation space).
+2. **"Iso-params with 5×-10× fewer parameters" is internally contradictory**: doc § 5.1 says params are "reduced by symmetry-group-size factor"; § 6 table says "params [-50%, -30%]"; these claims conflict.
+3. **Group-equivariant weight tying breaks the standard FA2 kernel call assumptions**: FA2 assumes independent Q/K/V; tied weights across heads change the autograd graph, may force slower fallback paths.
+
+### Numerology / specificity check
+"≥0.04 rotation-equivariance error reduction" — arbitrary threshold. The vertex-count-as-head-count framing (12 vertices = 12 heads) is numerology; the *correct* mapping is symmetry-group-element-count (60) not vertex-count.
+
+### Literature precedent
+Cohen & Welling 2016 ICML 'Group Equivariant CNNs' (arXiv:1602.07576); Weiler & Cesa 2019 NeurIPS 'General E(2)-Equivariant Steerable CNNs' (arXiv:1911.08251); Fuchs et al. 2020 NeurIPS 'SE(3)-Transformers' (arXiv:2006.10503); Brandstetter et al. 2022 ICLR 'Geometric and Physical Quantities improve E(3) Equivariant Message Passing' (arXiv:2110.02905). Islam 2025 is positioned in this lineage.
+
+### Expected effect size (90% CI a priori)
+QM9 atomization MAE: -0.1 to +0.05 kcal/mol vs. vanilla (consistent with Islam 2025's reported gains). CIFAR-10: -1.0 to +0.5 pp (likely null). Rotation-equivariance: -0.05 to -0.02 (consistent).
+
+### Minimum-distinguishing experiment
+Two arms on QM9 atomization at matched d_model, layers, params: (A) vanilla 12-head, (B) Platonic-tetra 12-head with proper group element accounting (NOT vertex-count). 3 seeds, 100 ep. Primary: MAE CI excluding 0 in favor of B.
+
+### Verdict
+DERIVATIVE+TESTABLE — real paper, real mechanism, but doc's citation (no arXiv ID) violates Rule 4 and the icosahedral-12-vertex framing misrepresents Islam 2025's tetra/cube/octa group-element design. Fix the citation to `Islam et al. 2025 arXiv 'Platonic Transformers: A Solid Choice For Equivariance' (arXiv:2510.03511)` and reframe head-count = group-element-count.

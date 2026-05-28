@@ -244,3 +244,35 @@ a small transformer + H66 cymatic-QKV init.
 ## 11. Status journal
 
 - 2026-05-27 — Created from template by Doc-Agent-C.
+
+---
+
+## Addendum: Research-Scientist Critique (2026-05-27)
+
+*Reviewer: SciCritic-G6 (elite-research-scientist critic). Critiquing the IDEA, not the implementation (audit at `audits/G6_audit.md`).*
+
+### Prior plausibility (LOW/MED/HIGH + why)
+LOW for the "cymatic" framing; MED for the dataset-as-toy-benchmark idea. The generator `sin(m*π*x/H) * sin(n*π*y/W)` is a **separable standing-wave** on a rectangular Dirichlet plate — NOT a Chladni mode. True Chladni patterns require solving the biharmonic plate equation `D∇⁴u + ρh ∂²u/∂t² = 0` with free-edge boundary conditions; the eigenfunctions are NOT separable products of sines, and the nodal lines are NOT the zero set of `sin(mπx)·sin(nπy)`. The doc's pattern is a 2D Helmholtz eigenmode on a fixed-edge membrane (drum), which is the *Faraday* / *Lamé* mode, not Chladni. Naming the dataset "cymatic"/"Chladni" is scientifically misleading; "drum-membrane eigenmode classification" is correct.
+
+### Mechanism scrutiny
+Even granting the mislabeled physics: the *hypothesis* is that "cymatic priors should help on a dataset constructed from cymatic eigenmodes". But this is a near-tautology — initializing a CNN with sine-wave Fourier basis filters (cymatic-init) and then testing classification on images that ARE those sine waves is testing memorization of basis functions, not generalization. ANY Fourier-basis init (Gabor, wavelets, DCT) would perform identically. The benchmark cannot distinguish "cymatic prior works" from "any sinusoidal init works". A scrambled-spectrum control (random orthogonal init) is needed to make the claim falsifiable in a non-trivial way.
+
+### Confounds (≥2)
+1. **Pattern → class is a trivial function**: m and n correspond directly to the 2D FFT peak location; a 1-layer FFT + argmax classifier would solve the task at >99% — no need for any learned prior.
+2. **Synthetic-data overfitting**: the 64-class structure with 1000 images/class differs from any natural distribution; performance on this dataset does not transfer.
+3. **Test "≥+10 pp top-1" assumes cymatic-init helps via spectral alignment — but plain He-init + standard SGD already learns Fourier filters from this data within 2-3 epochs (Rahaman 2019 spectral-bias arXiv:1806.08734). The lift may be early-epoch only; report convergence curves not endpoint.
+
+### Numerology / specificity check
+64 modes (1..8 × 1..8) — arbitrary; could be 16 or 256. 256×256 resolution — arbitrary. λ=0.05 for cymatic-loss — arbitrary. Threshold `|u| < 0.05` for nodal-line binarization — arbitrary.
+
+### Literature precedent
+Synthetic eigenmode classification datasets: e.g., Pestre 2020 "Texture Synthesis" — not directly comparable. Spectral-bias literature (Rahaman 2019 arXiv:1806.08734, Xu 2019 "Frequency Principle" arXiv:1901.06523) is the relevant background — and predicts that ANY CNN learns this easily without special priors.
+
+### Expected effect size (90% CI a priori)
+Vs. plain CNN with He-init: Δ top-1 ∈ [-2 pp, +3 pp] at 30 epochs (claim of +10-25 pp is unrealistic when baseline already solves the task).
+
+### Minimum-distinguishing experiment
+Three arms: (A) plain CNN He-init, (B) cymatic-init CNN, (C) random-Fourier-init CNN (orthogonal random sinusoids). If (B) and (C) match within 1 pp, the "cymatic"-specific claim is null and only "any Fourier init" matters. Plus mandatory baseline: 2D FFT + 1-layer logistic should hit 95%+; if it does, the benchmark is too easy to differentiate priors.
+
+### Verdict
+NUMEROLOGY (re: physics mislabeling) + DERIVATIVE+TESTABLE (re: actual content) — the dataset construction is mathematically a drum-membrane Helmholtz eigenmode, not a Chladni pattern; rename to "drum_eigenmode_dataset" or fix the math (solve biharmonic). The benchmark is also too easy to discriminate priors.

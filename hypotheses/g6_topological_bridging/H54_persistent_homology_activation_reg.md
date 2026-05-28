@@ -236,3 +236,35 @@ simplification stalls — i.e., over-parameterized + low data:
 ## 11. Status journal
 
 - 2026-05-27 — Created from template by Doc-Agent-C.
+
+---
+
+## Addendum: Research-Scientist Critique (2026-05-27)
+
+*Reviewer: SciCritic-G6 (elite-research-scientist critic). Critiquing the IDEA, not the implementation (audit at `audits/G6_audit.md`).*
+
+### Prior plausibility (LOW/MED/HIGH + why)
+LOW. H54 inherits every weakness of H51 and adds 3× the surrogate complexity. The "topological staircase" β₀ targets `{20, 10, 5}` and β₁ targets `{40, 5, 0}` are pulled from thin air: Naitzat et al. 2020 JMLR 'Topology of deep neural networks' (arXiv:2004.06093) *observes* monotonic simplification but never proposes specific staircase numbers, let alone β₀=20 at stage 1. The empirical Naitzat curves vary wildly by architecture and dataset (their Fig 5: β₀ ranges 1-200+ at intermediate layers). Fixing arbitrary targets and gradient-descending toward them imposes a hypothesis the data does not support.
+
+### Mechanism scrutiny
+The mechanism is identical to H51 — surrogate-PH via the same `betti_curve` machinery — but now applied at 3 stages with 6 targets and 3 λ values. The gradient pathway is highly susceptible to local minima: minimizing `||β₀(stage1) - 20||²` directly competes with the natural simplification that CE drives. If a stage *wants* to be at β₀=15 (because that's what CE optimization yields), the PH reg pulls it toward 20, fighting the task loss. There is no principled justification for why 20 is the right number at stage 1.
+
+### Confounds (≥2)
+1. **β₁ surrogate via cdist+sort is even more poorly defined than β₀**: true β₁ requires identifying *cycles*, which a smooth surrogate cannot do — only proper PH (gudhi, Ripser) computes β₁. Targeting "β₁=40" via the surrogate is regularizing toward whatever-the-surrogate-computes, which is not β₁.
+2. **Three lambdas × three targets × two Betti = 6 knobs**, no ablation budget; trivially overfittable.
+3. **Stage-feature extraction depends on hook placement**: pre-pool vs. post-pool vs. post-activation gives different point clouds with different topology; the staircase numbers are not extraction-invariant.
+
+### Numerology / specificity check
+b0_targets=[20,10,10], b1_targets=[40,5,0], lambdas=[0.05,0.1,0.2] — twelve free numerical knobs and no derivation. Why "2*n_classes" at stage 1? Why "4*n_classes" for β₁? These are aesthetics, not mechanism.
+
+### Literature precedent
+Hofer et al. 2019 ICML 'Connectivity-Optimized Representation Learning via PH' (arXiv:1906.00722) is real, uses true PH, reports +0.3 to +0.8 pp on CIFAR-10 with 30% training overhead. Carriere et al. 2020 PersLay (arXiv:1904.09378) is real but for graph classification, not hierarchical CNN reg. The "multi-stage staircase" with arbitrary targets has no precedent.
+
+### Expected effect size (90% CI a priori)
+Δ top-1 ∈ [-1.0 pp, +0.5 pp]; the claimed +2.0 pp is roughly 4× the highest credible literature lift.
+
+### Minimum-distinguishing experiment
+Three arms: (A) no PH reg, (B) PH reg with staircase targets [20,10,5], (C) PH reg with shuffled targets [5,10,20]. If (B) and (C) yield similar top-1, the *staircase structure* contributes nothing and only the magnitude of regularization matters. 50 ep × 3 seeds; report CI on (top-1_B − top-1_A).
+
+### Verdict
+DERIVATIVE+TESTABLE — extends H51's flawed surrogate to a hyperparameter-rich multi-stage variant with no principled target derivation. Reduces to "regularize stage activations toward specific summary statistics".

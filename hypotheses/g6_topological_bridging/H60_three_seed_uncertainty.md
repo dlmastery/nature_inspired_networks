@@ -245,3 +245,35 @@ The strongest demonstration: identify which Δ in the existing
 - 2026-05-27 — Created from template by Doc-Agent-C. Status remains
   `⏸ queued`; awaiting H58 (T2.1/T2.2) completion so the H58 result
   is included in the 3-seed re-sweep.
+
+---
+
+## Addendum: Research-Scientist Critique (2026-05-27)
+
+*Reviewer: SciCritic-G6 (elite-research-scientist critic). Critiquing the IDEA, not the implementation (audit at `audits/G6_audit.md`).*
+
+### Prior plausibility (LOW/MED/HIGH + why)
+N/A — this is not a hypothesis. Three-seed reporting with bootstrap CIs is **standard methodology**, mandated by Henderson et al. 2018 AAAI 'Deep Reinforcement Learning that Matters' (arXiv:1709.06560), Bouthillier et al. 2019 NeurIPS workshop 'Unreproducible Research is Reproducible' (arXiv:2002.06061), and every modern ML paper. Calling this a "hypothesis" is a category error. It belongs in `AUTORESEARCH_PROCESS.md` or `CLAUDE.md § 6 Rule 6` as a *gate*, not as `hypotheses/g6/H60`.
+
+### Mechanism scrutiny
+There is no scientific mechanism to scrutinize. The "claim" is that running 3 seeds will produce CIs — yes, of course it will. The downstream sub-claims ("H50 negative retains 95% CI exclusion", "H17 reclassified as null") are *empirical predictions about CI widths*, which depend entirely on seed variance σ. The doc asserts "σ ≈ 0.5 pp on CIFAR-10 12-epoch" without citation; in practice σ can range 0.2-2.0 pp depending on lr, batch size, augmentation, model size. The σ estimate is unsupported.
+
+### Confounds (≥2)
+1. **Bootstrap CI on N=3 samples is statistically incoherent**: standard bootstrap requires N ≥ 20-30 for reliable CIs; bootstrapping 3 values is essentially returning the empirical range. Use t-CI with df=2 (very wide) or just report (min, max, median).
+2. **Seed isolation is hard on Windows + CUDA + cudnn.benchmark=True**: per CLAUDE.md § 6, `cudnn.benchmark = True` is intentional — but cudnn algorithm selection is non-deterministic, contributing additional run-to-run variance beyond seed.
+3. **`--skip-existing` semantics**: if seed=0 was run under a slightly different config (e.g., before a code change), reusing it as "seed=0 of the 3-seed set" mixes runs from different code states. Re-run seed=0 too for hygiene.
+
+### Numerology / specificity check
+"≥1.5 pp gap reduction", "95% CI exclusion of 0", "σ ≈ 0.5 pp" — the σ estimate has no citation; the predicted CI widths are guesses. The pre-registration of specific Hs as "expected to remain significant" presupposes the answer.
+
+### Literature precedent
+Henderson 2018 arXiv:1709.06560 (the seed-variance crisis paper); Bouthillier 2019 arXiv:2002.06061; Pineau 2020 ML reproducibility checklist. The methodology is real and well-established.
+
+### Expected effect size (90% CI a priori)
+N/A — not a hypothesis with a Δ. The infrastructure will produce CIs of typical width ~0.5-1.5 pp for top-1; most current single-prior Δ < 1 pp will indeed become null at 95% CI (a generic prediction of small-sample statistics).
+
+### Minimum-distinguishing experiment
+None — re-running existing arms at 3 seeds simply produces error bars; nothing to "distinguish".
+
+### Verdict
+INFRASTRUCTURE-NOT-HYPOTHESIS — should be reclassified as a methodology gate (move to `CLAUDE.md § Rule 6` or `AUTORESEARCH_PROCESS.md`) rather than living in `hypotheses/g6/`. Use t-CI not bootstrap for N=3; cite Henderson 2018 properly. The framing "we predict CI excludes 0 for X but not Y" is post-hoc curve-fitting against the existing single-seed results.

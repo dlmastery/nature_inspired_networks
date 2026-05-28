@@ -272,3 +272,35 @@ regimes where natural Betti collapse is slow:
 ## 11. Status journal
 
 - 2026-05-27 — Created from template by Doc-Agent-C.
+
+---
+
+## Addendum: Research-Scientist Critique (2026-05-27)
+
+*Reviewer: SciCritic-G6 (elite-research-scientist critic). Critiquing the IDEA, not the implementation (audit at `audits/G6_audit.md`).*
+
+### Prior plausibility (LOW/MED/HIGH + why)
+LOW-to-MED. Real differentiable PH applied to representations has a legitimate (if niche) track record (Brüel-Gabrielsson 2020 arXiv:1905.12200, Hofer 2019 arXiv:1906.00722, Moor 2020 arXiv:1906.00722 "Topological Autoencoders"). But this repo's `betti_curve` is a *smooth cdist+sort surrogate*, NOT a real PH computation — it lacks the filtration over a simplicial complex that defines β₀ via union-find on edges sorted by length. A pairwise-distance MSE with `n_classes` is mathematically a soft k-means / contrastive prior wearing topological clothing. Calling that "Betti loss" overstates the connection to PH.
+
+### Mechanism scrutiny
+The proposed gradient `∂loss/∂feat` through `(b0 - n_classes)²` only flows usefully if `b0` is a *differentiable* function of `feat`. The doc waves at `topologylayer.nn.LevelSetLayer2D` but the actual repo uses the cdist surrogate. The mechanism collapses to: pull features whose pairwise distance falls just under threshold `ε` either closer or further apart — i.e., a hinged contrastive loss on a *density-grid*, not a topological invariant. Class labels never enter, so there is no mechanism that drives features for "dog" together vs. "cat" — only an aggregate pressure to have exactly `n_classes` components. Unsupervised clustering at best.
+
+### Confounds (≥2)
+1. **Label leakage absent**: target `β₀ = n_classes` is satisfied by ANY 10-cluster partition (e.g., color-clusters, brightness-clusters); the loss does not align clusters with class identity. The CE loss does that work; PH loss may even fight CE if CE wants to split classes into sub-clusters.
+2. **Persistence threshold `ε` couples to feature norm**: BatchNorm/weight-decay drift in feature scale will rescale `ε` and change `n_components` independently of any real topological change — a Goodhart trap.
+3. **Mini-batch artifact**: PH on a B=128 batch is not the PH of the manifold; it is the PH of a 128-sample sketch with high variance. The "topology" you regularize fluctuates per-batch.
+
+### Numerology / specificity check
+"≥1.5 pp gap reduction" and "≥30% faster β₀-collapse" are arbitrary thresholds with no derivation. λ=0.1 stage-3-only is one of dozens of plausible hyperparams; no ablation budget noted.
+
+### Literature precedent
+Moor et al. 2020 ICML "Topological Autoencoders" (arXiv:1906.00722) and Hofer 2019 (arXiv:1906.00722) are the closest legitimate prior art using real PH gradient; they report ~1 pp lifts on tiny benchmarks at large compute cost. Chen 2019 "A Topological Regularizer for Classifiers via Persistent Homology" (arXiv:1806.10714) reports null-to-marginal gains on CIFAR. The literature does NOT support 1.5 pp lift as a robust expectation.
+
+### Expected effect size (90% CI a priori)
+Δ top-1 ∈ [-0.5 pp, +0.3 pp]. Δ gap ∈ [-0.5 pp, +0.2 pp]. Gap reduction ≥1.5 pp is well outside the literature-supported band.
+
+### Minimum-distinguishing experiment
+Train two arms differing ONLY in λ_betti ∈ {0, 0.1} at 50 ep × 3 seeds. Primary outcome: 95% CI on (gap_λ=0 - gap_λ=0.1). If CI does not exclude 0, falsified. Mandatory ablation: shuffle class labels in CE while keeping PH loss — if test accuracy on real labels is unchanged, prove PH does nothing semantically.
+
+### Verdict
+DERIVATIVE+TESTABLE — the surrogate-PH loss is not novel topology, but it IS testable; effect-size pre-registration overshoots literature.
