@@ -1,0 +1,18 @@
+{
+  "tag": "loo_no_pd",
+  "dataset": "cifar10",
+  "seed": 0,
+  "epochs": 12,
+  "top1": 0.8537,
+  "top5": 0.9935,
+  "params": 262079,
+  "flops": 80810722.0,
+  "latency_ms": 4.6430099999997765,
+  "rot_eq_err": 0.8009075323740641,
+  "composite": 0.8494384078994757,
+  "composite_fingerprint": "d65565e9c7b12d14cbce30a801ecc6753aea3eb148074256bfcc051fa61d0893",
+  "epochs_to_target": -1,
+  "train_seconds": 368.8727949999957,
+  "train_top1": 0.869511217948718,
+  "generalization_gap": 0.01581121794871798
+}
