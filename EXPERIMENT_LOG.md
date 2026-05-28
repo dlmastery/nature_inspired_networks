@@ -108,6 +108,79 @@ benchmarks.
 | T6.6 | AudioSet log-mel spectrograms (cross-modal) | AudioSet | ○ planned |
 | T6.7 | Higgs UCI tabular (sister-project rail) | Higgs | ○ planned |
 
+## Campaign log — 2026-05-27 — 35-tag CIFAR-10 Phase-2 smoke
+
+> Dated campaign block (Rule 3: append-only). This logs the completed
+> implementation + CIFAR-10 Phase-2 screening campaign. The tiered
+> long-list above remains the canonical master index; this block
+> summarises the single largest sweep run to date.
+
+**Scope of the now-complete build.** 80 shared modules under
+`src/nature_inspired_networks/`, exercised by 78 `tests/test_*.py` files
+(~780+ unit tests, all green), backing 84 hypothesis design docs across
+thematic groups g1–g8.
+
+**Phase-2 smoke sweep.** 35 tags, seed 0, 12 epochs each, RTX 4090
+Laptop, bf16. **Zero failures** across all 35 runs. Wall-clock:
+~8559 s for the main 34-tag block + ~791 s for the G8 esoteric-extension
+tag = ~9350 s (~2.6 h) total. 12 epochs is a **screening budget**
+(Phase-2 broad scan), not a converged number — graduates re-run at the
+full recipe in Phase 4.
+
+**Seed-0 leaderboard (top-1, 12 ep).** Only **one** variant beat the
+ResNet-20 baseline:
+
+| rank | tag | H# | top-1 | note |
+|---|---|---|---|---|
+| 1 | `phi_budget` | H09 | **0.8554** | **ONLY variant > baseline** (+0.76 pp) |
+| 2 | `baseline_resnet20` | — | 0.8478 | reference |
+| 3 | `golden_momentum` | H48 | 0.8352 | |
+| 4 | `phi_dropout` | H47 | 0.8280 | |
+| 5 | `fractal` | H05 | 0.8246 | |
+| 6 | `fib_depth` | H02 | 0.8218 | @180k params |
+| 7 | `baseline_sg_vanilla` | — | 0.8216 | priors-off baseline |
+| 8 | `phi_multiscale` | H07 | 0.8200 | |
+| 9 | `golden_skip` | H17 | 0.8163 | |
+| 10 | `fib_prune` | H43 | 0.8115 | |
+| 11 | `golden_resize` | H03 | 0.8067 | |
+| 12 | `sine_act` | H81 | 0.8062 | |
+| 13 | `golden_spiral_init` | H31 | 0.8042 | |
+| 13 | `phi_compound` | H01 | 0.8042 | |
+| 15 | `chan_phi` / `chan_fib` / `fib_ensemble` | H04/— | 0.8011 | |
+| 18 | `phi_activation` | H39 | 0.7995 | |
+| 19 | `golden_modulate` | H17/H34 | 0.7981 | |
+| 19 | `phi_decay` | H44 | 0.7981 | |
+| 21 | `hex` | H21 | 0.7932 | |
+| 22 | `phi_lr` | H10 | 0.7875 | |
+| 23 | `toroidal` | H22 | 0.7805 | |
+| 24 | `cymatic_init` | H35 | 0.7744 | |
+| 25 | `phi_init` | H42 | 0.7656 | |
+| 26 | `constant_width` | H80 | 0.7595 | |
+| 27 | `phi_sparse` | H13 | 0.7333 | |
+| 28 | `full_fib` | H50 | 0.7324 | all-priors hybrid |
+| 29 | `fib_stride` | H18 | 0.7255 | |
+| 30 | `phi_relu` | H19 | 0.7107 | |
+| 31 | `group` | H24 | 0.6984 | C4 group conv |
+| 32 | `golden_bottleneck` | H06 | 0.6925 | @58k params |
+| 33 | `full_fib_avg` | H50+H58 | 0.6686 | |
+| 34 | `group_avg` | H58 | 0.6538 | |
+| 35 | `golden_adam` | H41 | 0.5196 | **FALSIFIED** — φ-scheduled Adam betas collapse training |
+
+**Verdicts.**
+- **Positive:** `phi_budget` (H09) is the only variant to clear the
+  ResNet-20 baseline at 12 ep (+0.76 pp). It graduates.
+- **Falsification:** `golden_adam` (H41) at 0.5196 top-1 — φ-derived
+  Adam β-schedule destabilises optimisation; recorded as a negative
+  result.
+- **Read:** at a 12-epoch screening budget the priors mostly do not beat
+  a well-tuned baseline; the signal is in the cross-row ablation deltas,
+  not the asymptote. Convergence (Phase 4) decides graduates.
+
+**Phase-4 CIFAR-100 shortlist.** The heavy-hitters that graduate to the
+≥30-epoch CIFAR-100 phase: `phi_budget` (H09), `fib_depth` (H02),
+`fractal` (H05), `golden_momentum` (H48), plus `baseline_resnet20` as
+the carried-forward reference.
+
 ## Header-line conventions
 
 - One row = one archive sub-directory = one `metrics.json`.

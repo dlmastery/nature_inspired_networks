@@ -129,6 +129,30 @@ is `GroupConv2d`, where the orbit-aware init is left as future work.
 | Hex conv | `HexConv2d` | `priors.py` | masked conv with optional toroidal pad |
 | Golden-angle gate | inside `NaturePriorBlock` | `blocks.py` | `cos(2π·k/φ + α)` per channel |
 
+## Module families — `src/nature_inspired_networks/` (80 modules)
+
+The shared package now exposes **80 modules** (single import surface,
+Rule 14), exercised by **78 `tests/test_*.py` files (~780+ unit tests,
+all green)** and backing **84 hypothesis docs across groups g1–g8**.
+Modules are grouped below by the 8 thematic families; only the key
+module per family is tabled with a one-line shape/role note (the full
+list is the directory itself).
+
+| family | theme | key modules | shape / role (one-liner) |
+|---|---|---|---|
+| **g1** | scaling & growth | `priors.fibonacci_channels`, `phi_budget`, `phi_compound`, `phi_multiscale`, `fib_depth` | choose stage widths/depths on φ/Fibonacci rules; budget-matched channel allocation (H09 best) |
+| **g2** | layer / channel / neuron | `phi_activation`, `phi_relu`, `sine_act`, `constant_width`, `fib_ensemble` | per-channel/per-neuron transforms; activation + width policies; (B,C,H,W)→(B,C,H,W) |
+| **g3** | topologies & graphs | `toroidal_pad`, `HexConv2d`, `GroupConv2d`, `hex_kernel_mask` | lattice/graph-structured conv: hex 7-tap mask, C4 orbit pool, circular (toroidal) padding |
+| **g4** | kernels / attention / filters | `cymatic_init_`, `golden_modulate`, `golden_skip`, `fibottention` | kernel init + channel gating + Fib-dilated attention; (B,C,H,W)→gated (B,C,H,W) |
+| **g5** | optimization / init / reg / NAS | `phi_lr`, `golden_momentum`, `golden_adam`, `phi_dropout`, `phi_decay`, `phi_init`, `fib_prune` | LR/momentum/β schedules, φ-weight init, φ-dropout, Fib structured pruning (training-time, no shape change) |
+| **g6** | topological bridging | `compute_betti`, betti-collapse hooks | β₀/β₁ persistence on trained features; diagnostic, not in forward path |
+| **g7** | cross-paradigm hybrids | `NaturePriorBlock`, `NaturePriorNet`, `full_fib` composer | compose multiple priors into one residual block / ResNet-shaped stack |
+| **g8** | esoteric extensions | `golden_spiral_init`, `golden_resize`, `metatron`/`vesica` routing, `harmonic_cymatic` | golden-spiral PE/init, Metatron-graph routing, harmonic-cymatic SwiGLU FFN variants |
+
+Every module is a drop-in flag/composer for `NaturePriorBlock` /
+`NaturePriorNet`; no module duplicates code from another (Rule 14). The
+mapping module↔hypothesis is in `IDEA_TABLE.md`.
+
 ## What the runner writes
 
 Per experiment (`experiments/<dataset>/<tag>_seed<S>/`):
