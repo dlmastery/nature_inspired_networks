@@ -234,3 +234,34 @@ gradient stats. Budget: ~5 hours.
 ## 11. Status journal
 
 - 2026-05-27 -- Created from template by Doc-Agent-A.
+
+---
+
+## Addendum: Research-Scientist Critique (2026-05-27)
+
+*Reviewer: SciCritic-G2 (elite-research-scientist critic). Critiquing the IDEA, not the implementation (that audit lives at `audits/G2_audit.md`).*
+
+### Prior plausibility (LOW/MED/HIGH + why)
+LOW. The proposal is a learnable per-channel threshold initialised at 1/φ ≈ 0.618. The activation-function-with-learnable-threshold space is well-explored: Shifted-ReLU (Clevert, Unterthiner, Hochreiter 2016 ICLR 'Fast and Accurate Deep Network Learning by Exponential Linear Units (ELUs)' arXiv:1511.07289), Translated-ReLU and Threshold-ReLU variants. After BN-pre-activation, inputs to the activation have mean ≈ 0, std ≈ 1; a threshold of 0.618 kills the lower 73 % of activations (Φ(0.618) ≈ 0.732), which is far more aggressive than ReLU (kills lower 50 %) and likely *hurts* gradient flow.
+
+### Mechanism scrutiny
+The "cortical interneuron firing threshold of 0.6 of dynamic range" claim is misappropriated. The Koch 1999 'Biophysics of Computation' reference shows interneuron thresholds at ~-55 mV with rest -65 mV and peak +30 mV, giving normalised threshold ≈ (10/95) ≈ 0.11, not 0.6. The doc's specific 0.6 number is incorrect for pyramidal cells (typically 0.18) and even for interneurons (0.10-0.25 range). The φ-link is post-hoc fabrication.
+
+### Confounds (≥ 2 alternatives)
+(1) Any learnable per-channel threshold (initialised at any reasonable value: 0.0, 0.5, 0.618, 1.0) will train to the same equilibrium given enough epochs — the init is just a warm-start direction. (2) After BN with eps and momentum, the input distribution is non-stationary; the 0.618 init's "kills 73% of channels at init" is only true at the very first step. (3) Threshold init at 0.618 *with* BN before activation = activation effectively learns a per-channel bias shift, which is what the BN affine *already does*. The hypothesis duplicates an existing degree of freedom.
+
+### Numerology check
+Yes. Threshold init at 0.5 vs 0.6 vs 0.618 vs 0.7 will give indistinguishable converged accuracy. With BN+affine bias, threshold init at 0.0 (standard ReLU) reaches the same trained equilibrium because the BN affine bias absorbs the shift. The φ value has no privileged status.
+
+### Literature precedent
+He, Zhang, Ren, Sun 2015 ICCV 'Delving Deep into Rectifiers' (arXiv:1502.01852) — PReLU, learnable slope. Trottier, Giguere, Chaib-draa 2017 ICMLA 'Parametric Exponential Linear Unit' (arXiv:1605.09332) — PELU. Ramachandran, Zoph, Le 2017 ICLR Workshop 'Searching for Activation Functions' (arXiv:1710.05941) — Swish/SiLU, learned via NAS. Lu, Shin, Su, Karniadakis 2019 JMLR 'Dying ReLU and Initialization' (arXiv:1903.06733) — analyses dying-ReLU; mitigation is *bias initialisation* (set bias < 0), which is exactly what the φ-threshold accomplishes — but at the wrong magnitude (the prescribed bias is ~0.1, not 0.618).
+
+### Expected effect size (90% CI a priori)
+On CIFAR-10 12-epoch with BN: Δtop-1 = [-0.6, +0.2] pp, biased negative because 0.618 is too aggressive a threshold. Without BN: Δtop-1 = [-2.0, -0.5] pp (severe channel-starvation). The dead-channel-reduction claim is plausible at large depths but the magnitude reduction is captured by BN already.
+
+### Minimum-distinguishing experiment
+Threshold-init sweep: {0.0, 0.1, 0.3, 0.5, 0.618, 0.8, 1.0} all learnable. If 0.618 does not dominate the others at p<0.05 over 5 seeds, the φ-specific claim collapses to "learnable threshold helps a little." Then ablate against PReLU at the same param-budget — if PReLU matches, the threshold direction is not the win.
+
+### Verdict
+NUMEROLOGY — 0.618 is dominated by BN+affine (which absorbs the shift) and the closest controls (any threshold in [0.1, 1.0]) are indistinguishable; the "interneuron 0.6 threshold" citation is factually wrong.
+

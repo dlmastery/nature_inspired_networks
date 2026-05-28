@@ -257,3 +257,34 @@ and Carbin 2019)?**
 ## 11. Status journal
 
 - 2026-05-27 -- Created from template by Doc-Agent-A.
+
+---
+
+## Addendum: Research-Scientist Critique (2026-05-27)
+
+*Reviewer: SciCritic-G2 (elite-research-scientist critic). Critiquing the IDEA, not the implementation (that audit lives at `audits/G2_audit.md`).*
+
+### Prior plausibility (LOW/MED/HIGH + why)
+LOW. The sparse-network literature (lottery ticket, magnitude pruning, IMP, RigL) is the most thoroughly swept density-vs-accuracy hyperparameter space in modern deep learning, and the optimum is consistently at much higher sparsity than 0.618 — Frankle and Carbin 2019 ICLR 'The Lottery Ticket Hypothesis' (arXiv:1803.03635) finds winning tickets at 3-10 % density, Evci et al 2020 ICML 'Rigging the Lottery: Making All Tickets Winners' (arXiv:1911.11134) sweeps 0.05-0.5 density and finds smooth tradeoffs. 0.618 is firmly in the *uninteresting middle* of the density curve. The biological "1/φ recurrence" citation (Markram et al 2015 Cell) does not actually claim cortical density is 1/φ — Markram reports laminar-specific densities ranging 0.05 to 0.4, and the 0.618 number does not appear in that paper.
+
+### Mechanism scrutiny
+The "p + p² = 1 phi identity" claim in §1 is a numerological coincidence dressed as a derivation: 0.618² ≈ 0.382, 0.618 + 0.382 = 1, but this identity has no meaning for weight sparsity. There is no information-theoretic or wiring-cost derivation linking 1/φ to a sparsity optimum. The "cortical microcircuit recurrence probability" claim is misattributed.
+
+### Confounds (≥ 2 alternatives)
+(1) The dense-vs-sparse comparison at fixed weight count is the well-known iso-param sparse-net result (Liu, Wang, Foroosh, Tappen, Pensky 2015 CVPR 'Sparse Convolutional Neural Networks' arXiv:1410.0440); any density between 0.4 and 0.7 will give iso-accuracy on small models. (2) Random vs magnitude pruning is a much bigger effect than the specific density value — confounding these two axes makes the φ claim unfalsifiable. (3) Implicit regularization from the random mask plays the same role as DropConnect (Wan et al 2013 ICML 'Regularization of Neural Networks using DropConnect').
+
+### Numerology check
+Yes — 0.618 vs 0.5 vs 0.7 vs 0.6 will all produce statistically indistinguishable results on CIFAR-10 at the +/- 0.5 pp falsifier band. The doc itself admits this implicitly by sweeping {0.382, 0.5, 0.618} in §7.1; if all three give the same accuracy, the φ-specific claim is dead.
+
+### Literature precedent
+Frankle and Carbin 2019 ICLR 'The Lottery Ticket Hypothesis: Finding Sparse, Trainable Neural Networks' (arXiv:1803.03635) — sweeps density over [0.01, 0.5]; 0.618 is never the optimum. Han, Pool, Tran, Dally 2015 NeurIPS 'Learning both Weights and Connections for Efficient Neural Networks' (arXiv:1506.02626) — magnitude pruning, density chosen by accuracy gate not by aesthetics. Lee, Ajanthan, Torr 2019 ICLR 'SNIP: Single-shot Network Pruning based on Connection Sensitivity' (arXiv:1810.02340) — single-shot pruning at user-chosen density; no φ. Hoefler, Alistarh, Ben-Nun, Dryden, Peste 2021 JMLR 'Sparsity in Deep Learning' (arXiv:2102.00554) — the canonical survey; concludes density should be tuned, not fixed by a constant.
+
+### Expected effect size (90% CI a priori)
+On CIFAR-10 12-epoch at density 0.618 (head only) vs dense baseline: Δtop-1 = [-0.4, +0.1] pp (mild capacity loss). At density 0.5: [-0.5, +0.0] pp. The 0.382 and 0.5 baselines should be indistinguishable from 0.618. The "Pareto improvement at iso-FLOPs" claim is implausible because the dense+mask implementation does not actually save FLOPs (the doc concedes this in §5.1).
+
+### Minimum-distinguishing experiment
+Sweep density at {0.382, 0.500, 0.618, 0.700, 0.800} with 5 seeds each. If 0.618 does not strictly dominate the others at p<0.05, the φ-specific claim falls. Additionally, run with both random and magnitude pruning at each density to deconfound mask-selection from density.
+
+### Verdict
+NUMEROLOGY — the 0.618 density choice has no derivable optimality property and the closest comparators (0.5, 0.7) will be statistically tied within the proposed falsifier window.
+

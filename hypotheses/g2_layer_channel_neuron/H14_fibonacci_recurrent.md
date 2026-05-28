@@ -279,3 +279,34 @@ constant-state Mamba. Budget: ~6 hours.
 ## 11. Status journal
 
 - 2026-05-27 -- Created from template by Doc-Agent-A.
+
+---
+
+## Addendum: Research-Scientist Critique (2026-05-27)
+
+*Reviewer: SciCritic-G2 (elite-research-scientist critic). Critiquing the IDEA, not the implementation (that audit lives at `audits/G2_audit.md`).*
+
+### Prior plausibility (LOW/MED/HIGH + why)
+LOW. The hypothesis stacks two unrelated φ-derived knobs (Fib hidden sizes + 1/φ-biased update gate) and predicts a 2-5 pp gain on synthetic copy tasks. The GRU literature already converged on what makes copy tasks work — Jozefowicz, Zaremba, Sutskever 2015 ICML 'An Empirical Exploration of Recurrent Network Architectures' (arXiv:1503.04069) systematically searched the GRU/LSTM gate-equation space and found that gate-bias initialisation matters but the optimum is the "forget bias = 1" trick (logit ≈ 0 → sigmoid = 0.5 to 0.73), not logit(1/φ) ≈ -0.481 (sigmoid = 0.618). Miller's "magical seven" has nothing to do with Fibonacci or φ; the citation is misappropriated.
+
+### Mechanism scrutiny
+The "biological half-life of working memory follows additive recurrence" claim is fabricated. Miller 1956 is about chunk capacity (7 ± 2), not decay rate. Working-memory decay is well-studied (Brown 1958, Peterson and Peterson 1959) and follows exponential not additive dynamics. The "logit(1/φ) makes the cell prefer to retain φ-fraction" reasoning is correct mechanically but indistinguishable from any update-gate-bias init in the range logit(0.5)=0 to logit(0.7)=0.85.
+
+### Confounds (≥ 2 alternatives)
+(1) Forget-gate-bias = 1 (Gers, Schmidhuber, Cummins 2000 Neural Computation 'Learning to Forget') gives sigmoid ≈ 0.73, which empirically dominates random init; the 1/φ ≈ 0.618 init is just close enough to capture most of the gain. (2) Fib hidden sizes [21, 34, 55] introduce a Linear projection between layers (Sec 5.1) that the constant-hidden GRU does not have — those extra params and the additional non-linearity-free path are confounds. (3) The proposed -25 % param drop is from the smaller widths, not from φ.
+
+### Numerology check
+Yes. Bias = logit(0.6) vs logit(0.618) vs logit(0.7) will all produce statistically indistinguishable results. Hidden sizes [16, 32, 64] (powers of 2) vs [21, 34, 55] (Fib) will be indistinguishable at iso-params. The proposed +2-5 pp lift on copy task at length 50-200 is almost certainly explained by the forget-gate-bias trick already in the literature, NOT by Fibonacci sizes.
+
+### Literature precedent
+Direct precedent: Gers, Schmidhuber, Cummins 2000 Neural Computation 'Learning to Forget: Continual Prediction with LSTM' (no arXiv) — forget bias init = 1 is the established trick. Tallec, Ollivier 2018 ICLR 'Can Recurrent Neural Networks Warp Time?' (arXiv:1804.11188) — derives optimal gate bias as chrono-init based on expected timescales; the optimum is task-dependent, not 1/φ. Jozefowicz, Zaremba, Sutskever 2015 ICML 'An Empirical Exploration of Recurrent Network Architectures' (arXiv:1503.04069) — exhaustive search; no φ. Fib hidden sizes are a special case of variable-width RNN (no specific paper because nobody found it useful).
+
+### Expected effect size (90% CI a priori)
+On synthetic copy task at length 50-200 with chrono-init or forget-bias=1 control: Δaccuracy = [-1.0, +1.0] pp. Most of the doc's predicted gain comes from the chrono-init effect; switching from logit(0.5) (no bias) to logit(0.618) recovers ~50 % of the chrono-init gain. The "+2 to +5 pp" prediction is implausible at iso-train-budget.
+
+### Minimum-distinguishing experiment
+Three-way control: {logit(0.5) no-bias init, logit(0.618) φ init, chrono-init Tallec-Ollivier 2018}. Hold hidden size constant at 64 for all three. If φ-init does not beat chrono-init by ≥ 1 pp, the φ-claim is dead. Then separately ablate Fib hidden sizes [21,34,55] against constant-42 (matched-param) — if no advantage, the Fib-width claim dies too.
+
+### Verdict
+NUMEROLOGY — both component claims (Fib widths, φ gate-bias) are dominated by existing, theoretically-motivated baselines (chrono-init, forget-bias=1) that the doc does not control against.
+

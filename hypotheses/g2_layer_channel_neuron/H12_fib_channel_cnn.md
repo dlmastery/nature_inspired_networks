@@ -272,3 +272,34 @@ Inception, MixNet)?**
 - (previous) -- T1.1 sg_chan_fib at single seed: Fib channels only, no
   phi-kernel addition. Top-1 80.11 pct, composite 0.8135.
 - (planned) -- exp001 adds the alternating-kernel phi variant.
+
+---
+
+## Addendum: Research-Scientist Critique (2026-05-27)
+
+*Reviewer: SciCritic-G2 (elite-research-scientist critic). Critiquing the IDEA, not the implementation (that audit lives at `audits/G2_audit.md`).*
+
+### Prior plausibility (LOW/MED/HIGH + why)
+LOW-MED. The Fib-channel-only ablation (T1.1 sg_chan_fib) already underperforms the constant-channel vanilla baseline (-2.05 pp top-1) at single seed. The doc proposes to **add another phi-derived knob** (alternating kernel sizes) on top of a *failed* prior to recover the loss — this is double-counting the same numerological hypothesis. Mixed-kernel CNNs (Inception, MixNet) work because of *parallel multi-scale feature extraction*, not sequential phi-spaced alternation; sequential kernel alternation has been tried under the name "kernel size search" by Tan, Pang, Le 2019 ICML 'MixConv: Mixed Depthwise Convolutional Kernels' (arXiv:1907.09595) and the optimum is found by NAS, not by phi.
+
+### Mechanism scrutiny
+The "joint width-and-kernel growth at the phi rate" claim is post-hoc. The biological precedent (V1→V2→V4 receptive-field growth) actually shows RF growth by ~2x per cortical area and ~5x cumulatively (Smith, Singh, Williams, Greenlee 2001 Cerebral Cortex), not phi^k. The doc's own cost analysis (Sec 5.1) admits the kernel-5 stages produce a +100 % param cost — the hypothesis then claims this is "capacity redistribution," which is unfalsifiable without separating the kernel-size and channel-count axes.
+
+### Confounds (≥ 2 alternatives)
+(1) Larger kernels straightforwardly improve accuracy in low-data regimes (3x3 vs 5x5 on CIFAR-10: Liu, Mao, Wu, Feichtenhofer, Darrell, Xie 2022 CVPR 'A ConvNet for the 2020s' arXiv:2201.03545 uses 7x7); the proposed comparison conflates this well-known effect with phi-spacing. (2) Parameter-count: +100 % params trivially helps a tiny CIFAR-10 network. (3) Effective receptive field: alternating stride-1 kernels 3,5,3,5 gives ERF = 1+2+4+6+8 = 21px on 32x32 CIFAR, which is nearly global — comparing against a 3x3-only ERF of 9px is unfair.
+
+### Numerology check
+Yes — kernels [3, 5, 3, 5] vs [3, 7, 3, 7] vs [3, 5, 7, 9] should all produce the same direction of effect. The phi-cascade (3 → round(3φ)=5 → round(5φ)=8) is just "increasing kernel size by ~60% per alternation," which can be replicated by any growth factor in [1.4, 1.8].
+
+### Literature precedent
+This is a rediscovery of multi-scale convolution. Szegedy et al 2015 CVPR 'Going Deeper with Convolutions' (arXiv:1409.4842) — Inception used parallel 1x1, 3x3, 5x5. Tan, Pang, Le 2019 ICML 'MixConv' (arXiv:1907.09595) — learned kernel-size mixtures. Ding, Zhang, Han, Ding, Sun 2022 CVPR 'Scaling Up Your Kernels to 31x31: Revisiting Large Kernel Design in CNNs' (arXiv:2203.06717) — large kernels are best monotonically, not in phi-pairs. Trockman, Kolter 2022 ICLR 'Patches Are All You Need?' (arXiv:2201.09792) — ConvMixer also uses single large kernel.
+
+### Expected effect size (90% CI a priori)
+On CIFAR-10 12-epoch at +100% params: Δtop-1 = [+0.3, +1.5] pp from raw capacity, NOT from phi. Iso-param control with constant kernel-5 throughout would dominate the phi-alternation by [-0.3, +0.3] pp (i.e., be statistically indistinguishable). The doc's predicted "+0.3 to +1.5 pp over T1.1" is plausible but entirely attributable to params.
+
+### Minimum-distinguishing experiment
+Iso-param control: match params by reducing channel counts on the kernel-5 stages so total params equals the constant-3 baseline. Then compare {3,3,3,3}, {3,5,3,5}_phi-spaced, {5,5,5,5}_constant, {3,5,7,9}_linear-growth. If phi-spacing has no advantage over linear-growth at iso-params, H12 is numerology.
+
+### Verdict
+NUMEROLOGY — the phi-kernel-spacing addition is indistinguishable from "any moderate kernel-size growth" and the existing Fib-channel evidence is already negative.
+

@@ -254,3 +254,40 @@ checkpoint final. 1 epoch. Budget: ~5 hours.
 ## 11. Status journal
 
 - 2026-05-27 -- Created from template by Doc-Agent-A.
+
+---
+
+## Addendum: Research-Scientist Critique (2026-05-27)
+
+*Reviewer: SciCritic-G2 (elite-research-scientist critic). Critiquing the IDEA, not the implementation (that audit lives at `audits/G2_audit.md`).*
+
+### Prior plausibility (LOW/MED/HIGH + why)
+LOW. The weight-averaging literature has a precise theoretical answer for the "best" weights: under the assumption that checkpoints are drawn from a stationary distribution near a flat minimum, *uniform* averaging (SWA) is optimal in mean-squared-error sense (Polyak-Ruppert averaging). Under the assumption that recent checkpoints are closer to the optimum, *exponential* decay (EMA) is optimal as a Wiener filter for non-stationary signals (Kingma, Ba 2015 ICLR 'Adam' arXiv:1412.6980 momentum analogy). Fibonacci weights [1,1,2,3,5,8,13,21] sit between these two regimes — they are an exponential-like decay (ratio ~φ per step) but discretised to integers. They cannot be optimal under either stationarity regime.
+
+### Mechanism scrutiny
+The "biological visual perception weights N fixations by Fibonacci" claim is fabricated. The fixation-integration literature (Bays, Husain 2008 Science 'Dynamic Shifts of Limited Working Memory Resources in Human Vision'; Najemnik, Geisler 2005 Nature 'Optimal eye movement strategies in visual search') shows fixation weighting is Bayesian-optimal (inverse-variance), not Fibonacci. The "motor consolidation Fitts law" claim is also fabricated — Fitts's law concerns log(D/W)+1 time-difficulty relations, not weighting schemes. The mechanistic argument is post-hoc.
+
+### Confounds (≥ 2 alternatives)
+(1) Fibonacci weights [1,1,2,3,5,8,13,21]/54 give EMA-like weight on the last sample = 21/54 ≈ 0.389, which is functionally equivalent to EMA with decay ~0.61. Any EMA at decay [0.5, 0.7] will match Fibonacci. (2) Total weight on last 3 checkpoints = (5+8+13+21)/54 = 47/54 ≈ 0.87 — i.e., this is mostly a "last 3-4 checkpoints, weighted exponentially" averaging, which is just EMA. (3) Number of checkpoints K=8 is the more important hyperparameter than the weighting scheme.
+
+### Numerology check
+Yes — Fibonacci [1,1,2,3,5,8,13,21] vs geometric [1, 1.6, 2.6, 4.2, 6.7, 10.8, 17.5, 28.2] (ratio φ) vs Lucas [2,1,3,4,7,11,18,29] would give indistinguishable averages. Both Fib and Lucas have ratio → φ in the limit; both produce ~EMA-decay-0.6 behaviour. The φ specificity has no privileged status over any geometric-decay schedule.
+
+### Literature precedent
+Direct precedents — all show uniform or exponential averaging suffices:
+- Izmailov, Podoprikhin, Garipov, Vetrov, Wilson 2018 UAI 'Averaging Weights Leads to Wider Optima and Better Generalization' (arXiv:1803.05407) — SWA, uniform weights, theoretically motivated.
+- Polyak, Juditsky 1992 SIAM JCO — original PR-averaging theory; uniform is asymptotically optimal.
+- Tarvainen, Valpola 2017 NeurIPS 'Mean teachers are better role models' (arXiv:1703.01780) — EMA at decay 0.99-0.999 for semi-supervised; exponential not Fib.
+- Caron et al 2021 ICCV 'Emerging Properties in Self-Supervised Vision Transformers (DINO)' (arXiv:2104.14294) — EMA teacher; momentum 0.996.
+- Athiwaratkun, Finzi, Izmailov, Wilson 2019 ICLR 'There Are Many Consistent Explanations of Unlabeled Data: Why You Should Average' (arXiv:1806.05594) — analyses averaging schemes; no Fib advantage.
+None propose Fibonacci weighting because there's no theoretical reason to.
+
+### Expected effect size (90% CI a priori)
+On CIFAR-10 ResNet-20 at 50 epochs: Fib-averaging vs SWA: Δtop-1 = [-0.15, +0.15] pp (statistically tied). Fib-averaging vs EMA-0.6: Δtop-1 = [-0.1, +0.1] pp (functionally identical). Fib-averaging vs final-only: Δtop-1 = [+0.3, +1.0] pp (the standard ensembling gain, attributable to averaging-not-Fib). The doc predicts "+0.5 to +1.5 pp over solo" which is plausible but the SWA-matching claim (+/- 0.1 pp) means the φ-specific contribution is exactly zero.
+
+### Minimum-distinguishing experiment
+Sweep weight schemes at fixed K=8: {uniform (SWA), Fibonacci [1,1,2,3,5,8,13,21], geometric ratio-φ, EMA decay-0.6, EMA decay-0.9, Lucas [2,1,3,4,7,11,18,29], reverse-Fib [21,13,8,5,3,2,1,1]}. If Fib does not strictly dominate within ±0.1 pp at p<0.05 over 5 seeds, the φ-specific claim is dead.
+
+### Verdict
+NUMEROLOGY — Fibonacci weighting is computationally equivalent to EMA at decay-0.6, which is dominated by either SWA (uniform) or higher-decay EMA depending on regime; there is no scenario where the Fib weighting specifically wins.
+

@@ -246,3 +246,34 @@ single seed.
 ## 11. Status journal
 
 - 2026-05-27 -- Created from template by Doc-Agent-A.
+
+---
+
+## Addendum: Research-Scientist Critique (2026-05-27)
+
+*Reviewer: SciCritic-G2 (elite-research-scientist critic). Critiquing the IDEA, not the implementation (that audit lives at `audits/G2_audit.md`).*
+
+### Prior plausibility (LOW/MED/HIGH + why)
+LOW-MED. Stride-3 convolutions have been tried (Inception-v3 Szegedy et al 2016 CVPR 'Rethinking the Inception Architecture for Computer Vision' arXiv:1512.00567 uses stride-3 grid reductions) and the empirical conclusion is that stride-2 is the sweet spot for most regimes because it preserves spatial information better than larger strides. The doc's CIFAR-100 setup (32x32 input) is particularly hostile to this hypothesis: after stride-2-3-2-3 the final spatial resolution is 1x1, meaning the last block does no spatial mixing — effectively just an FC layer at the end.
+
+### Mechanism scrutiny
+The "retinal-cortical scale-space cascade at 2.5x per step" claim is fabricated. RGC-to-V1 magnification follows a power law (Schwartz 1980 Biological Cybernetics — logarithmic conformal map), not a Fibonacci alternation. The retinal-LGN-V1-V2-V4 RF growth is closer to 2-3x per area with significant overlap (Felleman, Van Essen 1991 Cerebral Cortex). Translating "retina-to-cortex magnification" into "stride pattern" is a category error.
+
+### Confounds (≥ 2 alternatives)
+(1) Stride-3 stages have wider effective kernels (kernel_size=max(3,s) — see §5.1), so they're really doing "kernel-3 stride-3" vs "kernel-3 stride-2" — the kernel-vs-stride interaction is a confound. (2) FLOPs change by +20-30 % per doc; +20% FLOPs trivially helps a tiny CIFAR network. (3) The final 1x1 spatial map removes spatial inductive bias entirely from the last block.
+
+### Numerology check
+Yes — {2,3,2,3} and {2,5,2,5} (stride pair "{2,5} where 2+3=5") and {3,2,3,2} (the doc's reverse-Fib control) and {2,4,2,4} (geometric not Fibonacci) should all give indistinguishable results. The doc's predicted +0.3-0.8 pp lift is small enough that any 4-stride sequence with average geometric mean ≈ 2.4 will land in the same band.
+
+### Literature precedent
+Szegedy et al 2016 CVPR 'Rethinking the Inception Architecture for Computer Vision' (arXiv:1512.00567) — Inception-v3 uses stride-3 grid-reduction; established practice. Sandler, Howard, Zhu, Zhmoginov, Chen 2018 CVPR 'MobileNetV2' (arXiv:1801.04381) — non-uniform stride pattern, no Fibonacci. Liu, Mao, Wu, Feichtenhofer, Darrell, Xie 2022 CVPR 'A ConvNet for the 2020s' (arXiv:2201.03545) — modern ConvNeXt uses [4, 2, 2, 2, 2] patch-stem + stride-2 (powers of 2). Wu et al 2019 NeurIPS 'Wavelet Integrated CNNs for Noise-Robust Image Classification' (arXiv:1907.10455) — anti-aliased strides matter more than the stride number itself.
+
+### Expected effect size (90% CI a priori)
+On CIFAR-100 at 50 epochs with +20-30 % FLOPs: Δtop-1 = [-0.3, +0.6] pp, with most of the upper tail attributable to the FLOPs increase. At iso-FLOPs (which the doc does NOT commit to) Δtop-1 = [-0.4, +0.2] pp. The "finer cascade" intuition is undercut by the loss of 14x14 → 1x1 resolution in the last stages.
+
+### Minimum-distinguishing experiment
+Iso-FLOPs control: tune channel widths so {2,3,2,3} stride pattern matches {2,2,2,2} FLOPs. Then compare {2,2,2,2}, {2,3,2,3} (Fib), {3,2,3,2} (reverse Fib), {2,4,2,4} (geometric non-Fib), {2,3,3,2} (Fib variant). If {2,3,2,3} does not dominate within the falsifier band, H18 is "any non-uniform stride works." Then add Tiny-ImageNet (64x64) to test the proposed medium-resolution claim.
+
+### Verdict
+DERIVATIVE+TESTABLE — not pure numerology because stride is a well-defined architectural axis and the {2,3,2,3} configuration is concretely testable, but the φ-rationale is decorative; the experiment will likely show "any non-uniform stride works as well as Fib."
+

@@ -243,3 +243,34 @@ control. Budget: ~5 hours.
 ## 11. Status journal
 
 - 2026-05-27 -- Created from template by Doc-Agent-A.
+
+---
+
+## Addendum: Research-Scientist Critique (2026-05-27)
+
+*Reviewer: SciCritic-G2 (elite-research-scientist critic). Critiquing the IDEA, not the implementation (that audit lives at `audits/G2_audit.md`).*
+
+### Prior plausibility (LOW/MED/HIGH + why)
+LOW. There is no reason an additive recurrence should be the privileged width schedule for tabular MLPs: Gorishniy et al 2021 NeurIPS 'Revisiting Deep Learning Models for Tabular Data' (arXiv:2106.11189) systematically swept tabular MLP widths and found a flat plateau over a wide range of constant-width and pyramidal designs. The Fibonacci sequence is just one point inside that plateau. The biological "additive relay integration" justification is a post-hoc rationalisation — anatomical layer sizes in cortex (V1 ~140M, V2 ~70M, V4 ~30M neurons in macaque) are decreasing, not Fibonacci-increasing.
+
+### Mechanism scrutiny
+The "because" clause ("finer width granularity matched to additive information-integration cost") is post-hoc. There is no derivation linking Fibonacci spacing to a representational-bottleneck argument the way the rank–capacity argument works for bottleneck layers (Tan and Le 2019 ICML 'EfficientNet' arXiv:1905.11946). The doc itself concedes (Sec 5.1) that the proposed widths force a +26 % param overhead vs the linear baseline once normalised, which means any observed "improvement" would be a parameter-count confound, not a Fibonacci-prior confirmation.
+
+### Confounds (≥ 2 alternatives)
+(1) Pyramidal vs expanding capacity: an expanding-width MLP [16, 32, 64, 128, 256] would be the matched control for capacity-grows-with-depth, and likely beats Fib because powers-of-two align with tensor-core GEMM efficiency. (2) Stochastic regularisation: smaller early layers in [8, 13, 21, 34, 55] behave as a low-rank bottleneck (cf. Aghajanyan et al 2021 ACL 'Intrinsic Dimensionality Explains the Effectiveness of Language Model Fine-Tuning' arXiv:2012.13255), so any gain may be implicit-rank regularisation rather than φ. (3) Activation density vs width: smaller widths interact with dropout 0.1 differently from large widths — the dropout rate is a hidden confound.
+
+### Numerology check
+Yes — any monotone-increasing integer sequence with growth rate between 1.5 and 2.0 (e.g., [10, 16, 26, 42, 68] with ratio 1.6; or [8, 14, 24, 41, 70] with ratio 1.7) would produce a near-identical accuracy/param profile. The hypothesis predicts no measurable difference between Fib and "Lucas numbers" [7, 11, 18, 29, 47] (which also satisfy L(n+1)=L(n)+L(n-1) but start differently). Without a Lucas-control row the Fib claim is undistinguishable from any phi-growth schedule.
+
+### Literature precedent
+This is a rediscovery of growth-rate exploration. Huang, Liu, van der Maaten, Weinberger 2017 CVPR 'Densely Connected Convolutional Networks' (arXiv:1608.06993) explicitly tuned the growth-rate k (additive per-block widening) and found it a soft hyperparameter, not a magic constant. Tan and Le 2019 ICML 'EfficientNet: Rethinking Model Scaling for Convolutional Neural Networks' (arXiv:1905.11946) used compound scaling α^φ β^φ γ^φ where α, β, γ are tuned via grid search — the optimal exponents are not Fibonacci-related. The biological-half-life motivation overlaps with Lindsey, Ocko, Ganguli, Deny 2019 ICLR 'A Unified Theory of Early Visual Representations from Retina to Cortex' (arXiv:1901.00945), which derives RGC widths from efficient coding — and finds a smooth scaling law, not Fibonacci.
+
+### Expected effect size (90% CI a priori)
+On Higgs UCI at iso-params: ΔAUC = [-0.003, +0.003], ΔAccuracy = [-0.15, +0.15] pp. The doc claims [-0.2, +1.0] pp but the upper-tail is implausibly optimistic; my prior is centered at 0.0 with σ ≈ 0.1 pp. Param drop will be real (-25 to -40 %) because the widths are simply smaller, not because of φ.
+
+### Minimum-distinguishing experiment
+Add a **Lucas-numbers control row** [7, 11, 18, 29, 47] (same recurrence, different seed) AND a **constant ratio 1.618 rounded** row [13, 21, 34, 55, 89] (same growth, no Fib integers). If Fibonacci does not beat Lucas by ≥ 0.3 pp at p<0.05 over 5 seeds, the φ claim collapses to "any sublinear additive growth works." Cross-check at iso-params (~18.3k) so the param-count confound is removed.
+
+### Verdict
+NUMEROLOGY — the additive-recurrence justification is not derivable from any first principle, and the closest comparators (Lucas, rounded-ratio sequences) would produce statistically indistinguishable results within the proposed falsifier band.
+

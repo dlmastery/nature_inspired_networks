@@ -271,3 +271,40 @@ loss. Wall-clock: ~6 hours single seed.
   the pure skip-scaling variant. -0.30 pp from sg_chan_fib reference,
   treated as near no-op.
 - (planned) -- exp001 tests pure phi-skip without channel gating.
+
+---
+
+## Addendum: Research-Scientist Critique (2026-05-27)
+
+*Reviewer: SciCritic-G2 (elite-research-scientist critic). Critiquing the IDEA, not the implementation (that audit lives at `audits/G2_audit.md`).*
+
+### Prior plausibility (LOW/MED/HIGH + why)
+LOW. The residual-scaling literature has a definitive answer to the question "what is the right constant?" — and it is NOT 1/φ. Hanin, Rolnick 2018 NeurIPS 'How to Start Training: The Effect of Initialization and Architecture' (arXiv:1803.01719), Zhang, Dauphin, Ma 2019 ICLR 'Fixup Initialization: Residual Learning Without Normalization' (arXiv:1901.09321), and Wang, Ma, Dong, Huang, Zhang, Wei 2022 ACL 'DeepNet: Scaling Transformers to 1,000 Layers' (arXiv:2203.00555) all derive scaling constants from variance-preservation analysis: the answer is 1/sqrt(2L) (Fixup), or (2L)^(1/4) (DeepNet), or layer-dependent (Stable ResNet). These are mechanistic; they prevent variance blow-up at depth L. 1/φ is a constant, not depth-dependent — it cannot be the right answer for arbitrarily deep networks.
+
+### Mechanism scrutiny
+The "phi**2 = phi + 1 implies 1/phi**2 + 1/phi = 1" identity (§1) is true but irrelevant: the identity-preserving condition for residual blocks is skip + branch_gain² ≈ 1 in variance (per Stable ResNet) or skip² + branch² = 1 in norm, not skip + branch = 1 in linear sum. The doc's "implicit depth regularisation by phi-fraction" claim is post-hoc rationalisation. The "biological feedback gain near 0.618" claim is fabricated — cortical feedback gains in V1 lie in 0.1-0.3 range (Lamme, Roelfsema 2000 Trends in Neurosciences), not 0.618.
+
+### Confounds (≥ 2 alternatives)
+(1) Scaling the skip path by ANY constant < 1 will damp the residual stream — the relevant question is "which constant," and Fixup/DeepNet/Stable-ResNet all derive depth-dependent constants that differ from 1/φ. Any "stability improvement" from 1/φ is captured by these depth-aware schemes. (2) The T1.8 closest-data shows -0.30 pp top-1 already; the partial evidence is negative. (3) ReZero (alpha=0 init learnable) is strictly more flexible than fixed 1/φ — there is no scenario where fixed 1/φ dominates learnable-init-0.
+
+### Numerology check
+Yes. Skip-scale = 0.5 vs 0.618 vs 0.7 will produce indistinguishable training curves on a 20-layer ResNet. The Fixup-prescribed scale at L=20 is 1/sqrt(40) ≈ 0.158, which is *much* smaller than 1/φ. If 1/φ "stabilises training" then 0.5 will stabilise it equally well; if 1/φ damps too much, 0.7 will damp less. There is no a-priori reason 1/φ is the optimum.
+
+### Literature precedent
+Direct precedents — all derive scaling from stability arguments, NOT aesthetics:
+- Hayou, Ghosh, Doucet 2021 ICLR 'Stable ResNet' (arXiv:2010.12859) — branch-scaling 1/sqrt(L), depth-aware.
+- Zhang, Dauphin, Ma 2019 ICLR 'Fixup Initialization: Residual Learning Without Normalization' (arXiv:1901.09321) — Fixup uses depth-aware scaling.
+- Bachlechner, Majumder, Mao, Cottrell, McAuley 2021 UAI 'ReZero is All You Need: Fast Convergence at Large Depth' (arXiv:2003.04887) — learnable scalar init = 0.
+- Wang et al 2022 ACL 'DeepNet: Scaling Transformers to 1,000 Layers' (arXiv:2203.00555) — (2L)^(1/4) for transformers.
+- Nguyen, Salazar 2019 IWSLT 'Transformers without Tears: Improving the Normalization of Self-Attention' (arXiv:1910.05895) — ScaleNorm with depth-tied learnable.
+None of these constants are 1/φ. The doc's claim that 1/φ is the "natural-system optimum" is unsupported.
+
+### Expected effect size (90% CI a priori)
+On CIFAR-10 12-epoch ResNet-20: Δtop-1 (vs scale=1.0 baseline) = [-0.5, +0.1] pp; convergence speedup 0-5 % (likely indistinguishable from noise). On ResNet-110: Δtop-1 = [-0.3, +0.3] pp with possible mild stability benefit (but Fixup/Stable-ResNet would beat 1/φ). The T1.8 -0.30 pp evidence supports the LOW expectation.
+
+### Minimum-distinguishing experiment
+Sweep skip-scale at {0.5, 0.618, 0.707, 0.8, 0.9, 1.0} AND compare against {Fixup, ReZero-init=0, DeepNet (2L)^(1/4)} with depth in {20, 56, 110}. If 1/φ does not strictly dominate the swept constants AND beat the depth-aware baselines, the φ-claim is dead. The convergence-speedup claim requires loss curves, not just final top-1.
+
+### Verdict
+NUMEROLOGY — 1/φ has no stability argument, no derivation from variance-preservation, and is dominated by depth-aware schemes (Fixup, DeepNet, Stable-ResNet) that are theoretically grounded.
+

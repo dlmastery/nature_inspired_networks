@@ -243,3 +243,34 @@ Compare ppl + KV cache to uniform-head control. Budget: ~6 hours.
 ## 11. Status journal
 
 - 2026-05-27 -- Created from template by Doc-Agent-A.
+
+---
+
+## Addendum: Research-Scientist Critique (2026-05-27)
+
+*Reviewer: SciCritic-G2 (elite-research-scientist critic). Critiquing the IDEA, not the implementation (that audit lives at `audits/G2_audit.md`).*
+
+### Prior plausibility (LOW/MED/HIGH + why)
+LOW. The hypothesis stacks TWO Fibonacci knobs (head *count* per group AND head *dilation*) and predicts +0.5-1.0 pp top-1 on CIFAR-100. The head-count sweep literature (Cordonnier, Loukas, Jaggi 2020 ICLR 'On the Relationship between Self-Attention and Convolutional Layers' arXiv:1911.03584; Touvron et al 2021 ICCV 'Going deeper with Image Transformers' arXiv:2103.17239) finds head count is a flat hyperparameter over [4, 16]. The doc's own admission that d_head=12 is not FA2-compatible (must use d_head=32, total params +68 %) means any observed gain is a parameter-count confound, not a Fib-allocation confirmation.
+
+### Mechanism scrutiny
+"Reduced head redundancy" via Fibonacci allocation has no theoretical underpinning. Voita et al 2019 and Michel et al 2019 (correctly cited) showed that pruning *unimportant* heads is the win, not allocating heads by count. The doc reverses this: it adds heads (20 vs 12) and expects gain from "diversity," but adding redundant heads is the opposite of pruning. The biological "auditory critical bands at Fibonacci frequencies" claim is fabricated — the critical-band literature (Zwicker 1961, Bark scale) shows logarithmic frequency spacing, not Fibonacci.
+
+### Confounds (≥ 2 alternatives)
+(1) 20 heads at d_head=32 = 640-dim total attention space vs 12 heads at d_head=16 = 192-dim — the new model has 3.3x more attention capacity. Of course it might win, but for capacity not for Fib allocation. (2) The dilation cascade [1,2,3,5,8,13] resembles Fibottention (arXiv:2406.19391), which the doc cites; the proposed change is more dilation patterns, not specifically Fibonacci ones. (3) The 8-heads-at-dilation-13 group is doing local-window attention on 32x32 patch sequence — at d=13 the receptive field is wider than the patch grid, making it effectively global attention. 8 global-attention heads is just "more heads."
+
+### Numerology check
+Yes — head counts [2, 2, 3, 3, 5, 5] (totaling 20, geometric growth) and dilations [1, 2, 4, 7, 11, 16] (linear growth) would give identical effects. The proposed [1,1,2,3,5,8] head allocation and [1,2,3,5,8,13] dilations are one point in a 2D continuous design space; any reasonable point in that space should give the same result.
+
+### Literature precedent
+Rao et al 2024 'Fibottention: Inceptive Visual Representation Learning with Diverse Attention via Wythoff Array' (arXiv:2406.19391) — the closest precedent; the doc admits this. The Fibottention paper itself uses Wythoff-array dilation patterns and reports +0.5 pp ImageNet gains, but at significantly higher param/FLOPs cost. Child, Gray, Radford, Sutskever 2019 'Generating Long Sequences with Sparse Transformers' (arXiv:1904.10509) — sparse-attention patterns; no Fibonacci. Beltagy, Peters, Cohan 2020 'Longformer: The Long-Document Transformer' (arXiv:2004.05150) — sliding-window + dilated attention; dilation choices empirical, not Fibonacci.
+
+### Expected effect size (90% CI a priori)
+On CIFAR-100 at +30-70 % params: Δtop-1 = [+0.2, +1.0] pp, attributable to capacity. At iso-params (which the doc does not commit to): Δtop-1 = [-0.3, +0.3] pp. The "head diversity" claim from Voita 2019 actually predicts *fewer* heads should suffice, not more.
+
+### Minimum-distinguishing experiment
+Iso-param control: hold total attention params constant at 12-head ViT-Tiny level. Compare {12 heads uniform 1-dilation, 12 heads uniform 5-dilation, 12 heads Fib-dilation [1,1,2,3,5,8] split across them, 20 heads Fib-count Fib-dilation}. If Fib allocation does not beat *any* of the matched-param controls by ≥ 0.5 pp at p<0.05, H16 is window-dressing.
+
+### Verdict
+NUMEROLOGY — the Fibonacci head-count and head-dilation cascade are indistinguishable from any geometric-growth design point at iso-params, and the doc's predicted gain is entirely explained by the +68 % param overhead.
+
