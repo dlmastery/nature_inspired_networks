@@ -213,3 +213,37 @@ the **training** chunk-5 axis. Pairs naturally with H49.
 ## 11. Status journal
 
 - 2026-05-26 — Created from template by Doc-Agent-D.
+
+---
+
+## Addendum: Research-Scientist Critique (2026-05-27)
+
+*Reviewer: SciCritic-G7 (elite-research-scientist critic). Critiquing the IDEA, not the implementation (audit at `audits/G7_audit.md`).*
+
+### Prior plausibility (LOW/MED/HIGH + why)
+**MED.** Among G7, H65 is the most plausible — Naitzat, Zhitnikov, Lim 2020 J. Mach. Learn. Res. 'Topology of Deep Neural Networks' (arXiv:2004.06093) establishes the correlation between Betti collapse and generalisation, and Carrière, Chazal, Glisse, Ike, Kannan, Umeda 2021 ICML 'PersLay / TopologyLayer' (arXiv:1904.09378) provides differentiable persistent-homology gradients. The proposed loss — penalise β_0, β_1 sums across layers — is a direct operationalisation. The plausibility ceiling is bounded by the *expense* of computing PH on intermediate representations every step and the well-known sensitivity of PH gradients to filtration parameters.
+
+### Mechanism scrutiny — does the COMPOSITION buy anything beyond its components?
+The hypothesis is genuinely about a *single new mechanism* (PH-based auxiliary loss), not a hybrid stack — even though it lives under G7. Its main risk is over-regularisation: forcing β_1 → 0 across all layers eliminates exactly the topological richness (multi-modal distribution support) that complex tasks need. Naitzat 2020 shows Betti collapse *correlates* with generalisation — it does not show that *forcing* the collapse causes generalisation. Goodhart's law applies: maximising the correlate may break the underlying signal.
+
+### Confounds (≥2)
+1. **Filtration-parameter confound.** PH depends on the filtration radius schedule; results may swing wildly with this hyperparameter. The doc does not specify how this is selected.
+2. **Sample-set confound.** PH is computed on mini-batches; β-curves on batch-128 vs batch-1024 differ qualitatively. Reported gains may track batch size, not the loss term.
+
+### Additivity assumption check — the empirical record on G1-G5 (sg_full_fib at 73.24% vs baseline 84.78%) shows priors do NOT compound. Why should THIS specific hybrid escape that finding?
+H65 is mostly a single-mechanism hypothesis with one auxiliary loss — the anti-compounding concern is mild. But the doc proposes adding it to *fractal-toroidal manifolds* (H26), which already inflate β_1 by design. Forcing β_1 → 0 on a representation that fractal/toroidal priors *create* β_1 in is a direct self-cancellation: the new loss erases the prior's only operational effect. This is a textbook destructive interference.
+
+### Literature precedent
+- Naitzat, Zhitnikov, Lim 2020 (arXiv:2004.06093) — correlation, not causation.
+- Carrière et al. 2021 (arXiv:1904.09378) — differentiable PH backbone.
+- Moor, Horn, Rieck, Borgwardt 2020 ICML 'Topological Autoencoders' (arXiv:1906.00722) — uses similar PH loss; gains modest, training is slow, hyperparameter-sensitive.
+- Gabrielsson, Nelson, Dwaraknath, Skraba 2020 NeurIPS 'A topology layer for ML' (arXiv:1905.12200) — similar machinery; the conclusion is that PH losses help on tasks with intrinsically low-dimensional topology and hurt on others.
+
+### Expected effect size (90% CI a priori) — given anti-compounding, the prior should be near-baseline at best
+Perplexity Δ 90% CI: **[-0.05 nats, +0.15 nats]**, centred on +0.05 (marginal regression). Rotated-CIFAR equivariance Δ 90% CI: **[-0.02, +0.01]**, centred on 0. The "≥0.1 nats AND ≥0.03 equivariance" target is unlikely to be hit on both axes simultaneously.
+
+### Minimum-distinguishing experiment
+Apply the PH loss to a *plain* ResNet/Transformer baseline first (single-prior test). Only if it wins there does the hybrid with H26 even merit testing. Confirm sensitivity to filtration radius and batch size.
+
+### Verdict
+**DERIVATIVE+TESTABLE** — A known mechanism (TopologyLayer-style PH loss) repackaged; the auxiliary loss has been published several times, the novelty is only its deployment as a generalisation-correlate target.

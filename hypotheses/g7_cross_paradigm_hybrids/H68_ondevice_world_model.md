@@ -218,3 +218,37 @@ and **chunk-5 (training — JEPA curriculum)**.
 ## 11. Status journal
 
 - 2026-05-26 — Created from template by Doc-Agent-D.
+
+---
+
+## Addendum: Research-Scientist Critique (2026-05-27)
+
+*Reviewer: SciCritic-G7 (elite-research-scientist critic). Critiquing the IDEA, not the implementation (audit at `audits/G7_audit.md`).*
+
+### Prior plausibility (LOW/MED/HIGH + why)
+**LOW-MED.** World-model research is an active area (Ha & Schmidhuber 2018 NeurIPS 'World Models' (arXiv:1803.10122); Hafner, Pasukonis, Ba, Lillicrap 2023 arXiv 'DreamerV3' (arXiv:2301.04104)), and JEPA-style latent prediction (Bardes et al. 2024 'V-JEPA' (arXiv:2404.08471)) is genuinely promising. The plausibility collapses on the *toroidal KV* + *cymatic curriculum* overlays. The doc treats them as independently helpful, but the toroidal wrap is just modular positional indexing (= cyclic RoPE) and the cymatic curriculum is "low-to-high frequency auxiliary input" which is the standard frequency-progressive curriculum from CV literature, not specifically tied to small-model regimes.
+
+### Mechanism scrutiny — does the COMPOSITION buy anything beyond its components?
+The question the prompt asks is: "is the prior-laden small backbone specifically suited to world models, or generic?" The answer is *generic* — nothing about the toroidal/cymatic priors makes the resulting backbone better at synthetic physics than a vanilla 124M decoder with the same JEPA objective. The prior-laden backbone *bears the cost* of the priors (latency, code complexity, hyperparameter explosion) without a corresponding mechanism. The "wrap-around regularities before within-cycle regularities" curriculum claim has no theoretical or empirical basis in published world-model literature.
+
+### Confounds (≥2)
+1. **JEPA-vs-priors confound.** Most of the predicted gain (≥10 pp) likely comes from the JEPA objective alone, not from the toroidal/cymatic priors. A "JEPA-only" control would isolate this.
+2. **Curriculum-vs-init confound.** The cymatic curriculum schedules auxiliary-input frequency. A control with a simple low-pass-to-high-pass curriculum on the same input would isolate the cymatic-pattern shape from the curriculum-shape effect.
+
+### Additivity assumption check — the empirical record on G1-G5 (sg_full_fib at 73.24% vs baseline 84.78%) shows priors do NOT compound. Why should THIS specific hybrid escape that finding?
+H68 stacks three priors (JEPA + toroidal + cymatic-curriculum) and predicts +10 pp world-model accuracy. The anti-compounding evidence makes this prediction extreme. The doc never explains why the LLM-world-model regime would reverse the CIFAR-10 anti-compounding observation. The most likely outcome is that the JEPA objective helps modestly (a few pp) while the toroidal and cymatic priors are wash-or-regress.
+
+### Literature precedent
+- Ha & Schmidhuber 2018 World Models (arXiv:1803.10122) — VAE + RNN latent rollout, no priors needed.
+- Hafner et al. 2023 DreamerV3 (arXiv:2301.04104) — RSSM latent rollout; current SOTA on world models.
+- Bardes et al. 2024 V-JEPA (arXiv:2404.08471) — predictive feature learning; vision domain.
+- No published precedent for *toroidal-KV world models* or *cymatic curriculum world models*.
+
+### Expected effect size (90% CI a priori) — given anti-compounding, the prior should be near-baseline at best
+World-model accuracy Δ 90% CI: **[+1 pp, +6 pp]**, centred on +3 pp (likely from JEPA alone). The "≥10 pp" target sits at the optimistic edge. VRAM <8 GB is plausible at 124M.
+
+### Minimum-distinguishing experiment
+Iso-FLOP three-way: (i) vanilla 124M + AR; (ii) vanilla 124M + JEPA; (iii) full H68 (JEPA + toroidal KV + cymatic curriculum). Expectation: (ii) >> (i), (iii) ≈ (ii). Only if (iii) >> (ii) by > seed noise does the prior stack justify itself.
+
+### Verdict
+**INCONCLUSIVE-NEEDS-DATA** — A JEPA world-model with decorative geometric overlays; the JEPA component is the only mechanistically motivated axis, but the doc does not isolate its contribution.

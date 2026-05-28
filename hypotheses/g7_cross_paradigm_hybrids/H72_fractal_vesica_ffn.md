@@ -400,3 +400,39 @@ disentangle their per-axis contributions.
 ## 11. Status journal
 
 - 2026-05-27 — Created from template by Doc-Agent-E.
+
+---
+
+## Addendum: Research-Scientist Critique (2026-05-27)
+
+*Reviewer: SciCritic-G7 (elite-research-scientist critic). Critiquing the IDEA, not the implementation (audit at `audits/G7_audit.md`).*
+
+### Prior plausibility (LOW/MED/HIGH + why)
+**LOW.** Two compounding gambles: (i) FractalNet (Larsson, Maire, Shakhnarovich 2017 ICLR 'FractalNet: Ultra-Deep Neural Networks without Residuals' (arXiv:1605.07648)) has been largely superseded by ResNets and was never adopted at LLM scale; (ii) "Vesica Piscis half-radius overlap" between three sub-paths is a 1957-discovered Sacred Geometry decorative choice with no derived mechanistic value. Combining a deprecated architecture pattern with a decorative overlap is unlikely to lower WikiText-103 perplexity at 350M scale. The cost in latency (+8%) and parameters (+27%) is non-trivial.
+
+### Mechanism scrutiny — does the COMPOSITION buy anything beyond its components?
+Multi-path residuals (Veit, Wilber, Belongie 2016 NeurIPS 'Residual Networks Behave Like Ensembles of Relatively Shallow Networks' (arXiv:1605.06431)) is established for ResNets in vision, NOT for Transformer FFNs. The doc derives d_eff = 2 + 2·1/φ ≈ 3.24 — but effective-depth-via-recursion arguments do not transfer cleanly to FFN blocks in causal LMs, which are bottlenecked by attention, not by FFN depth. The "Vesica overlap" is a specific 3-path topology; no published result shows that *this* topology beats vanilla multi-branch FFN. The doc presents the 1/φ depth-shrink as natural law without showing it dominates other shrink factors (1/2, 1/e, 1/√2).
+
+### Confounds (≥2)
+1. **Capacity confound.** +27% parameters means non-iso-param; gains may be capacity-driven, not topology-driven. The doc's "iso-params" framing is misleading.
+2. **Multi-branch-vs-shape confound.** Any three-branch residual FFN (e.g. parallel-conv-style) might match Vesica gains. The half-radius overlap is one point in a continuum.
+3. **Latency confound.** +8% latency at scale is a substantial cost; the prediction "≥0.3 nats with ≤+12% wall-clock" may not hold under FlashAttention-compatible kernels.
+
+### Additivity assumption check — the empirical record on G1-G5 (sg_full_fib at 73.24% vs baseline 84.78%) shows priors do NOT compound. Why should THIS specific hybrid escape that finding?
+H72 stacks FractalNet recursion + Vesica overlap + φ depth-shrink. Three priors in one FFN block. The CIFAR-10 sg_full_fib precedent directly applies — the doc gives no reason the LLM FFN regime would reverse the anti-compounding observation. The implicit "two FFN priors compose" assumption has no published support.
+
+### Literature precedent
+- Larsson et al. 2017 FractalNet (arXiv:1605.07648) — deprecated; ResNets won.
+- Veit et al. 2016 (arXiv:1605.06431) — multi-path residual ensemble interpretation.
+- Shazeer 2020 arXiv 'GLU Variants Improve Transformer' (arXiv:2002.05202) — modern FFN improvements come from gating, not topology.
+- Wang, Zhang, Liu, Zhou, Sun 2024 arXiv 'Mixture of Depths' (arXiv:2404.02258) — dynamic depth allocation; works without fractal topology.
+- No published precedent for fractal-Vesica FFN.
+
+### Expected effect size (90% CI a priori) — given anti-compounding, the prior should be near-baseline at best
+Perplexity Δ 90% CI: **[+0.5 nats regression, +0.0 nats wash]**, centred on +0.25 (regression likely due to +27% params not compensating for the topology-induced training friction). Latency cost: probably exceeds +8%.
+
+### Minimum-distinguishing experiment
+Iso-FLOP four-way: (i) baseline FFN; (ii) 3-branch parallel FFN with equal overlap; (iii) 3-branch parallel + 1/φ depth-shrink (no Vesica overlap); (iv) full H72 (Vesica overlap). Compare (i) vs (ii) for any-multi-branch effect, (iii) vs (iv) for overlap-specific effect.
+
+### Verdict
+**DERIVATIVE+TESTABLE** — FractalNet + decorative overlap; the φ depth-shrink and Vesica overlap are the controlled variables, neither has derived mechanistic justification.

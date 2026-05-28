@@ -205,3 +205,37 @@ Transformer paradigm specifically.
 ## 11. Status journal
 
 - 2026-05-26 — Created from template by Doc-Agent-D.
+
+---
+
+## Addendum: Research-Scientist Critique (2026-05-27)
+
+*Reviewer: SciCritic-G7 (elite-research-scientist critic). Critiquing the IDEA, not the implementation (audit at `audits/G7_audit.md`).*
+
+### Prior plausibility (LOW/MED/HIGH + why)
+**LOW.** Initialising QKV with a structured orthonormal basis is a known technique (Saxe, McClelland, Ganguli 2014 ICLR 'Exact solutions to the nonlinear dynamics of learning in deep linear neural networks' (arXiv:1312.6120)). However, Saxe et al. show that *any* orthogonal init works — the specific choice of basis vectors converges away after the first few thousand steps in any LM training run. The claim that *Chladni eigenmodes specifically* lower perplexity by 0.3 nats at 350M scale at the end of training is implausible — the prior is washed out by gradient descent well before the model reaches its final state.
+
+### Mechanism scrutiny — does the COMPOSITION buy anything beyond its components?
+Two mechanisms: (i) static Chladni init (one-shot init choice); (ii) *dynamic φ-harmonic modulation* (rotating the basis phase during training). Static init is essentially the Daubechies 1992 wavelet init paradigm. The dynamic modulation is the novel contribution — but rotating the projection basis during training is mathematically equivalent to applying a time-varying orthogonal preconditioner, which has been studied (Henaff, Cho, Bruna 2017 Recurrent Orthogonal Networks; not central enough to count). No paper shows that *φ-spaced phase rotations* outperform arbitrary phase rotations.
+
+### Confounds (≥2)
+1. **Init-vs-final confound.** Any orthogonal init helps early training; Saxe 2014 shows this is identical regardless of the specific basis vectors. Claims about final perplexity Δ require ruling out generic orthogonal init.
+2. **FlashAttention-2 compat confound.** Dynamic modulation of QKV during training likely breaks the fixed-shape kernel fused into FlashAttention-2; the "preserves FA2 compatibility" claim is non-trivial and the doc does not explain how the modulation is folded into the kernel.
+
+### Additivity assumption check — the empirical record on G1-G5 (sg_full_fib at 73.24% vs baseline 84.78%) shows priors do NOT compound. Why should THIS specific hybrid escape that finding?
+H66 stacks two priors (Chladni-init + φ-modulation) on the same matrices. Both are decorative geometric choices applied to the *same control variable*. The anti-compounding evidence directly applies: two geometric overlays on one matrix is exactly the kind of "fully on" config that has failed.
+
+### Literature precedent
+- Saxe et al. 2014 (arXiv:1312.6120) — orthogonal init theory; basis identity does not matter after early steps.
+- Daubechies 1992 'Ten Lectures on Wavelets' — orthonormal wavelet bases.
+- Glorot & Bengio 2010 AISTATS 'Understanding the difficulty of training deep feedforward neural networks' — random init is good enough.
+- No published result of cymatic / Chladni init for Transformer QKV at 350M scale.
+
+### Expected effect size (90% CI a priori) — given anti-compounding, the prior should be near-baseline at best
+Perplexity Δ 90% CI: **[+0.1 nats regression, -0.05 nats marginal gain]**, centred on +0.02 (wash). Orthogonality-retention check: likely fails (gradient descent washes it out within 5k steps).
+
+### Minimum-distinguishing experiment
+Compare iso-FLOP: (i) random Xavier init; (ii) random orthogonal init; (iii) Chladni init (static); (iv) Chladni + φ-modulation. The expectation is (ii) ≈ (iii) ≈ (iv); the test is whether (iv) > (ii) by > seed noise.
+
+### Verdict
+**DERIVATIVE+TESTABLE** — Orthogonal init with a decorative basis-vector choice; the dynamic modulation adds a second decorative axis. Likely indistinguishable from generic orthogonal init.

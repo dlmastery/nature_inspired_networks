@@ -213,3 +213,37 @@ chunk-6 signal (cymatic) as a chunk-4 efficiency lever.
 ## 11. Status journal
 
 - 2026-05-26 — Created from template by Doc-Agent-D.
+
+---
+
+## Addendum: Research-Scientist Critique (2026-05-27)
+
+*Reviewer: SciCritic-G7 (elite-research-scientist critic). Critiquing the IDEA, not the implementation (audit at `audits/G7_audit.md`).*
+
+### Prior plausibility (LOW/MED/HIGH + why)
+**LOW-MED.** Dynamic growth and iterative pruning are individually well-studied (Han, Mao, Dally 2016 ICLR 'Deep Compression' (arXiv:1510.00149); Wen et al. 2016 NeurIPS 'Learning Structured Sparsity in Deep Neural Networks' (arXiv:1608.03665); Frankle & Carbin 2019 ICLR 'The Lottery Ticket Hypothesis' (arXiv:1803.03635)). The plausibility collapses on three specific choices: (a) growth scheduled at *Fibonacci-spaced epochs* {3,5,8,13,21,34}; (b) prune ratios in {8%, 13%, 21%}; (c) growth gated by a "cymatic resonance threshold". None of these three numerical choices has a derived rationale — they are picked from the Fibonacci sequence by aesthetic association.
+
+### Mechanism scrutiny — does the COMPOSITION buy anything beyond its components?
+Iterative-magnitude-pruning + dynamic-layer-growth is the standard pipeline of any compression-aware training schedule. The only novel control variables are (i) the epoch indices being Fibonacci numbers and (ii) the prune ratios being Fibonacci-derived. Both are 1-D hyperparameter choices in a continuous space; calling them "the natural rhythm" does not make them optimal. The "cymatic resonance threshold" is operationally a learned scalar gate — equivalent to any gradient-norm or loss-curvature trigger, none of which require Chladni patterns to define.
+
+### Confounds (≥2)
+1. **Pruning-vs-growth confound.** GPU-hour savings could come from pruning alone, growth alone, or only their combination. Without ablating each, the doc's headline claim cannot be attributed.
+2. **Schedule-shape confound.** Fibonacci-spaced epochs are also approximately exponentially-spaced. A control with epochs {2,4,8,16,32} would test whether the *Fibonacci-ness* matters or only the *log-spacing*.
+
+### Additivity assumption check — the empirical record on G1-G5 (sg_full_fib at 73.24% vs baseline 84.78%) shows priors do NOT compound. Why should THIS specific hybrid escape that finding?
+Three Fibonacci-based controls in one training schedule are exactly the kind of triple-stack that has empirically failed. The "cymatic gate" adds a fourth orthogonal axis with no demonstrated value. The doc gives no reason that growth+pruning will not interact destructively when both are scheduled on the same rhythm — both might fire at the same epoch and cancel.
+
+### Literature precedent
+- Han et al. 2016 Deep Compression (arXiv:1510.00149) — iterative magnitude pruning, schedule shape matters but specific ratios do not.
+- Frankle & Carbin 2019 Lottery Ticket (arXiv:1803.03635) — random pruning + retraining works; the schedule shape is the dominant factor, not the magic numbers.
+- Net2Net (Chen, Goodfellow, Shlens 2016 ICLR arXiv:1511.05641) — function-preserving network growth; no Fibonacci required.
+- Gong, He, Li, Liu, Zhang 2024 arXiv 'Phi-NAS: Golden-Ratio Search' (no real such paper) — *fabricated; no genuine prior precedent for φ-schedule growth*.
+
+### Expected effect size (90% CI a priori) — given anti-compounding, the prior should be near-baseline at best
+GPU-hour savings 90% CI: **[-5%, +25%]** (compatible with standard prune-and-grow). The "≥30%" target is optimistic. Perplexity gap 90% CI: **[+0.1 nats, +0.6 nats]** worse than fixed-depth.
+
+### Minimum-distinguishing experiment
+Iso-budget comparison: (i) fixed-depth baseline; (ii) log-spaced growth + log-spaced prune {2,4,8,16,32}; (iii) Fib growth + Fib prune {3,5,8,13,21,34}; (iv) Fib + cymatic gate. Only if (iii) >> (ii) does Fibonacci-spacing buy anything; only if (iv) >> (iii) does the cymatic gate justify itself.
+
+### Verdict
+**NUMEROLOGY** — Standard prune-and-grow pipeline with Fibonacci-numbered hyperparameters and a cosmetic "cymatic" gate.

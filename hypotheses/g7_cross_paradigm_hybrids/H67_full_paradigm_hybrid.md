@@ -363,3 +363,37 @@ itself is a publishable negative.
 ## 11. Status journal
 
 - 2026-05-26 — Created from template by Doc-Agent-D (the flagship).
+
+---
+
+## Addendum: Research-Scientist Critique (2026-05-27)
+
+*Reviewer: SciCritic-G7 (elite-research-scientist critic). Critiquing the IDEA, not the implementation (audit at `audits/G7_audit.md`).*
+
+### Prior plausibility (LOW/MED/HIGH + why)
+**LOW (near-zero).** H67 is the "everything-on" reference — Liquid + JEPA + KAN + Transformer + GNN with sacred manifolds, cymatic init, PRH alignment, golden-angle RoPE, hex graph, dodeca target. Five paradigm-level architectures, three init/loss overlays, on a single 4090. Each component is independently unproven at LLM scale; combining all of them with a "Pareto-dominant composite, no axis regressing by >5%" target violates basic experimental design — the more axes one demands non-regression on, the lower the joint probability of success.
+
+### Mechanism scrutiny — does the COMPOSITION buy anything beyond its components?
+By the doc's own framing, this is the *flagship synthesis claim of the entire repo*. But synthesis at this scale is anti-scientific: with ~10 simultaneously-changing variables, no positive or negative outcome can be attributed to any single mechanism. If H67 wins, we cannot say *why*; if it loses, we cannot say *what to fix*. This is the antithesis of Rule 1 (one config change per experiment) — Rule 1 exists precisely to prevent this kind of monolithic test.
+
+### Confounds (≥2)
+1. **Attribution-impossibility confound.** Five paradigm interactions × three overlays = ~30 pairwise interactions. None can be isolated without an exponential ablation matrix (2^10 ≈ 1024 configs at minimum).
+2. **Implementation-cost confound.** Liquid solvers + KAN splines + GNN message passing + JEPA EMA target + RoPE-icosa is a memory and FLOP nightmare; "iso-parameter" comparison at 350M will not be iso-FLOP, and any timing claim will be meaningless.
+3. **Hyperparameter explosion confound.** Each component has its own LR, schedule, regularisation; no joint sweep on a 4090 is feasible.
+
+### Additivity assumption check — the empirical record on G1-G5 (sg_full_fib at 73.24% vs baseline 84.78%) shows priors do NOT compound. Why should THIS specific hybrid escape that finding?
+This is the *direct LLM analogue* of sg_full_fib. The doc literally claims "Pareto-dominant" with "no axis regressing by more than 5%" — but sg_full_fib regressed by 10pp on its primary axis. The doc handwaves about "orthogonal axes" without proving orthogonality, and ignores the published evidence that *its own program* has already produced. The strong predictive Bayesian prior, given sg_full_fib, is that H67 will be the *worst* G7 variant — likely 5-15% below baseline on every axis simultaneously.
+
+### Literature precedent
+- Sutton 2019 'The Bitter Lesson' — methods that scale beat methods that encode prior knowledge; H67 is the maximal anti-Bitter-Lesson configuration.
+- Mixture-of-experts (Shazeer et al. 2017 ICLR 'Outrageously Large Neural Networks' arXiv:1701.06538) — combining diverse experts works when the *combinator* is learned, not when 10 priors are hand-fixed simultaneously.
+- No published precedent for combining Liquid + JEPA + KAN + Transformer + GNN in one decoder layer.
+
+### Expected effect size (90% CI a priori) — given anti-compounding, the prior should be near-baseline at best
+Perplexity Δ 90% CI: **[+2.0 nats regression, +0.0 nats wash]**, centred on +1.0 nats regression. The probability of "no axis regressing by >5%" is < 5%. The "Pareto-dominant composite" target is essentially impossible.
+
+### Minimum-distinguishing experiment
+This hypothesis is *unfalsifiable in the practical sense* — even a clear negative result cannot tell us which of the 10 axes is responsible. The only scientifically valid approach is to drop H67 entirely and run the 10 single-axis experiments first.
+
+### Verdict
+**UNFALSIFIABLE** — Attribution is impossible at this scale of composition; even a clear negative cannot tell us what to do next. The doc should explicitly predict worse-than-baseline as the SCIENCE (as the prompt instructs), but instead predicts Pareto-dominance — directly contradicting the program's own empirical record.

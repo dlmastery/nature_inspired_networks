@@ -264,3 +264,37 @@ simultaneously measurable; at 124M the JEPA auxiliary saturates.
 ## 11. Status journal
 
 - 2026-05-26 — Created from template by Doc-Agent-D.
+
+---
+
+## Addendum: Research-Scientist Critique (2026-05-27)
+
+*Reviewer: SciCritic-G7 (elite-research-scientist critic). Critiquing the IDEA, not the implementation (audit at `audits/G7_audit.md`).*
+
+### Prior plausibility (LOW/MED/HIGH + why)
+**LOW.** This is a triple-stack: (i) Liquid Time-Constant cells (Hasani, Lechner, Amini, Rus, Grosu 2021 AAAI 'Liquid Time-Constant Networks' (arXiv:2006.04439) — still unproven at LLM scale; LTCs are best demonstrated on tiny control tasks, not 32k-context language modeling); (ii) JEPA next-latent prediction (Bardes, Garrido, Ponce, Chen, Ballas, LeCun 2024 'V-JEPA' (arXiv:2404.08471) — vision domain, not causal LM); (iii) golden-angle spacing of τ_k = τ_0·φ^k. The author treats each as independently established and assumes additivity. None of the three components has been shown to outperform a Llama-class baseline at 350M scale, and combining three risky priors multiplies, not divides, the risk.
+
+### Mechanism scrutiny — does the COMPOSITION buy anything beyond its components?
+The doc claims LTC = short-range causal structure, JEPA = predictive coding scaffold, φ-spacing = "maximally diverse time constants." The author never demonstrates that φ-spacing is *uniquely* better than log-uniform spacing for time-constant diversity — log-uniform (which is what Hasani et al. 2021 actually recommend) already gives "maximally uncorrelated" coverage in the L2 sense; φ-spacing is just a particular irrational geometric progression with no provable advantage over τ_k = τ_0·2^k. The Vogel 1979 golden-angle result is about 2-D packing of *points on a disk*, not 1-D spacing on a log axis — the analogy is decorative.
+
+### Confounds (≥2)
+1. **JEPA-vs-AR loss confound.** Switching from cross-entropy to JEPA next-latent loss is a major loss-function change. Any perplexity Δ could come entirely from the loss (or from the EMA-target dynamics), not from LTC or φ-spacing. The proposed ablation matrix does not isolate the loss-function effect from the architecture effect.
+2. **Param-budget confound.** LTC cells use solvers (Euler/Runge-Kutta) inside the predictor. The implied FLOP and param count differs from a standard Transformer at "iso-parameters"; the comparison is not truly iso-FLOP.
+
+### Additivity assumption check — the empirical record on G1-G5 (sg_full_fib at 73.24% vs baseline 84.78%) shows priors do NOT compound. Why should THIS specific hybrid escape that finding?
+The doc never addresses this. The implicit assumption is that "biologically motivated" priors compose because biology composes them. But the sg_full_fib datum (six CNN priors, -10pp) directly refutes this: stacking biologically-motivated priors *destroys* performance. H61 stacks three *more ambitious* priors (LTC + JEPA + φ-spacing) in the LLM regime where each is even less validated. The doc gives no mechanism by which moving from CNN to causal-LM regime would reverse the anti-compounding observation.
+
+### Literature precedent
+- Hasani et al. 2021 (arXiv:2006.04439): LTC at ≤1M params on control tasks.
+- Bardes et al. 2024 (arXiv:2404.08471): V-JEPA at vision, not causal LM.
+- LeCun, Assran, Ballas, Bardes 2025 'Sequential JEPA' (arXiv:2506.09985): early-stage, no public LLM-scale beats.
+- No paper has fused LTC + JEPA + φ-spacing; absence is not evidence of an opportunity, it is often evidence the combination was tried and shelved.
+
+### Expected effect size (90% CI a priori) — given anti-compounding, the prior should be near-baseline at best
+Predicted Δ-perplexity 90% CI: **[+0.5 nats (regression), -0.1 nats (marginal gain)]**, centred on +0.2 (mild regression). The "≥0.4 nats improvement" target sits well outside the CI. KV-cache reduction may hold (toroidal wrap is real geometry) but is decoupled from the perplexity claim.
+
+### Minimum-distinguishing experiment
+Run four 350M decoder configs at iso-FLOP: (i) baseline AR Transformer; (ii) AR + LTC predictor head with log-uniform τ; (iii) JEPA + log-uniform τ; (iv) full H61 (JEPA + LTC + φ-spaced τ). If only (iv) wins, the φ-spacing is doing real work. If (iii) ≈ (iv), the φ-spacing is decorative; if (ii) ≈ baseline, LTC adds nothing in this regime.
+
+### Verdict
+**INCONCLUSIVE-NEEDS-DATA** — Triple-stack of unvalidated priors; the φ-spacing axis is the only novel control variable but is the weakest mechanistically. Without the 4-cell ablation above, no positive result can be attributed to the proposed mechanism.

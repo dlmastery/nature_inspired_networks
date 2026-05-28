@@ -416,3 +416,39 @@ flagship; both should not be run in the same 4090 campaign at
 ## 11. Status journal
 
 - 2026-05-27 — Created from template by Doc-Agent-E.
+
+---
+
+## Addendum: Research-Scientist Critique (2026-05-27)
+
+*Reviewer: SciCritic-G7 (elite-research-scientist critic). Critiquing the IDEA, not the implementation (audit at `audits/G7_audit.md`).*
+
+### Prior plausibility (LOW/MED/HIGH + why)
+**LOW.** Weight tying is established but generally REDUCES capacity, justified by data-efficiency arguments (Press & Wolf 2017 EACL 'Using the Output Embedding to Improve Language Models' (arXiv:1608.05859); Lan, Chen, Goodman, Gimpel, Sharma, Soricut 2020 ICLR 'ALBERT: A Lite BERT' (arXiv:1909.11942); Dehghani, Gouws, Vinyals, Uszkoreit, Kaiser 2019 ICLR 'Universal Transformer' (arXiv:1807.03819)). Tying QKV+FFN-gate+FFN-up through a *shared 13-vertex Metatron basis* is aggressive: 5-way tying is far beyond ALBERT's cross-layer scheme and the *13-vertex* dimensionality is unmotivated (why 13 and not 8, 16, 32?). The doc derives a 5·d² → d²+5·13d compression ratio, but ignores that capacity reduction below the loss curve's elbow degrades perplexity sharply.
+
+### Mechanism scrutiny — does the COMPOSITION buy anything beyond its components?
+The proposed factorisation M_i = U·S_i·V^T with shared U,V across {Q,K,V,gate,up} is a *low-rank tied factorisation*, equivalent in spirit to LoRA shared-base (Hu, Shen, Wallis, Allen-Zhu, Li, Wang, Wang, Chen 2022 ICLR 'LoRA' (arXiv:2106.09685)) but tying *across functional roles* (Q vs K vs V vs gate vs up). These roles have known mechanistic differences (Q/K live in attention scores; V lives in value mixing; gate/up live in FFN). Forcing them to share a basis sacrifices the per-role specialisation that modern Transformers have evolved to exploit. The 13-vertex constraint adds a second, decorative restriction on top of the tying.
+
+### Confounds (≥2)
+1. **Compression-vs-tying-basis confound.** Any 13-rank tied factorisation would give similar compression; the *Metatron* basis specifically is one of many 13-vertex graphs.
+2. **Capacity-vs-perplexity confound.** 18-30% compression means 18-30% fewer parameters. At iso-perplexity is a strong constraint — most tying schemes lose 0.1-0.3 nats at this compression level. The "no GSM8K regression beyond 1 pp" target may be unattainable.
+3. **Layer-position confound.** Tying may help at some layers and hurt at others; per-layer ablation would isolate.
+
+### Additivity assumption check — the empirical record on G1-G5 (sg_full_fib at 73.24% vs baseline 84.78%) shows priors do NOT compound. Why should THIS specific hybrid escape that finding?
+H74 stacks Metatron tying + Platonic group-tying (icosa/dodeca-symmetric head partition). Two structural constraints on the same parameter space. The CIFAR-10 anti-compounding evidence applies directly. The doc gives no reason these constraints will compose constructively rather than destructively.
+
+### Literature precedent
+- Press & Wolf 2017 (arXiv:1608.05859) — input/output embedding tying.
+- Lan et al. 2020 ALBERT (arXiv:1909.11942) — cross-layer tying for compression; small perplexity loss accepted.
+- Dehghani et al. 2019 Universal Transformer (arXiv:1807.03819) — cross-layer tying with recurrence.
+- Hu et al. 2022 LoRA (arXiv:2106.09685) — low-rank factorisation for adaptation; not for from-scratch tying.
+- No published precedent for QKV-FFN cross-role tying through any basis.
+
+### Expected effect size (90% CI a priori) — given anti-compounding, the prior should be near-baseline at best
+Param compression: 18-30% is plausible (the math is correct). Perplexity Δ at iso-perplexity: 90% CI **[+0.3 nats regression, +0.05 nats wash]**, centred on +0.15 nats (likely fail iso-perplexity). GSM8K Δ 90% CI: **[-3 pp, +0 pp]**, centred on -1 pp.
+
+### Minimum-distinguishing experiment
+(i) baseline 350M; (ii) 13-rank tied factorisation with random shared basis; (iii) full H74 (Metatron basis + Platonic group-tying); (iv) per-role 13-rank low-rank without tying. Compare (i) vs (ii) for tying-cost, (ii) vs (iii) for Metatron-specific benefit.
+
+### Verdict
+**DERIVATIVE+TESTABLE** — Aggressive cross-role weight tying with a decorative basis name; the math is sound but the 13-vertex Metatron-ness has no derived advantage over random 13-rank tying.

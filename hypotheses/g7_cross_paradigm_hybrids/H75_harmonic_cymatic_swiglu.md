@@ -388,3 +388,40 @@ sub-component. Conflicts with no other hypothesis.
 ## 11. Status journal
 
 - 2026-05-27 — Created from template by Doc-Agent-E.
+
+---
+
+## Addendum: Research-Scientist Critique (2026-05-27)
+
+*Reviewer: SciCritic-G7 (elite-research-scientist critic). Critiquing the IDEA, not the implementation (audit at `audits/G7_audit.md`).*
+
+### Prior plausibility (LOW/MED/HIGH + why)
+**LOW.** SwiGLU (Shazeer 2020 arXiv 'GLU Variants Improve Transformer' (arXiv:2002.05202)) is real and SOTA-aligned; gates are real and tunable. The novelty in H75 is (i) φ-parameterised gate x·σ(φ·x − τ_c(t)); (ii) per-channel dynamic threshold modulated by a Chladni-eigenmode basis. The prompt explicitly identifies the cymatic init as the controlled variable, with the rest being "window dressing." This is correct: the φ scaling factor in σ(φ·x) is a hyperparameter equivalent to multiplying the gate input by a constant ≈1.618 — almost certainly absorbable into the surrounding LayerNorm. The cymatic time-modulated threshold Σ_k a_k·cos(ω_k·t) is a *time-varying scalar offset* per channel — equivalent to a learnable per-channel bias with a sinusoidal schedule, which has been studied and shown to have minimal effect.
+
+### Mechanism scrutiny — does the COMPOSITION buy anything beyond its components?
+Two axes on the same gate: φ-scaled sigmoid + time-varying per-channel bias. The first is a constant rescaling; the second is a learnable bias schedule. Neither has published support for improving 350M-scale LM perplexity. Hodgkin-Huxley dynamics (1952) describe ion-channel dynamics; mapping them onto a SwiGLU gate is a metaphor, not a mechanism. The "cymatic resonance principle (Jenny 2001)" citation is a popular-science book, not a peer-reviewed primary source — citation rigor (Rule 4) is borderline here.
+
+### Confounds (≥2)
+1. **Activation-rescaling confound.** Multiplying gate input by φ is equivalent to rescaling the prior weight matrix by φ; this is absorbable into init scale and may have zero effect on final perplexity.
+2. **Per-channel-bias confound.** A learnable per-channel bias with sinusoidal schedule is a well-studied (and weak) hyperparameter; gains may track the addition of a bias term, not the cymatic shape of the schedule.
+3. **Wall-clock confound.** "≥15% faster early-step convergence" is sensitive to LR warmup and seed; effect easily attributable to noise.
+
+### Additivity assumption check — the empirical record on G1-G5 (sg_full_fib at 73.24% vs baseline 84.78%) shows priors do NOT compound. Why should THIS specific hybrid escape that finding?
+H75 stacks two priors (φ-gate + cymatic threshold) onto SwiGLU. Two priors on the same activation. The anti-compounding evidence applies directly. The doc gives no reason these will compose constructively. The most likely outcome is that one prior is washed by absorption into adjacent learnable layers, the other adds latency without measurable perplexity gain.
+
+### Literature precedent
+- Shazeer 2020 SwiGLU (arXiv:2002.05202) — original.
+- Ramachandran, Zoph, Le 2017 arXiv 'Searching for Activation Functions' (arXiv:1710.05941) — Swish/SiLU comes from NAS; no benefit shown for φ-scaling.
+- Hendrycks & Gimpel 2016 arXiv 'Gaussian Error Linear Units (GELUs)' (arXiv:1606.08415) — activation literature; no φ.
+- Misra 2019 arXiv 'Mish' (arXiv:1908.08681) — yet another activation; gains modest, mostly wash.
+- Hodgkin & Huxley 1952 J. Physiol. 'A quantitative description of membrane current' — biology not directly applicable.
+- No published precedent for cymatic-modulated SwiGLU.
+
+### Expected effect size (90% CI a priori) — given anti-compounding, the prior should be near-baseline at best
+WikiText-103 perplexity Δ 90% CI: **[+0.1 nats regression, -0.05 nats marginal gain]**, centred on +0.0 (wash). Early-step convergence Δ 90% CI: **[-5%, +5%]**, centred on 0. The "≥0.2 nats AND ≥15% wall-clock" target sits well outside both CIs.
+
+### Minimum-distinguishing experiment
+Iso-FLOP four-way: (i) baseline SwiGLU; (ii) φ-scaled gate (constant rescaling only); (iii) (i) + learnable per-channel bias with sinusoidal schedule; (iv) full H75. Compare (i) vs (ii) for φ-rescaling effect (expected: zero), (i) vs (iii) for schedule effect, (iii) vs (iv) for cymatic-shape effect.
+
+### Verdict
+**DERIVATIVE+TESTABLE** — SwiGLU + activation-rescaling + scheduled bias; the cymatic-shape axis is the only novel variable and is almost certainly within seed noise.

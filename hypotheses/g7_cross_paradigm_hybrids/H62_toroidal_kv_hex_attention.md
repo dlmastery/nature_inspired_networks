@@ -227,3 +227,37 @@ sparsification reported for V-JEPA 2's mask schedule.
 ## 11. Status journal
 
 - 2026-05-26 — Created from template by Doc-Agent-D.
+
+---
+
+## Addendum: Research-Scientist Critique (2026-05-27)
+
+*Reviewer: SciCritic-G7 (elite-research-scientist critic). Critiquing the IDEA, not the implementation (audit at `audits/G7_audit.md`).*
+
+### Prior plausibility (LOW/MED/HIGH + why)
+**LOW-MED.** The memory-reduction claim (40%) is partially independent of the perplexity claim and stands on plausible footing: sparse attention does cut KV memory (e.g. Beltagy, Peters, Cohan 2020 EMNLP 'Longformer: The Long-Document Transformer' (arXiv:2004.05150) — strided/global hybrid). The full claim, however, requires three priors to compose: hex-graph sparsity + toroidal wrap + Fib-ratio magnitude pruning. Each adds a separate failure surface. Hex-lattice equivariance (Hoogeboom, Peters, Cohen, Welling 2018 ECCV 'HexaConv' (arXiv:1803.02108)) is for *images*, not 1-D token sequences — there is no natural hex structure on a token sequence to preserve.
+
+### Mechanism scrutiny — does the COMPOSITION buy anything beyond its components?
+A 6-regular sparse attention pattern would be efficiently described by Child, Gray, Radford, Sutskever 2019 OpenAI 'Generating Long Sequences with Sparse Transformers' (arXiv:1904.10509) — a sparse Transformer with stride 6, no hex framing needed. The "toroidal wrap" reduces to cyclic positional indexing, which is just modular RoPE. Fib-ratio pruning is a single hyperparameter choice with no provable advantage over magnitude-percentile schedules. The "composition" therefore does not buy anything beyond a sparse-attention + RoPE-mod-N + iterative-magnitude-pruning baseline that has been published for years.
+
+### Confounds (≥2)
+1. **Sparsity-vs-geometry confound.** Any KV-memory win could be attributed to sparsity alone (stride-6 random fixed pattern would likely match). The 6-fold rotational symmetry has no semantic meaning on a 1-D causal stream.
+2. **Pruning-schedule confound.** Han, Mao, Dally 2016 ICLR 'Deep Compression' (arXiv:1510.00149) shows pruning gains depend strongly on schedule shape; a Fib schedule is one point in a 1-D family that has not been benchmarked against linear/cosine/cubic.
+
+### Additivity assumption check — the empirical record on G1-G5 (sg_full_fib at 73.24% vs baseline 84.78%) shows priors do NOT compound. Why should THIS specific hybrid escape that finding?
+The doc waves at "complementary axes" (graph topology + cache wrap + pruning) without demonstrating axis-orthogonality. The sg_full_fib precedent is directly relevant: a hex graph IS a geometric prior, a torus IS a topological prior, and Fib ratios are the SAME numerological choice that already lost on CIFAR-10. The hypothesis offers no reason the LLM regime would reverse the anti-compounding observation.
+
+### Literature precedent
+- Beltagy et al. 2020 Longformer (arXiv:2004.05150) — dilated + window attention beats dense at long context, no hex needed.
+- Child et al. 2019 sparse Transformer (arXiv:1904.10509) — strided sparse attention is the canonical reference.
+- Zaheer et al. 2020 NeurIPS 'Big Bird: Transformers for Longer Sequences' (arXiv:2007.14062) — random + window + global sparse pattern beat dense.
+- Hex-lattice attention has been published for image domains (HexaConv) but never shown to improve language-modeling perplexity at iso-FLOP.
+
+### Expected effect size (90% CI a priori) — given anti-compounding, the prior should be near-baseline at best
+KV-memory reduction 90% CI: **[+10%, +40%]** (likely real but probably matched by simpler sparse baselines). Perplexity Δ 90% CI: **[+0.5 nats regression, +0.0 nats wash]**, centred on +0.25 (mild regression). The "+0.2 nats max regression" target sits at the optimistic edge.
+
+### Minimum-distinguishing experiment
+Iso-FLOP comparison of: (i) dense baseline; (ii) stride-6 random sparse; (iii) hex-lattice sparse; (iv) hex + torus; (v) hex + torus + Fib prune. Only if (v) >> (iii) by a margin > seed noise does the composition justify itself.
+
+### Verdict
+**DERIVATIVE+TESTABLE** — A well-defined sparse-attention variant whose three priors are all replicas of existing published mechanisms with different decorative names. Likely indistinguishable from Longformer/BigBird at iso-FLOP.

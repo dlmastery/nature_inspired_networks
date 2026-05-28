@@ -221,3 +221,38 @@ basis-function composition is orthogonal to attention.
 ## 11. Status journal
 
 - 2026-05-26 — Created from template by Doc-Agent-D.
+
+---
+
+## Addendum: Research-Scientist Critique (2026-05-27)
+
+*Reviewer: SciCritic-G7 (elite-research-scientist critic). Critiquing the IDEA, not the implementation (audit at `audits/G7_audit.md`).*
+
+### Prior plausibility (LOW/MED/HIGH + why)
+**LOW.** Two compounding gambles: (i) KAN (Liu, Wang, Vaidya, Ruehle, Halverson, Soljačić, Hou, Tegmark 2024 NeurIPS 'KAN: Kolmogorov-Arnold Networks' (arXiv:2404.19756)) makes strong claims about MLP replacement on small benchmarks (Feynman equations, PDE solving) — but the follow-up literature (Yu, Wang, Hong, Wang 2024 'KAN or MLP: A Fairer Comparison' (arXiv:2407.16674)) shows KANs do NOT consistently outperform MLPs at fair iso-FLOP comparison; KAN's claimed gains often come from the spline parameter overhead. (ii) Pinning the KAN graph to *Metatron's Cube* (13 vertices, 78 edges) is an arbitrary choice with no derivation; Metatron's Cube is a 2-D figure with no canonical mapping to a function-composition graph. The biological motivation ("olfactory glomeruli networks have a near-Metatronic 13-circle organisation") is unsupported by neuroscience literature.
+
+### Mechanism scrutiny — does the COMPOSITION buy anything beyond its components?
+The composition claims two distinct benefits: (a) symbolic recovery on Feynman equations; (b) GSM8K gain. (a) is a property of KAN itself (Liu 2024 demonstrated it); the Metatron graph is unlikely to *help* — it constrains the function class. (b) is unjustified: GSM8K requires multi-step arithmetic reasoning, which has *nothing to do* with the Kolmogorov-Arnold representation of a fixed continuous function. The "symbolic-friendly representation" claim is unsupported speculation.
+
+### Confounds (≥2)
+1. **KAN-vs-MLP confound.** At iso-param-count, KANs often match MLPs (Yu et al. 2024 arXiv:2407.16674). Any Δ measured may be parameter-count, not Kolmogorov-Arnold structure.
+2. **Graph-shape confound.** A random 13-vertex graph with 78 edges may match the Metatron geometry; the test cannot attribute gains to Metatron specifically.
+3. **GSM8K-noise confound.** GSM8K zero-shot at 124M has high seed variance (±2 pp); the "+3 pp" claim may be within noise.
+
+### Additivity assumption check — the empirical record on G1-G5 (sg_full_fib at 73.24% vs baseline 84.78%) shows priors do NOT compound. Why should THIS specific hybrid escape that finding?
+H69 is a two-prior stack (KAN + Metatron). The Metatron axis is the extra-hand-wavy add-on (as the prompt explicitly notes). The anti-compounding evidence makes a positive composite Δ unlikely. The doc gives no reason the LLM-symbolic regime would reverse the CIFAR-10 anti-compounding observation.
+
+### Literature precedent
+- Liu et al. 2024 KAN (arXiv:2404.19756) — original.
+- Yu et al. 2024 (arXiv:2407.16674) — "KAN or MLP: A Fairer Comparison" — KAN does NOT consistently beat MLP at iso-FLOP.
+- Cranmer 2023 arXiv 'Interpretable Machine Learning for Science with PySR/SymbolicRegression.jl' (arXiv:2305.01582) — symbolic regression literature; no Metatron graph required.
+- No published precedent for KAN-on-Metatron architectures.
+
+### Expected effect size (90% CI a priori) — given anti-compounding, the prior should be near-baseline at best
+GSM8K Δ 90% CI: **[-1 pp, +2 pp]**, centred on +0.5 pp. Symbolic recovery rate on Feynman subset: a fair KAN should achieve 30-50% (Liu 2024), the Metatron constraint likely *reduces* this. The "≥40%" target is at the optimistic edge.
+
+### Minimum-distinguishing experiment
+(i) MLP head; (ii) standard KAN head; (iii) KAN-on-Metatron head; (iv) KAN-on-random-13-vertex-graph head. Compare (i) vs (ii) at iso-FLOP and (ii) vs (iii) vs (iv) for the graph-shape isolation.
+
+### Verdict
+**NUMEROLOGY** — KAN + Metatron is "KAN with a decorative graph constraint"; the Metatron axis is the controlled variable and has no derived justification.

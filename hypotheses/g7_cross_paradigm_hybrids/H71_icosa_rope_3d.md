@@ -216,3 +216,37 @@ reasoning in LLMs.
 ## 11. Status journal
 
 - 2026-05-26 — Created from template by Doc-Agent-D.
+
+---
+
+## Addendum: Research-Scientist Critique (2026-05-27)
+
+*Reviewer: SciCritic-G7 (elite-research-scientist critic). Critiquing the IDEA, not the implementation (audit at `audits/G7_audit.md`).*
+
+### Prior plausibility (LOW/MED/HIGH + why)
+**MED.** Of the G7 hybrids, H71 has the cleanest mathematical motivation: 3-D spatial reasoning DOES need 3-D positional encoding, and the icosahedral group (Cohen, Weiler, Kicanaoglu, Welling 2019 ICML 'Gauge Equivariant Convolutional Networks and the Icosahedral CNN' (arXiv:1902.04615)) IS the largest finite subgroup of SO(3) with uniform S² coverage. Multi-dimensional RoPE has been studied (Su, Lu, Pan, Murtadha, Wen, Liu 2024 'RoFormer' (arXiv:2104.09864) original is 1-D; recent work extends to N-D). The plausibility ceiling is set by the *fit to the benchmark*: 3D-Shapes/3D-navigation QA at GPT-2-small scale is a niche that may not exhibit gains visible above seed noise.
+
+### Mechanism scrutiny — does the COMPOSITION buy anything beyond its components?
+H71 is technically a *single-mechanism* hypothesis dressed as a hybrid. The "composition" is just "use 60-element rotation group instead of 1-D angle"; the icosahedral group choice is principled (largest discrete SO(3) subgroup with uniform S² coverage). The "place-cell hexagonal field generalises to icosahedral in 3-D bats" (Yartsev & Ulanovsky 2013) is a *contested* biological observation; subsequent literature (Ginosar, Aljadeff, Burak, Sompolinsky, Las, Ulanovsky 2021) shows grid cells in 3-D are *cubic-lattice-like*, NOT icosahedral. The biology motivation is weaker than stated.
+
+### Confounds (≥2)
+1. **3-D-PE-vs-rotation-group confound.** Any 3-D positional encoding (e.g. concatenated three 1-D RoPEs) would help 3-D spatial reasoning. The icosahedral *rotation group* is one of many 3-D PE schemes; gains may not be attributable to its specific structure.
+2. **Benchmark-design confound.** 3D-navigation QA at GPT-2-small scale (124M) is a saturation-prone benchmark; gains may saturate at any 3-D PE.
+
+### Additivity assumption check — the empirical record on G1-G5 (sg_full_fib at 73.24% vs baseline 84.78%) shows priors do NOT compound. Why should THIS specific hybrid escape that finding?
+H71 is closer to a single-mechanism hypothesis than the other G7 entries. The anti-compounding concern is mild — but the doc mentions "extends H24 + H34 + H30" which suggests intended composition with phyllotactic / Fibonacci priors. If H71 is run *alone* (just icosa-RoPE), the prior is plausible. If composed with H30 etc., it inherits the anti-compounding risk.
+
+### Literature precedent
+- Su et al. 2024 RoFormer (arXiv:2104.09864) — 1-D RoPE; canonical.
+- Cohen et al. 2019 Icosahedral CNN (arXiv:1902.04615) — icosahedral equivariance in vision.
+- Heo, Park, Han, Yun 2024 arXiv 'Rotary Position Embedding for Vision Transformer' (arXiv:2403.13298) — 2-D RoPE extension; recent.
+- Li, Zhao, Xu, Liu, He 2024 arXiv 'PixArt-α / 3D-Aware Generation' — 3-D PE schemes for vision diffusion, no icosahedral preference shown.
+
+### Expected effect size (90% CI a priori) — given anti-compounding, the prior should be near-baseline at best
+3-D nav QA Δ 90% CI: **[+0 pp, +4 pp]**, centred on +1.5 pp (assumes single-mechanism deployment). Rotation-equivariance Δ 90% CI: **[+0.01, +0.05]**, centred on +0.025. The "≥3 pp AND ≥0.04" target is achievable on one axis, less likely on both.
+
+### Minimum-distinguishing experiment
+Iso-FLOP, iso-param: (i) 1-D RoPE; (ii) 3×1-D concatenated RoPE; (iii) icosa-RoPE; (iv) octahedral-RoPE (24-element, smaller discrete SO(3) subgroup). Compare (i) vs (ii) for "any 3-D vs 1-D", and (ii) vs (iii) vs (iv) for "icosa-specific vs other discrete groups".
+
+### Verdict
+**NOVEL+TESTABLE** — Single, principled mechanism (icosahedral discrete SO(3)); the strongest G7 hypothesis. Should be run standalone, not composed with phyllotactic/Fibonacci priors that would re-introduce anti-compounding risk.

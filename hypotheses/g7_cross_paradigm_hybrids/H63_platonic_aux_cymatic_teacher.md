@@ -199,3 +199,37 @@ into a partially self-supervised geometric regulariser.
 ## 11. Status journal
 
 - 2026-05-26 — Created from template by Doc-Agent-D.
+
+---
+
+## Addendum: Research-Scientist Critique (2026-05-27)
+
+*Reviewer: SciCritic-G7 (elite-research-scientist critic). Critiquing the IDEA, not the implementation (audit at `audits/G7_audit.md`).*
+
+### Prior plausibility (LOW/MED/HIGH + why)
+**LOW.** Two compounding leaps of inference: (i) Huh, Cheung, Wang, Isola 2024 ICML 'The Platonic Representation Hypothesis' (arXiv:2405.07987) is a *descriptive* claim about large-model representations converging across modalities — it does NOT prescribe forcing alignment to a literal 20-vertex dodecahedron. The doc treats a metaphor (the title's "Platonic") as a constructive recipe. (ii) Chladni eigenmodes form a basis for *2-D plate vibrations*; their relationship to language model representations is decorative, not principled. Two metaphors do not make a method.
+
+### Mechanism scrutiny — does the COMPOSITION buy anything beyond its components?
+Auxiliary losses that compress hidden-state rank are well-studied (e.g. SimCLR-style contrastive, Barlow Twins, VICReg; cf. Zbontar et al. 2021 ICML 'Barlow Twins' (arXiv:2103.03230)). Pulling activations toward 20 fixed targets is essentially a 20-prototype contrastive objective with a hand-picked codebook geometry. No paper has shown that a *dodecahedron-shaped* codebook outperforms a learned codebook of equivalent size; the dodecahedron is one point in a vast space of 20-vertex polytopes. The cymatic-wavelet teacher is an unsupervised regression target — comparable to feature distillation from a randomly-initialised teacher (Frankle, Dziugaite, Roy, Carbin 2020 ICML 'Linear Mode Connectivity' (arXiv:1912.05671) — random teachers can help, but the *cymatic shape* of the teacher matters less than the regularisation it provides).
+
+### Confounds (≥2)
+1. **Aux-loss-presence confound.** Any λ_aux > 0 regularises the network. A control with λ_aux = 0.2 against a *random* 20-vertex target would isolate the dodecahedron geometry from the regularisation effect.
+2. **Teacher-signal confound.** A frozen randomly-initialised network would produce a similar "structured but unsupervised" target; the cymatic shape is not isolated.
+
+### Additivity assumption check — the empirical record on G1-G5 (sg_full_fib at 73.24% vs baseline 84.78%) shows priors do NOT compound. Why should THIS specific hybrid escape that finding?
+H63 combines Platonic projection (geometric prior) + cymatic teacher (frequency prior) — exactly the additive-priors recipe that has empirically failed. The doc claims "after every decoder layer" which multiplies the prior across depth; this is the worst possible composition pattern given the anti-compounding evidence. The doc does not even acknowledge that adding two auxiliary losses might destructively interfere.
+
+### Literature precedent
+- Huh et al. 2024 PRH (arXiv:2405.07987) — descriptive, not prescriptive.
+- Zbontar et al. 2021 Barlow Twins (arXiv:2103.03230) — fixed-target regularisation works regardless of target shape.
+- Hinton, Vinyals, Dean 2015 'Distilling the Knowledge in a Neural Network' (arXiv:1503.02531) — auxiliary teacher distillation literature; no requirement for a Platonic-solid teacher.
+- No prior work on dodeca-vertex projection losses for LMs.
+
+### Expected effect size (90% CI a priori) — given anti-compounding, the prior should be near-baseline at best
+GSM8K zero-shot Δ 90% CI: **[-1 pp, +1 pp]**, centred on +0.0 pp. The "≥2 pp" target is optimistic by a factor of 2-4. Any positive Δ is more likely attributable to the regularisation than to the dodeca/cymatic geometry.
+
+### Minimum-distinguishing experiment
+Ablate the target geometry: (i) baseline, no aux; (ii) random 20-target, λ=0.2; (iii) dodeca 20-target, λ=0.2; (iv) dodeca + cymatic teacher. Only if (iii) >> (ii) AND (iv) >> (iii) does the geometry justify itself.
+
+### Verdict
+**NUMEROLOGY** — Treats a metaphor (Platonic Representation) as a recipe and stacks two decorative geometries onto a vanilla auxiliary-loss regulariser.

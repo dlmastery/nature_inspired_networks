@@ -407,3 +407,39 @@ as orthogonal to the golden-angle prior.
 ## 11. Status journal
 
 - 2026-05-27 — Created from template by Doc-Agent-E.
+
+---
+
+## Addendum: Research-Scientist Critique (2026-05-27)
+
+*Reviewer: SciCritic-G7 (elite-research-scientist critic). Critiquing the IDEA, not the implementation (audit at `audits/G7_audit.md`).*
+
+### Prior plausibility (LOW/MED/HIGH + why)
+**LOW.** Triple-stack: (i) golden-angle RoPE frequencies (replaces 10000^(-2i/d) with 137.5°·φ^(-i/d)); (ii) learnable φ-spiral 2-D PE trajectory; (iii) Metatron-Cube edge weighting between positions. The doc claims a "co-designed" stack but each axis is independently unproven and the combination has no published precedent. The RoPE base-frequency literature (Men, Xu, Zhang, Wu, Sun 2024 arXiv 'Base of RoPE Bounds Context Length' (arXiv:2405.14591)) shows base-frequency choice matters for context length, but does NOT support golden-angle specifically — the optimal base scales with context length, not with φ.
+
+### Mechanism scrutiny — does the COMPOSITION buy anything beyond its components?
+Vogel 1979's golden-angle result is about *2-D point packing on a disk* — the most-irrational-rotation argument. RoPE base frequencies are *1-D log-axis spacing* — a completely different geometric problem. Conflating "most-irrational angle on S^1" with "optimal frequency spacing on a log axis" is a category error. The φ-spiral PE trajectory adds a learnable 2-D coordinate to each token — but tokens already have 1-D position; the spiral adds no genuine information unless it correlates with content, which the doc does not claim. The Metatron edge weighting is a fixed 13-vertex adjacency overlaid on N-token positions; the mapping from N tokens to 13 vertices is unspecified and must be by-modulus, which is just modular position again.
+
+### Confounds (≥2)
+1. **Base-frequency confound.** Any non-default RoPE base affects long-context perplexity (Men et al. 2024 arXiv:2405.14591). Gains may come from "not-10000" not from "golden-angle".
+2. **Learnable-PE confound.** Adding any learnable PE to RoPE generally helps; the spiral shape is one of infinitely many learnable PE schemes.
+3. **Composition-cost confound.** Three separate position-encoding mechanisms in one model creates a parameter and FLOP overhead the iso-params framing does not capture.
+
+### Additivity assumption check — the empirical record on G1-G5 (sg_full_fib at 73.24% vs baseline 84.78%) shows priors do NOT compound. Why should THIS specific hybrid escape that finding?
+H73 is a direct LLM analogue of stacking three geometric priors on one mechanism (position encoding). The CIFAR-10 anti-compounding precedent directly applies. The doc claims a "learned per-token gate" between the three sources will adaptively select — but learned gates do not save bad priors; if any of the three priors is harmful, the gate will down-weight it (best case) but the overhead remains.
+
+### Literature precedent
+- Su et al. 2024 RoFormer (arXiv:2104.09864) — RoPE original.
+- Men et al. 2024 (arXiv:2405.14591) — base-frequency analysis.
+- Chen et al. 2023 arXiv 'YaRN: Efficient Context Window Extension' (arXiv:2309.00071) — base-frequency scaling for context extension.
+- Peng, Quesnelle, Fan, Shippole 2023 arXiv 'YaRN' (arXiv:2309.00071) — base-frequency tweaks for context extension.
+- No published precedent for golden-angle RoPE base.
+
+### Expected effect size (90% CI a priori) — given anti-compounding, the prior should be near-baseline at best
+32k-context WikiText-103 perplexity Δ 90% CI: **[+0.5 nats regression, -0.1 nats marginal gain]**, centred on +0.1 nats (mild regression). The "≥0.4 nats improvement" target is well outside the CI.
+
+### Minimum-distinguishing experiment
+Iso-FLOP, iso-param at 32k context: (i) RoPE base=10000 baseline; (ii) RoPE base=137.5°·φ; (iii) (ii) + φ-spiral PE; (iv) full H73 (iii) + Metatron edge weighting. Compare (i) vs (ii) for base-only, (ii) vs (iii) vs (iv) for incremental adds.
+
+### Verdict
+**NUMEROLOGY** — Golden-angle base + φ-spiral + Metatron adjacency is three decorative geometries stacked on the same mechanism; no axis has derived value.

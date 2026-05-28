@@ -209,3 +209,37 @@ suffices for the bootstrap.
 ## 11. Status journal
 
 - 2026-05-26 — Created from template by Doc-Agent-D.
+
+---
+
+## Addendum: Research-Scientist Critique (2026-05-27)
+
+*Reviewer: SciCritic-G7 (elite-research-scientist critic). Critiquing the IDEA, not the implementation (audit at `audits/G7_audit.md`).*
+
+### Prior plausibility (LOW/MED/HIGH + why)
+**LOW.** Curriculum learning (Bengio, Louradour, Collobert, Weston 2009 ICML 'Curriculum Learning' (arXiv:0904.0102)) is real but the effect size is typically small (≤1-2 pp on common benchmarks) and the effect *depends on the difficulty ordering*, not on the source of structure. Injecting "Chladni-eigenmode interference patterns" as auxiliary phantom tokens is not a known curriculum-learning recipe; the doc treats Chladni patterns as automatically helpful because they are "structured and unsupervised" — but every random structured signal has the same property. Spontaneous-retinal-wave biology (Penn et al. 1998) is decorative; cortical pre-organisation drives receptive-field formation in vivo, not perplexity reduction in 124M LLMs on TinyStories.
+
+### Mechanism scrutiny — does the COMPOSITION buy anything beyond its components?
+H70 is essentially "auxiliary structured input stream + progressive complexity". The cymatic shape adds nothing over a generic frequency-progressive auxiliary. A frozen randomly-initialised network producing structured noise would likely provide an equivalent self-supervised signal. The "phantom tokens" mechanism is a thin wrapper over standard auxiliary-loss / multitask training.
+
+### Confounds (≥2)
+1. **Aux-token-volume confound.** Adding ANY extra tokens during training adds capacity and gradient signal. Gains may track token count, not Chladni structure.
+2. **Data-augmentation confound.** Mixing cymatic patterns into TinyStories is a form of data augmentation; the data-augmentation literature (Cubuk et al. 2020 NeurIPS 'RandAugment' (arXiv:1909.13719)) shows random augmentations work; the Chladni-specific augmentation has no theoretical advantage.
+
+### Additivity assumption check — the empirical record on G1-G5 (sg_full_fib at 73.24% vs baseline 84.78%) shows priors do NOT compound. Why should THIS specific hybrid escape that finding?
+H70 is single-prior in spirit (cymatic curriculum) but uses *progressive complexity* + *cymatic shape* + *low-data fraction* as three jointly-varied axes. The doc treats these as orthogonal but they trade off — at 10% data, the curriculum has too few real examples to interleave; at 50%, the cymatic patterns are dwarfed by real text. The interaction surface is sharp.
+
+### Literature precedent
+- Bengio et al. 2009 Curriculum Learning (arXiv:0904.0102) — effect size 1-2 pp.
+- Hacohen & Weinshall 2019 ICML 'On the Power of Curriculum Learning in Training Deep Networks' (arXiv:1904.03626) — curriculum effect depends strongly on the difficulty measure, not on the auxiliary signal source.
+- Wu, Dyer, Neyshabur 2021 arXiv 'When Do Curricula Work?' (arXiv:2012.03107) — curriculum often does NOT help in standard data regimes.
+- No published precedent for cymatic-pattern curriculum in LLM pretraining.
+
+### Expected effect size (90% CI a priori) — given anti-compounding, the prior should be near-baseline at best
+Perplexity gap recovery 90% CI: **[20%, 50%]**, centred on ~35%. The "≥80%" target is unrealistic — published curriculum gains do not approach 80% recovery in low-data regimes.
+
+### Minimum-distinguishing experiment
+Four-way at 30% data fraction: (i) no aux; (ii) random-noise aux; (iii) frequency-progressive aux (e.g. low-pass to high-pass); (iv) Chladni-eigenmode aux. Expectation: (ii) ≈ (iii) ≈ (iv), all marginally above (i). Only if (iv) >> (iii) does the Chladni shape matter.
+
+### Verdict
+**NUMEROLOGY** — Auxiliary-input curriculum learning with a decorative pattern source; the cymatic axis has no derived value over generic structured noise.
