@@ -1,37 +1,18 @@
-﻿# Abstract — NaturePriorBlock: an ablation surface for nature-inspired priors
+# Abstract — A Skeptical Protocol for Nature-Inspired Neural-Network Priors
 
-We introduce **NaturePriorBlock**, a CIFAR-scale residual block whose six
-"nature-inspired" inductive biases — hexagonal-masked convolution
-(HexaConv 2018), C4 group-equivariant convolution as a Platonic proxy
-(Cohen & Welling 2016), fractal recursive sub-paths (FractalNet 2017),
-toroidal (circular) padding (Pittorino 2022), Chladni-eigenmode
-("cymatic") filter initialization, and golden-angle channel
-modulation — are each toggleable for principled ablation. Combined with
-a Fibonacci-Net 2025-style channel schedule, the block drops into a
-ResNet-20-shaped backbone (3 stages × 3 blocks) at **127 k–259 k
-parameters**, comparable to a 272 k ResNet-20 baseline.
+We introduce **`nature_inspired_networks`**, an open autoresearch repository housing 84 nature-inspired neural-network hypotheses (φ-scaling, hexagonal lattices, Platonic / icosahedral equivariance, fractal recursion, toroidal closure, Chladni cymatic init, golden-angle modulation, and 15 cross-paradigm hybrids) across 8 thematic groups. Each hypothesis ships as a standalone pure-PyTorch primitive (~80 modules) with a committee-grade design doc, unit tests, and a SHA-256-fingerprinted composite metric.
 
-We embed the block in an autoresearch protocol inherited from
-`dlmastery/autoresearchimage`: every ablation row is an experiment with
-arXiv-cited motivation, a numeric pre-run prediction, and a
-SHA-256-fingerprinted composite metric
+**The methodological contribution** is the dual-track adversarial audit layered on top: a parallel 8-agent implementation-critic team verifies code-vs-doc correspondence (output: `audits/G<X>_audit.md`, four-tier verdicts PASS / MINOR / MAJOR / BROKEN), and a parallel 8-agent research-scientist-critic team independently challenges the scientific merit of each hypothesis (output: an addendum appended into every design doc, six-tier verdicts NOVEL+TESTABLE / DERIVATIVE+TESTABLE / NUMEROLOGY / FALSIFIED / UNFALSIFIABLE / INFRASTRUCTURE). An 8-agent Fixer campaign then patches every MAJOR / BROKEN finding with mechanism-verifying tests; every affected sweep row re-runs on the corrected code before any external claim is re-stated.
 
+**Key empirical findings.** Across the 83 audited implementations, **51 % land non-PASS** (24 MINOR / 15 MAJOR / 3 BROKEN). Across 81 hypotheses scientifically critiqued, **exactly ONE rates NOVEL+TESTABLE** (H71 IcosaRoPE3D, never smoked yet); roughly half are decorative NUMEROLOGY where φ could be replaced by any constant in [1.3, 2.0] with the same outcome. The pre-audit "headline" — H09 phi_budget cross-dataset positive at 85.54 % CIFAR-10 / 58.05 % CIFAR-100 3-seed median — turned out to be produced by a network whose realized stage-parameter ratio was 1:1.41:2.45, not the claimed 1:φ:φ². The Fixer campaign corrected this; the post-fix re-run of the headline claim is in flight.
+
+We make **no SOTA accuracy claim**. We claim (1) the protocol successfully catches headline claims produced by broken code BEFORE publication; (2) the audit + fixer + re-run cycle is portable to any autoresearch campaign as seven content-agnostic skills in `skills/`; (3) the strongest defensible category across 81 hypotheses is DERIVATIVE+TESTABLE — rediscoveries of established techniques under φ-flavoured rebranding — and the protocol successfully distinguishes them from numerology.
+
+**The contribution is the protocol, not the priors.** Repo: [`dlmastery/nature_inspired_networks`](https://github.com/dlmastery/nature_inspired_networks). Live dashboard: [`https://dlmastery.github.io/nature_inspired_networks/`](https://dlmastery.github.io/nature_inspired_networks/).
+
+---
+
+*Composite metric:*
 $$\textsf{composite} = \textsf{top-1} - 0.05\,\log_{10}(\textsf{params}_M) - 0.05\,\log_{10}(\textsf{latency}_{\text{ms}}).$$
 
-The included 11-row curated sweep on CIFAR-10 reaches **target ≥ 85 %
-top-1** in 12 epochs on a single RTX 4090 Laptop (16 GB) while exposing
-the **shape** — not the asymptote — of each prior's contribution: a
-sortable HTML dashboard surfaces Pareto fronts in
-top-1 vs. {params, FLOPs, latency}, an ablation bar chart with
-seed-std error bars, training curves, persistent-homology Betti-collapse
-curves on stage features, and a linear-CKA matrix between variants.
-
-This work does **not** claim ImageNet-scale SOTA. It claims (1) the
-nature-inspired priors can be cleanly compositionally ablated in one
-block; (2) every individual prior runs to convergence on a consumer
-GPU; (3) the autoresearch protocol's gates (Citation Rigor, Reasoning
-Blob Completeness, Goodhart fingerprint) fire against engineering bugs
-before they corrupt published numbers. The open repo,
-[`dlmastery/nature_inspired_networks`](https://github.com/dlmastery/nature_inspired_networks),
-ships the block, the runner, the dashboard, and a step-by-step
-30-minute reproduction recipe.
+*The composite formula is SHA-256-fingerprinted as `d65565e9c7b12d14cbce30a801ecc6753aea3eb148074256bfcc051fa61d0893`; editing it forces a `CompositeFingerprintError` (Rule 2).*
