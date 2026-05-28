@@ -136,7 +136,7 @@
 <div class='card panel-2col'><h3>Hypothesis ledger — 71-cell status grid (G1..G7 × hypothesis index; click to view the spec)</h3><i style='color:#8b949e'>hypotheses/INDEX.md not found.</i></div>
 </div>
 <h2 style='margin-top:30px'>Runs — click a row for reasoning ledger; ▸ for per-run training-curve + latency breakdown</h2>
-<div><span class='tier-chip active' onclick="setTier('ALL',this)">ALL</span><span class='tier-chip' onclick="setTier('T0',this)">T0</span><span class='tier-chip' onclick="setTier('T1',this)">T1</span><span class='tier-chip' onclick="setTier('T2',this)">T2</span><span class='tier-chip' onclick="setTier('T3',this)">T3</span><span class='tier-chip' onclick="setTier('T4',this)">T4</span><span class='tier-chip' onclick="setTier('T5',this)">T5</span></div>
+<div><span class='tier-chip active' onclick="setTier('ALL',this)">ALL</span><span class='tier-chip' onclick="setTier('T1',this)">T1</span><span class='tier-chip' onclick="setTier('T2',this)">T2</span><span class='tier-chip' onclick="setTier('T3',this)">T3</span><span class='tier-chip' onclick="setTier('T4',this)">T4</span><span class='tier-chip' onclick="setTier('T5',this)">T5</span><span class='tier-chip' onclick="setTier('T6',this)">T6</span></div>
 <input id='q' class='filter' placeholder='filter runs (tag/dataset/seed)…' oninput='applyFilters()'/>
 <table id='runs' data-dir='asc'><thead><tr>
 <th style='width:24px'></th>
@@ -155,9 +155,9 @@
 <th onclick='sortTable(13)'>Train (s)</th>
 <th>Tier</th>
 </tr></thead><tbody>
-<tr class='clickable best-row' data-tier='T0' onclick="openReasoning('baseline_resnet20')">
+<tr class='clickable best-row' data-tier='T6' onclick="openReasoning('baseline_resnet20')">
 <td onclick='event.stopPropagation();toggleDetail(this,"baseline_resnet20")' style='cursor:pointer;color:#58a6ff;font-weight:600;text-align:center'>▸</td>
-<td data-v='baseline_resnet20'><span class='swatch status-done' style='display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle'></span><span class='tag-pill'>baseline_resnet20</span></td>
+<td data-v='baseline_resnet20'><span class='swatch status-planned' style='display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle'></span><a href='experiments/baseline_resnet20_seed0.html' title='open per-experiment page' onclick='event.stopPropagation()'><span class='tag-pill'>baseline_resnet20</span></a></td>
 <td data-v='cifar10'>cifar10</td>
 <td data-v='0'>0</td>
 <td data-v='15'>15</td>
@@ -170,12 +170,12 @@
 <td data-v='0.8457667539833655'>0.8458</td>
 <td data-v='-1'>-1</td>
 <td data-v='194.42383620000328'>194.4238</td>
-<td data-v='T0'><span class='chip'>T0</span></td>
+<td data-v='T6'><span class='chip'>T6</span></td>
 </tr>
 <tr class='detail-row' style='display:none'><td colspan='15'><div class='detail-grid'><div class='detail-block'><div class='lbl'>Training curve (epoch → test top-1)</div><div><svg width='220' height='36' viewBox='0 0 220 36' xmlns='http://www.w3.org/2000/svg' style='vertical-align:middle'><polyline points='2.0,34.0 17.4,26.8 32.9,22.1 48.3,16.5 63.7,17.6 79.1,14.0 94.6,8.0 110.0,7.0 125.4,7.6 140.9,5.8 156.3,4.5 171.7,4.3 187.1,2.7 202.6,2.3 218.0,2.0' fill='none' stroke='#58a6ff' stroke-width='1.6'/><circle cx='218.0' cy='2.0' r='2.4' fill='#3fb950'/><text x='218' y='32' fill='#8b949e' font-size='10' text-anchor='end'>84.8%</text></svg></div></div><div class='detail-block'><div class='lbl'>Latency / compute breakdown</div><div>latency (batch=1): <b>4.030 ms</b><br>train wall-clock: <b>194.4 s</b><br>generalisation gap (train−test top1): <b>2.46 pp</b><br>model: <b>?</b> · channel_mode: <b>?</b></div></div><div class='detail-block panel-2col' style='grid-column:1/3'><div class='lbl'>Prior flags</div><div><i style="color:#8b949e">no flags recorded</i></div></div></div></td></tr>
 <tr class='clickable ' data-tier='' onclick="openReasoning('sg_only_phi_budget')">
 <td onclick='event.stopPropagation();toggleDetail(this,"sg_only_phi_budget")' style='cursor:pointer;color:#58a6ff;font-weight:600;text-align:center'>▸</td>
-<td data-v='sg_only_phi_budget'><span class='tag-pill'>sg_only_phi_budget</span></td>
+<td data-v='sg_only_phi_budget'><a href='experiments/sg_only_phi_budget_seed0.html' title='open per-experiment page' onclick='event.stopPropagation()'><span class='tag-pill'>sg_only_phi_budget</span></a></td>
 <td data-v='cifar10'>cifar10</td>
 <td data-v='0'>0</td>
 <td data-v='12'>12</td>
@@ -191,9 +191,9 @@
 <td data-v=''><span class='chip'>—</span></td>
 </tr>
 <tr class='detail-row' style='display:none'><td colspan='15'><div class='detail-grid'><div class='detail-block'><div class='lbl'>Training curve (epoch → test top-1)</div><div><svg width='220' height='36' viewBox='0 0 220 36' xmlns='http://www.w3.org/2000/svg' style='vertical-align:middle'><polyline points='2.0,34.0 21.6,22.8 41.3,19.0 60.9,14.1 80.5,8.6 100.2,8.3 119.8,6.3 139.5,6.4 159.1,3.2 178.7,3.4 198.4,2.7 218.0,2.0' fill='none' stroke='#58a6ff' stroke-width='1.6'/><circle cx='218.0' cy='2.0' r='2.4' fill='#3fb950'/><text x='218' y='32' fill='#8b949e' font-size='10' text-anchor='end'>85.5%</text></svg></div></div><div class='detail-block'><div class='lbl'>Latency / compute breakdown</div><div>latency (batch=1): <b>6.266 ms</b><br>train wall-clock: <b>570.1 s</b><br>generalisation gap (train−test top1): <b>2.87 pp</b><br>model: <b>?</b> · channel_mode: <b>?</b></div></div><div class='detail-block panel-2col' style='grid-column:1/3'><div class='lbl'>Prior flags</div><div><i style="color:#8b949e">no flags recorded</i></div></div></div></td></tr>
-<tr class='clickable ' data-tier='T0' onclick="openReasoning('baseline_resnet20')">
+<tr class='clickable ' data-tier='T6' onclick="openReasoning('baseline_resnet20')">
 <td onclick='event.stopPropagation();toggleDetail(this,"baseline_resnet20")' style='cursor:pointer;color:#58a6ff;font-weight:600;text-align:center'>▸</td>
-<td data-v='baseline_resnet20'><span class='swatch status-done' style='display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle'></span><span class='tag-pill'>baseline_resnet20</span></td>
+<td data-v='baseline_resnet20'><span class='swatch status-planned' style='display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle'></span><a href='experiments/baseline_resnet20_seed2.html' title='open per-experiment page' onclick='event.stopPropagation()'><span class='tag-pill'>baseline_resnet20</span></a></td>
 <td data-v='cifar10'>cifar10</td>
 <td data-v='2'>2</td>
 <td data-v='12'>12</td>
@@ -206,12 +206,12 @@
 <td data-v='0.8330846391554206'>0.8331</td>
 <td data-v='-1'>-1</td>
 <td data-v='497.1665828000114'>497.1666</td>
-<td data-v='T0'><span class='chip'>T0</span></td>
+<td data-v='T6'><span class='chip'>T6</span></td>
 </tr>
 <tr class='detail-row' style='display:none'><td colspan='15'><div class='detail-grid'><div class='detail-block'><div class='lbl'>Training curve (epoch → test top-1)</div><div><svg width='220' height='36' viewBox='0 0 220 36' xmlns='http://www.w3.org/2000/svg' style='vertical-align:middle'><polyline points='2.0,34.0 21.6,27.6 41.3,21.4 60.9,14.2 80.5,16.2 100.2,10.4 119.8,5.7 139.5,5.6 159.1,4.6 178.7,3.3 198.4,2.1 218.0,2.0' fill='none' stroke='#58a6ff' stroke-width='1.6'/><circle cx='218.0' cy='2.0' r='2.4' fill='#3fb950'/><text x='218' y='32' fill='#8b949e' font-size='10' text-anchor='end'>83.5%</text></svg></div></div><div class='detail-block'><div class='lbl'>Latency / compute breakdown</div><div>latency (batch=1): <b>3.935 ms</b><br>train wall-clock: <b>497.2 s</b><br>generalisation gap (train−test top1): <b>2.12 pp</b><br>model: <b>?</b> · channel_mode: <b>?</b></div></div><div class='detail-block panel-2col' style='grid-column:1/3'><div class='lbl'>Prior flags</div><div><i style="color:#8b949e">no flags recorded</i></div></div></div></td></tr>
 <tr class='clickable ' data-tier='' onclick="openReasoning('sg_only_golden_momentum')">
 <td onclick='event.stopPropagation();toggleDetail(this,"sg_only_golden_momentum")' style='cursor:pointer;color:#58a6ff;font-weight:600;text-align:center'>▸</td>
-<td data-v='sg_only_golden_momentum'><span class='tag-pill'>sg_only_golden_momentum</span></td>
+<td data-v='sg_only_golden_momentum'><a href='experiments/sg_only_golden_momentum_seed0.html' title='open per-experiment page' onclick='event.stopPropagation()'><span class='tag-pill'>sg_only_golden_momentum</span></a></td>
 <td data-v='cifar10'>cifar10</td>
 <td data-v='0'>0</td>
 <td data-v='12'>12</td>
@@ -227,9 +227,9 @@
 <td data-v=''><span class='chip'>—</span></td>
 </tr>
 <tr class='detail-row' style='display:none'><td colspan='15'><div class='detail-grid'><div class='detail-block'><div class='lbl'>Training curve (epoch → test top-1)</div><div><svg width='220' height='36' viewBox='0 0 220 36' xmlns='http://www.w3.org/2000/svg' style='vertical-align:middle'><polyline points='2.0,34.0 21.6,24.9 41.3,18.3 60.9,21.6 80.5,13.0 100.2,8.3 119.8,5.5 139.5,6.1 159.1,4.1 178.7,3.0 198.4,2.4 218.0,2.0' fill='none' stroke='#58a6ff' stroke-width='1.6'/><circle cx='218.0' cy='2.0' r='2.4' fill='#3fb950'/><text x='218' y='32' fill='#8b949e' font-size='10' text-anchor='end'>83.5%</text></svg></div></div><div class='detail-block'><div class='lbl'>Latency / compute breakdown</div><div>latency (batch=1): <b>4.510 ms</b><br>train wall-clock: <b>380.8 s</b><br>generalisation gap (train−test top1): <b>1.90 pp</b><br>model: <b>?</b> · channel_mode: <b>?</b></div></div><div class='detail-block panel-2col' style='grid-column:1/3'><div class='lbl'>Prior flags</div><div><i style="color:#8b949e">no flags recorded</i></div></div></div></td></tr>
-<tr class='clickable ' data-tier='T0' onclick="openReasoning('baseline_sg_vanilla')">
+<tr class='clickable ' data-tier='T6' onclick="openReasoning('baseline_sg_vanilla')">
 <td onclick='event.stopPropagation();toggleDetail(this,"baseline_sg_vanilla")' style='cursor:pointer;color:#58a6ff;font-weight:600;text-align:center'>▸</td>
-<td data-v='baseline_sg_vanilla'><span class='swatch status-done' style='display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle'></span><span class='tag-pill'>baseline_sg_vanilla</span></td>
+<td data-v='baseline_sg_vanilla'><span class='swatch status-planned' style='display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle'></span><a href='experiments/baseline_sg_vanilla_seed1.html' title='open per-experiment page' onclick='event.stopPropagation()'><span class='tag-pill'>baseline_sg_vanilla</span></a></td>
 <td data-v='cifar10'>cifar10</td>
 <td data-v='1'>1</td>
 <td data-v='12'>12</td>
@@ -242,12 +242,12 @@
 <td data-v='0.8298688599859824'>0.8299</td>
 <td data-v='-1'>-1</td>
 <td data-v='457.453337199986'>457.4533</td>
-<td data-v='T0'><span class='chip'>T0</span></td>
+<td data-v='T6'><span class='chip'>T6</span></td>
 </tr>
 <tr class='detail-row' style='display:none'><td colspan='15'><div class='detail-grid'><div class='detail-block'><div class='lbl'>Training curve (epoch → test top-1)</div><div><svg width='220' height='36' viewBox='0 0 220 36' xmlns='http://www.w3.org/2000/svg' style='vertical-align:middle'><polyline points='2.0,34.0 21.6,20.4 41.3,17.2 60.9,14.9 80.5,10.0 100.2,7.0 119.8,8.3 139.5,5.2 159.1,3.9 178.7,2.5 198.4,2.2 218.0,2.0' fill='none' stroke='#58a6ff' stroke-width='1.6'/><circle cx='218.0' cy='2.0' r='2.4' fill='#3fb950'/><text x='218' y='32' fill='#8b949e' font-size='10' text-anchor='end'>83.0%</text></svg></div></div><div class='detail-block'><div class='lbl'>Latency / compute breakdown</div><div>latency (batch=1): <b>5.276 ms</b><br>train wall-clock: <b>457.5 s</b><br>generalisation gap (train−test top1): <b>2.03 pp</b><br>model: <b>?</b> · channel_mode: <b>?</b></div></div><div class='detail-block panel-2col' style='grid-column:1/3'><div class='lbl'>Prior flags</div><div><i style="color:#8b949e">no flags recorded</i></div></div></div></td></tr>
 <tr class='clickable ' data-tier='' onclick="openReasoning('sg_only_fib_depth')">
 <td onclick='event.stopPropagation();toggleDetail(this,"sg_only_fib_depth")' style='cursor:pointer;color:#58a6ff;font-weight:600;text-align:center'>▸</td>
-<td data-v='sg_only_fib_depth'><span class='tag-pill'>sg_only_fib_depth</span></td>
+<td data-v='sg_only_fib_depth'><a href='experiments/sg_only_fib_depth_seed0.html' title='open per-experiment page' onclick='event.stopPropagation()'><span class='tag-pill'>sg_only_fib_depth</span></a></td>
 <td data-v='cifar10'>cifar10</td>
 <td data-v='0'>0</td>
 <td data-v='12'>12</td>
@@ -263,9 +263,9 @@
 <td data-v=''><span class='chip'>—</span></td>
 </tr>
 <tr class='detail-row' style='display:none'><td colspan='15'><div class='detail-grid'><div class='detail-block'><div class='lbl'>Training curve (epoch → test top-1)</div><div><svg width='220' height='36' viewBox='0 0 220 36' xmlns='http://www.w3.org/2000/svg' style='vertical-align:middle'><polyline points='2.0,34.0 21.6,28.0 41.3,19.0 60.9,11.6 80.5,13.5 100.2,10.6 119.8,7.8 139.5,4.9 159.1,4.0 178.7,2.5 198.4,2.3 218.0,2.0' fill='none' stroke='#58a6ff' stroke-width='1.6'/><circle cx='218.0' cy='2.0' r='2.4' fill='#3fb950'/><text x='218' y='32' fill='#8b949e' font-size='10' text-anchor='end'>82.2%</text></svg></div></div><div class='detail-block'><div class='lbl'>Latency / compute breakdown</div><div>latency (batch=1): <b>4.548 ms</b><br>train wall-clock: <b>375.6 s</b><br>generalisation gap (train−test top1): <b>1.37 pp</b><br>model: <b>?</b> · channel_mode: <b>?</b></div></div><div class='detail-block panel-2col' style='grid-column:1/3'><div class='lbl'>Prior flags</div><div><i style="color:#8b949e">no flags recorded</i></div></div></div></td></tr>
-<tr class='clickable ' data-tier='T0' onclick="openReasoning('baseline_sg_vanilla')">
+<tr class='clickable ' data-tier='T6' onclick="openReasoning('baseline_sg_vanilla')">
 <td onclick='event.stopPropagation();toggleDetail(this,"baseline_sg_vanilla")' style='cursor:pointer;color:#58a6ff;font-weight:600;text-align:center'>▸</td>
-<td data-v='baseline_sg_vanilla'><span class='swatch status-done' style='display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle'></span><span class='tag-pill'>baseline_sg_vanilla</span></td>
+<td data-v='baseline_sg_vanilla'><span class='swatch status-planned' style='display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle'></span><a href='experiments/baseline_sg_vanilla_seed0.html' title='open per-experiment page' onclick='event.stopPropagation()'><span class='tag-pill'>baseline_sg_vanilla</span></a></td>
 <td data-v='cifar10'>cifar10</td>
 <td data-v='0'>0</td>
 <td data-v='12'>12</td>
@@ -278,12 +278,12 @@
 <td data-v='0.8257917281761024'>0.8258</td>
 <td data-v='-1'>-1</td>
 <td data-v='348.093827299992'>348.0938</td>
-<td data-v='T0'><span class='chip'>T0</span></td>
+<td data-v='T6'><span class='chip'>T6</span></td>
 </tr>
 <tr class='detail-row' style='display:none'><td colspan='15'><div class='detail-grid'><div class='detail-block'><div class='lbl'>Training curve (epoch → test top-1)</div><div><svg width='220' height='36' viewBox='0 0 220 36' xmlns='http://www.w3.org/2000/svg' style='vertical-align:middle'><polyline points='2.0,34.0 21.6,23.5 41.3,15.9 60.9,16.3 80.5,11.2 100.2,10.2 119.8,9.7 139.5,4.5 159.1,3.0 178.7,2.5 198.4,2.0 218.0,2.0' fill='none' stroke='#58a6ff' stroke-width='1.6'/><circle cx='218.0' cy='2.0' r='2.4' fill='#3fb950'/><text x='218' y='32' fill='#8b949e' font-size='10' text-anchor='end'>82.2%</text></svg></div></div><div class='detail-block'><div class='lbl'>Latency / compute breakdown</div><div>latency (batch=1): <b>4.425 ms</b><br>train wall-clock: <b>348.1 s</b><br>generalisation gap (train−test top1): <b>1.71 pp</b><br>model: <b>?</b> · channel_mode: <b>?</b></div></div><div class='detail-block panel-2col' style='grid-column:1/3'><div class='lbl'>Prior flags</div><div><i style="color:#8b949e">no flags recorded</i></div></div></div></td></tr>
-<tr class='clickable ' data-tier='T0' onclick="openReasoning('baseline_sg_vanilla')">
+<tr class='clickable ' data-tier='T6' onclick="openReasoning('baseline_sg_vanilla')">
 <td onclick='event.stopPropagation();toggleDetail(this,"baseline_sg_vanilla")' style='cursor:pointer;color:#58a6ff;font-weight:600;text-align:center'>▸</td>
-<td data-v='baseline_sg_vanilla'><span class='swatch status-done' style='display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle'></span><span class='tag-pill'>baseline_sg_vanilla</span></td>
+<td data-v='baseline_sg_vanilla'><span class='swatch status-planned' style='display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle'></span><a href='experiments/baseline_sg_vanilla_seed2.html' title='open per-experiment page' onclick='event.stopPropagation()'><span class='tag-pill'>baseline_sg_vanilla</span></a></td>
 <td data-v='cifar10'>cifar10</td>
 <td data-v='2'>2</td>
 <td data-v='12'>12</td>
@@ -296,12 +296,12 @@
 <td data-v='0.8243339977762792'>0.8243</td>
 <td data-v='-1'>-1</td>
 <td data-v='447.044426700013'>447.0444</td>
-<td data-v='T0'><span class='chip'>T0</span></td>
+<td data-v='T6'><span class='chip'>T6</span></td>
 </tr>
 <tr class='detail-row' style='display:none'><td colspan='15'><div class='detail-grid'><div class='detail-block'><div class='lbl'>Training curve (epoch → test top-1)</div><div><svg width='220' height='36' viewBox='0 0 220 36' xmlns='http://www.w3.org/2000/svg' style='vertical-align:middle'><polyline points='2.0,34.0 21.6,21.3 41.3,16.6 60.9,13.3 80.5,12.1 100.2,8.2 119.8,7.6 139.5,4.8 159.1,3.9 178.7,3.4 198.4,2.2 218.0,2.0' fill='none' stroke='#58a6ff' stroke-width='1.6'/><circle cx='218.0' cy='2.0' r='2.4' fill='#3fb950'/><text x='218' y='32' fill='#8b949e' font-size='10' text-anchor='end'>82.3%</text></svg></div></div><div class='detail-block'><div class='lbl'>Latency / compute breakdown</div><div>latency (batch=1): <b>4.955 ms</b><br>train wall-clock: <b>447.0 s</b><br>generalisation gap (train−test top1): <b>1.63 pp</b><br>model: <b>?</b> · channel_mode: <b>?</b></div></div><div class='detail-block panel-2col' style='grid-column:1/3'><div class='lbl'>Prior flags</div><div><i style="color:#8b949e">no flags recorded</i></div></div></div></td></tr>
-<tr class='clickable ' data-tier='T0' onclick="openReasoning('baseline_resnet20')">
+<tr class='clickable ' data-tier='T6' onclick="openReasoning('baseline_resnet20')">
 <td onclick='event.stopPropagation();toggleDetail(this,"baseline_resnet20")' style='cursor:pointer;color:#58a6ff;font-weight:600;text-align:center'>▸</td>
-<td data-v='baseline_resnet20'><span class='swatch status-done' style='display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle'></span><span class='tag-pill'>baseline_resnet20</span></td>
+<td data-v='baseline_resnet20'><span class='swatch status-planned' style='display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle'></span><a href='experiments/baseline_resnet20_seed1.html' title='open per-experiment page' onclick='event.stopPropagation()'><span class='tag-pill'>baseline_resnet20</span></a></td>
 <td data-v='cifar10'>cifar10</td>
 <td data-v='1'>1</td>
 <td data-v='12'>12</td>
@@ -314,12 +314,12 @@
 <td data-v='0.8240445615882567'>0.8240</td>
 <td data-v='-1'>-1</td>
 <td data-v='557.2852373999776'>557.2852</td>
-<td data-v='T0'><span class='chip'>T0</span></td>
+<td data-v='T6'><span class='chip'>T6</span></td>
 </tr>
 <tr class='detail-row' style='display:none'><td colspan='15'><div class='detail-grid'><div class='detail-block'><div class='lbl'>Training curve (epoch → test top-1)</div><div><svg width='220' height='36' viewBox='0 0 220 36' xmlns='http://www.w3.org/2000/svg' style='vertical-align:middle'><polyline points='2.0,34.0 21.6,24.3 41.3,18.0 60.9,15.0 80.5,11.0 100.2,11.8 119.8,6.1 139.5,5.1 159.1,3.4 178.7,2.9 198.4,2.2 218.0,2.0' fill='none' stroke='#58a6ff' stroke-width='1.6'/><circle cx='218.0' cy='2.0' r='2.4' fill='#3fb950'/><text x='218' y='32' fill='#8b949e' font-size='10' text-anchor='end'>83.4%</text></svg></div></div><div class='detail-block'><div class='lbl'>Latency / compute breakdown</div><div>latency (batch=1): <b>5.778 ms</b><br>train wall-clock: <b>557.3 s</b><br>generalisation gap (train−test top1): <b>2.03 pp</b><br>model: <b>?</b> · channel_mode: <b>?</b></div></div><div class='detail-block panel-2col' style='grid-column:1/3'><div class='lbl'>Prior flags</div><div><i style="color:#8b949e">no flags recorded</i></div></div></div></td></tr>
 <tr class='clickable ' data-tier='' onclick="openReasoning('sg_only_phi_dropout')">
 <td onclick='event.stopPropagation();toggleDetail(this,"sg_only_phi_dropout")' style='cursor:pointer;color:#58a6ff;font-weight:600;text-align:center'>▸</td>
-<td data-v='sg_only_phi_dropout'><span class='tag-pill'>sg_only_phi_dropout</span></td>
+<td data-v='sg_only_phi_dropout'><a href='experiments/sg_only_phi_dropout_seed0.html' title='open per-experiment page' onclick='event.stopPropagation()'><span class='tag-pill'>sg_only_phi_dropout</span></a></td>
 <td data-v='cifar10'>cifar10</td>
 <td data-v='0'>0</td>
 <td data-v='12'>12</td>
@@ -337,7 +337,7 @@
 <tr class='detail-row' style='display:none'><td colspan='15'><div class='detail-grid'><div class='detail-block'><div class='lbl'>Training curve (epoch → test top-1)</div><div><svg width='220' height='36' viewBox='0 0 220 36' xmlns='http://www.w3.org/2000/svg' style='vertical-align:middle'><polyline points='2.0,34.0 21.6,22.7 41.3,20.3 60.9,14.1 80.5,15.2 100.2,9.1 119.8,8.2 139.5,6.9 159.1,3.4 178.7,3.5 198.4,2.2 218.0,2.0' fill='none' stroke='#58a6ff' stroke-width='1.6'/><circle cx='218.0' cy='2.0' r='2.4' fill='#3fb950'/><text x='218' y='32' fill='#8b949e' font-size='10' text-anchor='end'>82.8%</text></svg></div></div><div class='detail-block'><div class='lbl'>Latency / compute breakdown</div><div>latency (batch=1): <b>4.748 ms</b><br>train wall-clock: <b>390.4 s</b><br>generalisation gap (train−test top1): <b>1.12 pp</b><br>model: <b>?</b> · channel_mode: <b>?</b></div></div><div class='detail-block panel-2col' style='grid-column:1/3'><div class='lbl'>Prior flags</div><div><i style="color:#8b949e">no flags recorded</i></div></div></div></td></tr>
 <tr class='clickable ' data-tier='' onclick="openReasoning('sg_only_sine_act')">
 <td onclick='event.stopPropagation();toggleDetail(this,"sg_only_sine_act")' style='cursor:pointer;color:#58a6ff;font-weight:600;text-align:center'>▸</td>
-<td data-v='sg_only_sine_act'><span class='tag-pill'>sg_only_sine_act</span></td>
+<td data-v='sg_only_sine_act'><a href='experiments/sg_only_sine_act_seed0.html' title='open per-experiment page' onclick='event.stopPropagation()'><span class='tag-pill'>sg_only_sine_act</span></a></td>
 <td data-v='cifar10'>cifar10</td>
 <td data-v='0'>0</td>
 <td data-v='12'>12</td>
@@ -355,7 +355,7 @@
 <tr class='detail-row' style='display:none'><td colspan='15'><div class='detail-grid'><div class='detail-block'><div class='lbl'>Training curve (epoch → test top-1)</div><div><svg width='220' height='36' viewBox='0 0 220 36' xmlns='http://www.w3.org/2000/svg' style='vertical-align:middle'><polyline points='2.0,34.0 21.6,21.6 41.3,17.9 60.9,12.5 80.5,13.3 100.2,9.0 119.8,7.4 139.5,6.1 159.1,4.9 178.7,2.9 198.4,2.4 218.0,2.0' fill='none' stroke='#58a6ff' stroke-width='1.6'/><circle cx='218.0' cy='2.0' r='2.4' fill='#3fb950'/><text x='218' y='32' fill='#8b949e' font-size='10' text-anchor='end'>80.6%</text></svg></div></div><div class='detail-block'><div class='lbl'>Latency / compute breakdown</div><div>latency (batch=1): <b>4.214 ms</b><br>train wall-clock: <b>382.4 s</b><br>generalisation gap (train−test top1): <b>1.34 pp</b><br>model: <b>?</b> · channel_mode: <b>?</b></div></div><div class='detail-block panel-2col' style='grid-column:1/3'><div class='lbl'>Prior flags</div><div><i style="color:#8b949e">no flags recorded</i></div></div></div></td></tr>
 <tr class='clickable ' data-tier='' onclick="openReasoning('sg_chan_fib')">
 <td onclick='event.stopPropagation();toggleDetail(this,"sg_chan_fib")' style='cursor:pointer;color:#58a6ff;font-weight:600;text-align:center'>▸</td>
-<td data-v='sg_chan_fib'><span class='tag-pill'>sg_chan_fib</span></td>
+<td data-v='sg_chan_fib'><a href='experiments/sg_chan_fib_seed1.html' title='open per-experiment page' onclick='event.stopPropagation()'><span class='tag-pill'>sg_chan_fib</span></a></td>
 <td data-v='cifar10'>cifar10</td>
 <td data-v='1'>1</td>
 <td data-v='12'>12</td>
@@ -373,7 +373,7 @@
 <tr class='detail-row' style='display:none'><td colspan='15'><div class='detail-grid'><div class='detail-block'><div class='lbl'>Training curve (epoch → test top-1)</div><div><svg width='220' height='36' viewBox='0 0 220 36' xmlns='http://www.w3.org/2000/svg' style='vertical-align:middle'><polyline points='2.0,34.0 21.6,29.5 41.3,17.0 60.9,16.4 80.5,10.8 100.2,12.0 119.8,7.0 139.5,5.7 159.1,4.4 178.7,3.3 198.4,2.1 218.0,2.0' fill='none' stroke='#58a6ff' stroke-width='1.6'/><circle cx='218.0' cy='2.0' r='2.4' fill='#3fb950'/><text x='218' y='32' fill='#8b949e' font-size='10' text-anchor='end'>80.7%</text></svg></div></div><div class='detail-block'><div class='lbl'>Latency / compute breakdown</div><div>latency (batch=1): <b>4.685 ms</b><br>train wall-clock: <b>453.8 s</b><br>generalisation gap (train−test top1): <b>1.51 pp</b><br>model: <b>?</b> · channel_mode: <b>?</b></div></div><div class='detail-block panel-2col' style='grid-column:1/3'><div class='lbl'>Prior flags</div><div><i style="color:#8b949e">no flags recorded</i></div></div></div></td></tr>
 <tr class='clickable ' data-tier='' onclick="openReasoning('sg_chan_fib')">
 <td onclick='event.stopPropagation();toggleDetail(this,"sg_chan_fib")' style='cursor:pointer;color:#58a6ff;font-weight:600;text-align:center'>▸</td>
-<td data-v='sg_chan_fib'><span class='tag-pill'>sg_chan_fib</span></td>
+<td data-v='sg_chan_fib'><a href='experiments/sg_chan_fib_seed2.html' title='open per-experiment page' onclick='event.stopPropagation()'><span class='tag-pill'>sg_chan_fib</span></a></td>
 <td data-v='cifar10'>cifar10</td>
 <td data-v='2'>2</td>
 <td data-v='12'>12</td>
@@ -391,7 +391,7 @@
 <tr class='detail-row' style='display:none'><td colspan='15'><div class='detail-grid'><div class='detail-block'><div class='lbl'>Training curve (epoch → test top-1)</div><div><svg width='220' height='36' viewBox='0 0 220 36' xmlns='http://www.w3.org/2000/svg' style='vertical-align:middle'><polyline points='2.0,34.0 21.6,23.4 41.3,22.8 60.9,13.7 80.5,19.3 100.2,9.3 119.8,7.4 139.5,6.5 159.1,4.0 178.7,3.3 198.4,2.3 218.0,2.0' fill='none' stroke='#58a6ff' stroke-width='1.6'/><circle cx='218.0' cy='2.0' r='2.4' fill='#3fb950'/><text x='218' y='32' fill='#8b949e' font-size='10' text-anchor='end'>81.2%</text></svg></div></div><div class='detail-block'><div class='lbl'>Latency / compute breakdown</div><div>latency (batch=1): <b>6.115 ms</b><br>train wall-clock: <b>514.0 s</b><br>generalisation gap (train−test top1): <b>0.44 pp</b><br>model: <b>?</b> · channel_mode: <b>?</b></div></div><div class='detail-block panel-2col' style='grid-column:1/3'><div class='lbl'>Prior flags</div><div><i style="color:#8b949e">no flags recorded</i></div></div></div></td></tr>
 <tr class='clickable ' data-tier='' onclick="openReasoning('sg_chan_phi')">
 <td onclick='event.stopPropagation();toggleDetail(this,"sg_chan_phi")' style='cursor:pointer;color:#58a6ff;font-weight:600;text-align:center'>▸</td>
-<td data-v='sg_chan_phi'><span class='tag-pill'>sg_chan_phi</span></td>
+<td data-v='sg_chan_phi'><a href='experiments/sg_chan_phi_seed1.html' title='open per-experiment page' onclick='event.stopPropagation()'><span class='tag-pill'>sg_chan_phi</span></a></td>
 <td data-v='cifar10'>cifar10</td>
 <td data-v='1'>1</td>
 <td data-v='12'>12</td>
@@ -409,7 +409,7 @@
 <tr class='detail-row' style='display:none'><td colspan='15'><div class='detail-grid'><div class='detail-block'><div class='lbl'>Training curve (epoch → test top-1)</div><div><svg width='220' height='36' viewBox='0 0 220 36' xmlns='http://www.w3.org/2000/svg' style='vertical-align:middle'><polyline points='2.0,34.0 21.6,29.5 41.3,17.0 60.9,16.4 80.5,10.8 100.2,12.0 119.8,7.0 139.5,5.7 159.1,4.4 178.7,3.3 198.4,2.1 218.0,2.0' fill='none' stroke='#58a6ff' stroke-width='1.6'/><circle cx='218.0' cy='2.0' r='2.4' fill='#3fb950'/><text x='218' y='32' fill='#8b949e' font-size='10' text-anchor='end'>80.7%</text></svg></div></div><div class='detail-block'><div class='lbl'>Latency / compute breakdown</div><div>latency (batch=1): <b>5.353 ms</b><br>train wall-clock: <b>562.6 s</b><br>generalisation gap (train−test top1): <b>1.51 pp</b><br>model: <b>?</b> · channel_mode: <b>?</b></div></div><div class='detail-block panel-2col' style='grid-column:1/3'><div class='lbl'>Prior flags</div><div><i style="color:#8b949e">no flags recorded</i></div></div></div></td></tr>
 <tr class='clickable ' data-tier='' onclick="openReasoning('sg_only_golden_resize')">
 <td onclick='event.stopPropagation();toggleDetail(this,"sg_only_golden_resize")' style='cursor:pointer;color:#58a6ff;font-weight:600;text-align:center'>▸</td>
-<td data-v='sg_only_golden_resize'><span class='tag-pill'>sg_only_golden_resize</span></td>
+<td data-v='sg_only_golden_resize'><a href='experiments/sg_only_golden_resize_seed0.html' title='open per-experiment page' onclick='event.stopPropagation()'><span class='tag-pill'>sg_only_golden_resize</span></a></td>
 <td data-v='cifar10'>cifar10</td>
 <td data-v='0'>0</td>
 <td data-v='12'>12</td>
@@ -427,7 +427,7 @@
 <tr class='detail-row' style='display:none'><td colspan='15'><div class='detail-grid'><div class='detail-block'><div class='lbl'>Training curve (epoch → test top-1)</div><div><svg width='220' height='36' viewBox='0 0 220 36' xmlns='http://www.w3.org/2000/svg' style='vertical-align:middle'><polyline points='2.0,34.0 21.6,24.4 41.3,21.1 60.9,14.1 80.5,13.2 100.2,8.2 119.8,11.5 139.5,6.7 159.1,5.5 178.7,3.1 198.4,2.3 218.0,2.0' fill='none' stroke='#58a6ff' stroke-width='1.6'/><circle cx='218.0' cy='2.0' r='2.4' fill='#3fb950'/><text x='218' y='32' fill='#8b949e' font-size='10' text-anchor='end'>80.7%</text></svg></div></div><div class='detail-block'><div class='lbl'>Latency / compute breakdown</div><div>latency (batch=1): <b>5.186 ms</b><br>train wall-clock: <b>373.3 s</b><br>generalisation gap (train−test top1): <b>1.26 pp</b><br>model: <b>?</b> · channel_mode: <b>?</b></div></div><div class='detail-block panel-2col' style='grid-column:1/3'><div class='lbl'>Prior flags</div><div><i style="color:#8b949e">no flags recorded</i></div></div></div></td></tr>
 <tr class='clickable ' data-tier='' onclick="openReasoning('sg_chan_phi')">
 <td onclick='event.stopPropagation();toggleDetail(this,"sg_chan_phi")' style='cursor:pointer;color:#58a6ff;font-weight:600;text-align:center'>▸</td>
-<td data-v='sg_chan_phi'><span class='tag-pill'>sg_chan_phi</span></td>
+<td data-v='sg_chan_phi'><a href='experiments/sg_chan_phi_seed0.html' title='open per-experiment page' onclick='event.stopPropagation()'><span class='tag-pill'>sg_chan_phi</span></a></td>
 <td data-v='cifar10'>cifar10</td>
 <td data-v='0'>0</td>
 <td data-v='12'>12</td>
@@ -445,7 +445,7 @@
 <tr class='detail-row' style='display:none'><td colspan='15'><div class='detail-grid'><div class='detail-block'><div class='lbl'>Training curve (epoch → test top-1)</div><div><svg width='220' height='36' viewBox='0 0 220 36' xmlns='http://www.w3.org/2000/svg' style='vertical-align:middle'><polyline points='2.0,34.0 21.6,26.5 41.3,14.4 60.9,14.7 80.5,11.7 100.2,7.9 119.8,7.0 139.5,6.3 159.1,4.0 178.7,2.8 198.4,2.1 218.0,2.0' fill='none' stroke='#58a6ff' stroke-width='1.6'/><circle cx='218.0' cy='2.0' r='2.4' fill='#3fb950'/><text x='218' y='32' fill='#8b949e' font-size='10' text-anchor='end'>80.1%</text></svg></div></div><div class='detail-block'><div class='lbl'>Latency / compute breakdown</div><div>latency (batch=1): <b>4.106 ms</b><br>train wall-clock: <b>351.4 s</b><br>generalisation gap (train−test top1): <b>1.69 pp</b><br>model: <b>?</b> · channel_mode: <b>?</b></div></div><div class='detail-block panel-2col' style='grid-column:1/3'><div class='lbl'>Prior flags</div><div><i style="color:#8b949e">no flags recorded</i></div></div></div></td></tr>
 <tr class='clickable ' data-tier='' onclick="openReasoning('sg_only_phi_compound')">
 <td onclick='event.stopPropagation();toggleDetail(this,"sg_only_phi_compound")' style='cursor:pointer;color:#58a6ff;font-weight:600;text-align:center'>▸</td>
-<td data-v='sg_only_phi_compound'><span class='tag-pill'>sg_only_phi_compound</span></td>
+<td data-v='sg_only_phi_compound'><a href='experiments/sg_only_phi_compound_seed0.html' title='open per-experiment page' onclick='event.stopPropagation()'><span class='tag-pill'>sg_only_phi_compound</span></a></td>
 <td data-v='cifar10'>cifar10</td>
 <td data-v='0'>0</td>
 <td data-v='12'>12</td>
@@ -463,7 +463,7 @@
 <tr class='detail-row' style='display:none'><td colspan='15'><div class='detail-grid'><div class='detail-block'><div class='lbl'>Training curve (epoch → test top-1)</div><div><svg width='220' height='36' viewBox='0 0 220 36' xmlns='http://www.w3.org/2000/svg' style='vertical-align:middle'><polyline points='2.0,34.0 21.6,24.6 41.3,15.0 60.9,14.7 80.5,14.7 100.2,7.1 119.8,6.5 139.5,5.2 159.1,4.1 178.7,3.6 198.4,2.1 218.0,2.0' fill='none' stroke='#58a6ff' stroke-width='1.6'/><circle cx='218.0' cy='2.0' r='2.4' fill='#3fb950'/><text x='218' y='32' fill='#8b949e' font-size='10' text-anchor='end'>80.4%</text></svg></div></div><div class='detail-block'><div class='lbl'>Latency / compute breakdown</div><div>latency (batch=1): <b>4.738 ms</b><br>train wall-clock: <b>378.1 s</b><br>generalisation gap (train−test top1): <b>1.43 pp</b><br>model: <b>?</b> · channel_mode: <b>?</b></div></div><div class='detail-block panel-2col' style='grid-column:1/3'><div class='lbl'>Prior flags</div><div><i style="color:#8b949e">no flags recorded</i></div></div></div></td></tr>
 <tr class='clickable ' data-tier='' onclick="openReasoning('sg_only_phi_multiscale')">
 <td onclick='event.stopPropagation();toggleDetail(this,"sg_only_phi_multiscale")' style='cursor:pointer;color:#58a6ff;font-weight:600;text-align:center'>▸</td>
-<td data-v='sg_only_phi_multiscale'><span class='tag-pill'>sg_only_phi_multiscale</span></td>
+<td data-v='sg_only_phi_multiscale'><a href='experiments/sg_only_phi_multiscale_seed0.html' title='open per-experiment page' onclick='event.stopPropagation()'><span class='tag-pill'>sg_only_phi_multiscale</span></a></td>
 <td data-v='cifar10'>cifar10</td>
 <td data-v='0'>0</td>
 <td data-v='12'>12</td>
@@ -481,7 +481,7 @@
 <tr class='detail-row' style='display:none'><td colspan='15'><div class='detail-grid'><div class='detail-block'><div class='lbl'>Training curve (epoch → test top-1)</div><div><svg width='220' height='36' viewBox='0 0 220 36' xmlns='http://www.w3.org/2000/svg' style='vertical-align:middle'><polyline points='2.0,34.0 21.6,24.6 41.3,19.0 60.9,13.3 80.5,10.5 100.2,11.6 119.8,11.7 139.5,6.3 159.1,4.5 178.7,3.6 198.4,2.5 218.0,2.0' fill='none' stroke='#58a6ff' stroke-width='1.6'/><circle cx='218.0' cy='2.0' r='2.4' fill='#3fb950'/><text x='218' y='32' fill='#8b949e' font-size='10' text-anchor='end'>82.0%</text></svg></div></div><div class='detail-block'><div class='lbl'>Latency / compute breakdown</div><div>latency (batch=1): <b>6.438 ms</b><br>train wall-clock: <b>486.9 s</b><br>generalisation gap (train−test top1): <b>0.87 pp</b><br>model: <b>?</b> · channel_mode: <b>?</b></div></div><div class='detail-block panel-2col' style='grid-column:1/3'><div class='lbl'>Prior flags</div><div><i style="color:#8b949e">no flags recorded</i></div></div></div></td></tr>
 <tr class='clickable ' data-tier='' onclick="openReasoning('sg_only_golden_spiral_init')">
 <td onclick='event.stopPropagation();toggleDetail(this,"sg_only_golden_spiral_init")' style='cursor:pointer;color:#58a6ff;font-weight:600;text-align:center'>▸</td>
-<td data-v='sg_only_golden_spiral_init'><span class='tag-pill'>sg_only_golden_spiral_init</span></td>
+<td data-v='sg_only_golden_spiral_init'><a href='experiments/sg_only_golden_spiral_init_seed0.html' title='open per-experiment page' onclick='event.stopPropagation()'><span class='tag-pill'>sg_only_golden_spiral_init</span></a></td>
 <td data-v='cifar10'>cifar10</td>
 <td data-v='0'>0</td>
 <td data-v='12'>12</td>
@@ -499,7 +499,7 @@
 <tr class='detail-row' style='display:none'><td colspan='15'><div class='detail-grid'><div class='detail-block'><div class='lbl'>Training curve (epoch → test top-1)</div><div><svg width='220' height='36' viewBox='0 0 220 36' xmlns='http://www.w3.org/2000/svg' style='vertical-align:middle'><polyline points='2.0,34.0 21.6,24.6 41.3,15.0 60.9,14.7 80.5,14.7 100.2,7.1 119.8,6.5 139.5,5.2 159.1,4.1 178.7,3.6 198.4,2.1 218.0,2.0' fill='none' stroke='#58a6ff' stroke-width='1.6'/><circle cx='218.0' cy='2.0' r='2.4' fill='#3fb950'/><text x='218' y='32' fill='#8b949e' font-size='10' text-anchor='end'>80.4%</text></svg></div></div><div class='detail-block'><div class='lbl'>Latency / compute breakdown</div><div>latency (batch=1): <b>4.961 ms</b><br>train wall-clock: <b>398.6 s</b><br>generalisation gap (train−test top1): <b>1.43 pp</b><br>model: <b>?</b> · channel_mode: <b>?</b></div></div><div class='detail-block panel-2col' style='grid-column:1/3'><div class='lbl'>Prior flags</div><div><i style="color:#8b949e">no flags recorded</i></div></div></div></td></tr>
 <tr class='clickable ' data-tier='' onclick="openReasoning('sg_chan_fib')">
 <td onclick='event.stopPropagation();toggleDetail(this,"sg_chan_fib")' style='cursor:pointer;color:#58a6ff;font-weight:600;text-align:center'>▸</td>
-<td data-v='sg_chan_fib'><span class='tag-pill'>sg_chan_fib</span></td>
+<td data-v='sg_chan_fib'><a href='experiments/sg_chan_fib_seed0.html' title='open per-experiment page' onclick='event.stopPropagation()'><span class='tag-pill'>sg_chan_fib</span></a></td>
 <td data-v='cifar10'>cifar10</td>
 <td data-v='0'>0</td>
 <td data-v='12'>12</td>
@@ -517,7 +517,7 @@
 <tr class='detail-row' style='display:none'><td colspan='15'><div class='detail-grid'><div class='detail-block'><div class='lbl'>Training curve (epoch → test top-1)</div><div><svg width='220' height='36' viewBox='0 0 220 36' xmlns='http://www.w3.org/2000/svg' style='vertical-align:middle'><polyline points='2.0,34.0 21.6,26.5 41.3,14.4 60.9,14.7 80.5,11.7 100.2,7.9 119.8,7.0 139.5,6.3 159.1,4.0 178.7,2.8 198.4,2.1 218.0,2.0' fill='none' stroke='#58a6ff' stroke-width='1.6'/><circle cx='218.0' cy='2.0' r='2.4' fill='#3fb950'/><text x='218' y='32' fill='#8b949e' font-size='10' text-anchor='end'>80.1%</text></svg></div></div><div class='detail-block'><div class='lbl'>Latency / compute breakdown</div><div>latency (batch=1): <b>4.435 ms</b><br>train wall-clock: <b>358.2 s</b><br>generalisation gap (train−test top1): <b>1.69 pp</b><br>model: <b>?</b> · channel_mode: <b>?</b></div></div><div class='detail-block panel-2col' style='grid-column:1/3'><div class='lbl'>Prior flags</div><div><i style="color:#8b949e">no flags recorded</i></div></div></div></td></tr>
 <tr class='clickable ' data-tier='' onclick="openReasoning('sg_only_fib_ensemble')">
 <td onclick='event.stopPropagation();toggleDetail(this,"sg_only_fib_ensemble")' style='cursor:pointer;color:#58a6ff;font-weight:600;text-align:center'>▸</td>
-<td data-v='sg_only_fib_ensemble'><span class='tag-pill'>sg_only_fib_ensemble</span></td>
+<td data-v='sg_only_fib_ensemble'><a href='experiments/sg_only_fib_ensemble_seed0.html' title='open per-experiment page' onclick='event.stopPropagation()'><span class='tag-pill'>sg_only_fib_ensemble</span></a></td>
 <td data-v='cifar10'>cifar10</td>
 <td data-v='0'>0</td>
 <td data-v='12'>12</td>
@@ -535,7 +535,7 @@
 <tr class='detail-row' style='display:none'><td colspan='15'><div class='detail-grid'><div class='detail-block'><div class='lbl'>Training curve (epoch → test top-1)</div><div><svg width='220' height='36' viewBox='0 0 220 36' xmlns='http://www.w3.org/2000/svg' style='vertical-align:middle'><polyline points='2.0,34.0 21.6,24.6 41.3,15.0 60.9,14.7 80.5,14.7 100.2,7.1 119.8,6.5 139.5,5.2 159.1,4.1 178.7,3.6 198.4,2.1 218.0,2.0' fill='none' stroke='#58a6ff' stroke-width='1.6'/><circle cx='218.0' cy='2.0' r='2.4' fill='#3fb950'/><text x='218' y='32' fill='#8b949e' font-size='10' text-anchor='end'>80.4%</text></svg></div></div><div class='detail-block'><div class='lbl'>Latency / compute breakdown</div><div>latency (batch=1): <b>4.512 ms</b><br>train wall-clock: <b>380.1 s</b><br>generalisation gap (train−test top1): <b>1.74 pp</b><br>model: <b>?</b> · channel_mode: <b>?</b></div></div><div class='detail-block panel-2col' style='grid-column:1/3'><div class='lbl'>Prior flags</div><div><i style="color:#8b949e">no flags recorded</i></div></div></div></td></tr>
 <tr class='clickable ' data-tier='' onclick="openReasoning('sg_only_phi_decay')">
 <td onclick='event.stopPropagation();toggleDetail(this,"sg_only_phi_decay")' style='cursor:pointer;color:#58a6ff;font-weight:600;text-align:center'>▸</td>
-<td data-v='sg_only_phi_decay'><span class='tag-pill'>sg_only_phi_decay</span></td>
+<td data-v='sg_only_phi_decay'><a href='experiments/sg_only_phi_decay_seed0.html' title='open per-experiment page' onclick='event.stopPropagation()'><span class='tag-pill'>sg_only_phi_decay</span></a></td>
 <td data-v='cifar10'>cifar10</td>
 <td data-v='0'>0</td>
 <td data-v='12'>12</td>
@@ -553,7 +553,7 @@
 <tr class='detail-row' style='display:none'><td colspan='15'><div class='detail-grid'><div class='detail-block'><div class='lbl'>Training curve (epoch → test top-1)</div><div><svg width='220' height='36' viewBox='0 0 220 36' xmlns='http://www.w3.org/2000/svg' style='vertical-align:middle'><polyline points='2.0,34.0 21.6,26.1 41.3,15.8 60.9,14.3 80.5,12.6 100.2,10.5 119.8,6.1 139.5,5.9 159.1,5.2 178.7,2.5 198.4,2.2 218.0,2.0' fill='none' stroke='#58a6ff' stroke-width='1.6'/><circle cx='218.0' cy='2.0' r='2.4' fill='#3fb950'/><text x='218' y='32' fill='#8b949e' font-size='10' text-anchor='end'>79.8%</text></svg></div></div><div class='detail-block'><div class='lbl'>Latency / compute breakdown</div><div>latency (batch=1): <b>4.174 ms</b><br>train wall-clock: <b>368.6 s</b><br>generalisation gap (train−test top1): <b>1.56 pp</b><br>model: <b>?</b> · channel_mode: <b>?</b></div></div><div class='detail-block panel-2col' style='grid-column:1/3'><div class='lbl'>Prior flags</div><div><i style="color:#8b949e">no flags recorded</i></div></div></div></td></tr>
 <tr class='clickable ' data-tier='T1' onclick="openReasoning('sg_only_fractal')">
 <td onclick='event.stopPropagation();toggleDetail(this,"sg_only_fractal")' style='cursor:pointer;color:#58a6ff;font-weight:600;text-align:center'>▸</td>
-<td data-v='sg_only_fractal'><span class='swatch status-done' style='display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle'></span><span class='tag-pill'>sg_only_fractal</span></td>
+<td data-v='sg_only_fractal'><span class='swatch status-done' style='display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle'></span><a href='experiments/sg_only_fractal_seed0.html' title='open per-experiment page' onclick='event.stopPropagation()'><span class='tag-pill'>sg_only_fractal</span></a></td>
 <td data-v='cifar10'>cifar10</td>
 <td data-v='0'>0</td>
 <td data-v='12'>12</td>
@@ -571,7 +571,7 @@
 <tr class='detail-row' style='display:none'><td colspan='15'><div class='detail-grid'><div class='detail-block'><div class='lbl'>Training curve (epoch → test top-1)</div><div><svg width='220' height='36' viewBox='0 0 220 36' xmlns='http://www.w3.org/2000/svg' style='vertical-align:middle'><polyline points='2.0,34.0 21.6,29.0 41.3,27.6 60.9,17.5 80.5,16.1 100.2,10.4 119.8,14.1 139.5,6.9 159.1,4.6 178.7,3.4 198.4,2.6 218.0,2.0' fill='none' stroke='#58a6ff' stroke-width='1.6'/><circle cx='218.0' cy='2.0' r='2.4' fill='#3fb950'/><text x='218' y='32' fill='#8b949e' font-size='10' text-anchor='end'>82.5%</text></svg></div></div><div class='detail-block'><div class='lbl'>Latency / compute breakdown</div><div>latency (batch=1): <b>7.420 ms</b><br>train wall-clock: <b>373.8 s</b><br>generalisation gap (train−test top1): <b>0.86 pp</b><br>model: <b>?</b> · channel_mode: <b>?</b></div></div><div class='detail-block panel-2col' style='grid-column:1/3'><div class='lbl'>Prior flags</div><div><i style="color:#8b949e">no flags recorded</i></div></div></div></td></tr>
 <tr class='clickable ' data-tier='' onclick="openReasoning('sg_only_phi_activation')">
 <td onclick='event.stopPropagation();toggleDetail(this,"sg_only_phi_activation")' style='cursor:pointer;color:#58a6ff;font-weight:600;text-align:center'>▸</td>
-<td data-v='sg_only_phi_activation'><span class='tag-pill'>sg_only_phi_activation</span></td>
+<td data-v='sg_only_phi_activation'><a href='experiments/sg_only_phi_activation_seed0.html' title='open per-experiment page' onclick='event.stopPropagation()'><span class='tag-pill'>sg_only_phi_activation</span></a></td>
 <td data-v='cifar10'>cifar10</td>
 <td data-v='0'>0</td>
 <td data-v='12'>12</td>
@@ -589,7 +589,7 @@
 <tr class='detail-row' style='display:none'><td colspan='15'><div class='detail-grid'><div class='detail-block'><div class='lbl'>Training curve (epoch → test top-1)</div><div><svg width='220' height='36' viewBox='0 0 220 36' xmlns='http://www.w3.org/2000/svg' style='vertical-align:middle'><polyline points='2.0,34.0 21.6,21.6 41.3,15.2 60.9,14.4 80.5,8.3 100.2,8.3 119.8,6.8 139.5,5.2 159.1,3.7 178.7,2.9 198.4,2.3 218.0,2.0' fill='none' stroke='#58a6ff' stroke-width='1.6'/><circle cx='218.0' cy='2.0' r='2.4' fill='#3fb950'/><text x='218' y='32' fill='#8b949e' font-size='10' text-anchor='end'>80.0%</text></svg></div></div><div class='detail-block'><div class='lbl'>Latency / compute breakdown</div><div>latency (batch=1): <b>5.023 ms</b><br>train wall-clock: <b>390.5 s</b><br>generalisation gap (train−test top1): <b>1.43 pp</b><br>model: <b>?</b> · channel_mode: <b>?</b></div></div><div class='detail-block panel-2col' style='grid-column:1/3'><div class='lbl'>Prior flags</div><div><i style="color:#8b949e">no flags recorded</i></div></div></div></td></tr>
 <tr class='clickable ' data-tier='T1' onclick="openReasoning('sg_only_fractal')">
 <td onclick='event.stopPropagation();toggleDetail(this,"sg_only_fractal")' style='cursor:pointer;color:#58a6ff;font-weight:600;text-align:center'>▸</td>
-<td data-v='sg_only_fractal'><span class='swatch status-done' style='display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle'></span><span class='tag-pill'>sg_only_fractal</span></td>
+<td data-v='sg_only_fractal'><span class='swatch status-done' style='display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle'></span><a href='experiments/sg_only_fractal_seed2.html' title='open per-experiment page' onclick='event.stopPropagation()'><span class='tag-pill'>sg_only_fractal</span></a></td>
 <td data-v='cifar10'>cifar10</td>
 <td data-v='2'>2</td>
 <td data-v='12'>12</td>
@@ -607,7 +607,7 @@
 <tr class='detail-row' style='display:none'><td colspan='15'><div class='detail-grid'><div class='detail-block'><div class='lbl'>Training curve (epoch → test top-1)</div><div><svg width='220' height='36' viewBox='0 0 220 36' xmlns='http://www.w3.org/2000/svg' style='vertical-align:middle'><polyline points='2.0,34.0 21.6,28.7 41.3,15.9 60.9,14.5 80.5,9.8 100.2,13.4 119.8,7.0 139.5,7.3 159.1,4.5 178.7,2.7 198.4,2.4 218.0,2.0' fill='none' stroke='#58a6ff' stroke-width='1.6'/><circle cx='218.0' cy='2.0' r='2.4' fill='#3fb950'/><text x='218' y='32' fill='#8b949e' font-size='10' text-anchor='end'>82.5%</text></svg></div></div><div class='detail-block'><div class='lbl'>Latency / compute breakdown</div><div>latency (batch=1): <b>9.027 ms</b><br>train wall-clock: <b>393.1 s</b><br>generalisation gap (train−test top1): <b>1.34 pp</b><br>model: <b>?</b> · channel_mode: <b>?</b></div></div><div class='detail-block panel-2col' style='grid-column:1/3'><div class='lbl'>Prior flags</div><div><i style="color:#8b949e">no flags recorded</i></div></div></div></td></tr>
 <tr class='clickable ' data-tier='T1' onclick="openReasoning('sg_only_golden_modulate')">
 <td onclick='event.stopPropagation();toggleDetail(this,"sg_only_golden_modulate")' style='cursor:pointer;color:#58a6ff;font-weight:600;text-align:center'>▸</td>
-<td data-v='sg_only_golden_modulate'><span class='swatch status-done' style='display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle'></span><span class='tag-pill'>sg_only_golden_modulate</span></td>
+<td data-v='sg_only_golden_modulate'><span class='swatch status-done' style='display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle'></span><a href='experiments/sg_only_golden_modulate_seed0.html' title='open per-experiment page' onclick='event.stopPropagation()'><span class='tag-pill'>sg_only_golden_modulate</span></a></td>
 <td data-v='cifar10'>cifar10</td>
 <td data-v='0'>0</td>
 <td data-v='12'>12</td>
@@ -625,7 +625,7 @@
 <tr class='detail-row' style='display:none'><td colspan='15'><div class='detail-grid'><div class='detail-block'><div class='lbl'>Training curve (epoch → test top-1)</div><div><svg width='220' height='36' viewBox='0 0 220 36' xmlns='http://www.w3.org/2000/svg' style='vertical-align:middle'><polyline points='2.0,34.0 21.6,18.2 41.3,16.3 60.9,13.3 80.5,10.5 100.2,8.0 119.8,6.7 139.5,5.3 159.1,4.5 178.7,3.1 198.4,2.3 218.0,2.0' fill='none' stroke='#58a6ff' stroke-width='1.6'/><circle cx='218.0' cy='2.0' r='2.4' fill='#3fb950'/><text x='218' y='32' fill='#8b949e' font-size='10' text-anchor='end'>79.8%</text></svg></div></div><div class='detail-block'><div class='lbl'>Latency / compute breakdown</div><div>latency (batch=1): <b>5.948 ms</b><br>train wall-clock: <b>363.0 s</b><br>generalisation gap (train−test top1): <b>0.42 pp</b><br>model: <b>?</b> · channel_mode: <b>?</b></div></div><div class='detail-block panel-2col' style='grid-column:1/3'><div class='lbl'>Prior flags</div><div><i style="color:#8b949e">no flags recorded</i></div></div></div></td></tr>
 <tr class='clickable ' data-tier='' onclick="openReasoning('sg_only_golden_skip')">
 <td onclick='event.stopPropagation();toggleDetail(this,"sg_only_golden_skip")' style='cursor:pointer;color:#58a6ff;font-weight:600;text-align:center'>▸</td>
-<td data-v='sg_only_golden_skip'><span class='tag-pill'>sg_only_golden_skip</span></td>
+<td data-v='sg_only_golden_skip'><a href='experiments/sg_only_golden_skip_seed0.html' title='open per-experiment page' onclick='event.stopPropagation()'><span class='tag-pill'>sg_only_golden_skip</span></a></td>
 <td data-v='cifar10'>cifar10</td>
 <td data-v='0'>0</td>
 <td data-v='12'>12</td>
@@ -643,7 +643,7 @@
 <tr class='detail-row' style='display:none'><td colspan='15'><div class='detail-grid'><div class='detail-block'><div class='lbl'>Training curve (epoch → test top-1)</div><div><svg width='220' height='36' viewBox='0 0 220 36' xmlns='http://www.w3.org/2000/svg' style='vertical-align:middle'><polyline points='2.0,34.0 21.6,23.5 41.3,17.4 60.9,12.4 80.5,12.1 100.2,7.4 119.8,6.3 139.5,5.8 159.1,3.8 178.7,2.9 198.4,2.4 218.0,2.0' fill='none' stroke='#58a6ff' stroke-width='1.6'/><circle cx='218.0' cy='2.0' r='2.4' fill='#3fb950'/><text x='218' y='32' fill='#8b949e' font-size='10' text-anchor='end'>81.6%</text></svg></div></div><div class='detail-block'><div class='lbl'>Latency / compute breakdown</div><div>latency (batch=1): <b>7.294 ms</b><br>train wall-clock: <b>396.7 s</b><br>generalisation gap (train−test top1): <b>2.14 pp</b><br>model: <b>?</b> · channel_mode: <b>?</b></div></div><div class='detail-block panel-2col' style='grid-column:1/3'><div class='lbl'>Prior flags</div><div><i style="color:#8b949e">no flags recorded</i></div></div></div></td></tr>
 <tr class='clickable ' data-tier='' onclick="openReasoning('sg_only_phi_lr')">
 <td onclick='event.stopPropagation();toggleDetail(this,"sg_only_phi_lr")' style='cursor:pointer;color:#58a6ff;font-weight:600;text-align:center'>▸</td>
-<td data-v='sg_only_phi_lr'><span class='tag-pill'>sg_only_phi_lr</span></td>
+<td data-v='sg_only_phi_lr'><a href='experiments/sg_only_phi_lr_seed0.html' title='open per-experiment page' onclick='event.stopPropagation()'><span class='tag-pill'>sg_only_phi_lr</span></a></td>
 <td data-v='cifar10'>cifar10</td>
 <td data-v='0'>0</td>
 <td data-v='12'>12</td>
@@ -661,7 +661,7 @@
 <tr class='detail-row' style='display:none'><td colspan='15'><div class='detail-grid'><div class='detail-block'><div class='lbl'>Training curve (epoch → test top-1)</div><div><svg width='220' height='36' viewBox='0 0 220 36' xmlns='http://www.w3.org/2000/svg' style='vertical-align:middle'><polyline points='2.0,34.0 21.6,20.5 41.3,14.2 60.9,15.2 80.5,17.2 100.2,8.2 119.8,6.6 139.5,5.4 159.1,8.9 178.7,4.3 198.4,5.6 218.0,2.0' fill='none' stroke='#58a6ff' stroke-width='1.6'/><circle cx='218.0' cy='2.0' r='2.4' fill='#3fb950'/><text x='218' y='32' fill='#8b949e' font-size='10' text-anchor='end'>78.8%</text></svg></div></div><div class='detail-block'><div class='lbl'>Latency / compute breakdown</div><div>latency (batch=1): <b>4.324 ms</b><br>train wall-clock: <b>379.2 s</b><br>generalisation gap (train−test top1): <b>2.82 pp</b><br>model: <b>?</b> · channel_mode: <b>?</b></div></div><div class='detail-block panel-2col' style='grid-column:1/3'><div class='lbl'>Prior flags</div><div><i style="color:#8b949e">no flags recorded</i></div></div></div></td></tr>
 <tr class='clickable ' data-tier='' onclick="openReasoning('sg_only_fib_prune')">
 <td onclick='event.stopPropagation();toggleDetail(this,"sg_only_fib_prune")' style='cursor:pointer;color:#58a6ff;font-weight:600;text-align:center'>▸</td>
-<td data-v='sg_only_fib_prune'><span class='tag-pill'>sg_only_fib_prune</span></td>
+<td data-v='sg_only_fib_prune'><a href='experiments/sg_only_fib_prune_seed0.html' title='open per-experiment page' onclick='event.stopPropagation()'><span class='tag-pill'>sg_only_fib_prune</span></a></td>
 <td data-v='cifar10'>cifar10</td>
 <td data-v='0'>0</td>
 <td data-v='12'>12</td>
@@ -679,7 +679,7 @@
 <tr class='detail-row' style='display:none'><td colspan='15'><div class='detail-grid'><div class='detail-block'><div class='lbl'>Training curve (epoch → test top-1)</div><div><svg width='220' height='36' viewBox='0 0 220 36' xmlns='http://www.w3.org/2000/svg' style='vertical-align:middle'><polyline points='2.0,16.8 21.6,14.3 41.3,10.3 60.9,7.4 80.5,7.4 100.2,4.5 119.8,3.6 139.5,34.0 159.1,2.7 178.7,2.2 198.4,2.0 218.0,2.0' fill='none' stroke='#58a6ff' stroke-width='1.6'/><circle cx='218.0' cy='2.0' r='2.4' fill='#3fb950'/><text x='218' y='32' fill='#8b949e' font-size='10' text-anchor='end'>81.2%</text></svg></div></div><div class='detail-block'><div class='lbl'>Latency / compute breakdown</div><div>latency (batch=1): <b>6.107 ms</b><br>train wall-clock: <b>382.1 s</b><br>generalisation gap (train−test top1): <b>2.02 pp</b><br>model: <b>?</b> · channel_mode: <b>?</b></div></div><div class='detail-block panel-2col' style='grid-column:1/3'><div class='lbl'>Prior flags</div><div><i style="color:#8b949e">no flags recorded</i></div></div></div></td></tr>
 <tr class='clickable ' data-tier='' onclick="openReasoning('sg_chan_phi')">
 <td onclick='event.stopPropagation();toggleDetail(this,"sg_chan_phi")' style='cursor:pointer;color:#58a6ff;font-weight:600;text-align:center'>▸</td>
-<td data-v='sg_chan_phi'><span class='tag-pill'>sg_chan_phi</span></td>
+<td data-v='sg_chan_phi'><a href='experiments/sg_chan_phi_seed2.html' title='open per-experiment page' onclick='event.stopPropagation()'><span class='tag-pill'>sg_chan_phi</span></a></td>
 <td data-v='cifar10'>cifar10</td>
 <td data-v='2'>2</td>
 <td data-v='12'>12</td>
@@ -697,7 +697,7 @@
 <tr class='detail-row' style='display:none'><td colspan='15'><div class='detail-grid'><div class='detail-block'><div class='lbl'>Training curve (epoch → test top-1)</div><div><svg width='220' height='36' viewBox='0 0 220 36' xmlns='http://www.w3.org/2000/svg' style='vertical-align:middle'><polyline points='2.0,34.0 21.6,23.4 41.3,22.8 60.9,13.7 80.5,19.3 100.2,9.3 119.8,7.4 139.5,6.5 159.1,4.0 178.7,3.3 198.4,2.3 218.0,2.0' fill='none' stroke='#58a6ff' stroke-width='1.6'/><circle cx='218.0' cy='2.0' r='2.4' fill='#3fb950'/><text x='218' y='32' fill='#8b949e' font-size='10' text-anchor='end'>81.2%</text></svg></div></div><div class='detail-block'><div class='lbl'>Latency / compute breakdown</div><div>latency (batch=1): <b>16.622 ms</b><br>train wall-clock: <b>928.7 s</b><br>generalisation gap (train−test top1): <b>0.44 pp</b><br>model: <b>?</b> · channel_mode: <b>?</b></div></div><div class='detail-block panel-2col' style='grid-column:1/3'><div class='lbl'>Prior flags</div><div><i style="color:#8b949e">no flags recorded</i></div></div></div></td></tr>
 <tr class='clickable ' data-tier='T1' onclick="openReasoning('sg_only_hex')">
 <td onclick='event.stopPropagation();toggleDetail(this,"sg_only_hex")' style='cursor:pointer;color:#58a6ff;font-weight:600;text-align:center'>▸</td>
-<td data-v='sg_only_hex'><span class='swatch status-done' style='display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle'></span><span class='tag-pill'>sg_only_hex</span></td>
+<td data-v='sg_only_hex'><span class='swatch status-done' style='display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle'></span><a href='experiments/sg_only_hex_seed0.html' title='open per-experiment page' onclick='event.stopPropagation()'><span class='tag-pill'>sg_only_hex</span></a></td>
 <td data-v='cifar10'>cifar10</td>
 <td data-v='0'>0</td>
 <td data-v='12'>12</td>
@@ -715,7 +715,7 @@
 <tr class='detail-row' style='display:none'><td colspan='15'><div class='detail-grid'><div class='detail-block'><div class='lbl'>Training curve (epoch → test top-1)</div><div><svg width='220' height='36' viewBox='0 0 220 36' xmlns='http://www.w3.org/2000/svg' style='vertical-align:middle'><polyline points='2.0,34.0 21.6,20.0 41.3,14.2 60.9,11.3 80.5,11.2 100.2,8.2 119.8,8.0 139.5,9.7 159.1,5.1 178.7,3.3 198.4,2.4 218.0,2.0' fill='none' stroke='#58a6ff' stroke-width='1.6'/><circle cx='218.0' cy='2.0' r='2.4' fill='#3fb950'/><text x='218' y='32' fill='#8b949e' font-size='10' text-anchor='end'>79.3%</text></svg></div></div><div class='detail-block'><div class='lbl'>Latency / compute breakdown</div><div>latency (batch=1): <b>7.549 ms</b><br>train wall-clock: <b>366.0 s</b><br>generalisation gap (train−test top1): <b>1.26 pp</b><br>model: <b>?</b> · channel_mode: <b>?</b></div></div><div class='detail-block panel-2col' style='grid-column:1/3'><div class='lbl'>Prior flags</div><div><i style="color:#8b949e">no flags recorded</i></div></div></div></td></tr>
 <tr class='clickable ' data-tier='T1' onclick="openReasoning('sg_only_cymatic_init')">
 <td onclick='event.stopPropagation();toggleDetail(this,"sg_only_cymatic_init")' style='cursor:pointer;color:#58a6ff;font-weight:600;text-align:center'>▸</td>
-<td data-v='sg_only_cymatic_init'><span class='swatch status-done' style='display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle'></span><span class='tag-pill'>sg_only_cymatic_init</span></td>
+<td data-v='sg_only_cymatic_init'><span class='swatch status-done' style='display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle'></span><a href='experiments/sg_only_cymatic_init_seed0.html' title='open per-experiment page' onclick='event.stopPropagation()'><span class='tag-pill'>sg_only_cymatic_init</span></a></td>
 <td data-v='cifar10'>cifar10</td>
 <td data-v='0'>0</td>
 <td data-v='12'>12</td>
@@ -733,7 +733,7 @@
 <tr class='detail-row' style='display:none'><td colspan='15'><div class='detail-grid'><div class='detail-block'><div class='lbl'>Training curve (epoch → test top-1)</div><div><svg width='220' height='36' viewBox='0 0 220 36' xmlns='http://www.w3.org/2000/svg' style='vertical-align:middle'><polyline points='2.0,34.0 21.6,27.3 41.3,16.5 60.9,14.6 80.5,15.1 100.2,9.9 119.8,8.2 139.5,7.3 159.1,3.5 178.7,3.2 198.4,2.2 218.0,2.0' fill='none' stroke='#58a6ff' stroke-width='1.6'/><circle cx='218.0' cy='2.0' r='2.4' fill='#3fb950'/><text x='218' y='32' fill='#8b949e' font-size='10' text-anchor='end'>77.4%</text></svg></div></div><div class='detail-block'><div class='lbl'>Latency / compute breakdown</div><div>latency (batch=1): <b>4.141 ms</b><br>train wall-clock: <b>358.2 s</b><br>generalisation gap (train−test top1): <b>0.98 pp</b><br>model: <b>?</b> · channel_mode: <b>?</b></div></div><div class='detail-block panel-2col' style='grid-column:1/3'><div class='lbl'>Prior flags</div><div><i style="color:#8b949e">no flags recorded</i></div></div></div></td></tr>
 <tr class='clickable ' data-tier='T1' onclick="openReasoning('sg_only_fractal')">
 <td onclick='event.stopPropagation();toggleDetail(this,"sg_only_fractal")' style='cursor:pointer;color:#58a6ff;font-weight:600;text-align:center'>▸</td>
-<td data-v='sg_only_fractal'><span class='swatch status-done' style='display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle'></span><span class='tag-pill'>sg_only_fractal</span></td>
+<td data-v='sg_only_fractal'><span class='swatch status-done' style='display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle'></span><a href='experiments/sg_only_fractal_seed1.html' title='open per-experiment page' onclick='event.stopPropagation()'><span class='tag-pill'>sg_only_fractal</span></a></td>
 <td data-v='cifar10'>cifar10</td>
 <td data-v='1'>1</td>
 <td data-v='12'>12</td>
@@ -751,7 +751,7 @@
 <tr class='detail-row' style='display:none'><td colspan='15'><div class='detail-grid'><div class='detail-block'><div class='lbl'>Training curve (epoch → test top-1)</div><div><svg width='220' height='36' viewBox='0 0 220 36' xmlns='http://www.w3.org/2000/svg' style='vertical-align:middle'><polyline points='2.0,34.0 21.6,29.6 41.3,20.6 60.9,13.8 80.5,18.0 100.2,11.3 119.8,7.3 139.5,5.3 159.1,5.5 178.7,3.2 198.4,2.2 218.0,2.0' fill='none' stroke='#58a6ff' stroke-width='1.6'/><circle cx='218.0' cy='2.0' r='2.4' fill='#3fb950'/><text x='218' y='32' fill='#8b949e' font-size='10' text-anchor='end'>81.7%</text></svg></div></div><div class='detail-block'><div class='lbl'>Latency / compute breakdown</div><div>latency (batch=1): <b>15.273 ms</b><br>train wall-clock: <b>623.4 s</b><br>generalisation gap (train−test top1): <b>1.83 pp</b><br>model: <b>?</b> · channel_mode: <b>?</b></div></div><div class='detail-block panel-2col' style='grid-column:1/3'><div class='lbl'>Prior flags</div><div><i style="color:#8b949e">no flags recorded</i></div></div></div></td></tr>
 <tr class='clickable ' data-tier='T1' onclick="openReasoning('sg_only_toroidal')">
 <td onclick='event.stopPropagation();toggleDetail(this,"sg_only_toroidal")' style='cursor:pointer;color:#58a6ff;font-weight:600;text-align:center'>▸</td>
-<td data-v='sg_only_toroidal'><span class='swatch status-done' style='display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle'></span><span class='tag-pill'>sg_only_toroidal</span></td>
+<td data-v='sg_only_toroidal'><span class='swatch status-done' style='display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle'></span><a href='experiments/sg_only_toroidal_seed1.html' title='open per-experiment page' onclick='event.stopPropagation()'><span class='tag-pill'>sg_only_toroidal</span></a></td>
 <td data-v='cifar10'>cifar10</td>
 <td data-v='1'>1</td>
 <td data-v='12'>12</td>
@@ -769,7 +769,7 @@
 <tr class='detail-row' style='display:none'><td colspan='15'><div class='detail-grid'><div class='detail-block'><div class='lbl'>Training curve (epoch → test top-1)</div><div><svg width='220' height='36' viewBox='0 0 220 36' xmlns='http://www.w3.org/2000/svg' style='vertical-align:middle'><polyline points='2.0,34.0 21.6,31.7 41.3,22.4 60.9,18.5 80.5,14.3 100.2,11.7 119.8,11.1 139.5,9.1 159.1,5.2 178.7,4.2 198.4,3.1 218.0,2.0' fill='none' stroke='#58a6ff' stroke-width='1.6'/><circle cx='218.0' cy='2.0' r='2.4' fill='#3fb950'/><text x='218' y='32' fill='#8b949e' font-size='10' text-anchor='end'>78.6%</text></svg></div></div><div class='detail-block'><div class='lbl'>Latency / compute breakdown</div><div>latency (batch=1): <b>8.456 ms</b><br>train wall-clock: <b>410.2 s</b><br>generalisation gap (train−test top1): <b>2.48 pp</b><br>model: <b>?</b> · channel_mode: <b>?</b></div></div><div class='detail-block panel-2col' style='grid-column:1/3'><div class='lbl'>Prior flags</div><div><i style="color:#8b949e">no flags recorded</i></div></div></div></td></tr>
 <tr class='clickable ' data-tier='T1' onclick="openReasoning('sg_only_toroidal')">
 <td onclick='event.stopPropagation();toggleDetail(this,"sg_only_toroidal")' style='cursor:pointer;color:#58a6ff;font-weight:600;text-align:center'>▸</td>
-<td data-v='sg_only_toroidal'><span class='swatch status-done' style='display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle'></span><span class='tag-pill'>sg_only_toroidal</span></td>
+<td data-v='sg_only_toroidal'><span class='swatch status-done' style='display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle'></span><a href='experiments/sg_only_toroidal_seed0.html' title='open per-experiment page' onclick='event.stopPropagation()'><span class='tag-pill'>sg_only_toroidal</span></a></td>
 <td data-v='cifar10'>cifar10</td>
 <td data-v='0'>0</td>
 <td data-v='12'>12</td>
@@ -787,7 +787,7 @@
 <tr class='detail-row' style='display:none'><td colspan='15'><div class='detail-grid'><div class='detail-block'><div class='lbl'>Training curve (epoch → test top-1)</div><div><svg width='220' height='36' viewBox='0 0 220 36' xmlns='http://www.w3.org/2000/svg' style='vertical-align:middle'><polyline points='2.0,34.0 21.6,18.5 41.3,15.0 60.9,15.9 80.5,11.5 100.2,6.5 119.8,6.0 139.5,5.4 159.1,4.2 178.7,2.7 198.4,2.3 218.0,2.0' fill='none' stroke='#58a6ff' stroke-width='1.6'/><circle cx='218.0' cy='2.0' r='2.4' fill='#3fb950'/><text x='218' y='32' fill='#8b949e' font-size='10' text-anchor='end'>78.0%</text></svg></div></div><div class='detail-block'><div class='lbl'>Latency / compute breakdown</div><div>latency (batch=1): <b>9.344 ms</b><br>train wall-clock: <b>395.4 s</b><br>generalisation gap (train−test top1): <b>3.29 pp</b><br>model: <b>?</b> · channel_mode: <b>?</b></div></div><div class='detail-block panel-2col' style='grid-column:1/3'><div class='lbl'>Prior flags</div><div><i style="color:#8b949e">no flags recorded</i></div></div></div></td></tr>
 <tr class='clickable ' data-tier='' onclick="openReasoning('sg_only_phi_init')">
 <td onclick='event.stopPropagation();toggleDetail(this,"sg_only_phi_init")' style='cursor:pointer;color:#58a6ff;font-weight:600;text-align:center'>▸</td>
-<td data-v='sg_only_phi_init'><span class='tag-pill'>sg_only_phi_init</span></td>
+<td data-v='sg_only_phi_init'><a href='experiments/sg_only_phi_init_seed0.html' title='open per-experiment page' onclick='event.stopPropagation()'><span class='tag-pill'>sg_only_phi_init</span></a></td>
 <td data-v='cifar10'>cifar10</td>
 <td data-v='0'>0</td>
 <td data-v='12'>12</td>
@@ -805,7 +805,7 @@
 <tr class='detail-row' style='display:none'><td colspan='15'><div class='detail-grid'><div class='detail-block'><div class='lbl'>Training curve (epoch → test top-1)</div><div><svg width='220' height='36' viewBox='0 0 220 36' xmlns='http://www.w3.org/2000/svg' style='vertical-align:middle'><polyline points='2.0,34.0 21.6,29.0 41.3,26.0 60.9,17.2 80.5,12.7 100.2,8.0 119.8,7.0 139.5,5.7 159.1,4.1 178.7,2.6 198.4,2.0 218.0,2.1' fill='none' stroke='#58a6ff' stroke-width='1.6'/><circle cx='218.0' cy='2.1' r='2.4' fill='#3fb950'/><text x='218' y='32' fill='#8b949e' font-size='10' text-anchor='end'>76.6%</text></svg></div></div><div class='detail-block'><div class='lbl'>Latency / compute breakdown</div><div>latency (batch=1): <b>4.739 ms</b><br>train wall-clock: <b>375.0 s</b><br>generalisation gap (train−test top1): <b>0.84 pp</b><br>model: <b>?</b> · channel_mode: <b>?</b></div></div><div class='detail-block panel-2col' style='grid-column:1/3'><div class='lbl'>Prior flags</div><div><i style="color:#8b949e">no flags recorded</i></div></div></div></td></tr>
 <tr class='clickable ' data-tier='T1' onclick="openReasoning('sg_only_toroidal')">
 <td onclick='event.stopPropagation();toggleDetail(this,"sg_only_toroidal")' style='cursor:pointer;color:#58a6ff;font-weight:600;text-align:center'>▸</td>
-<td data-v='sg_only_toroidal'><span class='swatch status-done' style='display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle'></span><span class='tag-pill'>sg_only_toroidal</span></td>
+<td data-v='sg_only_toroidal'><span class='swatch status-done' style='display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle'></span><a href='experiments/sg_only_toroidal_seed2.html' title='open per-experiment page' onclick='event.stopPropagation()'><span class='tag-pill'>sg_only_toroidal</span></a></td>
 <td data-v='cifar10'>cifar10</td>
 <td data-v='2'>2</td>
 <td data-v='12'>12</td>
@@ -823,7 +823,7 @@
 <tr class='detail-row' style='display:none'><td colspan='15'><div class='detail-grid'><div class='detail-block'><div class='lbl'>Training curve (epoch → test top-1)</div><div><svg width='220' height='36' viewBox='0 0 220 36' xmlns='http://www.w3.org/2000/svg' style='vertical-align:middle'><polyline points='2.0,34.0 21.6,29.5 41.3,22.6 60.9,17.3 80.5,18.7 100.2,11.4 119.8,12.2 139.5,9.1 159.1,4.4 178.7,3.2 198.4,2.4 218.0,2.0' fill='none' stroke='#58a6ff' stroke-width='1.6'/><circle cx='218.0' cy='2.0' r='2.4' fill='#3fb950'/><text x='218' y='32' fill='#8b949e' font-size='10' text-anchor='end'>77.4%</text></svg></div></div><div class='detail-block'><div class='lbl'>Latency / compute breakdown</div><div>latency (batch=1): <b>7.759 ms</b><br>train wall-clock: <b>388.0 s</b><br>generalisation gap (train−test top1): <b>3.10 pp</b><br>model: <b>?</b> · channel_mode: <b>?</b></div></div><div class='detail-block panel-2col' style='grid-column:1/3'><div class='lbl'>Prior flags</div><div><i style="color:#8b949e">no flags recorded</i></div></div></div></td></tr>
 <tr class='clickable ' data-tier='T1' onclick="openReasoning('sg_only_cymatic_init')">
 <td onclick='event.stopPropagation();toggleDetail(this,"sg_only_cymatic_init")' style='cursor:pointer;color:#58a6ff;font-weight:600;text-align:center'>▸</td>
-<td data-v='sg_only_cymatic_init'><span class='swatch status-done' style='display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle'></span><span class='tag-pill'>sg_only_cymatic_init</span></td>
+<td data-v='sg_only_cymatic_init'><span class='swatch status-done' style='display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle'></span><a href='experiments/sg_only_cymatic_init_seed2.html' title='open per-experiment page' onclick='event.stopPropagation()'><span class='tag-pill'>sg_only_cymatic_init</span></a></td>
 <td data-v='cifar10'>cifar10</td>
 <td data-v='2'>2</td>
 <td data-v='12'>12</td>
@@ -841,7 +841,7 @@
 <tr class='detail-row' style='display:none'><td colspan='15'><div class='detail-grid'><div class='detail-block'><div class='lbl'>Training curve (epoch → test top-1)</div><div><svg width='220' height='36' viewBox='0 0 220 36' xmlns='http://www.w3.org/2000/svg' style='vertical-align:middle'><polyline points='2.0,34.0 21.6,28.6 41.3,23.6 60.9,14.5 80.5,14.7 100.2,9.4 119.8,6.6 139.5,5.9 159.1,3.8 178.7,2.9 198.4,2.5 218.0,2.0' fill='none' stroke='#58a6ff' stroke-width='1.6'/><circle cx='218.0' cy='2.0' r='2.4' fill='#3fb950'/><text x='218' y='32' fill='#8b949e' font-size='10' text-anchor='end'>76.3%</text></svg></div></div><div class='detail-block'><div class='lbl'>Latency / compute breakdown</div><div>latency (batch=1): <b>4.701 ms</b><br>train wall-clock: <b>416.0 s</b><br>generalisation gap (train−test top1): <b>1.13 pp</b><br>model: <b>?</b> · channel_mode: <b>?</b></div></div><div class='detail-block panel-2col' style='grid-column:1/3'><div class='lbl'>Prior flags</div><div><i style="color:#8b949e">no flags recorded</i></div></div></div></td></tr>
 <tr class='clickable ' data-tier='T1' onclick="openReasoning('sg_only_hex')">
 <td onclick='event.stopPropagation();toggleDetail(this,"sg_only_hex")' style='cursor:pointer;color:#58a6ff;font-weight:600;text-align:center'>▸</td>
-<td data-v='sg_only_hex'><span class='swatch status-done' style='display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle'></span><span class='tag-pill'>sg_only_hex</span></td>
+<td data-v='sg_only_hex'><span class='swatch status-done' style='display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle'></span><a href='experiments/sg_only_hex_seed2.html' title='open per-experiment page' onclick='event.stopPropagation()'><span class='tag-pill'>sg_only_hex</span></a></td>
 <td data-v='cifar10'>cifar10</td>
 <td data-v='2'>2</td>
 <td data-v='12'>12</td>
@@ -859,7 +859,7 @@
 <tr class='detail-row' style='display:none'><td colspan='15'><div class='detail-grid'><div class='detail-block'><div class='lbl'>Training curve (epoch → test top-1)</div><div><svg width='220' height='36' viewBox='0 0 220 36' xmlns='http://www.w3.org/2000/svg' style='vertical-align:middle'><polyline points='2.0,34.0 21.6,24.2 41.3,27.8 60.9,14.0 80.5,15.2 100.2,12.5 119.8,9.7 139.5,6.6 159.1,4.4 178.7,3.6 198.4,2.3 218.0,2.0' fill='none' stroke='#58a6ff' stroke-width='1.6'/><circle cx='218.0' cy='2.0' r='2.4' fill='#3fb950'/><text x='218' y='32' fill='#8b949e' font-size='10' text-anchor='end'>79.3%</text></svg></div></div><div class='detail-block'><div class='lbl'>Latency / compute breakdown</div><div>latency (batch=1): <b>21.092 ms</b><br>train wall-clock: <b>868.2 s</b><br>generalisation gap (train−test top1): <b>1.09 pp</b><br>model: <b>?</b> · channel_mode: <b>?</b></div></div><div class='detail-block panel-2col' style='grid-column:1/3'><div class='lbl'>Prior flags</div><div><i style="color:#8b949e">no flags recorded</i></div></div></div></td></tr>
 <tr class='clickable ' data-tier='T1' onclick="openReasoning('sg_only_hex')">
 <td onclick='event.stopPropagation();toggleDetail(this,"sg_only_hex")' style='cursor:pointer;color:#58a6ff;font-weight:600;text-align:center'>▸</td>
-<td data-v='sg_only_hex'><span class='swatch status-done' style='display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle'></span><span class='tag-pill'>sg_only_hex</span></td>
+<td data-v='sg_only_hex'><span class='swatch status-done' style='display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle'></span><a href='experiments/sg_only_hex_seed1.html' title='open per-experiment page' onclick='event.stopPropagation()'><span class='tag-pill'>sg_only_hex</span></a></td>
 <td data-v='cifar10'>cifar10</td>
 <td data-v='1'>1</td>
 <td data-v='12'>12</td>
@@ -877,7 +877,7 @@
 <tr class='detail-row' style='display:none'><td colspan='15'><div class='detail-grid'><div class='detail-block'><div class='lbl'>Training curve (epoch → test top-1)</div><div><svg width='220' height='36' viewBox='0 0 220 36' xmlns='http://www.w3.org/2000/svg' style='vertical-align:middle'><polyline points='2.0,34.0 21.6,27.9 41.3,19.7 60.9,15.4 80.5,13.4 100.2,10.0 119.8,9.6 139.5,7.4 159.1,4.1 178.7,3.9 198.4,2.2 218.0,2.0' fill='none' stroke='#58a6ff' stroke-width='1.6'/><circle cx='218.0' cy='2.0' r='2.4' fill='#3fb950'/><text x='218' y='32' fill='#8b949e' font-size='10' text-anchor='end'>79.9%</text></svg></div></div><div class='detail-block'><div class='lbl'>Latency / compute breakdown</div><div>latency (batch=1): <b>31.012 ms</b><br>train wall-clock: <b>1147.6 s</b><br>generalisation gap (train−test top1): <b>1.33 pp</b><br>model: <b>?</b> · channel_mode: <b>?</b></div></div><div class='detail-block panel-2col' style='grid-column:1/3'><div class='lbl'>Prior flags</div><div><i style="color:#8b949e">no flags recorded</i></div></div></div></td></tr>
 <tr class='clickable ' data-tier='T1' onclick="openReasoning('sg_only_cymatic_init')">
 <td onclick='event.stopPropagation();toggleDetail(this,"sg_only_cymatic_init")' style='cursor:pointer;color:#58a6ff;font-weight:600;text-align:center'>▸</td>
-<td data-v='sg_only_cymatic_init'><span class='swatch status-done' style='display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle'></span><span class='tag-pill'>sg_only_cymatic_init</span></td>
+<td data-v='sg_only_cymatic_init'><span class='swatch status-done' style='display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle'></span><a href='experiments/sg_only_cymatic_init_seed1.html' title='open per-experiment page' onclick='event.stopPropagation()'><span class='tag-pill'>sg_only_cymatic_init</span></a></td>
 <td data-v='cifar10'>cifar10</td>
 <td data-v='1'>1</td>
 <td data-v='12'>12</td>
@@ -895,7 +895,7 @@
 <tr class='detail-row' style='display:none'><td colspan='15'><div class='detail-grid'><div class='detail-block'><div class='lbl'>Training curve (epoch → test top-1)</div><div><svg width='220' height='36' viewBox='0 0 220 36' xmlns='http://www.w3.org/2000/svg' style='vertical-align:middle'><polyline points='2.0,34.0 21.6,25.7 41.3,19.3 60.9,16.9 80.5,10.9 100.2,11.2 119.8,7.9 139.5,6.2 159.1,4.3 178.7,3.6 198.4,2.5 218.0,2.0' fill='none' stroke='#58a6ff' stroke-width='1.6'/><circle cx='218.0' cy='2.0' r='2.4' fill='#3fb950'/><text x='218' y='32' fill='#8b949e' font-size='10' text-anchor='end'>75.8%</text></svg></div></div><div class='detail-block'><div class='lbl'>Latency / compute breakdown</div><div>latency (batch=1): <b>4.758 ms</b><br>train wall-clock: <b>355.6 s</b><br>generalisation gap (train−test top1): <b>0.96 pp</b><br>model: <b>?</b> · channel_mode: <b>?</b></div></div><div class='detail-block panel-2col' style='grid-column:1/3'><div class='lbl'>Prior flags</div><div><i style="color:#8b949e">no flags recorded</i></div></div></div></td></tr>
 <tr class='clickable ' data-tier='' onclick="openReasoning('sg_only_constant_width')">
 <td onclick='event.stopPropagation();toggleDetail(this,"sg_only_constant_width")' style='cursor:pointer;color:#58a6ff;font-weight:600;text-align:center'>▸</td>
-<td data-v='sg_only_constant_width'><span class='tag-pill'>sg_only_constant_width</span></td>
+<td data-v='sg_only_constant_width'><a href='experiments/sg_only_constant_width_seed0.html' title='open per-experiment page' onclick='event.stopPropagation()'><span class='tag-pill'>sg_only_constant_width</span></a></td>
 <td data-v='cifar10'>cifar10</td>
 <td data-v='0'>0</td>
 <td data-v='12'>12</td>
@@ -913,7 +913,7 @@
 <tr class='detail-row' style='display:none'><td colspan='15'><div class='detail-grid'><div class='detail-block'><div class='lbl'>Training curve (epoch → test top-1)</div><div><svg width='220' height='36' viewBox='0 0 220 36' xmlns='http://www.w3.org/2000/svg' style='vertical-align:middle'><polyline points='2.0,31.6 21.6,24.8 41.3,34.0 60.9,15.5 80.5,15.7 100.2,10.4 119.8,7.4 139.5,6.0 159.1,4.0 178.7,2.8 198.4,2.1 218.0,2.0' fill='none' stroke='#58a6ff' stroke-width='1.6'/><circle cx='218.0' cy='2.0' r='2.4' fill='#3fb950'/><text x='218' y='32' fill='#8b949e' font-size='10' text-anchor='end'>75.9%</text></svg></div></div><div class='detail-block'><div class='lbl'>Latency / compute breakdown</div><div>latency (batch=1): <b>6.724 ms</b><br>train wall-clock: <b>391.7 s</b><br>generalisation gap (train−test top1): <b>1.89 pp</b><br>model: <b>?</b> · channel_mode: <b>?</b></div></div><div class='detail-block panel-2col' style='grid-column:1/3'><div class='lbl'>Prior flags</div><div><i style="color:#8b949e">no flags recorded</i></div></div></div></td></tr>
 <tr class='clickable ' data-tier='T1' onclick="openReasoning('sg_only_golden_modulate')">
 <td onclick='event.stopPropagation();toggleDetail(this,"sg_only_golden_modulate")' style='cursor:pointer;color:#58a6ff;font-weight:600;text-align:center'>▸</td>
-<td data-v='sg_only_golden_modulate'><span class='swatch status-done' style='display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle'></span><span class='tag-pill'>sg_only_golden_modulate</span></td>
+<td data-v='sg_only_golden_modulate'><span class='swatch status-done' style='display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle'></span><a href='experiments/sg_only_golden_modulate_seed1.html' title='open per-experiment page' onclick='event.stopPropagation()'><span class='tag-pill'>sg_only_golden_modulate</span></a></td>
 <td data-v='cifar10'>cifar10</td>
 <td data-v='1'>1</td>
 <td data-v='12'>12</td>
@@ -931,7 +931,7 @@
 <tr class='detail-row' style='display:none'><td colspan='15'><div class='detail-grid'><div class='detail-block'><div class='lbl'>Training curve (epoch → test top-1)</div><div><svg width='220' height='36' viewBox='0 0 220 36' xmlns='http://www.w3.org/2000/svg' style='vertical-align:middle'><polyline points='2.0,33.2 21.6,34.0 41.3,21.0 60.9,15.0 80.5,11.9 100.2,13.4 119.8,11.8 139.5,6.1 159.1,3.8 178.7,3.1 198.4,2.6 218.0,2.0' fill='none' stroke='#58a6ff' stroke-width='1.6'/><circle cx='218.0' cy='2.0' r='2.4' fill='#3fb950'/><text x='218' y='32' fill='#8b949e' font-size='10' text-anchor='end'>78.3%</text></svg></div></div><div class='detail-block'><div class='lbl'>Latency / compute breakdown</div><div>latency (batch=1): <b>22.285 ms</b><br>train wall-clock: <b>1115.7 s</b><br>generalisation gap (train−test top1): <b>1.24 pp</b><br>model: <b>?</b> · channel_mode: <b>?</b></div></div><div class='detail-block panel-2col' style='grid-column:1/3'><div class='lbl'>Prior flags</div><div><i style="color:#8b949e">no flags recorded</i></div></div></div></td></tr>
 <tr class='clickable ' data-tier='T1' onclick="openReasoning('sg_only_golden_modulate')">
 <td onclick='event.stopPropagation();toggleDetail(this,"sg_only_golden_modulate")' style='cursor:pointer;color:#58a6ff;font-weight:600;text-align:center'>▸</td>
-<td data-v='sg_only_golden_modulate'><span class='swatch status-done' style='display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle'></span><span class='tag-pill'>sg_only_golden_modulate</span></td>
+<td data-v='sg_only_golden_modulate'><span class='swatch status-done' style='display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle'></span><a href='experiments/sg_only_golden_modulate_seed2.html' title='open per-experiment page' onclick='event.stopPropagation()'><span class='tag-pill'>sg_only_golden_modulate</span></a></td>
 <td data-v='cifar10'>cifar10</td>
 <td data-v='2'>2</td>
 <td data-v='12'>12</td>
@@ -949,7 +949,7 @@
 <tr class='detail-row' style='display:none'><td colspan='15'><div class='detail-grid'><div class='detail-block'><div class='lbl'>Training curve (epoch → test top-1)</div><div><svg width='220' height='36' viewBox='0 0 220 36' xmlns='http://www.w3.org/2000/svg' style='vertical-align:middle'><polyline points='2.0,34.0 21.6,28.9 41.3,23.0 60.9,16.5 80.5,13.3 100.2,18.3 119.8,8.4 139.5,10.6 159.1,4.9 178.7,3.9 198.4,2.1 218.0,2.0' fill='none' stroke='#58a6ff' stroke-width='1.6'/><circle cx='218.0' cy='2.0' r='2.4' fill='#3fb950'/><text x='218' y='32' fill='#8b949e' font-size='10' text-anchor='end'>77.9%</text></svg></div></div><div class='detail-block'><div class='lbl'>Latency / compute breakdown</div><div>latency (batch=1): <b>21.743 ms</b><br>train wall-clock: <b>1156.8 s</b><br>generalisation gap (train−test top1): <b>1.27 pp</b><br>model: <b>?</b> · channel_mode: <b>?</b></div></div><div class='detail-block panel-2col' style='grid-column:1/3'><div class='lbl'>Prior flags</div><div><i style="color:#8b949e">no flags recorded</i></div></div></div></td></tr>
 <tr class='clickable ' data-tier='' onclick="openReasoning('sg_only_golden_bottleneck')">
 <td onclick='event.stopPropagation();toggleDetail(this,"sg_only_golden_bottleneck")' style='cursor:pointer;color:#58a6ff;font-weight:600;text-align:center'>▸</td>
-<td data-v='sg_only_golden_bottleneck'><span class='tag-pill'>sg_only_golden_bottleneck</span></td>
+<td data-v='sg_only_golden_bottleneck'><a href='experiments/sg_only_golden_bottleneck_seed0.html' title='open per-experiment page' onclick='event.stopPropagation()'><span class='tag-pill'>sg_only_golden_bottleneck</span></a></td>
 <td data-v='cifar10'>cifar10</td>
 <td data-v='0'>0</td>
 <td data-v='12'>12</td>
@@ -967,7 +967,7 @@
 <tr class='detail-row' style='display:none'><td colspan='15'><div class='detail-grid'><div class='detail-block'><div class='lbl'>Training curve (epoch → test top-1)</div><div><svg width='220' height='36' viewBox='0 0 220 36' xmlns='http://www.w3.org/2000/svg' style='vertical-align:middle'><polyline points='2.0,34.0 21.6,23.6 41.3,17.9 60.9,18.3 80.5,15.0 100.2,8.4 119.8,8.1 139.5,5.4 159.1,3.7 178.7,3.0 198.4,2.6 218.0,2.0' fill='none' stroke='#58a6ff' stroke-width='1.6'/><circle cx='218.0' cy='2.0' r='2.4' fill='#3fb950'/><text x='218' y='32' fill='#8b949e' font-size='10' text-anchor='end'>69.2%</text></svg></div></div><div class='detail-block'><div class='lbl'>Latency / compute breakdown</div><div>latency (batch=1): <b>7.089 ms</b><br>train wall-clock: <b>456.8 s</b><br>generalisation gap (train−test top1): <b>0.10 pp</b><br>model: <b>?</b> · channel_mode: <b>?</b></div></div><div class='detail-block panel-2col' style='grid-column:1/3'><div class='lbl'>Prior flags</div><div><i style="color:#8b949e">no flags recorded</i></div></div></div></td></tr>
 <tr class='clickable ' data-tier='T1' onclick="openReasoning('sg_full_fib')">
 <td onclick='event.stopPropagation();toggleDetail(this,"sg_full_fib")' style='cursor:pointer;color:#58a6ff;font-weight:600;text-align:center'>▸</td>
-<td data-v='sg_full_fib'><span class='swatch status-done' style='display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle'></span><span class='tag-pill'>sg_full_fib</span></td>
+<td data-v='sg_full_fib'><span class='swatch status-done' style='display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle'></span><a href='experiments/sg_full_fib_seed0.html' title='open per-experiment page' onclick='event.stopPropagation()'><span class='tag-pill'>sg_full_fib</span></a></td>
 <td data-v='cifar10'>cifar10</td>
 <td data-v='0'>0</td>
 <td data-v='12'>12</td>
@@ -985,7 +985,7 @@
 <tr class='detail-row' style='display:none'><td colspan='15'><div class='detail-grid'><div class='detail-block'><div class='lbl'>Training curve (epoch → test top-1)</div><div><svg width='220' height='36' viewBox='0 0 220 36' xmlns='http://www.w3.org/2000/svg' style='vertical-align:middle'><polyline points='2.0,34.0 21.6,23.9 41.3,22.3 60.9,14.4 80.5,14.2 100.2,10.1 119.8,9.6 139.5,5.4 159.1,3.9 178.7,2.6 198.4,2.2 218.0,2.0' fill='none' stroke='#58a6ff' stroke-width='1.6'/><circle cx='218.0' cy='2.0' r='2.4' fill='#3fb950'/><text x='218' y='32' fill='#8b949e' font-size='10' text-anchor='end'>73.2%</text></svg></div></div><div class='detail-block'><div class='lbl'>Latency / compute breakdown</div><div>latency (batch=1): <b>20.016 ms</b><br>train wall-clock: <b>478.9 s</b><br>generalisation gap (train−test top1): <b>1.93 pp</b><br>model: <b>?</b> · channel_mode: <b>?</b></div></div><div class='detail-block panel-2col' style='grid-column:1/3'><div class='lbl'>Prior flags</div><div><i style="color:#8b949e">no flags recorded</i></div></div></div></td></tr>
 <tr class='clickable ' data-tier='' onclick="openReasoning('sg_only_phi_sparse')">
 <td onclick='event.stopPropagation();toggleDetail(this,"sg_only_phi_sparse")' style='cursor:pointer;color:#58a6ff;font-weight:600;text-align:center'>▸</td>
-<td data-v='sg_only_phi_sparse'><span class='tag-pill'>sg_only_phi_sparse</span></td>
+<td data-v='sg_only_phi_sparse'><a href='experiments/sg_only_phi_sparse_seed0.html' title='open per-experiment page' onclick='event.stopPropagation()'><span class='tag-pill'>sg_only_phi_sparse</span></a></td>
 <td data-v='cifar10'>cifar10</td>
 <td data-v='0'>0</td>
 <td data-v='12'>12</td>
@@ -1003,7 +1003,7 @@
 <tr class='detail-row' style='display:none'><td colspan='15'><div class='detail-grid'><div class='detail-block'><div class='lbl'>Training curve (epoch → test top-1)</div><div><svg width='220' height='36' viewBox='0 0 220 36' xmlns='http://www.w3.org/2000/svg' style='vertical-align:middle'><polyline points='2.0,34.0 21.6,23.9 41.3,17.3 60.9,16.4 80.5,11.4 100.2,11.7 119.8,10.1 139.5,5.8 159.1,4.1 178.7,2.5 198.4,2.4 218.0,2.0' fill='none' stroke='#58a6ff' stroke-width='1.6'/><circle cx='218.0' cy='2.0' r='2.4' fill='#3fb950'/><text x='218' y='32' fill='#8b949e' font-size='10' text-anchor='end'>73.3%</text></svg></div></div><div class='detail-block'><div class='lbl'>Latency / compute breakdown</div><div>latency (batch=1): <b>22.217 ms</b><br>train wall-clock: <b>507.2 s</b><br>generalisation gap (train−test top1): <b>1.01 pp</b><br>model: <b>?</b> · channel_mode: <b>?</b></div></div><div class='detail-block panel-2col' style='grid-column:1/3'><div class='lbl'>Prior flags</div><div><i style="color:#8b949e">no flags recorded</i></div></div></div></td></tr>
 <tr class='clickable ' data-tier='T1' onclick="openReasoning('sg_only_group')">
 <td onclick='event.stopPropagation();toggleDetail(this,"sg_only_group")' style='cursor:pointer;color:#58a6ff;font-weight:600;text-align:center'>▸</td>
-<td data-v='sg_only_group'><span class='swatch status-done' style='display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle'></span><span class='tag-pill'>sg_only_group</span></td>
+<td data-v='sg_only_group'><span class='swatch status-done' style='display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle'></span><a href='experiments/sg_only_group_seed0.html' title='open per-experiment page' onclick='event.stopPropagation()'><span class='tag-pill'>sg_only_group</span></a></td>
 <td data-v='cifar10'>cifar10</td>
 <td data-v='0'>0</td>
 <td data-v='12'>12</td>
@@ -1021,7 +1021,7 @@
 <tr class='detail-row' style='display:none'><td colspan='15'><div class='detail-grid'><div class='detail-block'><div class='lbl'>Training curve (epoch → test top-1)</div><div><svg width='220' height='36' viewBox='0 0 220 36' xmlns='http://www.w3.org/2000/svg' style='vertical-align:middle'><polyline points='2.0,34.0 21.6,28.0 41.3,22.8 60.9,19.4 80.5,16.9 100.2,10.1 119.8,6.6 139.5,8.0 159.1,4.3 178.7,2.6 198.4,2.0 218.0,2.0' fill='none' stroke='#58a6ff' stroke-width='1.6'/><circle cx='218.0' cy='2.0' r='2.4' fill='#3fb950'/><text x='218' y='32' fill='#8b949e' font-size='10' text-anchor='end'>69.8%</text></svg></div></div><div class='detail-block'><div class='lbl'>Latency / compute breakdown</div><div>latency (batch=1): <b>9.749 ms</b><br>train wall-clock: <b>379.6 s</b><br>generalisation gap (train−test top1): <b>1.33 pp</b><br>model: <b>?</b> · channel_mode: <b>?</b></div></div><div class='detail-block panel-2col' style='grid-column:1/3'><div class='lbl'>Prior flags</div><div><i style="color:#8b949e">no flags recorded</i></div></div></div></td></tr>
 <tr class='clickable ' data-tier='T1' onclick="openReasoning('sg_only_group')">
 <td onclick='event.stopPropagation();toggleDetail(this,"sg_only_group")' style='cursor:pointer;color:#58a6ff;font-weight:600;text-align:center'>▸</td>
-<td data-v='sg_only_group'><span class='swatch status-done' style='display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle'></span><span class='tag-pill'>sg_only_group</span></td>
+<td data-v='sg_only_group'><span class='swatch status-done' style='display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle'></span><a href='experiments/sg_only_group_seed1.html' title='open per-experiment page' onclick='event.stopPropagation()'><span class='tag-pill'>sg_only_group</span></a></td>
 <td data-v='cifar10'>cifar10</td>
 <td data-v='1'>1</td>
 <td data-v='12'>12</td>
@@ -1039,7 +1039,7 @@
 <tr class='detail-row' style='display:none'><td colspan='15'><div class='detail-grid'><div class='detail-block'><div class='lbl'>Training curve (epoch → test top-1)</div><div><svg width='220' height='36' viewBox='0 0 220 36' xmlns='http://www.w3.org/2000/svg' style='vertical-align:middle'><polyline points='2.0,34.0 21.6,30.8 41.3,22.5 60.9,21.7 80.5,11.0 100.2,9.4 119.8,8.2 139.5,7.2 159.1,3.9 178.7,2.8 198.4,2.1 218.0,2.0' fill='none' stroke='#58a6ff' stroke-width='1.6'/><circle cx='218.0' cy='2.0' r='2.4' fill='#3fb950'/><text x='218' y='32' fill='#8b949e' font-size='10' text-anchor='end'>69.9%</text></svg></div></div><div class='detail-block'><div class='lbl'>Latency / compute breakdown</div><div>latency (batch=1): <b>12.256 ms</b><br>train wall-clock: <b>930.0 s</b><br>generalisation gap (train−test top1): <b>0.97 pp</b><br>model: <b>?</b> · channel_mode: <b>?</b></div></div><div class='detail-block panel-2col' style='grid-column:1/3'><div class='lbl'>Prior flags</div><div><i style="color:#8b949e">no flags recorded</i></div></div></div></td></tr>
 <tr class='clickable ' data-tier='' onclick="openReasoning('sg_only_fib_stride')">
 <td onclick='event.stopPropagation();toggleDetail(this,"sg_only_fib_stride")' style='cursor:pointer;color:#58a6ff;font-weight:600;text-align:center'>▸</td>
-<td data-v='sg_only_fib_stride'><span class='tag-pill'>sg_only_fib_stride</span></td>
+<td data-v='sg_only_fib_stride'><a href='experiments/sg_only_fib_stride_seed0.html' title='open per-experiment page' onclick='event.stopPropagation()'><span class='tag-pill'>sg_only_fib_stride</span></a></td>
 <td data-v='cifar10'>cifar10</td>
 <td data-v='0'>0</td>
 <td data-v='12'>12</td>
@@ -1057,7 +1057,7 @@
 <tr class='detail-row' style='display:none'><td colspan='15'><div class='detail-grid'><div class='detail-block'><div class='lbl'>Training curve (epoch → test top-1)</div><div><svg width='220' height='36' viewBox='0 0 220 36' xmlns='http://www.w3.org/2000/svg' style='vertical-align:middle'><polyline points='2.0,34.0 21.6,26.8 41.3,18.9 60.9,13.9 80.5,12.7 100.2,10.0 119.8,9.7 139.5,5.9 159.1,3.9 178.7,3.7 198.4,2.4 218.0,2.0' fill='none' stroke='#58a6ff' stroke-width='1.6'/><circle cx='218.0' cy='2.0' r='2.4' fill='#3fb950'/><text x='218' y='32' fill='#8b949e' font-size='10' text-anchor='end'>72.5%</text></svg></div></div><div class='detail-block'><div class='lbl'>Latency / compute breakdown</div><div>latency (batch=1): <b>22.517 ms</b><br>train wall-clock: <b>514.2 s</b><br>generalisation gap (train−test top1): <b>1.41 pp</b><br>model: <b>?</b> · channel_mode: <b>?</b></div></div><div class='detail-block panel-2col' style='grid-column:1/3'><div class='lbl'>Prior flags</div><div><i style="color:#8b949e">no flags recorded</i></div></div></div></td></tr>
 <tr class='clickable ' data-tier='T1' onclick="openReasoning('sg_only_group')">
 <td onclick='event.stopPropagation();toggleDetail(this,"sg_only_group")' style='cursor:pointer;color:#58a6ff;font-weight:600;text-align:center'>▸</td>
-<td data-v='sg_only_group'><span class='swatch status-done' style='display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle'></span><span class='tag-pill'>sg_only_group</span></td>
+<td data-v='sg_only_group'><span class='swatch status-done' style='display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle'></span><a href='experiments/sg_only_group_seed2.html' title='open per-experiment page' onclick='event.stopPropagation()'><span class='tag-pill'>sg_only_group</span></a></td>
 <td data-v='cifar10'>cifar10</td>
 <td data-v='2'>2</td>
 <td data-v='12'>12</td>
@@ -1075,7 +1075,7 @@
 <tr class='detail-row' style='display:none'><td colspan='15'><div class='detail-grid'><div class='detail-block'><div class='lbl'>Training curve (epoch → test top-1)</div><div><svg width='220' height='36' viewBox='0 0 220 36' xmlns='http://www.w3.org/2000/svg' style='vertical-align:middle'><polyline points='2.0,34.0 21.6,24.8 41.3,16.2 60.9,13.5 80.5,10.3 100.2,9.4 119.8,9.1 139.5,4.4 159.1,3.5 178.7,3.3 198.4,2.3 218.0,2.0' fill='none' stroke='#58a6ff' stroke-width='1.6'/><circle cx='218.0' cy='2.0' r='2.4' fill='#3fb950'/><text x='218' y='32' fill='#8b949e' font-size='10' text-anchor='end'>70.3%</text></svg></div></div><div class='detail-block'><div class='lbl'>Latency / compute breakdown</div><div>latency (batch=1): <b>24.552 ms</b><br>train wall-clock: <b>422.8 s</b><br>generalisation gap (train−test top1): <b>0.97 pp</b><br>model: <b>?</b> · channel_mode: <b>?</b></div></div><div class='detail-block panel-2col' style='grid-column:1/3'><div class='lbl'>Prior flags</div><div><i style="color:#8b949e">no flags recorded</i></div></div></div></td></tr>
 <tr class='clickable ' data-tier='' onclick="openReasoning('sg_only_phi_relu')">
 <td onclick='event.stopPropagation();toggleDetail(this,"sg_only_phi_relu")' style='cursor:pointer;color:#58a6ff;font-weight:600;text-align:center'>▸</td>
-<td data-v='sg_only_phi_relu'><span class='tag-pill'>sg_only_phi_relu</span></td>
+<td data-v='sg_only_phi_relu'><a href='experiments/sg_only_phi_relu_seed0.html' title='open per-experiment page' onclick='event.stopPropagation()'><span class='tag-pill'>sg_only_phi_relu</span></a></td>
 <td data-v='cifar10'>cifar10</td>
 <td data-v='0'>0</td>
 <td data-v='12'>12</td>
@@ -1093,7 +1093,7 @@
 <tr class='detail-row' style='display:none'><td colspan='15'><div class='detail-grid'><div class='detail-block'><div class='lbl'>Training curve (epoch → test top-1)</div><div><svg width='220' height='36' viewBox='0 0 220 36' xmlns='http://www.w3.org/2000/svg' style='vertical-align:middle'><polyline points='2.0,34.0 21.6,26.9 41.3,22.2 60.9,19.5 80.5,13.0 100.2,10.5 119.8,7.5 139.5,6.5 159.1,4.2 178.7,3.0 198.4,2.5 218.0,2.0' fill='none' stroke='#58a6ff' stroke-width='1.6'/><circle cx='218.0' cy='2.0' r='2.4' fill='#3fb950'/><text x='218' y='32' fill='#8b949e' font-size='10' text-anchor='end'>71.1%</text></svg></div></div><div class='detail-block'><div class='lbl'>Latency / compute breakdown</div><div>latency (batch=1): <b>21.601 ms</b><br>train wall-clock: <b>510.0 s</b><br>generalisation gap (train−test top1): <b>1.35 pp</b><br>model: <b>?</b> · channel_mode: <b>?</b></div></div><div class='detail-block panel-2col' style='grid-column:1/3'><div class='lbl'>Prior flags</div><div><i style="color:#8b949e">no flags recorded</i></div></div></div></td></tr>
 <tr class='clickable ' data-tier='T2' onclick="openReasoning('sg_only_group_avg')">
 <td onclick='event.stopPropagation();toggleDetail(this,"sg_only_group_avg")' style='cursor:pointer;color:#58a6ff;font-weight:600;text-align:center'>▸</td>
-<td data-v='sg_only_group_avg'><span class='swatch status-done' style='display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle'></span><span class='tag-pill'>sg_only_group_avg</span></td>
+<td data-v='sg_only_group_avg'><span class='swatch status-done' style='display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle'></span><a href='experiments/sg_only_group_avg_seed0.html' title='open per-experiment page' onclick='event.stopPropagation()'><span class='tag-pill'>sg_only_group_avg</span></a></td>
 <td data-v='cifar10'>cifar10</td>
 <td data-v='0'>0</td>
 <td data-v='12'>12</td>
@@ -1111,7 +1111,7 @@
 <tr class='detail-row' style='display:none'><td colspan='15'><div class='detail-grid'><div class='detail-block'><div class='lbl'>Training curve (epoch → test top-1)</div><div><svg width='220' height='36' viewBox='0 0 220 36' xmlns='http://www.w3.org/2000/svg' style='vertical-align:middle'><polyline points='2.0,34.0 21.6,26.1 41.3,20.0 60.9,17.0 80.5,9.9 100.2,14.3 119.8,8.5 139.5,7.3 159.1,5.2 178.7,2.6 198.4,2.0 218.0,2.2' fill='none' stroke='#58a6ff' stroke-width='1.6'/><circle cx='218.0' cy='2.2' r='2.4' fill='#3fb950'/><text x='218' y='32' fill='#8b949e' font-size='10' text-anchor='end'>65.4%</text></svg></div></div><div class='detail-block'><div class='lbl'>Latency / compute breakdown</div><div>latency (batch=1): <b>8.822 ms</b><br>train wall-clock: <b>486.9 s</b><br>generalisation gap (train−test top1): <b>1.78 pp</b><br>model: <b>?</b> · channel_mode: <b>?</b></div></div><div class='detail-block panel-2col' style='grid-column:1/3'><div class='lbl'>Prior flags</div><div><i style="color:#8b949e">no flags recorded</i></div></div></div></td></tr>
 <tr class='clickable ' data-tier='T2' onclick="openReasoning('sg_full_fib_avg')">
 <td onclick='event.stopPropagation();toggleDetail(this,"sg_full_fib_avg")' style='cursor:pointer;color:#58a6ff;font-weight:600;text-align:center'>▸</td>
-<td data-v='sg_full_fib_avg'><span class='swatch status-done' style='display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle'></span><span class='tag-pill'>sg_full_fib_avg</span></td>
+<td data-v='sg_full_fib_avg'><span class='swatch status-done' style='display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle'></span><a href='experiments/sg_full_fib_avg_seed0.html' title='open per-experiment page' onclick='event.stopPropagation()'><span class='tag-pill'>sg_full_fib_avg</span></a></td>
 <td data-v='cifar10'>cifar10</td>
 <td data-v='0'>0</td>
 <td data-v='12'>12</td>
@@ -1129,7 +1129,7 @@
 <tr class='detail-row' style='display:none'><td colspan='15'><div class='detail-grid'><div class='detail-block'><div class='lbl'>Training curve (epoch → test top-1)</div><div><svg width='220' height='36' viewBox='0 0 220 36' xmlns='http://www.w3.org/2000/svg' style='vertical-align:middle'><polyline points='2.0,26.4 21.6,34.0 41.3,18.6 60.9,18.5 80.5,18.5 100.2,9.2 119.8,8.7 139.5,6.4 159.1,3.3 178.7,3.5 198.4,2.5 218.0,2.0' fill='none' stroke='#58a6ff' stroke-width='1.6'/><circle cx='218.0' cy='2.0' r='2.4' fill='#3fb950'/><text x='218' y='32' fill='#8b949e' font-size='10' text-anchor='end'>66.9%</text></svg></div></div><div class='detail-block'><div class='lbl'>Latency / compute breakdown</div><div>latency (batch=1): <b>19.900 ms</b><br>train wall-clock: <b>582.5 s</b><br>generalisation gap (train−test top1): <b>0.70 pp</b><br>model: <b>?</b> · channel_mode: <b>?</b></div></div><div class='detail-block panel-2col' style='grid-column:1/3'><div class='lbl'>Prior flags</div><div><i style="color:#8b949e">no flags recorded</i></div></div></div></td></tr>
 <tr class='clickable ' data-tier='' onclick="openReasoning('sg_only_golden_adam')">
 <td onclick='event.stopPropagation();toggleDetail(this,"sg_only_golden_adam")' style='cursor:pointer;color:#58a6ff;font-weight:600;text-align:center'>▸</td>
-<td data-v='sg_only_golden_adam'><span class='tag-pill'>sg_only_golden_adam</span></td>
+<td data-v='sg_only_golden_adam'><a href='experiments/sg_only_golden_adam_seed0.html' title='open per-experiment page' onclick='event.stopPropagation()'><span class='tag-pill'>sg_only_golden_adam</span></a></td>
 <td data-v='cifar10'>cifar10</td>
 <td data-v='0'>0</td>
 <td data-v='12'>12</td>

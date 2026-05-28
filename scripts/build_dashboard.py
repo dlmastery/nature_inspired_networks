@@ -16,6 +16,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 from nature_inspired_networks.dashboard import (  # noqa: E402
     load_runs,
     parse_findings_headline,
+    render_all_experiment_pages,
     render_dashboard,
 )
 
@@ -146,6 +147,11 @@ def main(argv=None) -> int:
         repo_root=repo_root,
     )
 
+    # Per-experiment independent pages (one .html per <tag>_seed<N> run dir).
+    exp_out = out_dir / "experiments"
+    exp_pages = render_all_experiment_pages(results, exp_out)
+    print(f"[ok] {len(exp_pages)} per-experiment pages written to {exp_out}")
+
     # Mirror PNG plots into docs/dashboard/ and copy reasoning + betti so the
     # docs mirror is self-contained.
     docs_dir = Path("docs") / "dashboard"
@@ -158,6 +164,16 @@ def main(argv=None) -> int:
     # one directory deep from the repo root).
     dashboard_html = (out_dir / "dashboard.html").read_text(encoding="utf-8")
     (docs_dir / "dashboard.html").write_text(dashboard_html, encoding="utf-8")
+
+    # Mirror the per-experiment pages into docs/dashboard/experiments/ so they
+    # are live on GitHub Pages at the same relative path as in dashboard/.
+    docs_exp_dir = docs_dir / "experiments"
+    docs_exp_dir.mkdir(parents=True, exist_ok=True)
+    for fname in exp_pages:
+        (docs_exp_dir / fname).write_text(
+            (exp_out / fname).read_text(encoding="utf-8"), encoding="utf-8"
+        )
+    print(f"[ok] {len(exp_pages)} per-experiment pages mirrored to {docs_exp_dir}")
 
     # docs/index.html landing page with the negative-finding ribbon + CTA.
     (Path("docs") / "index.html").write_text(
