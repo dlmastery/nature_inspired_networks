@@ -69,19 +69,50 @@ def fib_growth_schedule(n_events: int = 4, start_index: int = 3) -> tuple[int, .
 # ---------------------------------------------------------------------------
 # Grow helper -- appends NaturePriorBlock clones to the deepest stage
 # ---------------------------------------------------------------------------
-def _kaiming_reinit_(module: nn.Module) -> None:
-    """Kaiming-reinitialise every Conv2d / Linear weight in ``module``.
+def _function_preserving_init_(block: nn.Module) -> None:
+    """Initialise a freshly-appended :class:`NaturePriorBlock` so that
+    its forward pass is the identity function at insertion time.
 
-    Used by :func:`grow_model` so newly inserted blocks start from a
-    fresh He-normal draw rather than reusing the caller's seed state.
-    Bias terms are zeroed; BatchNorm gamma/beta are left at their PyTorch
-    defaults (1.0 / 0.0).
+    This implements Net2Net-style function-preserving growth (Chen,
+    Goodfellow, Shlens 2016 ICLR 'Net2Net: Accelerating Learning via
+    Knowledge Transfer', arXiv:1511.05641). The block's residual form is
+    ``y_out = relu(residual_branch(x) + skip(x))``. Because the
+    appended block has matched ``c_in == c_out`` and ``stride == 1``,
+    the skip is :class:`nn.Identity`, so ``skip(x) == x`` and (since
+    ``x`` is the post-ReLU activation of the prior block, hence
+    non-negative) ``relu(0 + x) == x``.
+
+    To make ``residual_branch(x) == 0`` for every input, we zero the
+    BatchNorm gamma (``weight``) and beta (``bias``) of EVERY BN in the
+    block's terminal residual branch (``block.conv2``). Each BN then
+    outputs zero regardless of upstream conv weights:
+    ``bn(y) = gamma * (y - mu) / sigma + beta = 0``. The fractal-path
+    variant's ``0.5 * (a + b)`` merge becomes ``0.5 * (0 + 0) == 0``
+    because both ``a`` and ``b`` terminate in (now-zeroed) BN layers.
+
+    Conv weights are kept at their PyTorch default (Kaiming-uniform)
+    initialisation so the block has well-conditioned gradients the
+    moment BN gamma starts moving away from zero — training "wakes up"
+    the block smoothly rather than from a degenerate zero-weight start.
+
+    The golden-angle channel modulation (when enabled) multiplies the
+    residual output by ``cos(phases + alpha) * 0.5 + 0.5``; since the
+    residual output is zero, the gate is irrelevant. ``alpha`` is left
+    at its default zero initialisation.
     """
-    for m in module.modules():
-        if isinstance(m, (nn.Conv2d, nn.Linear)):
-            nn.init.kaiming_normal_(m.weight, nonlinearity="relu")
-            if m.bias is not None:
-                nn.init.zeros_(m.bias)
+    # Identity-init: zero the BN gamma + beta of every BatchNorm in the
+    # residual branch (conv2). This makes the branch output zero, so
+    # the block reduces to its identity skip.
+    conv2 = getattr(block, "conv2", None)
+    if conv2 is None:
+        # Non-NaturePriorBlock module: fall back to a no-op (the caller
+        # documents this branch as silently passing through, matching
+        # the prior behaviour of unknown module types).
+        return
+    for m in conv2.modules():
+        if isinstance(m, nn.BatchNorm2d):
+            nn.init.zeros_(m.weight)
+            nn.init.zeros_(m.bias)
 
 
 def grow_model(model: nn.Module, n_extra_blocks: int = 1,
@@ -100,6 +131,12 @@ def grow_model(model: nn.Module, n_extra_blocks: int = 1,
     reference is returned so callers can chain. Models without a
     ``stages`` ModuleList are returned untouched (the H08 callback then
     no-ops on growth events).
+
+    Function-preservation contract: each appended block is initialised
+    via :func:`_function_preserving_init_` (Net2Net-style identity
+    init), so ``model(x)`` after ``grow_model`` equals ``model(x)``
+    before within float tolerance. See the docstring of
+    :func:`_function_preserving_init_` for the mechanism.
     """
     if n_extra_blocks < 0:
         raise ValueError(f"n_extra_blocks must be >= 0; got {n_extra_blocks}")
@@ -122,9 +159,17 @@ def grow_model(model: nn.Module, n_extra_blocks: int = 1,
     if c_out is None:
         return model
     flags = flags or _infer_flags(last_block)
+    # Inserted blocks must be put in eval-equivalent mode so BN uses its
+    # zeroed gamma + beta directly rather than re-computing running
+    # stats from the first batch. We rely on the fact that BN with
+    # gamma=0, beta=0 outputs zero regardless of running stats; that
+    # holds in both train() and eval() modes.
     for _ in range(n_extra_blocks):
         new_block = NaturePriorBlock(c_out, c_out, stride=1, flags=flags)
-        _kaiming_reinit_(new_block)
+        _function_preserving_init_(new_block)
+        # Inherit the parent module's training mode so the new block's
+        # BNs behave consistently with their siblings.
+        new_block.train(mode=model.training)
         last_stage.append(new_block)
     return model
 

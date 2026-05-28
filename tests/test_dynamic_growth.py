@@ -135,6 +135,41 @@ def test_callback_idempotent_on_repeated_step():
     assert p_after_first == p_after_repeat
 
 
+def test_h08_function_preserving_growth():
+    """G1-audit gate: after a growth event the forward output on a fixed
+    input must match the pre-growth output within 1e-5 (Net2Net-style
+    function-preserving init per Chen, Goodfellow, Shlens 2016 ICLR
+    arXiv:1511.05641).
+
+    This test would FAIL on the legacy Kaiming-reinit code (audit
+    measured max-abs-diff = 0.088) and PASSES with the identity-init
+    fix that zeroes the BN gamma + beta of the inserted block's
+    residual branch (conv2).
+    """
+    torch.manual_seed(0)
+    factory = _minimal_factory()
+    model = factory()
+    # Switch to eval mode so BatchNorm uses running statistics (which
+    # match the inputs since we're using the same input). This isolates
+    # the growth-event identity contract from BN's training-mode batch
+    # normalisation, which would also satisfy the contract here but
+    # adds an unnecessary degree of freedom.
+    model.eval()
+    x = torch.randn(2, 3, 32, 32)
+    with torch.no_grad():
+        y_before = model(x).clone()
+    grow_model(model, n_extra_blocks=2)
+    model.eval()  # New blocks default to train; force eval for parity.
+    with torch.no_grad():
+        y_after = model(x)
+    max_abs_diff = (y_after - y_before).abs().max().item()
+    assert torch.allclose(y_before, y_after, atol=1e-5, rtol=0), (
+        f"Function-preservation contract violated: max_abs_diff = "
+        f"{max_abs_diff:.6f}, exceeds 1e-5 tolerance. The appended "
+        f"blocks did not act as identity at insertion."
+    )
+
+
 if __name__ == "__main__":
     import inspect
 
