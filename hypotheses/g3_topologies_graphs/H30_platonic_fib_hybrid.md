@@ -189,3 +189,35 @@ The H58 follow-up experiment T2.1 (currently running) is the **direct prerequisi
 ## 12. Status journal
 
 - 2026-05-27 — Created from template by Doc-Agent-B. Integrates T1.4 lesson and H58 prerequisite chain.
+
+---
+
+## Addendum: Research-Scientist Critique (2026-05-27)
+
+*Reviewer: SciCritic-G3 (elite-research-scientist critic). Critiquing the IDEA, not the implementation (that audit lives at `audits/G3_audit.md`).*
+
+### Prior plausibility (LOW/MED/HIGH + why)
+**VERY LOW — the design is mathematically inconsistent.** The implementation critic flagged that the canonical (1, 1, 2, 3, 5, 8) per-vertex degree partition is GEOMETRICALLY UNACHIEVABLE on an icosahedral nearest-neighbour kNN graph: the icosahedron has 12 vertices each with degree 5 (5-regular graph) — there is no way to assign degree {1, 1, 2, 3, 5, 8} to 20 dodecahedral vertices while respecting nearest-neighbour structure (the dodecahedron is 3-regular). The handshake lemma requires `Σ deg(v) = 2·|E|`; for {1,1,2,3,5,8} the sum is 20, requiring 10 edges, but a connected graph on 20 nodes needs ≥ 19 edges. So the design as STATED is impossible. The audit note that the test was "relaxed to an inequality" papers over a foundational geometric inconsistency — the hypothesis is not just speculative, it is internally contradictory.
+
+### Mechanism scrutiny — does the topology actually buy what the doc claims?
+The §1 mechanism asks for two priors to compose: (a) icosahedral 60-element symmetry group, (b) Fibonacci vertex-degree allocation. The first IS a well-defined and useful equivariance prior (Cohen 2019 ICML 'Gauge equivariant CNNs and the icosahedral CNN' arXiv:1902.04615). The second is **incompatible** with the first: an equivariant message-passing GNN under the I60 group requires vertex-transitivity (every vertex looks like every other under the group action), and a degree-{1,1,2,3,5,8} graph is by construction NOT vertex-transitive. So the Fibonacci-degree allocation BREAKS the icosahedral equivariance — you cannot have both at once. The hypothesis is therefore self-contradicting at the mechanistic level. ModelNet40 (Wu et al. 2015 CVPR 'ShapeNets' arXiv:1406.5670) is a standard 3-D classification benchmark, but the proposed network would inherit none of the equivariance benefits because the graph is not symmetric.
+
+### Confounds (≥2)
+1. **Implementation-relaxation confound**: the audit relaxed the equality assertion to an inequality, meaning the IMPLEMENTED graph is NOT what the design specifies. Any positive result would attribute to the relaxed implementation, not the stated hypothesis.
+2. **Latency-metric confound**: the +10 % inference-latency reduction claim assumes a Fibonacci-degree distribution gives sparser message passing on average. But on a 20-vertex graph, the constant-factor latency overhead of indexing and gather/scatter is much larger than the message-passing FLOPs; a 10 % latency change is implausible.
+3. **ModelNet40 plateau**: SOTA on ModelNet40 is ~94 % and the variance between training runs is ~1 pp; the +1.5 pp falsifier is barely above noise.
+
+### Numerology / specificity check — does the SPECIFIC polytope matter or would any vertex-transitive graph do?
+The icosahedral group MATTERS for equivariance (it is the maximal finite SO(3) subgroup). The Fibonacci-degree allocation does NOT matter — and indeed CANNOT be realised (see above). Even if the design were corrected to a more relaxed "degree distribution that is APPROXIMATELY Fibonacci-shaped", the Fibonacci-specific shape contributes nothing the literature has documented; any heavy-tail degree distribution (power-law, exponential) would give qualitatively similar behaviour. **5 ≠ 8** in the icosahedron's actual degree set (5-regular), so {1,1,2,3,5,8} contains numbers that don't even appear in icosa-related graph invariants.
+
+### Literature precedent — equivariance/GNN literature is huge; place this hypothesis on the map
+Foundational: Cohen et al. 2019 ICML 'Gauge equivariant convolutional networks and the icosahedral CNN' (arXiv:1902.04615); Wang et al. 2019 SIGGRAPH 'Dynamic Graph CNN for learning on point clouds' (DGCNN) (arXiv:1801.07829); Qi et al. 2017 CVPR 'PointNet' (arXiv:1612.00593); Qi et al. 2017 NeurIPS 'PointNet++' (arXiv:1706.02413). Fully Fibonacci-distributed vertex degrees on a 20-node graph have no precedent in this literature — and there is a good reason for the absence: it would break the equivariance that the graph structure is intended to provide.
+
+### Expected effect size (90% CI a priori)
+ModelNet40 vs uniform-degree-6 icosa baseline: Δ accuracy ∈ [-2, +1] pp; falsification of +1.0 pp likely. Latency: ±5 % around baseline, but with high implementation-dependent variance. The 3-seed runs are unlikely to clear the falsifier band.
+
+### Minimum-distinguishing experiment
+**Required**: a 3-arm comparison at matched params on ModelNet40, 3 seeds: (a) icosa-vertex-transitive 12-node degree-5 graph (canonical), (b) corrected-Fibonacci-distribution on 12 nodes with handshake-lemma-respecting degrees (≥ 11 edges), (c) random degree-distribution on 12 nodes. If (b) > (a) AND (b) > (c), the Fibonacci-degree claim has marginal support. The realistic outcome: (a) >> (b) ≈ (c) because (a) is vertex-transitive and the others are not.
+
+### Verdict
+NUMEROLOGY + MATHEMATICALLY-INCONSISTENT — the Fibonacci-degree allocation {1,1,2,3,5,8} on 20 dodecahedral vertices is geometrically unrealisable on an icosa-nearest-neighbour graph (handshake lemma + connectivity), and even if relaxed, it breaks the vertex-transitivity required for the icosahedral equivariance prior to function. The hypothesis composes two priors that are formally incompatible. Recommend either dropping it or splitting into separate icosa-equivariance and Fibonacci-channel hypotheses (the latter is H24's already-flagged concern).

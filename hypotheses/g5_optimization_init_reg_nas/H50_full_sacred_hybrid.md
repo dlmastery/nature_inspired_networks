@@ -412,3 +412,33 @@ falsified it?**
   stack, group-conv max-pool 75% signal loss, additive-vs-
   multiplicative compound failure, recommended cures H58 / H45 /
   H67. Status remains `✗ disproved` at 12-epoch CIFAR-10 scale.
+
+---
+
+## Addendum: Research-Scientist Critique (2026-05-27)
+
+*Reviewer: SciCritic-G5 (elite-research-scientist critic). Critiquing the IDEA, not the implementation (audit at `audits/G5_audit.md`).*
+
+### Prior plausibility (LOW/MED/HIGH + why)
+LOW from inception. The hypothesis assumes additive composition of independent priors (each prior is approximately neutral / mildly positive in isolation, so stacking them should compound). This is a category error: in deep learning, prior stacking is *multiplicative in failure modes*, not additive in benefits. Each prior re-shapes the loss landscape; stacking re-shapes it K times in incompatible directions. The CIFAR-10 result (73.24 % vs. 84.78 % baseline, Δ = -11.54 pp) is the textbook signature of compound-bias-variance failure.
+
+### Mechanism scrutiny — does the optimizer/init/reg theory actually predict the claimed effect?
+No — and the existing literature predicts anti-compounding. The bias-variance decomposition (Geman, Bienenstock, Doursat 1992 'Neural Networks and the Bias/Variance Dilemma'; Belkin, Hsu, Ma, Mandal 2019 PNAS 'Reconciling modern machine-learning practice and the classical bias–variance trade-off' arXiv:1812.11118) shows that adding K independent regularizers / priors *adds biases* but *does not subtract variances* by the same factor — net effect is monotonic increase in bias for diminishing variance reduction. Lakshminarayanan, Pritzel, Blundell 2017 NeurIPS 'Simple and Scalable Predictive Uncertainty Estimation using Deep Ensembles' (arXiv:1612.01474) is the canonical "stacking helps via averaging *outputs*, not via stacking inductive biases" reference. The full-sacred-hybrid stacks 7+ inductive biases inside a single network — biases stack but representations don't.
+
+### Confounds (≥2)
+(1) **Optimizer interaction.** Several stacked priors (φ-init, fib-channels, hex-attention) each change effective LR; their interaction produces an effective-LR drift that's not in any single component's spec sheet. (2) **Capacity tax.** Each prior consumes parameters or constrains shapes; the K-fold stack leaves negligible free capacity for the actual classification task. (3) **Numerical conditioning.** BN with hex-grouped channels + φ-init + Fib widths produces unusual condition numbers in the first few layers (the audit confirms group-conv max-pool 75% signal loss).
+
+### Numerology / specificity check
+Numerology at the meta-level. The hypothesis "all sacred priors compound" is a numerological claim about numerological claims — it presupposes that φ, Fibonacci, Platonic, hexagonal, toroidal, cymatic, golden-angle priors share a hidden mathematical compatibility (they don't — they come from unrelated mathematical structures: continued fractions, recurrence relations, finite groups, lattice geometry, eigenvalues of the Laplacian, irrational rotations).
+
+### Literature precedent — optimization/init is one of the most studied fields in DL
+The mature literature on inductive-bias composition shows anti-compounding: Battaglia, Hamrick, Bapst, Sanchez-Gonzalez, Zambaldi, Malinowski, Tacchetti, Raposo, Santoro, Faulkner, et al. 2018 arXiv 'Relational inductive biases, deep learning, and graph networks' (arXiv:1806.01261) cautions that hand-designed priors must match the data's true generative process. Cohen & Welling 2016 ICML 'Group Equivariant Convolutional Networks' (arXiv:1602.07576) — adding the *right* equivariance helps, the *wrong* equivariance hurts. Stacking 7+ priors of mixed alignment with CIFAR-10's class structure is a recipe for the observed -11.5 pp regression.
+
+### Expected effect size (90% CI a priori)
+[-15 pp, -3 pp] on CIFAR-10 top-1 vs. baseline. Observed: -11.54 pp; squarely within the prior. This was foreseeable.
+
+### Minimum-distinguishing experiment
+Already executed. The hypothesis is empirically refuted. The minimum forward-looking experiment is the *additive* hyperparameter-by-hyperparameter ablation: turn each prior on individually, measure the marginal effect, compute the predicted sum, compare to the observed compound effect; if the compound effect lies far below the predicted sum, the anti-compounding is confirmed. This is exactly the analysis FINDINGS.md should present.
+
+### Verdict
+NUMEROLOGY + EMPIRICALLY-REFUTED — Stacking K numerological priors does not produce K-fold benefit; it produces K-fold capacity tax and biased landscape. The doc partially owns this (status: `✗ disproved` per the journal entry), which is appropriate; the addendum here adds that the failure was *predictable* from bias-variance and inductive-bias-mismatch theory, not just empirically discovered. Recommend the doc be promoted from "disproved on CIFAR-10" to "disproved AND was a priori implausible per Battaglia 2018 / Cohen-Welling 2016".

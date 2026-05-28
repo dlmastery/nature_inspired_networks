@@ -273,3 +273,33 @@ sparsity** regime (≥95%) where the schedule shape matters most:
 ## 11. Status journal
 
 - 2026-05-27 — Created from template by Doc-Agent-C.
+
+---
+
+## Addendum: Research-Scientist Critique (2026-05-27)
+
+*Reviewer: SciCritic-G5 (elite-research-scientist critic). Critiquing the IDEA, not the implementation (audit at `audits/G5_audit.md`).*
+
+### Prior plausibility (LOW/MED/HIGH + why)
+LOW-MED. Iterative magnitude pruning (IMP) itself is a well-established baseline (Han, Pool, Tran, Dally 2015 NeurIPS 'Learning both Weights and Connections for Efficient Neural Network' arXiv:1506.02626; Frankle & Carbin 2018 ICLR 'The Lottery Ticket Hypothesis: Finding Sparse, Trainable Neural Networks' arXiv:1803.03635), so the *mechanism* (sweeping prune fractions) has solid grounding. What is dubious is anchoring the prune-rate schedule on Fibonacci ratios `{F_k / F_{k+1}}` rather than learning-curve-driven adaptive thresholds (e.g. AMC, Gradual-Magnitude-Pruning).
+
+### Mechanism scrutiny — does the optimizer/init/reg theory actually predict the claimed effect?
+Pruning theory predicts a *plateau-then-cliff* sparsity–accuracy curve (Zhu & Gupta 2017 arXiv:1710.01878 'To prune, or not to prune') whose break-point depends on architecture and dataset, not on any number-theoretic property of the schedule. Frankle 2018 sweeps prune fractions linearly or geometrically; the IMP iteration count `k` is bounded by when the accuracy collapses, NOT by the Fibonacci index. Mapping iteration `k` to `F_k/F_{k+1} → 1/φ` is purely cosmetic — the limit is asymptotic so for `k ≥ 4` every Fibonacci ratio is within 1% of 1/φ ≈ 0.618 (`F_4/F_5 = 5/8 = 0.625`, `F_5/F_6 = 8/13 = 0.615`). So "Fibonacci pruning" with k ≥ 4 is operationally indistinguishable from "constant prune-rate 0.618".
+
+### Confounds (≥2)
+(1) **Finetune-budget coupling.** Each IMP iteration includes a retrain phase; total wall-clock = iterations × retrain epochs. Fib schedule's "increasing prune mass per iteration" trades retrain budget vs. compression — observed accuracy is confounded with effective training budget. (2) **Layer-wise vs. global pruning.** The doc does not specify; layer-wise IMP at Fib ratios is very different from global magnitude thresholding. (3) **Rewinding.** Frankle 2019 ICLR 'Linear Mode Connectivity and the Lottery Ticket Hypothesis' (arXiv:1912.05671) shows rewind-to-early-step matters more than the schedule.
+
+### Numerology / specificity check
+Numerology. The claim that "consecutive Fibonacci ratios" matter is mathematically vacuous beyond k=4: the sequence converges so fast to 1/φ that the schedule is empirically just "prune by 61.8 % per round". A controlled experiment would compare {Fib schedule, constant 0.618, constant 0.5, constant 0.75, geometric (1 - 1/k)} at iso-FLOPs; if Fib doesn't strictly dominate, the Fib-specificity is refuted.
+
+### Literature precedent — optimization/init is one of the most studied fields in DL
+Pruning literature: Han et al. 2015 (arXiv:1506.02626); Frankle & Carbin 2018 (arXiv:1803.03635); Zhu & Gupta 2017 (arXiv:1710.01878); Liu, Sun, Zhou, Huang, Darrell 2018 ICLR 'Rethinking the Value of Network Pruning' (arXiv:1810.05270); Blalock, Gonzalez Ortiz, Frankle, Guttag 2020 MLSys 'What is the State of Neural Network Pruning?' (arXiv:2003.03033). Blalock 2020 in particular shows ~80 % of published pruning improvements vanish under matched-FLOPs evaluation; this critique applies directly to any Fib-anchored claim.
+
+### Expected effect size (90% CI a priori)
+[-2 pp, +0.5 pp] on CIFAR-10 top-1 at iso-FLOPs vs. constant-0.618 IMP baseline. If the hypothesis were "Fib *itself* helps", upper bound shrinks to +0.2 pp because the asymptotic prune rate is identical.
+
+### Minimum-distinguishing experiment
+Run 5-iteration IMP with prune-rate sequence `{F_k/F_{k+1}}_{k=1..5} = {0.5, 0.667, 0.6, 0.625, 0.615}` vs. constant `0.618` vs. linear `{0.2, 0.4, 0.6, 0.8, 0.95}` at 12 epochs CIFAR-10 + 3 seeds. If Fib doesn't dominate by ≥ 0.5 pp with non-overlapping 95% CI, Fib-specificity is refuted (the rest is just IMP).
+
+### Verdict
+DERIVATIVE+TESTABLE — IMP is well-grounded but Fib-anchoring of the prune schedule converges too fast to 1/φ to be empirically distinguishable from constant-0.618 pruning beyond iteration 4; recommend recasting the hypothesis as "IMP at φ-asymptote prune-rate" and dropping the Fibonacci-sequence framing entirely.

@@ -161,3 +161,35 @@ WikiText-103 124 M with `GoldenSpiralEmbedding`. Train 100 k steps; compare conv
 ## 11. Status journal
 
 - 2026-05-27 — Created from template by Doc-Agent-B.
+
+---
+
+## Addendum: Research-Scientist Critique (2026-05-27)
+
+*Reviewer: SciCritic-G3 (elite-research-scientist critic). Critiquing the IDEA, not the implementation (that audit lives at `audits/G3_audit.md`).*
+
+### Prior plausibility (LOW/MED/HIGH + why)
+**LOW.** Initialization of node embeddings on a 2-D golden-spiral lattice and then in Xavier-init for the remaining (d-2) dimensions is a one-time INPUT distribution choice that is forgotten within ~10 training steps. The optimiser will rotate and rescale the 2-D component to whatever local optimum it finds; the "spiral structure" is destroyed immediately. The literature on input embeddings (Mikolov et al. 2013 NeurIPS 'Distributed representations of words and phrases' arXiv:1310.4546; Pennington et al. 2014 EMNLP 'GloVe') makes clear that the structure of an initial embedding matters less than the loss-shaped final embedding — even an entirely random init converges to similar geometry within a few epochs. So the prior is fundamentally fragile.
+
+### Mechanism scrutiny — does the topology actually buy what the doc claims?
+The §1 mechanism quotes Vogel 1979's `r_k = √k, θ_k = k · 137.5°` and claims this gives "the most isotropic discrete sampling of the disc" with "approximately constant Voronoi-cell area". That part is true (Ridley 1982 J. Theor. Biol. 'Computer simulation of the sunflower seed pattern'). But the leap to "GNN node embeddings need an isotropic init" is unsupported. (a) GNN initial node embeddings are typically a CONSTANT (e.g., a one-hot or atom-type lookup, not 2-D coordinates); their spatial structure is not "embedded position" but a feature category. (b) Even when GNN embeddings are random 2-D for visualisation (t-SNE / UMAP outputs), the golden-spiral structure is a POST-HOC layout choice, not an initialisation choice. (c) The "epochs-to-convergence" benefit assumes the loss landscape has a saddle at Xavier init that golden-spiral init avoids — there is no evidence for this in the GNN literature.
+
+### Confounds (≥2)
+1. **Scale-of-init confound**: Vogel's `r_k = √k` puts the k-th embedding at radius √k, which grows unboundedly. For matched-Glorot scale you must rescale; the rescaling is a confound for "isotropy benefit vs init-variance benefit".
+2. **Only-first-2-dim confound**: the doc puts golden spiral in dim 1,2 and Xavier in dim 3,...,d. The first two dims are a tiny fraction of total embedding parameters; if d=128 (typical), the spiral contributes 2/128 ≈ 1.5 % of the embedding variance — way below detectability.
+3. **Convergence-epoch metric is non-standard**: "epochs-to-convergence" requires a stopping criterion that introduces hyperparameters; this can be tuned to favour either side.
+
+### Numerology / specificity check — does the SPECIFIC polytope matter or would any vertex-transitive graph do?
+The golden angle 137.5° is unique as the most-irrational angle, but for a finite-n sample (n = 5000 ogbg-molhiv molecules), virtually ANY irrational angle produces a near-uniform sampling — the difference between 137.5° and 137.1° on n = 5000 nodes is invisible. The doc would need to ablate against (a) uniform-radial layout, (b) Halton or Sobol quasi-random init, (c) golden-spiral. Quasi-Monte Carlo sequences (Niederreiter 1992; Sobol 1967) achieve the same low-discrepancy property without any φ.
+
+### Literature precedent — equivariance/GNN literature is huge; place this hypothesis on the map
+Relevant prior art: Mikolov et al. 2013 NeurIPS 'Distributed representations of words' (arXiv:1310.4546); Glorot & Bengio 2010 AISTATS 'Understanding the difficulty of training deep feedforward neural networks' (no arXiv) — Xavier init; You et al. 2020 NeurIPS 'Graph contrastive learning with augmentations' (arXiv:2010.13902) — node-feature augmentation; Errica et al. 2020 ICLR 'A fair comparison of graph neural networks for graph classification' (arXiv:1912.09893) — shows initial node features matter modestly on ogbg-molhiv. None of these find that a specific GEOMETRIC initial-embedding structure (spiral vs Gaussian) makes a measurable difference. Glorot 2010 is the foundational result that initialisation MAGNITUDE matters far more than structure.
+
+### Expected effect size (90% CI a priori)
+ROC-AUC on `ogbg-molhiv`: Δ ∈ [-0.3, +0.5] pp. The +1 pp falsifier sits well above the CI's upper bound — falsification is the modal outcome. Epochs-to-convergence: at best ±10 % depending on stopping criterion, well below the 20 % threshold.
+
+### Minimum-distinguishing experiment
+**Required ablation**, 3 seeds: (a) golden-spiral init, (b) Sobol quasi-random init, (c) Halton init, (d) Gaussian/Xavier init. If (a) significantly beats (b)+(c), the φ specifically matters. The realistic outcome is (a) ≈ (b) ≈ (c) ≈ (d) within seed noise.
+
+### Verdict
+NUMEROLOGY — the golden-spiral init's claimed isotropy is shared with any low-discrepancy sequence, and the gradient signal washes out the geometric structure within 10 epochs. The hypothesis's testable falsification is likely; the +1 pp threshold is unreachable. Recommend either dropping this hypothesis or reframing it as a low-discrepancy init study with multiple QMC baselines and no φ specificity claim.

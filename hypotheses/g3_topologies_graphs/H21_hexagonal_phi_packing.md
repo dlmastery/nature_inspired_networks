@@ -211,3 +211,35 @@ T1.3 (`sg_only_hex`) on upright CIFAR-10 yielded top-1 79.32 % vs the `sg_chan_f
 ## 12. Status journal
 
 - 2026-05-27 — Created from template by Doc-Agent-B. References T1.3 negative result and queued T2.7 follow-up.
+
+---
+
+## Addendum: Research-Scientist Critique (2026-05-27)
+
+*Reviewer: SciCritic-G3 (elite-research-scientist critic). Critiquing the IDEA, not the implementation (that audit lives at `audits/G3_audit.md`).*
+
+### Prior plausibility (LOW/MED/HIGH + why)
+**LOW** for upright CIFAR-10, **MED** for rotated-CIFAR. Hex convolution is a legitimate equivariance prior (Hoogeboom et al. 2018 ICML 'HexaConv' arXiv:1803.02108) but its documented gains accrue on hex-sampled data (aerial, microscopy on hex sensors). CIFAR-10 is acquired on Bayer-filter cameras, demosaiced to a square Cartesian raster — there is NO underlying hex prior in the data. The 60° angular resolution is a feature of the FILTER, not the signal; the signal's 90°-axis dominance (Olshausen & Field 1996 Nature) actually FAVOURS the square stencil for upright CIFAR. The T1.3 negative (-? pp via `sg_only_hex` at 79.32 %) is exactly what theory predicts.
+
+### Mechanism scrutiny — does the topology actually buy what the doc claims?
+Three claims in §1 break down on inspection. (a) **Isotropy**: the 7-tap hex stencil with hex-aligned sampling is more rotation-equivariant than a 9-tap square only if the INPUT is also hex-sampled or the kernel is paired with hex resampling. Hoogeboom 2018 explicitly does the hex resampling. The doc does not commit to that, so the claimed isotropy is unfounded. (b) **Information density**: at fixed nearest-neighbour distance the hex stencil has 7 taps vs the square's 9 — fewer parameters per tap, not more. The "15.5 % more sampling points per unit area" claim conflates pixel density with kernel tap count. (c) **φ-radial weighting**: scaling the 6 neighbours by 1/φ is mathematically equivalent to a global learning-rate scaling on those taps that the optimiser can undo in one step. There is no first-principles argument why 1/φ specifically beats any other neighbour-attenuation factor.
+
+### Confounds (≥2)
+1. **Parameter / FLOP mismatch**: 7-tap hex vs 9-tap square at "matched parameter budget" requires either widening the hex channels (changes capacity distribution) or padding to 9 taps with two zeros (then it IS a square kernel with two dead taps).
+2. **Resampling artefacts**: applying a hex stencil to a square-rastered input WITHOUT hex resampling produces a non-uniform receptive field whose effective stencil shape depends on row parity — this is itself a non-trivial regulariser confound, independent of any "hex prior".
+3. **Initialization confound**: the 1/φ centre-vs-edge weighting is also an effective scale on per-tap gradient magnitudes; any benefit may attribute to the (Glorot 2010-style) gain change rather than to "phyllotaxis energy".
+
+### Numerology / specificity check — does the SPECIFIC polytope matter or would any vertex-transitive graph do?
+The hex stencil is C6-vertex-transitive, but so is any rotated square stencil (C4) or octagon (C8). The doc gives no ablation isolating "C6 specifically" vs "any vertex-transitive stencil". The 1/φ factor is pure numerology: nothing in Hoogeboom 2018, nothing in Hales 2001 Honeycomb Conjecture (which is about WAX, not weights), implies that 1/φ is the correct radial attenuation. Any value in (0, 1) would give qualitatively the same "energy concentration"; the optimiser will find the local optimum regardless. φ here is decoration, not mechanism.
+
+### Literature precedent — equivariance/GNN literature is huge; place this hypothesis on the map
+The relevant literature: Hoogeboom et al. 2018 ICML 'HexaConv' (arXiv:1803.02108) — definitive hex-conv baseline; Cohen & Welling 2016 ICML 'Group Equivariant Convolutional Networks' (arXiv:1602.07576) — the foundational G-CNN paper for C4/D4; Weiler & Cesa 2019 NeurIPS 'General E(2)-Equivariant Steerable CNNs' (arXiv:1911.08251) — the modern e2cnn framework that subsumes C6 / C4 / Cn arbitrarily. The φ-radial-weighting modification is novel only as an init choice and is best framed in the context of Glorot & Bengio 2010 AISTATS 'Understanding the difficulty of training deep feedforward neural networks'. Without the rotation-equivariant resampling pipeline that Hoogeboom uses, the H21 design is strictly weaker than the precedent.
+
+### Expected effect size (90% CI a priori)
+On **upright CIFAR-10**: Δ top-1 ∈ [-1.5, +0.3] pp (centered slightly negative, T1.3 in the band). On **rotated-CIFAR-10** with proper hex-resampled inputs: Δ top-1 ∈ [+0.3, +2.5] pp (Hoogeboom-band but smaller because CIFAR is low-res). The +1.5 pp falsifier threshold sits near the upper edge of the credible interval — falsification likely.
+
+### Minimum-distinguishing experiment
+**Single experiment, 3 seeds.** Fix dataset = rotated-CIFAR-10. Four variants at matched param budget: (i) square 3×3, (ii) hex 7-tap UNIFORM weights, (iii) hex 7-tap with 1/φ peripheral weights, (iv) hex 7-tap with 1/2 peripheral weights (control for "any sub-unity attenuation"). If (iii) beats (iv) by > 1 σ AND (ii)→(iii) gap > (ii)→(iv) gap, the φ specifically matters. Otherwise the φ claim is numerology and only (ii) is a real prior.
+
+### Verdict
+DERIVATIVE+TESTABLE — the hex-stencil component is sound prior art (Hoogeboom 2018) but the φ-radial modification is numerology that the proposed protocol does not isolate; falsification on the φ-specific claim is the likely outcome.

@@ -286,3 +286,33 @@ Cymatic loss should help most on **synthetic Chladni-pattern data**
 ## 11. Status journal
 
 - 2026-05-27 — Created from template by Doc-Agent-C.
+
+---
+
+## Addendum: Research-Scientist Critique (2026-05-27)
+
+*Reviewer: SciCritic-G5 (elite-research-scientist critic). Critiquing the IDEA, not the implementation (audit at `audits/G5_audit.md`).*
+
+### Prior plausibility (LOW/MED/HIGH + why)
+LOW. Adding an auxiliary loss that pulls activations toward fixed Chladni / cymatic mode patterns is a regularizer whose bias is *unrelated to the task distribution*. Image classification on CIFAR-10 requires representations that separate semantic classes; Chladni-mode templates encode 2D-wave-equation eigenfunctions of a square membrane that have no causal relation to dog-vs-cat-vs-airplane class structure. Adding a loss that says "make the conv-4 feature map look like a Bessel-mode pattern" forces representational capacity to be spent on task-irrelevant geometry.
+
+### Mechanism scrutiny — does the optimizer/init/reg theory actually predict the claimed effect?
+No. Regularization theory (Tikhonov regularization; Goodfellow, Bengio, Courville 2016 'Deep Learning' Ch. 7) predicts an auxiliary loss helps generalization *only when its bias correlates with the task's true structure*. Chladni modes are eigenfunctions of `∇²ψ = -k²ψ` on a square domain — useful for membrane physics, not for class-discriminative features. Compare to true task-relevant auxiliary losses: rotation-prediction (Gidaris, Singh, Komodakis 2018 ICLR 'Unsupervised Representation Learning by Predicting Image Rotations' arXiv:1803.07728), patch-relative-position (Doersch, Gupta, Efros 2015 ICCV arXiv:1505.05192), SimCLR (Chen, Kornblith, Norouzi, Hinton 2020 ICML arXiv:2002.05709) — these all have task-correlated bias. Cymatic loss does not.
+
+### Confounds (≥2)
+(1) **Loss-weight coupling.** Any auxiliary loss with weight `λ` acts as an implicit LR scaler / batch-norm regularizer at small `λ`; observed metrics confound the cymatic-template effect with the implicit-regularization-strength effect. A control with random-template loss at the same `λ` is required to isolate the template specificity. (2) **Activation-scale absorption.** BN absorbs scale shifts induced by the auxiliary loss, so a "Chladni-shaped activation" claim cannot be falsified via scale alone — only via shape, which BN partly destroys. (3) **Layer-of-attachment.** Attaching the loss to conv-1 vs. conv-4 produces very different effects; the doc doesn't specify which layer is the target.
+
+### Numerology / specificity check
+Numerology + arbitrary-prior. The Chladni mode shapes are specific (square-membrane eigenfunctions), but their relevance to image classification is unargued. The hypothesis silently assumes "natural-looking pattern → better representation"; this is the ImageNet-pre-training-via-Perlin-noise / 'Pre-training without Natural Images' (Kataoka, Okayasu, Matsumoto, Yamagata, Yamada, Inoue, Nakamura, Satoh 2020 ACCV arXiv:2101.08515) family of arguments, but Kataoka et al. show fractal-pre-training underperforms ImageNet by 5–10 pp.
+
+### Literature precedent — optimization/init is one of the most studied fields in DL
+Auxiliary losses are well-studied: Bachman, Hjelm, Buchwalter 2019 NeurIPS 'Learning Representations by Maximizing Mutual Information Across Views' (arXiv:1906.00910); Misra & van der Maaten 2020 CVPR 'Self-Supervised Learning of Pretext-Invariant Representations' (arXiv:1912.01991). The lesson is consistent: aux-loss bias must align with task structure (often via augmentation invariance), not with externally imposed templates. Frequency-domain regularizers exist (Rahaman, Baratin, Arpit, Draxler, Lin, Hamprecht, Bengio, Courville 2019 ICML 'On the Spectral Bias of Neural Networks' arXiv:1806.08734) but they regularize *spectrum* not *template*.
+
+### Expected effect size (90% CI a priori)
+[-2 pp, +0.2 pp] on CIFAR-10 top-1 vs. no-aux-loss baseline. Most likely outcome: small regression from misaligned bias plus capacity tax.
+
+### Minimum-distinguishing experiment
+Three-way: (i) no aux-loss baseline, (ii) cymatic-template aux-loss at λ ∈ {0.01, 0.1, 1.0}, (iii) random-frozen-template aux-loss at matched λ × 3 seeds CIFAR-10. If (ii) does not beat (iii) by ≥ 0.3 pp with non-overlapping CI, the Chladni-specificity is refuted — any observed effect is purely the implicit regularization of pulling activations toward *some* fixed template.
+
+### Verdict
+NUMEROLOGY — Chladni-mode aux-loss imposes a task-irrelevant bias on representations; the framing as "natural pattern" is aesthetic and the predicted help is unmotivated by regularization theory. Recommend dropping unless reframed as a controlled-template-bias study (cymatic vs. random-template) to isolate any specificity.

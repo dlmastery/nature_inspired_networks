@@ -273,3 +273,33 @@ search space?**
 ## 11. Status journal
 
 - 2026-05-27 — Created from template by Doc-Agent-C.
+
+---
+
+## Addendum: Research-Scientist Critique (2026-05-27)
+
+*Reviewer: SciCritic-G5 (elite-research-scientist critic). Critiquing the IDEA, not the implementation (audit at `audits/G5_audit.md`).*
+
+### Prior plausibility (LOW/MED/HIGH + why)
+LOW. The hypothesis structure is fundamentally flawed: restricting NAS to a search space `{φ, Fib, Platonic-equivariant, hexagonal, toroidal, cymatic, golden-angle}` is *strictly worse* than open NAS *unless* the restricted priors individually outperform unrestricted alternatives. The Phase-5 3-seed evidence (FINDINGS.md) and the H50-full-hybrid result (73.24 % vs. 84.78 % baseline = -11.5 pp) demonstrate the priors do not stack. A NAS over a search space of mostly-neutral and several actively-harmful priors will, in expectation, return architectures that are no better than (and likely worse than) random sampling from the unrestricted space.
+
+### Mechanism scrutiny — does the optimizer/init/reg theory actually predict the claimed effect?
+NAS theory (Liu, Simonyan, Yang 2019 ICLR 'DARTS: Differentiable Architecture Search' arXiv:1806.09055; Pham, Guan, Zoph, Le, Dean 2018 ICML 'Efficient Neural Architecture Search via Parameter Sharing' arXiv:1802.03268; Xie, Zheng, Liu, Lin 2019 ICLR 'SNAS: Stochastic Neural Architecture Search' arXiv:1812.09926) predicts NAS quality scales with: (a) coverage of the search space — wider is better unless priors are positively known to help, (b) candidate diversity, (c) signal-to-noise of the proxy task. The "sacred" restriction reduces (a) and (b) and adds no signal to (c). The hypothesis implicitly assumes the constituent priors compound positively — Section 5 of FINDINGS.md (and the H50 result) demonstrate they do not.
+
+### Confounds (≥2)
+(1) **Survivorship bias in the restricted space.** If NAS returns a "good" Sacred-NAS architecture, the question is whether it would have ranked highly in an open NAS — typically the answer in restricted searches is "yes but lower" because the restriction filters out the actual top-K candidates. (2) **Cell-template confound.** The sacred-NAS cell template might include or exclude DepthwiseSeparable, BN-vs-GN, etc., which dominate over the sacred prior. (3) **Search-budget coupling.** NAS budget on a small space looks artificially good per FLOPs.
+
+### Numerology / specificity check
+Numerology by composition. The restriction takes seven independent numerological priors (φ-scaling, Fibonacci, Platonic, hexagonal, toroidal, cymatic, golden-angle), most of which individually under-perform, and assumes a "Bonferroni for free": that the discrete-search over sacred combinations will find a compounding sweet-spot. There is no theoretical argument given for why such a sweet-spot should exist; the H50 result is evidence against.
+
+### Literature precedent — optimization/init is one of the most studied fields in DL
+NAS literature: DARTS (arXiv:1806.09055), ENAS (arXiv:1802.03268), SNAS (arXiv:1812.09926), Once-for-All (Cai, Gan, Wang, Zhang, Han 2020 ICLR arXiv:1908.09791), and Yu, Sciuto, Jaggi, Musat, Salzmann 2020 ICLR 'Evaluating the Search Phase of Neural Architecture Search' (arXiv:1902.08142) which shows ~50 % of NAS gains are search-noise on top of strong baselines. Restricting to a hand-picked "natural" subspace adds prior-bias on top of NAS's already-high search-noise.
+
+### Expected effect size (90% CI a priori)
+[-3 pp, -0.3 pp] on CIFAR-10 top-1 vs. open-DARTS baseline at iso-search-budget. Most likely outcome: Sacred-NAS converges to the best individual prior (probably "all priors off, i.e. the baseline"), wasting compute relative to open NAS.
+
+### Minimum-distinguishing experiment
+Run DARTS on `cells = {sacred ops}` vs. DARTS on `cells = {standard ops} ∪ {sacred ops}` (i.e. additive, not restrictive) vs. DARTS on `cells = {standard ops}` only, at matched search-budget × 3 seeds CIFAR-10. If the restrictive variant doesn't win by ≥ 0.5 pp with non-overlapping CI, the restriction is refuted; if the additive variant wins, the priors are useful but should not displace standard operators.
+
+### Verdict
+DERIVATIVE+TESTABLE — NAS over a hand-picked sub-space of mostly individually-neutral or harmful priors will, by construction, underperform open NAS; the hypothesis is testable but the prior strongly anticipates failure. Recommend reframing as an *additive* NAS (sacred ops added to the standard search space) rather than a restrictive one, which removes the worst-case downside.

@@ -280,3 +280,33 @@ regime* where overfitting dominates:
 ## 11. Status journal
 
 - 2026-05-27 — Created from template by Doc-Agent-C.
+
+---
+
+## Addendum: Research-Scientist Critique (2026-05-27)
+
+*Reviewer: SciCritic-G5 (elite-research-scientist critic). Critiquing the IDEA, not the implementation (audit at `audits/G5_audit.md`).*
+
+### Prior plausibility (LOW/MED/HIGH + why)
+LOW-MED. Layer-wise weight-decay scaling is a real and useful trick (LAMB You, Li, Reddi, Hseu, Kumar, Bhojanapalli, Song, Demmel, Keutzer, Hsieh 2019 ICLR 'Large Batch Optimization for Deep Learning: Training BERT in 76 minutes' arXiv:1904.00962; LARS You, Gitman, Ginsburg 2017 arXiv:1708.03888). What is implausible is that the per-layer schedule should specifically follow a `φ^{-k}` geometric progression rather than the empirically motivated norm-ratio scaling LAMB/LARS uses.
+
+### Mechanism scrutiny — does the optimizer/init/reg theory actually predict the claimed effect?
+Decoupled-WD theory (Loshchilov & Hutter 2017 arXiv:1711.05101) treats `wd` as a per-parameter hyperparameter with effective shrinkage `(1 - lr · wd)`. Layer-wise scheduling implicitly assumes parameter-norm growth is uneven across depth — which is true (Cohen, Kaur, Li, Kolter, Talwalkar 2021 ICLR 'Gradient Descent on Neural Networks Typically Occurs at the Edge of Stability' arXiv:2103.00065 shows late-layer norm grows faster), but the *correct* scaling is norm-based, not depth-based. Hoffer, Hubara, Soudry 2017 NeurIPS 'Train longer, generalize better' (arXiv:1705.08741) shows WD effectively controls "effective learning rate"; making it geometrically smaller at deeper layers `wd_k = wd_0 / φ^k` *amplifies* the effective LR at depth, the opposite of what edge-of-stability would prescribe (deep layers need MORE constraint, not less).
+
+### Confounds (≥2)
+(1) **WD is collinear with LR.** `(1 - lr · wd)` means halving `wd` is approximately equivalent to halving `lr` for that layer; the φ-WD schedule is silently an LR schedule. (2) **Norm-growth direction.** Cohen 2021 / Frankle 2020 suggest deep layers need *more* regularization, not less; `φ^{-k}` goes the wrong way. (3) **AdamW's bias-correction.** AdamW's effective shrinkage interacts with the `(1 - β1^t)` / `(1 - β2^t)` terms differently at each layer when WD is layer-varying.
+
+### Numerology / specificity check
+Numerology. `φ^{-k} = (0.618)^k` produces decays `{1.0, 0.618, 0.382, 0.236, 0.146, 0.090, ...}` — these are NOT special; any decay constant in `[0.5, 0.7]` produces qualitatively identical schedules. A controlled experiment would test `c^{-k}` for `c ∈ {1.2, 1.4, 1.618, 1.8, 2.0, 2.5}` and check if `c = φ` lies on a flat plateau (refuting specificity) or an isolated peak (confirming). The doc does not propose this control.
+
+### Literature precedent — optimization/init is one of the most studied fields in DL
+LAMB (arXiv:1904.00962) and LARS (arXiv:1708.03888) prescribe norm-ratio scaling, not depth-indexed scaling. Andriushchenko, D'Angelo, Varre, Flammarion 2023 ICML 'Why Do We Need Weight Decay in Modern Deep Learning?' (arXiv:2310.04415) shows WD's primary role is to keep weights in a bounded region where the LR schedule remains effective — depth-varying WD breaks this guarantee. Zhuang, Liu, Cai, Wang, Wang, Sun, Lin, Long 2020 NeurIPS 'AdaBelief Optimizer: Adapting Stepsizes by the Belief in Observed Gradients' (arXiv:2010.07468) explores belief-based per-param adaptation — again norm-based, not depth-based.
+
+### Expected effect size (90% CI a priori)
+[-1.5 pp, +0.2 pp] on CIFAR-10 top-1 vs. constant-WD AdamW baseline. Most likely outcome: slight regression from over-shrinking shallow layers + under-regularizing deep layers.
+
+### Minimum-distinguishing experiment
+Run constant-WD vs. `wd_k = wd_0 / φ^k` vs. `wd_k = wd_0 · φ^k` (reverse direction) vs. LAMB-style norm-ratio scaling at iso-LR for 12 epochs CIFAR-10 × 3 seeds. If the reverse-direction schedule beats the φ^{-k} schedule, the depth-indexed claim is falsified.
+
+### Verdict
+NUMEROLOGY — Layer-wise WD scheduling is a defensible mechanism, but the `φ^{-k}` choice (a) ignores LAMB's norm-based scaling literature, (b) likely points the schedule in the wrong direction (shallow over-regularized, deep under-regularized), and (c) is empirically indistinguishable from any geometric decay with constant in `[0.5, 0.7]`. Recommend reframing as a LAMB-variant or dropping the φ anchoring.

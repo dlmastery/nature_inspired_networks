@@ -272,3 +272,33 @@ class PhiDropoutLLM(PhiDropout):
 ## 11. Status journal
 
 - 2026-05-27 — Created from template by Doc-Agent-C.
+
+---
+
+## Addendum: Research-Scientist Critique (2026-05-27)
+
+*Reviewer: SciCritic-G5 (elite-research-scientist critic). Critiquing the IDEA, not the implementation (audit at `audits/G5_audit.md`).*
+
+### Prior plausibility (LOW/MED/HIGH + why)
+LOW-MED. Cyclical / scheduled dropout is a real technique (Morerio, Cavazza, Volpi, Vidal, Murino 2017 ICLR-W 'Curriculum Dropout' arXiv:1703.06229; Pham & Le 2021 NeurIPS 'AutoDropout' arXiv:2110.04895), but anchoring the cycle ratios on Fibonacci ratios `{F_k/F_{k+1}}` is purely cosmetic — beyond k=4 the ratios are within 1% of 1/φ ≈ 0.618 (see H43 critique).
+
+### Mechanism scrutiny — does the optimizer/init/reg theory actually predict the claimed effect?
+Dropout theory (Srivastava, Hinton, Krizhevsky, Sutskever, Salakhutdinov 2014 JMLR 'Dropout: A Simple Way to Prevent Neural Networks from Overfitting'; Wager, Wang, Liang 2013 NIPS 'Dropout Training as Adaptive Regularization' arXiv:1307.1493) treats dropout-rate `p` as a scalar regularization knob. Cyclical / curriculum dropout (Morerio 2017) increases `p` over training because feature reliability grows with epochs — this is a well-grounded but empirically weak effect on CIFAR-10 (~0.2 pp typical). Anchoring the curriculum shape on Fibonacci ratios adds no theoretical content because (a) the schedule converges to constant 0.618 after iteration 4, (b) the choice of 0.618 over 0.5 / 0.6 / 0.7 has no statistical-learning justification.
+
+### Confounds (≥2)
+(1) **Effective-LR coupling.** Dropout `p` reduces effective batch size via inverted-dropout scaling, so a `p` schedule is implicitly an effective-LR schedule. (2) **BN-dropout interaction.** Li, Chen, Hu, Yang 2019 CVPR 'Understanding the Disharmony between Dropout and Batch Normalization by Variance Shift' (arXiv:1801.05134) shows BN and dropout co-active in conv layers produce variance-shift artifacts — Fib-scheduled `p` does not address this. (3) **Layer-of-attachment.** Dropout works best between FC layers; on ResNet-20 the FC head is a single layer, leaving little surface for cyclical scheduling.
+
+### Numerology / specificity check
+Pure numerology. After 4 iterations the Fib ratios are within 0.5% of 1/φ, so the schedule is operationally equivalent to "constant `p` = 0.382 or 0.618 alternating" — there is no actual Fibonacci structure beyond iteration 4. A controlled test would compare Fib-schedule to constant-0.5, constant-0.618, linear-curriculum {0.0 → 0.5}, and cosine-{0.0, 0.5} curricula at iso-epochs × 3 seeds CIFAR-10; if Fib doesn't strictly dominate, the hypothesis is refuted.
+
+### Literature precedent — optimization/init is one of the most studied fields in DL
+Dropout literature is mature: Srivastava 2014 JMLR; Wan, Zeiler, Zhang, LeCun, Fergus 2013 ICML 'Regularization of Neural Networks using DropConnect'; Ba & Frey 2013 NIPS 'Adaptive dropout for training deep neural networks'; Gal & Ghahramani 2016 ICML 'Dropout as a Bayesian Approximation' (arXiv:1506.02142); Ghiasi, Lin, Le 2018 NeurIPS 'DropBlock: A regularization method for convolutional networks' (arXiv:1810.12890); Pham & Le 2021 NeurIPS AutoDropout (arXiv:2110.04895). Across this literature, the `p` value matters within ±0.1 of the optimum; the SCHEDULE matters within ±0.3 pp; no paper finds Fibonacci-anchoring of the schedule.
+
+### Expected effect size (90% CI a priori)
+[-0.5 pp, +0.3 pp] on CIFAR-10 top-1 vs. constant-`p=0.1` ResNet-20 baseline. Effects of this size are within seed-noise and require 5-10 seeds to detect.
+
+### Minimum-distinguishing experiment
+{constant 0.1, constant 0.5, linear-curriculum 0→0.5, Fib-schedule, cosine 0→0.5} × 3 seeds × 12 epochs CIFAR-10. Compute pairwise paired-t-test composite delta. If Fib-schedule doesn't beat all others by ≥ 0.3 pp with p < 0.05, the Fib-specificity is refuted.
+
+### Verdict
+NUMEROLOGY — Fibonacci-anchored dropout schedules collapse to constant-0.618 after a few iterations and have no statistical-learning motivation over generic curriculum dropout. Recommend dropping the Fib framing and either (a) adopting AutoDropout (Pham & Le 2021) or (b) reframing as a simple linear/cosine curriculum study without numerological dressing.

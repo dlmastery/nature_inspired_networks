@@ -192,3 +192,35 @@ LLM-track: WikiText-103 at 124 M with DodecaReadout aux head + H49 PRH alignment
 ## 11. Status journal
 
 - 2026-05-27 — Created from template by Doc-Agent-B.
+
+---
+
+## Addendum: Research-Scientist Critique (2026-05-27)
+
+*Reviewer: SciCritic-G3 (elite-research-scientist critic). Critiquing the IDEA, not the implementation (that audit lives at `audits/G3_audit.md`).*
+
+### Prior plausibility (LOW/MED/HIGH + why)
+**LOW-MED.** Quantizing or constraining a latent to a fixed codebook is a well-established regulariser (van den Oord et al. 2017 NeurIPS 'Neural Discrete Representation Learning' arXiv:1711.00937), and prototype-network ideas (Snell et al. 2017 NeurIPS 'Prototypical Networks for Few-Shot Learning' arXiv:1703.05175) lend further weight. But the SPECIFIC choice of 20 dodecahedral vertices, placed at golden-ratio coordinates in 3-D and then embedded in some D-dim latent, has no learning-theoretic justification beyond "20 is the right number for some benchmarks". The doc tries to derive value from the φ-coordinate structure of the dodecahedron vertices, but those coordinates live in R³, not in latent space — a linear projection into the latent's D-dim space scrambles the geometric structure entirely.
+
+### Mechanism scrutiny — does the topology actually buy what the doc claims?
+Three breakdown points: (a) **The dodecahedron-as-codebook idea forces vector quantisation onto 20 codewords**, which is a HARD bottleneck on the model's effective number of classes. CIFAR-10 has 10 classes (codebook fine), but CIFAR-100 has 100 classes (codebook crushes it). The doc proposes CIFAR-10-as-ID / CIFAR-100-as-OOD setup, which is fine for OOD detection, but the ID accuracy of a 20-vertex bottleneck on CIFAR-10 will trail an unconstrained baseline by 1-3 pp — confounding the OOD claim. (b) **Rotation equivariance under I60**: the doc claims the dodeca-vertex set is "rotation-equivariant under the icosahedral group", which is true geometrically — but a permutation of latent codewords under group action is NOT the same as latent-space rotation equivariance for downstream classification. The classifier reads codeword identity, not codeword geometry. (c) **OOD-AUC effect**: the proposed mechanism is that "compact codebook → tighter ID density → better OOD score". This is mechanistically the same as Liu et al. 2020 NeurIPS 'Energy-Based OOD Detection' (arXiv:2010.03759) and yields gains of 1-3 pp AUC for ANY discrete bottleneck — not specific to dodecahedra.
+
+### Confounds (≥2)
+1. **Codebook-size confound**: a 20-codeword bottleneck vs unconstrained-dim-20 latent confounds dimensionality with discretisation. The right control is a learnable 20-prototype codebook (not Platonic-fixed) — that isolates the "20 prototype" benefit from the "Platonic-vertex specifically" claim.
+2. **OOD-detection methodology confound**: OOD-AUC on (CIFAR-10, CIFAR-100) is notoriously fickle (Hendrycks & Gimpel 2017 ICLR arXiv:1610.02136); the +2 pp threshold sits within seed variance for 3 seeds.
+3. **Latent-rotation-instability metric**: this metric is defined ambiguously — is it under input rotations of the IMAGE, or under random rotations of the LATENT VECTOR? Those measure entirely different things.
+
+### Numerology / specificity check — does the SPECIFIC polytope matter or would any vertex-transitive graph do?
+The doc itself emphasises 20 dodeca vertices with φ-coordinates, but a learnable 20-prototype set will fit ANY task better than fixed dodeca vertices (the optimiser will rotate the simplex). Fixing the codebook to a Platonic vertex set is a STRICT subset of the learnable-codebook hypothesis class. So either (a) the fixed dodeca codebook performs worse (the prior is anti-helpful) or (b) the difference is statistically indistinguishable from a random fixed 20-point arrangement on the unit sphere. **20 specifically** is also not Fibonacci or particularly resonant; it is simply 4 × 5 (the count of pentagonal faces × pentagon vertices). The φ-coordinate claim ("dodeca IS the geometric realization of golden ratio") is true in R³ but irrelevant in R^D after a linear projection.
+
+### Literature precedent — equivariance/GNN literature is huge; place this hypothesis on the map
+Direct precedent: van den Oord et al. 2017 NeurIPS 'Neural Discrete Representation Learning' (arXiv:1711.00937) — VQ-VAE codebook framework; Mettes et al. 2019 NeurIPS 'Hyperspherical Prototype Networks' (arXiv:1901.10514) — fixed prototype points on the hypersphere; Snell et al. 2017 NeurIPS 'Prototypical Networks' (arXiv:1703.05175). Mettes 2019 is the closest match and explicitly compares Platonic-solid vertex prototypes vs random / optimised prototypes — Platonic does NOT generally win. The doc does not cite Mettes 2019, which is the obvious prior art.
+
+### Expected effect size (90% CI a priori)
+OOD-AUC on (CIFAR-10 ID, CIFAR-100 OOD) vs unconstrained-dim-20 baseline: Δ ∈ [-1, +2] pp. The falsifier of +1.0 pp lies near the upper edge of the CI; falsification is the modal outcome. The latent-rotation-instability metric depends entirely on how it is defined; an unfair instantiation could yield arbitrary gains.
+
+### Minimum-distinguishing experiment
+**Required ablation, 3 seeds, CIFAR-10 ID + CIFAR-100 OOD**: (a) fixed dodecahedral 20-vertex codebook, (b) random fixed 20-point spherical lattice, (c) learnable 20-prototype codebook with hypersphere normalisation (Mettes 2019), (d) unconstrained dim-20 latent. If (a) > (b) > (c) the Platonic-specific claim holds; the realistic ordering is likely (c) > (d) > (a) ≈ (b).
+
+### Verdict
+DERIVATIVE+TESTABLE (the VQ / prototype-network frame is sound) but the dodecahedral-vertex specificity is NUMEROLOGY that Mettes 2019 (uncited!) already addressed. Recommend reframing as "fixed-prototype-codebook ablation" with dodecahedron as one of several codebooks; expected verdict is that learnable codebooks dominate.

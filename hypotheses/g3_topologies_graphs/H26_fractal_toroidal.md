@@ -167,3 +167,35 @@ Fractal-toroidal Transformer at 124 M on WikiText-103 with anytime evaluation at
 ## 11. Status journal
 
 - 2026-05-27 — Created from template by Doc-Agent-B.
+
+---
+
+## Addendum: Research-Scientist Critique (2026-05-27)
+
+*Reviewer: SciCritic-G3 (elite-research-scientist critic). Critiquing the IDEA, not the implementation (that audit lives at `audits/G3_audit.md`).*
+
+### Prior plausibility (LOW/MED/HIGH + why)
+**LOW.** This is a composition of one likely-positive prior (fractal recursion, H05 +2.35 pp single positive — but see caveat below) with one essentially-falsified prior (toroidal padding, H22 -2.06 pp). Compositions where one component is negative are generally worse than the positive component alone — additive priors compose multiplicatively in effect size only when both are aligned with the data. The doc concedes the toroidal component needs a "wrap-aware target dataset" but then claims a SUPER-additive effect (+3 pp > sum of H05 alone + H22 alone). That super-additive prediction is unsupported and contradicts the (limited) compositional-prior literature.
+
+### Mechanism scrutiny — does the topology actually buy what the doc claims?
+The §1 mechanism conflates three distinct fractal-on-torus motifs: (a) cosmological 3-torus models (a fringe cosmological topology hypothesis from Luminet et al. 2003 Nature 'Dodecahedral space topology' — itself NOT a standard model claim); (b) vortex-ring fluid dynamics; (c) Mandelbrot set Julia subsets. None of these systems have a documented productive analogue in image-classification CNNs. The DL argument reduces to: "H05 was the only positive single prior, and H22's mechanism is structurally complementary, so compose them." But H05's +2.35 pp came on UPRIGHT CIFAR-10, where H22 has been measured negative. The dataset where H22 might pay off (tiled / wrap-aware) is one where H05's fractal multiplicity has never been tested. The compositional claim is therefore an extrapolation in two simultaneous directions.
+
+### Confounds (≥2)
+1. **Tiled-CIFAR synthesis confound**: "tiled-CIFAR" is not a standard benchmark; the doc would need to specify exactly how the tiling is constructed (replicated images? mosaic of 4 images?). Different tiling schemes give different effective priors and the falsifier number depends on the choice.
+2. **Param-budget confound**: fractal recursion adds depth, toroidal padding adds boundary smoothness — they do not lie on a common param axis. Matched-param comparison requires careful design that the doc does not specify.
+3. **Cherry-pick risk on H05's positive**: the +2.35 pp from H05 was a SINGLE-prior result on a SINGLE seed during T1.x; 3-seed median may shrink the effect. Building a compositional hypothesis on an unconfirmed single-seed positive is fragile.
+
+### Numerology / specificity check — does the SPECIFIC polytope matter or would any vertex-transitive graph do?
+N/A (no polytope). The "fractal" component here is `_FractalPath` from H05 (Larsson 2017 FractalNet arXiv:1605.07648-style recursion), which is a depth-recursion structure not a literal fractal. There is no φ in this hypothesis — the only "sacred" content is the toroidal-fractal pairing as a thematic motif. Substituting H05's recursive depth for any other depth-multiplexer (DenseNet's dense skip, ResNet's residual) would likely give the same compositional gain or loss; the FractalNet specificity is not tested.
+
+### Literature precedent — equivariance/GNN literature is huge; place this hypothesis on the map
+Direct precedent: Larsson et al. 2017 ICLR 'FractalNet: ultra-deep neural networks without residuals' (arXiv:1605.07648); Pittorino et al. 2022 'Loss landscape of deep networks' (arXiv:2202.03038) for circular padding; Schubert et al. 2019 NeurIPS 'CircleNet' for circular conv. No paper I am aware of composes FractalNet with circular padding. This is not because nobody thought of it; it is because the compositional benefit on standard photographic image data is implausible — fractal nets help in deep-thin regimes (depth ≥ 40, narrow channels), circular padding helps on periodic data; these regimes don't overlap.
+
+### Expected effect size (90% CI a priori)
+On hypothetical "tiled-CIFAR": Δ top-1 vs planar-fractal baseline ∈ [-1.0, +1.5] pp. The +2 pp falsifier is at the upper-tail; falsification is the modal outcome. The Betti-β₁ collapse rate claim requires defining how collapse is measured — the metric is not standard.
+
+### Minimum-distinguishing experiment
+**Necessary 2 × 2 factorial design**, 3 seeds, on a specified tiled-CIFAR with explicit tile schema: {planar | toroidal} × {non-fractal | fractal}. Look for the interaction term — is the fractal×toroidal cell ABOVE the sum of marginal effects? If yes, super-additivity is real. If not, the composition is at best linear-additive and at worst sub-additive (most likely outcome).
+
+### Verdict
+INCONCLUSIVE-NEEDS-DATA + the prediction of super-additive composition lacks mechanistic support; one of the two priors (H22) is already negative on photographic data, so the composition's success hinges entirely on a non-standard tiled-CIFAR dataset that has not been specified. The 2 × 2 factorial is needed before this hypothesis deserves further investment.

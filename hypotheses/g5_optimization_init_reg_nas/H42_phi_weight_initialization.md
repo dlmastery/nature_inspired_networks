@@ -292,3 +292,33 @@ constant?**
 ## 11. Status journal
 
 - 2026-05-27 — Created from template by Doc-Agent-C.
+
+---
+
+## Addendum: Research-Scientist Critique (2026-05-27)
+
+*Reviewer: SciCritic-G5 (elite-research-scientist critic). Critiquing the IDEA, not the implementation (audit at `audits/G5_audit.md`).*
+
+### Prior plausibility (LOW/MED/HIGH + why)
+LOW. He's `std = sqrt(2 / fan_in)` is derived analytically: the `2` arises because ReLU zeros half the pre-activation mass, so to preserve `Var[a^(l)] = Var[a^(l-1)]` across layers one must double the weight variance to compensate. Replacing the `2` with `φ ≈ 1.618` is, by construction, *under-scaling* — the forward signal variance will *decay* by a factor of `(φ/2) = 0.809` per ReLU layer. Across 20 layers this is `0.809^20 ≈ 0.014`, i.e. a 70× attenuation of activation variance into the network's tail. This is vanishing-activation territory, not "closer to the unit-isometry optimum".
+
+### Mechanism scrutiny — does the optimizer/init/reg theory actually predict the claimed effect?
+No, and the doc gets the math backwards. Dynamical isometry (Saxe, McClelland, Ganguli 2014 ICLR 'Exact solutions to the nonlinear dynamics of learning in deep linear neural networks' arXiv:1312.6120; Pennington, Schoenholz, Ganguli 2017 NeurIPS 'Resurrecting the Sigmoid in Deep Learning through Dynamical Isometry and a Mean Field Theory' arXiv:1711.04735) requires Jacobian singular values concentrated at 1.0 — for ReLU networks WITHOUT BN, this is achieved precisely by the `√(2/fan_in)` Kaiming choice; with BN it is approximate but the BN scale absorbs the residual. Reducing the gain to `√(φ/fan_in) = √(1.618/fan_in) < √(2/fan_in)` pushes Jacobian singular values toward zero (vanishing-gradient half-plane), not toward unity. The "self-similar Fibonacci variance composition" argument in § 1 is a sleight of hand: residual blocks have `Var(x + f(x)) ≈ 2·Var(x)` (when f and x have the same scale) only because of the addition, not because of any φ-tuning of f's weights.
+
+### Confounds (≥2)
+(1) **BatchNorm scale absorbs init.** As § 1 admits, "BatchNorm already enforces unit second moment regardless of the init scale" — but the doc then proceeds to argue the init scale matters anyway. If BN is doing its job, the difference between He and φ-init should attenuate at the BN scale parameter; any observed effect is BN-warmup confounded. (2) **Skip-connection variance accounting.** ResNet's variance is dominated by the running sum of residuals, not by the per-block init scale; Hanin & Rolnick 2018 NeurIPS 'How to Start Training: The Effect of Initialization and Architecture' (arXiv:1803.01719) shows that residual-block init matters mostly for gradient norm at the *first* step. (3) **Last-layer init.** A common trick in ResNet papers (Goyal et al. 2017 arXiv:1706.02677) is zero-init of the last BN's γ — this is what actually matters for residual-block stability, not the convolution's weight scale.
+
+### Numerology / specificity check
+Pure numerology. The doc never tests `std = sqrt(c / fan_in)` for `c ∈ {1.0, 1.272, 1.5, 1.618, 1.8, 2.0, 2.5}` to demonstrate `c = φ` is locally optimal. The "self-similar 2-tap filter `[φ-1, 1]/√φ`" claim is an algebraic identity unrelated to actual CNN initialization (3×3 conv kernels are not 2-tap and have spatial structure). Choice of φ over any nearby constant is aesthetic.
+
+### Literature precedent — optimization/init is one of the most studied fields in DL
+Init has been studied to death. Glorot & Bengio 2010 AISTATS 'Understanding the difficulty of training deep feedforward neural networks' (arXiv:1001.3014); He, Zhang, Ren, Sun 2015 ICCV 'Delving Deep into Rectifiers: Surpassing Human-Level Performance on ImageNet Classification' (arXiv:1502.01852); Mishkin & Matas 2016 ICLR 'All you need is a good init' (arXiv:1511.06422); Zhang, Dauphin, Ma 2019 ICLR 'Fixup Initialization: Residual Learning Without Normalization' (arXiv:1901.09321); De & Smith 2020 NeurIPS 'Batch Normalization Biases Residual Blocks Towards the Identity Function in Deep Networks' (arXiv:2002.10444). The literature converges: with BN, init scale within a 2× factor of Kaiming is largely irrelevant; without BN, Fixup / SkipInit are the modern answer, neither of which is φ-scaled.
+
+### Expected effect size (90% CI a priori)
+[-5 pp, -0.5 pp] on CIFAR-10 top-1 vs. He-init baseline at 12 epochs. Observed: 76.56 % vs. ~80 % baseline = -3.5 pp; consistent with the prior.
+
+### Minimum-distinguishing experiment
+Sweep `std = sqrt(c / fan_in)` for `c ∈ {1.0, 1.272² = 1.618, 2.0, 2.83² = 8.0}` × 3 seeds; if `c = 1.618` lies on a smooth curve with no local optimum near φ — and Reddit/Stack-Overflow-style empirical evidence already shows He is near-optimal — the φ-specificity is refuted. Already empirically refuted at 1 seed.
+
+### Verdict
+NUMEROLOGY — `c = φ` under-scales relative to He's `c = 2`, causing the empirically observed ~3.5 pp regression. The doc inverts the dynamical-isometry argument and treats `√φ < √2 < √π` as a free parameter unrelated to ReLU's variance-doubling requirement; recommend updating `Implementation status: ✗ disproved (12-ep CIFAR-10: 76.56 % vs. ~80 % baseline)` and reframing the motivation as a falsified numerology rather than a dynamical-isometry argument.

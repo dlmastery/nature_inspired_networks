@@ -202,3 +202,35 @@ T1.6 (`sg_only_toroidal`) on upright CIFAR-10 yielded top-1 78.05 % vs the `sg_c
 ## 12. Status journal
 
 - 2026-05-27 — Created from template by Doc-Agent-B. References T1.6 negative result and queued T2.6 follow-up.
+
+---
+
+## Addendum: Research-Scientist Critique (2026-05-27)
+
+*Reviewer: SciCritic-G3 (elite-research-scientist critic). Critiquing the IDEA, not the implementation (that audit lives at `audits/G3_audit.md`).*
+
+### Prior plausibility (LOW/MED/HIGH + why)
+**LOW for upright CIFAR (essentially falsified — T1.6 sg_only_toroidal -2.06 pp); MED for genuinely periodic data (panoramas, spherical projections, audio loops, periodic textures); LOW for the φ-scaling component regardless of dataset.** Toroidal/circular padding is well-known to help only when the data manifold actually wraps. CIFAR-10 photographs do NOT wrap — a cat's left side does not continue as its right side. The 2026-05 sweep negative is mechanistically expected, not surprising. The doc paragraph in §1 listing "vortices, cortex, oscillators" as torus-topology is a non-sequitur: those systems' phase spaces are toroidal, the SIGNALS recorded from them are not.
+
+### Mechanism scrutiny — does the topology actually buy what the doc claims?
+The mechanism for circular padding is real (Schubert et al. 2019 CircleNet; Pittorino et al. 2022 'Loss landscapes in neural networks' arXiv:2202.03038): on periodic data, zero-padding teaches the network a spurious "image edge = dark/discontinuous" feature, and circular padding removes that. But this benefit is **bounded by the fraction of receptive-field area that lies in padded regions**, which on 32×32 CIFAR with a 3×3 kernel is ~1/16 of the field on edge tiles only. The expected upper bound on Δ top-1 from removing the boundary artefact alone is sub-percent. The "φ-scaled wrap distance" is then geometrically incoherent: if the image is W=32 wide, wrapping at period φ·W = 51.78 means the kernel sees content from row r at column (c + 32) mod 51.78, which is a non-integer offset that requires interpolation. The doc does not specify the interpolation and the φ-period itself has no physical interpretation — natural periodic data has period W, not φ·W.
+
+### Confounds (≥2)
+1. **The T1.6 negative on upright CIFAR is correctly explained by data-prior mismatch**, but the doc punts to "wrap-aware target dataset" — moving the goalposts. The hypothesis as stated should be UPDATED to read "DISCARDED on upright photographic data" and re-scoped, not held open with a synthetic-data escape hatch.
+2. **Receptive-field-area confound**: circular padding's effect scales with the ratio of padded pixels to total pixels; this confounds depth (deeper nets see more padding) with the toroidal prior itself.
+3. **"Flatter minima" claim from Pittorino 2022**: that paper measures loss-landscape sharpness, not generalisation — flatter minima are correlated with but not causal for accuracy (Dinh et al. 2017 ICML 'Sharp Minima Can Generalize For Deep Nets' arXiv:1703.04933). Using it as a mechanism for top-1 lift is over-reading.
+
+### Numerology / specificity check — does the SPECIFIC polytope matter or would any vertex-transitive graph do?
+N/A directly (this is a padding scheme, not a graph). But the φ-scaling is pure numerology: any wrap period other than W is non-physical for periodic data; only W = 32 has a real interpretation. The φ·W = 51.78 wrap is decorative. There is no first-principles reason to prefer φ over, say, 2W or W/2.
+
+### Literature precedent — equivariance/GNN literature is huge; place this hypothesis on the map
+Relevant prior art: Schubert et al. 2019 NeurIPS 'CircleNet for hip landmark detection' — circular conv on circular ROIs; Cheng et al. 2020 ECCV 'OmniDet: surround-view fisheye object detection' (arXiv:2102.07448) — circular padding for panoramic; Pittorino et al. 2022 'Loss landscape geometry in deep nets' (arXiv:2202.03038) — loss landscape under various padding. Standard PyTorch `nn.Conv2d(padding_mode='circular')` has existed since 2018. The novelty in H22 reduces to the φ-period choice, which is unsupported.
+
+### Expected effect size (90% CI a priori)
+On **upright CIFAR-10**: already measured at -2.06 pp; CI [-2.5, -1.5]. On a **legitimately wrap-aware dataset** (e.g., tiled-textures): Δ top-1 ∈ [+0.0, +1.0] pp from the circular component, ZERO additional benefit from φ-scaling. The +1.5 pp falsifier is unlikely to be met.
+
+### Minimum-distinguishing experiment
+**Required design**: tiled-CIFAR or panoramic dataset with three padding variants at matched params: (a) zero, (b) circular (period W), (c) circular φ-period (with bilinear interpolation). If (c) > (b) by > 1 σ, the φ component is real; otherwise it is numerology and only (b) is the substantive prior. Also: a single seed will not suffice — variance on tiled-CIFAR is large.
+
+### Verdict
+NUMERIOLOGY (for φ-scaling component) + UNFALSIFIABLE-AS-STATED (the doc moves to "wrap-aware target" after upright CIFAR falsification — the falsifier needs to be tightened or the hypothesis closed). The circular-padding base is derivative prior art. Recommendation: mark H22 as **DISCARDED on photographic CIFAR (per T1.6)** and either close it or re-scope to a single tiled-texture experiment with a controlled φ-vs-W ablation.

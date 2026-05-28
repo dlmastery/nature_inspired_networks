@@ -195,3 +195,35 @@ T1.7 (`sg_only_cymatic_init`) on upright CIFAR-10 yielded top-1 77.44 % vs refer
 ## 12. Status journal
 
 - 2026-05-27 — Created from template by Doc-Agent-B. Integrates T1.7 cymatic-init negative-result lesson into the dynamic variant.
+
+---
+
+## Addendum: Research-Scientist Critique (2026-05-27)
+
+*Reviewer: SciCritic-G3 (elite-research-scientist critic). Critiquing the IDEA, not the implementation (that audit lives at `audits/G3_audit.md`).*
+
+### Prior plausibility (LOW/MED/HIGH + why)
+**LOW.** This is a composition of H21 (hex stencil — already mildly negative on upright CIFAR) with H35 (cymatic init — also negative per the doc's own §11 note: T1.7 negative), plus a novel temporal-modulation mechanism `w_k(t) = w_0,k · cos(ω·t + k·φ)` applied to the hex stencil weights. Composing two negative single priors and then adding a third novel mechanism is unlikely to produce a positive result; the prior probability that the third mechanism rescues the composition is small. The targeted dataset (UCF-101 subset) is also a 16 GB-VRAM-friendly mid-scale video benchmark where the SOTA recipe is dramatically different from the network class proposed here (modern UCF-101 SOTA uses 3D conv + transformer + Kinetics pretraining, not phase-locked hex filters).
+
+### Mechanism scrutiny — does the topology actually buy what the doc claims?
+The §1 mechanism reads as a chain of suggestive analogies: cymatics (Chladni plates) → hex resonance modes → φ-harmonic phases → cortical theta/alpha/gamma rhythms → video classification. Each link is plausible in isolation but the chain breaks at the joints. (a) Chladni patterns are eigenmodes of the wave equation on a PLATE WITH A SPECIFIC BOUNDARY, not generic hex resonance — the modes depend critically on plate shape. (b) "φ-harmonics are the most-irrational frequency ratios (avoiding interference)" is a misuse — irrational frequency ratios produce quasi-periodic, NOT interference-free, signals; they spread power across all frequencies (Berge et al. 1984 'Order within Chaos'). (c) The Sussillo & Abbott 2009 RNN-stability paper (arXiv:0903.4537) is about chaotic neural dynamics in echo-state RNNs, not periodic weight modulation in CNNs; the citation is structurally inapplicable. (d) The mapping to cortical rhythms (theta 4-8 Hz, alpha 8-12 Hz, gamma 30-100 Hz) is post-hoc decoration with no quantitative grounding.
+
+### Confounds (≥2)
+1. **Temporal-axis confound**: `w_k(t)` requires a time axis `t`. For VIDEO data this is well-defined per frame. For CIFAR / IMAGE data there is no time axis — the doc proposes UCF-101 video but the H21 / H35 baselines were image-only. Comparing across these is not "compositional"; it is a different problem entirely.
+2. **Frequency-ω confound**: ω is a free hyperparameter. The doc does not specify how it is chosen — per-channel learned? Fixed? Tied to data sampling rate? Different choices give qualitatively different filters and the +2 pp threshold can be tuned by tuning ω.
+3. **Pretraining baseline confound**: any UCF-101 result without Kinetics pretraining is dramatically below SOTA (~70 % vs ~95 %); the +2 pp improvement claim is over what baseline? On a from-scratch UCF-101, +2 pp is within seed noise; on a Kinetics-pretrained baseline, the hypothesis architecture is not even applicable.
+
+### Numerology / specificity check — does the SPECIFIC polytope matter or would any vertex-transitive graph do?
+The 7-tap hex stencil from H21 inherits all H21 numerology issues. The `cos(ω·t + k·φ)` phase shift uses φ (irrational) but ANY irrational number π, e, √2, √3, √5 has the same "incommensurability" property; φ is not unique among irrationals. The k-indexed phase shift could just as well be `k · π` or `k · e` — there is no a-priori reason to prefer φ.
+
+### Literature precedent — equivariance/GNN literature is huge; place this hypothesis on the map
+Relevant prior art: Hoogeboom et al. 2018 ICML 'HexaConv' (arXiv:1803.02108) for hex; Bai et al. 2020 NeurIPS 'Multiscale Deep Equilibrium Models' (arXiv:2006.08656) for implicit-dynamics filters; Carreira & Zisserman 2017 CVPR 'Quo Vadis, Action Recognition?' (arXiv:1705.07750) for UCF-101 SOTA recipe; Maron et al. 2018 ICLR 'Invariant and equivariant graph networks' for symmetry-priored time-series; Sussillo & Abbott 2009 Neuron 'Generating coherent patterns of activity from chaotic neural networks' (arXiv:0903.4537) — chaotic-RNN paper, only tangentially related. No paper modulates CNN weights with a cosine-of-time term as a learning-time inductive bias; the closest is HyperNetworks (Ha et al. 2017 ICLR 'HyperNetworks' arXiv:1609.09106) which generates weights from a context vector, not from a fixed cosine schedule.
+
+### Expected effect size (90% CI a priori)
+UCF-101 (25-class subset, no pretraining): Δ top-1 vs static-hex baseline ∈ [-2, +1] pp. Falsification of +1.0 pp is very likely. Seed-variance reduction by 15 % is plausible only because oscillating weights can dampen training noise — but at the cost of plateau accuracy.
+
+### Minimum-distinguishing experiment
+**Multi-arm ablation**, 3 seeds, UCF-101 25-class subset, from-scratch training, matched params: (a) static square 3×3 baseline, (b) static hex 7-tap, (c) hex 7-tap with cymatic resonance φ-phase, (d) hex 7-tap with random-phase cos modulation, (e) hex 7-tap with cos modulation at single phase (no per-k φ). If (c) > (d) AND (c) > (e), the φ-specificity holds. Realistic outcome: (a) ≈ (b) > (c) ≈ (d) ≈ (e), or (c)/(d)/(e) all lose to static.
+
+### Verdict
+NUMEROLOGY — combines two already-negative components with a novel cosine-of-time modulation whose mechanistic justification is a chain of broken analogies. The φ-phase choice is non-specific; the dataset (UCF-101 subset, no pretraining) is the wrong testbed for modern action recognition. Recommend dropping or reformulating without the cymatic-rhetoric envelope.

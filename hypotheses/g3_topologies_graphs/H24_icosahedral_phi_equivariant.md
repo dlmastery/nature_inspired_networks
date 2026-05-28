@@ -194,3 +194,35 @@ T1.4 (`sg_only_group`) on upright CIFAR-10 yielded top-1 69.84 % vs the `sg_chan
 ## 12. Status journal
 
 - 2026-05-27 — Created from template by Doc-Agent-B. Integrates T1.4 (C4 proxy max-pool failure) and T2.1 (H58 avg-pool fix in flight) as the direct prerequisite chain.
+
+---
+
+## Addendum: Research-Scientist Critique (2026-05-27)
+
+*Reviewer: SciCritic-G3 (elite-research-scientist critic). Critiquing the IDEA, not the implementation (that audit lives at `audits/G3_audit.md`).*
+
+### Prior plausibility (LOW/MED/HIGH + why)
+**HIGH for the equivariance backbone on spherical / IcoMNIST data; LOW for the Fibonacci channel allocation.** Icosahedral CNNs are well-established (Cohen et al. 2019 ICML 'Gauge equivariant convolutional networks and the icosahedral CNN' arXiv:1902.04615; Weiler & Cesa 2019 NeurIPS 'General E(2)-equivariant steerable CNNs' arXiv:1911.08251). The 2-8 pp gains on Spherical MNIST and climate-pattern segmentation reported by Cohen 2019 are real and the prediction on those datasets is solidly grounded. However, the distinguishing contribution proposed here is the Fibonacci channel allocation {1,1,2,3,5,8} summing to 20, layered on top of the equivariance — and that component is numerology decoupled from the equivariance mechanism.
+
+### Mechanism scrutiny — does the topology actually buy what the doc claims?
+The equivariance buys what Cohen 2019 promised: a finite-group constraint that reduces the hypothesis class to functions equivariant under the I60 / A5 icosahedral group, which generalises better on spherical signals because the data manifold IS the sphere. The avg-pool over orbits is the standard orbit-reduction operator and the H58 lesson (max-pool destroys capacity) is correct — this is also discussed in Cohen & Welling 2016 ICML 'Group Equivariant CNNs' (arXiv:1602.07576). The PROBLEM is the Fibonacci channel allocation. Channels in a G-CNN are partitioned by isotypic component (irreducible representation of the group), and the natural partition for I60 is dictated by the 9 irreducible representations (dim 1, 3, 3', 4, 4', 5, 5', 5'', 6 — total 60). The Fibonacci partition {1,1,2,3,5,8} sums to 20 and has 6 cells, neither of which matches the 9-irrep structure of I60. So the Fibonacci allocation is NOT a representation-theoretic prior; it is a numerological allocation orthogonal to the group structure that the equivariance buys.
+
+### Confounds (≥2)
+1. **Pool-operator confound (already identified in H58)**: T1.4's catastrophic -10.27 pp top-1 was the max-pool bug, not the equivariance prior per se. Fixing pool → avg restores most of the loss. The new claim must isolate "icosahedral equivariance contribution" from "fix the pool bug" contribution.
+2. **Wrong testbed if data is not spherical**: rotated-CIFAR-10 is NOT a spherical signal; it is a planar 2-D signal with a uniformly random in-plane rotation applied. Rotated-CIFAR equivariance is a C∞ (or fine-discretized SO(2)) prior, not I60. e2cnn (Weiler 2019) handles this case directly with SO(2)-steerable convs and is the right comparison; an icosahedral I60-equivariant net is an awkward fit.
+3. **Compute confound**: icosahedral group-conv has 60× the per-forward-pass FLOPs of a planar conv; matched-param does not mean matched-compute. The composite metric must price compute properly.
+
+### Numerology / specificity check — does the SPECIFIC polytope matter or would any vertex-transitive graph do?
+The 60-element icosahedral group IS the largest finite rotation subgroup of SO(3), so for the EQUIVARIANCE part the specific polytope DOES matter (only icosahedral or its dual gives 60 elements with discrete sphere sampling). For the FIBONACCI CHANNEL ALLOCATION it does NOT matter: {1,1,2,3,5,8} = 20 is one of countless partitions; uniform {3,3,3,3,4,4} = 20 is equally defensible, the geometric-{4,4,4,4,4} or representation-theoretic {1,3,3,4,4,5} are more principled.
+
+### Literature precedent — equivariance/GNN literature is huge; place this hypothesis on the map
+Foundational: Cohen et al. 2019 ICML 'Gauge equivariant CNNs and the icosahedral CNN' (arXiv:1902.04615) — direct precedent; Cohen & Welling 2016 ICML 'Group Equivariant CNNs' (arXiv:1602.07576); Weiler & Cesa 2019 NeurIPS 'General E(2)-equivariant steerable CNNs' (arXiv:1911.08251); Maron et al. 2020 ICML 'Learning algebraic multigrid using graph neural networks' for icosahedral mesh refinement (arXiv:2003.05744). The Fibonacci-channel allocation has no precedent in this literature for a reason: channel partitions in G-CNNs are determined by representation theory, not aesthetics.
+
+### Expected effect size (90% CI a priori)
+On Spherical MNIST: Δ ∈ [+2, +6] pp (Cohen 2019 band; falsifier of +3 pp is plausible). On rotated-CIFAR-10: Δ ∈ [-2, +1.5] pp (icosahedral equivariance is the wrong group for in-plane rotation; the +1.5 pp threshold is unlikely). The Fibonacci-channel contribution: Δ ∈ [-0.5, +0.5] pp, indistinguishable from noise.
+
+### Minimum-distinguishing experiment
+**Required ablation**: at fixed icosahedral equivariance and fixed avg-pool, compare three channel-partition schemes: (a) Fibonacci {1,1,2,3,5,8}, (b) uniform {3,3,3,3,4,4}, (c) representation-theoretic {1,3,3,4,4,5}. Run on Spherical MNIST with 3 seeds. If (a) > (c) by > 1 σ, the Fibonacci prior has support. Otherwise the equivariance is doing all the work and Fibonacci is decoration.
+
+### Verdict
+DERIVATIVE+TESTABLE (equivariance backbone — solid prior art) but the Fibonacci channel allocation is NUMEROLOGY orthogonal to the group structure. Recommend re-scoping H24 as "icosahedral CNN on Spherical MNIST (replication of Cohen 2019)" + a separate sub-hypothesis for the Fibonacci channel question with the ablation above.

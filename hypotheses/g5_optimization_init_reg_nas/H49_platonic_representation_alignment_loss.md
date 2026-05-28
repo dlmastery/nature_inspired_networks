@@ -283,3 +283,33 @@ convergence:
 ## 11. Status journal
 
 - 2026-05-27 — Created from template by Doc-Agent-C.
+
+---
+
+## Addendum: Research-Scientist Critique (2026-05-27)
+
+*Reviewer: SciCritic-G5 (elite-research-scientist critic). Critiquing the IDEA, not the implementation (audit at `audits/G5_audit.md`).*
+
+### Prior plausibility (LOW/MED/HIGH + why)
+LOW. The Platonic Representation Hypothesis (Huh, Cheung, Wang, Isola 2024 ICML 'The Platonic Representation Hypothesis' arXiv:2405.07987) is a real and well-cited paper, but its central empirical claim is that representations CONVERGE NATURALLY to a Platonic ideal as scale increases — it is an *observational* hypothesis about what large models DO, not a prescriptive recommendation that we should *force* small models toward a fixed Platonic template via auxiliary loss. Forcing alignment via a CKA loss (Kornblith, Norouzi, Lee, Hinton 2019 ICML 'Similarity of Neural Network Representations Revisited' arXiv:1905.00414) replaces the data-driven natural alignment with a hard-coded template — exactly the opposite of what the PRH paper observes.
+
+### Mechanism scrutiny — does the optimizer/init/reg theory actually predict the claimed effect?
+No, it predicts the opposite. PRH says that *as a function of model + data scale*, representations cluster toward a shared latent geometry. The implication is to scale up, not to add a regularizer. Adding a CKA-alignment loss to a fixed external Platonic target (a) imposes a representation geometry that may not match the dataset's true class manifold, (b) consumes capacity that would otherwise be spent on discriminative features, (c) constrains the model to a *specific* Platonic embedding that PRH itself shows is reached by larger models *without* such forcing. The hypothesis confuses observation with causation.
+
+### Confounds (≥2)
+(1) **CKA's invariance properties.** CKA is invariant to orthogonal rotations and isotropic scaling, so the "target Platonic embedding" is only defined up to those symmetries; the loss has many equivalent minima that may differ on downstream classification. (2) **Loss-weight λ.** Auxiliary-loss strength λ confounds the alignment effect with implicit regularization; a control with CKA-to-random-target at matched λ is needed. (3) **Layer-of-attachment.** Aligning conv-1 vs. fc-1 vs. logits to a Platonic target produces qualitatively different effects.
+
+### Numerology / specificity check
+Numerology by construction. The "Platonic target" must be defined — typically as embeddings from a pretrained large model or a hand-designed symmetric structure. If the target is from a pretrained model, this is just distillation (Hinton, Vinyals, Dean 2015 NIPS-W 'Distilling the Knowledge in a Neural Network' arXiv:1503.02531) wearing Platonic clothes. If the target is hand-designed (e.g., embeddings on a regular simplex), this is a special case of fixed-classifier methods (Hoffer, Hubara, Soudry 2018 NeurIPS 'Fix your classifier: the marginal value of training the last weight layer' arXiv:1809.10180) and the Platonic framing adds nothing.
+
+### Literature precedent — optimization/init is one of the most studied fields in DL
+Distillation (arXiv:1503.02531); CKA (arXiv:1905.00414); fixed-classifier (arXiv:1809.10180); PRH (arXiv:2405.07987); Bansal, Nakkiran, Barak 2021 NeurIPS 'Revisiting Model Stitching to Compare Neural Representations' (arXiv:2106.07682) — none of these prescribe forcing alignment to a fixed Platonic target as a beneficial regularizer.
+
+### Expected effect size (90% CI a priori)
+[-2.5 pp, +0.3 pp] on CIFAR-10 top-1 vs. no-aux-loss baseline. Most likely outcome: small regression from misaligned representational bias.
+
+### Minimum-distinguishing experiment
+Three-way: (i) no aux-loss baseline, (ii) CKA-align-to-Platonic-target at λ ∈ {0.01, 0.1, 1.0}, (iii) CKA-align-to-random-frozen-target at matched λ × 3 seeds CIFAR-10. If (ii) doesn't beat (iii) by ≥ 0.3 pp with non-overlapping CI, the Platonic-specificity is refuted; any positive effect is just generic representational regularization.
+
+### Verdict
+NUMEROLOGY — The PRH paper is descriptive ("representations converge naturally with scale"), not prescriptive ("we should force them via aux loss"). The implementation conflates the two. Recommend either (a) reframing as a distillation study with a defined teacher, or (b) dropping in favor of *measuring* PRH-style convergence at the end of training rather than enforcing it during training.

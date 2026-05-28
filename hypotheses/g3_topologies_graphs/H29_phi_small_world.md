@@ -184,3 +184,35 @@ WikiText-103 at 124 M with `phi_small_world_mask` attention pattern. Train 100 k
 ## 11. Status journal
 
 - 2026-05-27 — Created from template by Doc-Agent-B.
+
+---
+
+## Addendum: Research-Scientist Critique (2026-05-27)
+
+*Reviewer: SciCritic-G3 (elite-research-scientist critic). Critiquing the IDEA, not the implementation (that audit lives at `audits/G3_audit.md`).*
+
+### Prior plausibility (LOW/MED/HIGH + why)
+**VERY LOW — this hypothesis appears to misread the small-world literature.** Watts & Strogatz 1998 Nature 'Collective dynamics of small-world networks' (arXiv:cond-mat/9803197) explicitly identifies the small-world regime as the rewiring-probability window p ∈ [0.001, 0.1], where clustering remains HIGH (close to lattice C) AND path length drops to near-random L. By p = 0.5 the network is essentially random with low clustering — Watts & Strogatz's Figure 2 shows clustering C(p)/C(0) ≈ 0.05 at p = 0.5 (95 % collapse from lattice value) — and by p = 0.618 it is firmly in the Erdős-Rényi regime, NOT the small-world regime. **The doc has the small-world phenomenology backwards: p = 1/φ ≈ 0.618 is OUTSIDE the small-world window, not optimally inside it.** The claim cites Bullmore & Sporns 2009 Nature Reviews Neuroscience 'Complex brain networks' (no arXiv) for "cortical p ≈ 0.5-0.7", but that estimate is the rewiring-equivalent of empirical brain networks; it does not endorse p = 0.5-0.7 as OPTIMAL for downstream tasks, and Watts-Strogatz themselves locate optimal small-world structure at much smaller p.
+
+### Mechanism scrutiny — does the topology actually buy what the doc claims?
+The doc claims "optimal balance of local clustering and path length" at p = 1/φ. This is empirically false on the Watts-Strogatz curve. The actual optimum (high C, low L) is in the well-known kink region around p = 0.01-0.1, which Watts & Strogatz call the "small-world plateau". Setting p = 0.618 destroys clustering (so the network loses local-feature-extraction inductive bias) without further reducing path length (which already plateaued by p ≈ 0.1). The hypothesis is therefore predicting BEST performance at a graph configuration that the small-world literature locates as PESSIMAL (high path length is gone, but so is clustering — the network gains nothing). On Cora/Citeseer/Pubmed node-classification, GNNs benefit from the inherent message-passing locality of the citation graph; rewiring 61.8 % of edges destroys that locality.
+
+### Confounds (≥2)
+1. **Methodology confound**: the doc proposes computing average shortest-path length on a Watts-Strogatz constructed graph as a falsifier metric, but the empirical graphs Cora/Citeseer/Pubmed are NOT Watts-Strogatz graphs — they have their own topology and any rewiring is destructive editing.
+2. **GNN-architecture confound**: modern GNNs (GAT, GraphSAGE, Graph Transformer) learn attention over edges, effectively soft-rewiring; the fixed Watts-Strogatz p is washed out by attention.
+3. **Cora seed variance**: 3-seed median on Cora node-classification has ~1 pp variance; the +0.5 pp threshold is below noise.
+
+### Numerology / specificity check — does the SPECIFIC polytope matter or would any vertex-transitive graph do?
+N/A (no polytope). The substantive numerology is the SPECIFIC value p = 1/φ ≈ 0.618. The doc claims this is "the most-irrational fraction less than 1", but the most-irrational fraction in (0,1) is also a property shared by 1 - 1/φ, by any continued-fraction-best-approximation of irrationals, and the small-world phenomenon is a topological transition that occurs OVER a window of p values — it does not have a knife-edge optimum at any specific irrational. Setting p = 1/φ vs p = 0.5 vs p = 0.7 vs p = 0.6 should give STATISTICALLY INDISTINGUISHABLE results because the underlying transition is continuous and the Watts-Strogatz Figure 2 curve is nearly flat across p ∈ [0.3, 1.0].
+
+### Literature precedent — equivariance/GNN literature is huge; place this hypothesis on the map
+Foundational: Watts & Strogatz 1998 Nature 'Collective dynamics of small-world networks' (arXiv:cond-mat/9803197); Bullmore & Sporns 2009 Nature Reviews Neuroscience 'Complex brain networks: graph theoretical analysis' (no arXiv); Newman 2003 SIAM Review 'The structure and function of complex networks' (arXiv:cond-mat/0303516). GNN-specific: You et al. 2020 ICML 'Design space for graph neural networks' (arXiv:2011.08843) — exhaustive search over GNN design choices including graph rewiring; their finding is that random rewiring at p > 0.3 HURTS node classification. The doc's hypothesis contradicts a well-known empirical regularity in the GNN design-space literature.
+
+### Expected effect size (90% CI a priori)
+Cora / Citeseer / Pubmed node-classification accuracy vs p = 0.1 baseline: Δ ∈ [-3, -0.5] pp. The +0.5 pp falsifier is at the upper edge of the CI but on the WRONG SIDE — falsification likely with a NEGATIVE result, not just null. This is one of the few G3 hypotheses where I expect the data to actively contradict the claim.
+
+### Minimum-distinguishing experiment
+**Watts-Strogatz sweep**, 3 seeds, Cora: p ∈ {0.01, 0.05, 0.1, 0.2, 0.5, 0.618, 0.9}. Plot accuracy vs p. The realistic curve will show monotone decline as p crosses 0.1; p = 0.618 will be measurably WORSE than p = 0.1 (Watts-Strogatz "default plateau" small-world regime). The hypothesis is then falsified by direct empirical measurement.
+
+### Verdict
+NUMEROLOGY + MISUNDERSTANDING-OF-LITERATURE — the small-world regime in Watts-Strogatz is the small-p window (0.001-0.1), not p = 0.618 which lies in the Erdős-Rényi-like random regime; the hypothesis appears to misread the small-world phenomenon. The specific φ-based p has no mechanistic support. Recommend either dropping the hypothesis or repurposing it as an "explicit Watts-Strogatz sweep" with p = 1/φ as ONE of many points on the curve — that turns it into a falsification experiment rather than an optimisation claim.

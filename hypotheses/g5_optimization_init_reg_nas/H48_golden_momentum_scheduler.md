@@ -247,3 +247,33 @@ The schedule should help most under *very short training budgets*:
 ## 11. Status journal
 
 - 2026-05-27 — Created from template by Doc-Agent-C.
+
+---
+
+## Addendum: Research-Scientist Critique (2026-05-27)
+
+*Reviewer: SciCritic-G5 (elite-research-scientist critic). Critiquing the IDEA, not the implementation (audit at `audits/G5_audit.md`).*
+
+### Prior plausibility (LOW/MED/HIGH + why)
+LOW-MED. Momentum scheduling is a known technique (Smith, Topin 2018 arXiv:1708.07120 'Super-Convergence: Very Fast Training of Neural Networks Using Large Learning Rates' — uses linear momentum schedule; Loshchilov & Hutter 2017 ICLR SGDR 'SGDR: Stochastic Gradient Descent with Warm Restarts' arXiv:1608.03983), so the *mechanism* of scheduling β1 over an epoch has prior. The φ-anchoring of the schedule endpoints (β1: 1/φ → 1/φ²) is decorative numerology — the schedule shape's effect is dominated by *endpoints* and *rate*, not by the specific numerical values being golden.
+
+### Mechanism scrutiny — does the optimizer/init/reg theory actually predict the claimed effect?
+Partly. Decaying momentum across epochs (early high-momentum to escape sharp basins, late low-momentum to fine-tune) is well-grounded (Smith 2018 super-convergence). But the *specific* claim that β1 should travel exactly from 0.618 to 0.382 has no theoretical support — Smith's linear schedule goes from 0.95 to 0.85, both well above the φ-range, and works because momentum at 0.382 essentially disables velocity accumulation (effective horizon ≈ 1.6 steps). Setting β1 = 0.382 at end-of-training is operationally close to switching off Adam's momentum, which contradicts both Smith 2018 and the early-vs-late SGD literature.
+
+### Confounds (≥2)
+(1) **End-of-training low-momentum is unusual.** Standard practice keeps momentum constant or *increases* it (LARS 2017 arXiv:1708.03888); decreasing it from 0.618 to 0.382 contradicts standard practice. (2) **β1-β2 interaction.** If used inside Adam, the bias-correction `(1 - β1^t)` term shifts substantially across the schedule, confounding the "momentum effect" with a "bias-correction effect". (3) **3-seed variance.** The reported +0.84 pp CIFAR-100 lead at seed 0 falls within typical 3-seed IQR ranges for this dataset (often 0.5–1.5 pp).
+
+### Numerology / specificity check
+Numerology. The specific golden endpoints `{0.618, 0.382}` collapse on the Adam EMA-horizon analysis to the same broken-Adam regime critiqued in H41; the schedule shape matters but the φ-specific values do not.
+
+### Literature precedent — optimization/init is one of the most studied fields in DL
+Smith & Topin 2018 (arXiv:1708.07120); Loshchilov & Hutter 2017 SGDR (arXiv:1608.03983); Sutskever, Martens, Dahl, Hinton 2013 ICML 'On the importance of initialization and momentum in deep learning'; Wang, Recht 2022 ICML 'Towards Theoretically Understanding Why SGD Generalizes Better Than ADAM in Deep Learning' (arXiv:2010.05627). No precedent finds φ-specific momentum optimal.
+
+### Expected effect size (90% CI a priori)
+[-0.5 pp, +0.5 pp] on CIFAR-10/100 top-1 vs. constant-β1 baseline at iso-budget, with 3-seed-median expected to be indistinguishable from zero.
+
+### Minimum-distinguishing experiment
+Already partly executed. Phase-5 3-seed re-run shows `golden_momentum` min (56.43) < baseline max (56.62), meaning the seed-0 +0.84 pp CIFAR-100 lead does NOT survive at 3 seeds. The doc should now be updated to mark `Implementation status: ✗ refuted at 3-seed CIFAR-100 (lead does not survive seed variance)`. Continuing minimum-distinguishing test: linear-decay 0.9 → 0.5 vs. golden 0.618 → 0.382 vs. constant 0.9 × 5 seeds; if golden ties or loses, refuted.
+
+### Verdict
+DERIVATIVE+TESTABLE+EMPIRICALLY-REFUTED — Momentum scheduling is real; φ-specificity is not. The Phase-5 3-seed result already shows the seed-0 win is within noise, so the hypothesis should be marked as not-supported-at-3-seed and the doc should own this rather than continue claiming +0.84 pp. Recommend reframing as a Smith-2018 super-convergence baseline study without numerological dressing.
