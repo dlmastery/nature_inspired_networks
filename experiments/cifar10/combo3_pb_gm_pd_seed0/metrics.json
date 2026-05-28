@@ -1,0 +1,18 @@
+{
+  "tag": "combo3_pb_gm_pd",
+  "dataset": "cifar10",
+  "seed": 0,
+  "epochs": 12,
+  "top1": 0.8566,
+  "top5": 0.9943,
+  "params": 262078,
+  "flops": 80810722.0,
+  "latency_ms": 3.2487140000012005,
+  "rot_eq_err": 0.8238104855020841,
+  "composite": 0.8600928977080183,
+  "composite_fingerprint": "d65565e9c7b12d14cbce30a801ecc6753aea3eb148074256bfcc051fa61d0893",
+  "epochs_to_target": 11,
+  "train_seconds": 369.86589249999815,
+  "train_top1": 0.8787059294871795,
+  "generalization_gap": 0.022105929487179488
+}
