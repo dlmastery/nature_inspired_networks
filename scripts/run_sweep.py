@@ -293,6 +293,70 @@ def build_matrix(curated: bool = True) -> list[dict]:
                                     flags=base_flags.copy(),
                                     sine_activation=True,
                                     omega_init=1.0)))
+
+    # ---------------------------------------------------------------
+    # COMBO LADDER — additive stack of N orthogonal (non-competing)
+    # priors on top of phi_budget (the only verified single-prior
+    # positive). Each row adds exactly one new orthogonal-axis prior:
+    #   N=2: + golden_momentum   (momentum schedule, trainer callback)
+    #   N=3: + phi_dropout       (regulariser, model-level inject)
+    #   N=4: + phi_decay_wd      (per-layer wd, optimizer)
+    #   N=5: + phi_lr            (LR scheduler)
+    #   N=6: + fib_ensemble      (post-hoc inference averaging)
+    #   N=7: + sine_act          (activation swap; ReLU -> sin(omega*x))
+    #   N=8: + fib_prune         (Fib-epoch magnitude pruning)
+    # Axes are mutually orthogonal (each touches a different layer of
+    # the training stack); they CANNOT compete by construction. This
+    # is the additivity test missing from the original sg_full_fib
+    # ablation (which stacked 6 priors on the SAME _GenericConv
+    # forward path and was catastrophic). Compute: ~8 runs * ~8 min on
+    # the 4090 ~= 65 min, CIFAR-10 seed 0, 12-epoch smoke.
+    # ---------------------------------------------------------------
+    PB = dict(model="phi_budget", phi_model="phi_budget",
+              phi_budget_total=270_000, phi_budget_n_stages=3,
+              phi_budget_mode="phi")  # the verified-winner base
+
+    rows.append(dict(tag="combo2_pb_gm",
+                     overrides=dict(**PB, momentum_schedule="golden")))
+    rows.append(dict(tag="combo3_pb_gm_pd",
+                     overrides=dict(**PB, momentum_schedule="golden",
+                                    dropout="phi_dropout",
+                                    dropout_cycle="fib", dropout_length=5)))
+    rows.append(dict(tag="combo4_pb_gm_pd_pdw",
+                     overrides=dict(**PB, momentum_schedule="golden",
+                                    dropout="phi_dropout",
+                                    dropout_cycle="fib", dropout_length=5,
+                                    phi_decay_wd=True, phi_decay_base=5e-4)))
+    rows.append(dict(tag="combo5_pb_gm_pd_pdw_plr",
+                     overrides=dict(**PB, momentum_schedule="golden",
+                                    dropout="phi_dropout",
+                                    dropout_cycle="fib", dropout_length=5,
+                                    phi_decay_wd=True, phi_decay_base=5e-4,
+                                    scheduler="phi_decay")))
+    rows.append(dict(tag="combo6_pb_gm_pd_pdw_plr_fe",
+                     overrides=dict(**PB, momentum_schedule="golden",
+                                    dropout="phi_dropout",
+                                    dropout_cycle="fib", dropout_length=5,
+                                    phi_decay_wd=True, phi_decay_base=5e-4,
+                                    scheduler="phi_decay",
+                                    fib_ensemble=dict(enabled=True, K=8))))
+    rows.append(dict(tag="combo7_pb_gm_pd_pdw_plr_fe_sa",
+                     overrides=dict(**PB, momentum_schedule="golden",
+                                    dropout="phi_dropout",
+                                    dropout_cycle="fib", dropout_length=5,
+                                    phi_decay_wd=True, phi_decay_base=5e-4,
+                                    scheduler="phi_decay",
+                                    fib_ensemble=dict(enabled=True, K=8),
+                                    sine_activation=True, omega_init=1.0)))
+    rows.append(dict(tag="combo8_pb_gm_pd_pdw_plr_fe_sa_fp",
+                     overrides=dict(**PB, momentum_schedule="golden",
+                                    dropout="phi_dropout",
+                                    dropout_cycle="fib", dropout_length=5,
+                                    phi_decay_wd=True, phi_decay_base=5e-4,
+                                    scheduler="phi_decay",
+                                    fib_ensemble=dict(enabled=True, K=8),
+                                    sine_activation=True, omega_init=1.0,
+                                    prune_schedule="fibonacci", prune_length=5)))
     return rows
 
 
