@@ -151,3 +151,104 @@ but out of scope for v0.
 
 - 2026-05-27 — Implemented + tested (6/6 green) as a standalone G8
   primitive. Hard and soft mask variants both validated.
+
+---
+
+## Addendum: Research-Scientist Critique (2026-05-27)
+
+*Reviewer: SciCritic-G8 (elite-research-scientist critic). Critiquing
+the IDEA, not the implementation (audit at `audits/G8_audit.md`).*
+
+### Prior plausibility (LOW/MED/HIGH + why)
+
+LOW. The isotropy-prior framing is real (Worrall, Garbin,
+Turmukhambetov, Brostow 2017 CVPR 'Harmonic Networks: Deep
+Translation and Rotation Equivariance' (arXiv:1612.04642); Weiler,
+Hamprecht, Storath 2018 CVPR 'Learning Steerable Filters for
+Rotation Equivariant CNNs' (arXiv:1711.07289)), but the Reuleaux
+triangle is a *peculiar* choice — it has C₃ symmetry, not full
+rotational isotropy. A disk-masked kernel has continuous rotational
+symmetry; Reuleaux is *less* isotropic than a disk while removing
+fewer corner taps. Also, the empirical record in this repo's
+existing audit shows H80 already attains 75.95 % vs. 84.78 %
+baseline (−8.8 pp) — a catastrophic confirmed negative.
+
+### Mechanism scrutiny — does the NEUTRAL recast match the cited real technique?
+
+PARTIALLY. Shaped-kernel masking is real (Hoogeboom, Peters, Cohen,
+Welling 2018 'HexaConv' (arXiv:1803.02108) — same masking technique
+for hex). But a Reuleaux triangle has *triangular* symmetry (C₃v),
+which is *more* anisotropic than a square (C₄v) along the rotation
+axis — three-fold beats four-fold for orientation bias. The cited
+Worrall 2017 arXiv:1612.04642 motivates *circular* / steerable
+supports, not Reuleaux. The neutral recast is honest about being a
+"shaped mask" but misnames Reuleaux's symmetry as isotropic.
+
+### Does the esoteric origin contaminate the implementation or framing?
+
+YES. The doc opens with the Reuleaux triangle as a "sacred
+constant-width form". The *constant-width* property is geometric
+(rolls smoothly between parallel lines) but has *no relevance* to
+convolution: a convolution doesn't roll, it convolves. The
+constant-width property is a red herring. The framing is selected
+for sacred-geometry resonance, not engineering need.
+
+### Confounds (≥2)
+
+1. **Capacity loss dominates.** For k=5, the Reuleaux mask covers
+   ~10 of 25 cells, a 60 % reduction in effective kernel capacity
+   (the masked taps have zero contribution at *every* spatial
+   position). The −8.8 pp empirical drop is almost certainly the
+   capacity loss, not isotropy benefit. The doc's §6 row "params
+   [0%, 0%]" is *trainable* params, but *effective* params drop by
+   ~60 %.
+2. **Hex baseline is the better comparand.** HexConv (Hoogeboom
+   2018 arXiv:1803.02108) also masks corners but retains ~75 % of
+   cells with a hexagonal (C₆v) support — strictly more isotropic
+   than Reuleaux's C₃v. The Reuleaux mask is dominated by hex on
+   both axes (isotropy *and* capacity).
+3. **No rotation-test reporting yet.** The falsifier requires a
+   ±15° rotated-test eval, but the smoke row reports only upright
+   accuracy; the isotropy claim is not measured by the
+   experiment.
+
+### Numerology / specificity check
+
+The Reuleaux triangle is one of *infinitely many* curves of
+constant width (Reuleaux polygons of any odd `n`, Reuleaux's
+two-circle curve, the Meissner solids in 3-D, etc.). The
+specificity to the n=3 Reuleaux is not justified by any property of
+CIFAR-10 — it appears because the triangle is the "sacred" Reuleaux
+in popular geometry. A higher-`n` Reuleaux polygon (closer to a
+disk) would be more isotropic.
+
+### Literature precedent — was the neutral recast already known?
+
+YES. Disk/Gaussian/Sobel kernel-masking is decades old; hexagonal
+masking is established (HexaConv arXiv:1803.02108). Steerable
+filters (Weiler 2018 arXiv:1711.07289) and harmonic networks
+(Worrall 2017 arXiv:1612.04642) achieve genuine rotation
+equivariance, not just isotropy. The Reuleaux-masked kernel is
+strictly weaker than each of these.
+
+### Expected effect size (90% CI a priori)
+
+CIFAR-10 12-ep top-1 vs. square baseline: [−10 pp, −4 pp] (the
+empirical record's −8.8 pp falls inside). Top-1 drop under ±15°
+rotation: smaller-than-square by [0 pp, −2 pp] (modest isotropy
+gain, dominated by capacity loss). The doc's predicted [-0.5, +0.5]
+upright Δ has already been falsified.
+
+### Minimum-distinguishing experiment
+
+Three-arm comparison: (a) square k=5, (b) hex-masked k=5, (c)
+Reuleaux-masked k=5. The hypothesis lives only if (c) beats (b) on
+either upright accuracy OR rotation robustness — otherwise it is
+strictly dominated by the established hex mask.
+
+### Verdict
+
+INCONCLUSIVE-NEEDS-DATA — empirically negative on upright CIFAR-10
+(−8.8 pp), and the doc's rotation-robustness claim is still
+unmeasured; if the hex-mask baseline dominates on both axes, the
+verdict moves to DERIVATIVE+REJECTED.

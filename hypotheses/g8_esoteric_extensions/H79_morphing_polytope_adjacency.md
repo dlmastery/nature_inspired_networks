@@ -141,3 +141,109 @@ fixed-adjacency variant.
 ## 11. Status journal
 
 - 2026-05-27 — Created; primitive + 5 unit tests green.
+
+---
+
+## Addendum: Research-Scientist Critique (2026-05-27)
+
+*Reviewer: SciCritic-G8 (elite-research-scientist critic). Critiquing
+the IDEA, not the implementation (audit at `audits/G8_audit.md`).*
+
+### Prior plausibility (LOW/MED/HIGH + why)
+
+LOW. The general idea (learnable adjacency / topology) is real
+(Kipf, Welling 2017 ICLR 'Semi-Supervised Classification with Graph
+Convolutional Networks' (arXiv:1609.02907); Battaglia, Hamrick,
+Bapst 2018 'Relational inductive biases, deep learning, and graph
+networks' (arXiv:1806.01261); Liu, Simonyan, Yang 2019 ICLR 'DARTS:
+Differentiable Architecture Search' (arXiv:1806.09055)). But
+restricting the family to a 1-parameter convex interpolation between
+*exactly* the cuboctahedron and *exactly* the icosahedron is
+hyper-specific with no task-level motivation: CIFAR-10 has no
+12-vertex relational structure to morph between. The plausibility
+collapses once one asks: what about the 12-vertex truncated
+tetrahedron, or the 30-edge dodecahedron, or any other 12-vertex
+graph?
+
+### Mechanism scrutiny — does the NEUTRAL recast match the cited real technique?
+
+PARTIALLY. The GCN propagation (Kipf 2017 arXiv:1609.02907) and
+learnable-adjacency framing (Battaglia 2018 arXiv:1806.01261) are
+faithfully implemented. But the broader literature on learnable
+graph topology (DARTS arXiv:1806.09055; graph attention networks —
+Veličković, Cucurullo, Casanova, Romero, Liò, Bengio 2018 ICLR
+'Graph Attention Networks' (arXiv:1710.10903)) makes the *whole*
+adjacency learnable, not a 1-parameter convex blend between two
+fixed endpoints. The author's recast is a *constrained* learnable
+topology — strictly weaker than the cited literature.
+
+### Does the esoteric origin contaminate the implementation or framing?
+
+YES, decisively. The choice of cuboctahedron ↔ icosahedron is
+entirely the Buckminster Fuller "jitterbug" / "vector equilibrium"
+mystical motif. Without that motif, no rational principle selects
+these two 12-vertex polyhedra out of the dozens of plausible
+candidates. The doc itself opens §1 with "Buckminster Fuller's
+jitterbug" — the engineering motivation *is* the esoteric framing
+in this case.
+
+### Confounds (≥2)
+
+1. **Reshape-to-12 confound.** Reshaping a pooled feature into 12
+   node slots is itself an architectural choice; the relational
+   message passing might help (or hurt) regardless of which two
+   adjacencies are blended. The fair baseline is a 12-node graph
+   with a *learned* full adjacency (n=12, 66 free off-diagonal
+   weights), not a 1-scalar morph.
+2. **Endpoint asymmetry.** Cuboctahedron has 24 edges; icosahedron
+   has 30. A learnable convex blend monotonically increases edge
+   density with `t`, so the "morph" is partially a *density* knob,
+   not a pure topology shift. A density-matched ablation (uniform
+   12-vertex graphs with 24 and 30 edges drawn randomly) is needed.
+3. **Single scalar.** A 1-parameter family cannot reach most
+   12-vertex graphs at all; the optimiser is restricted to a line
+   in graph space, and the line is chosen by mystical motif.
+
+### Numerology / specificity check
+
+The number 12 appears because the cuboctahedron and icosahedron
+share 12 vertices (a coincidence Fuller fetishised). 12 is not
+intrinsic to CIFAR-10 or any image task. The framing privileges
+two polytopes over hundreds of 12-vertex graphs (Petersen graph,
+truncated tetrahedron, snub disphenoid, cubic graphs, etc.) with no
+defensible reason beyond the jitterbug aesthetic. This is the
+clearest numerology case in G8: a *graph-family* prior chosen by
+sacred-geometry coincidence.
+
+### Literature precedent — was the neutral recast already known?
+
+The *generalisation* (learnable graph topology) is heavily explored
+(DARTS arXiv:1806.09055; GAT arXiv:1710.10903; NRI — Kipf, Fetaya,
+Wang, Welling, Zemel 2018 ICML 'Neural Relational Inference for
+Interacting Systems' (arXiv:1802.04687)). The *specific* recast
+(convex blend of two named platonic adjacencies) is not in the
+literature because no one would propose it without the jitterbug
+prior.
+
+### Expected effect size (90% CI a priori)
+
+CIFAR-10 12-ep top-1 vs. fixed cubocta adjacency: [−0.5 pp, +0.1
+pp]. The single scalar cannot meaningfully outperform either
+endpoint on a non-graph-structured task; at best `t` collapses to
+the better endpoint (an outcome the doc concedes is "valid").
+
+### Minimum-distinguishing experiment
+
+Three-arm sweep on a graph-classification benchmark (e.g.
+TUDatasets / MUTAG, or a synthetic 12-node graph task): (a) fixed
+cubocta adjacency, (b) fixed icosa adjacency, (c) morphing. The
+hypothesis lives only if (c) > max(a, b) by ≥ 0.5 pp at 3-seed
+median. CIFAR-10 image classification is the *wrong* benchmark —
+images have no native 12-vertex graph structure.
+
+### Verdict
+
+NUMEROLOGY — the cuboctahedron↔icosahedron-only morph family is
+selected by the jitterbug motif; the general "learnable adjacency"
+prior is real but already known and is a strict superset of this
+1-scalar restriction.

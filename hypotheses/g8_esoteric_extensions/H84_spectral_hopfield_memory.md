@@ -140,3 +140,117 @@ measure perplexity vs. a no-memory baseline.
 ## 11. Status journal
 
 - 2026-05-27 — Created; primitive + 5 unit tests green.
+
+---
+
+## Addendum: Research-Scientist Critique (2026-05-27)
+
+*Reviewer: SciCritic-G8 (elite-research-scientist critic). Critiquing
+the IDEA, not the implementation (audit at `audits/G8_audit.md`).*
+
+### Prior plausibility (LOW/MED/HIGH + why)
+
+LOW. Modern Hopfield networks (Ramsauer, Schäfl, Lehner, Seidl,
+Widrich, Adler, Gruber, Holzleitner, Pavlović, Sandve, Greiff,
+Kreil, Kopp, Klambauer, Brandstetter, Hochreiter 2020 'Hopfield
+Networks is All You Need' (arXiv:2008.02217)) is real — it is
+literally `softmax(β·Xᵀq)X`, mathematically identical to attention
+with X as both keys and values. But applying `rfft` to both query
+and bank *before* the inner product is a *unitary* change of basis
+(rfft is approximately unitary up to a scale; norm-preserving). A
+unitary rotation of both arguments of an inner product *does not
+change the inner product*. So `⟨rfft(q), rfft(xᵢ)⟩ ≈ ⟨q, xᵢ⟩` up
+to a constant, and the retrieval is essentially identical to
+raw-basis modern Hopfield.
+
+### Mechanism scrutiny — does the NEUTRAL recast match the cited real technique?
+
+PARTIALLY. The modern Hopfield core (`softmax(β·Xᵀq)X`) is faithful
+to Ramsauer 2020 (arXiv:2008.02217). But the doc states (§2)
+"`irfft(rfft(x))` round-trip is lossless" — true — but then claims
+this *changes* which patterns win. By Parseval's theorem, for *real*
+signals, `⟨rfft(a), rfft(b)⟩_complex = N·⟨a, b⟩_real` (up to
+conventions). So the softmax score *order* across patterns is
+preserved exactly under rfft when *both* sides are transformed.
+Unless the spectral feature is concatenated as `[real, imag]` and
+*then* something non-isometric happens (e.g. magnitude-only:
+`|rfft|` discards phase, which IS non-unitary), the spectral basis
+contributes nothing beyond raw.
+
+### Does the esoteric origin contaminate the implementation or framing?
+
+YES. The "crystal vibration memory" framing makes "match in FFT
+basis" sound mechanistically distinct from "match in raw basis"
+when, for unitary transforms applied to both sides, the two are
+mathematically equivalent. The framing leads to a literally
+inert (or near-inert) modification being presented as a novel
+prior.
+
+### Confounds (≥2)
+
+1. **Unitary invariance.** The rfft is (up to normalisation)
+   unitary. `⟨Uq, Ux⟩ = ⟨q, x⟩`. Therefore softmax outputs are
+   unchanged. The §6 row "spectral basis helps periodic patterns
+   [+5%]" is mathematically implausible unless implementation
+   detail (real-imag stacking with a non-Hermitian inner product,
+   or magnitude-only) breaks unitarity.
+2. **Stacked real+imag.** The doc says "stacking real+imag →
+   spectral feature". The complex inner product is
+   `Re(⟨a,b⟩) + i·Im(⟨a,b⟩)`; stacking real/imag as a 2N real
+   vector and taking a real dot product equals
+   `Re(⟨a,b⟩_complex)`. So this *is* approximately unitary up to
+   sign conventions; gain remains implausible.
+3. **Bank-buffer non-trainability.** If the bank X is a *buffer*
+   (not learned), the retrieval is content-addressable lookup, not
+   feature learning; the spectral basis affects only retrieval
+   ordering on a fixed bank.
+
+### Numerology / specificity check
+
+The "crystal lattice memory" / "phonon mode" framing is decorative.
+The FFT is the eigenbasis of the discrete Laplacian only on a 1-D
+ring; for higher-D or non-grid features the FFT is not the natural
+eigenbasis. The spectral framing privileges a specific unitary
+transform out of an uncountable family with no task justification.
+
+### Literature precedent — was the neutral recast already known?
+
+YES. Modern Hopfield itself (Ramsauer 2020 arXiv:2008.02217) is the
+literature. Frequency-domain similarity matching is also studied
+(Selesnick, Burrus 1998 IEEE Trans Sig Proc 'Generalized digital
+Butterworth filter design'; many template-matching works use
+correlation in the frequency domain via convolution theorem). Lee-
+Thorp, Ainslie, Eckstein, Ontanon 2022 NAACL 'FNet: Mixing Tokens
+with Fourier Transforms' (arXiv:2105.03824) showed that
+*replacing* attention with FFT mixing performs reasonably — but
+that is a *replacement*, not a unitary reparameterisation of
+similarity scoring.
+
+### Expected effect size (90% CI a priori)
+
+Associative recall accuracy vs. raw-basis Hopfield at matched β:
+[−0.5 %, +0.5 %] — essentially noise, as predicted by the unitary
+argument. The doc's `[−0 %, +5 %]` upper bound is implausible
+unless the implementation introduces a non-unitarity (e.g.,
+magnitude-only retrieval), which would actually *discard*
+phase information.
+
+### Minimum-distinguishing experiment
+
+Three-arm associative recall: (a) raw-basis modern Hopfield, (b)
+spectral-basis with full complex (real+imag stacked) inner product,
+(c) spectral-basis magnitude-only (phase discarded). Predict
+(a) ≈ (b) at machine precision, and (c) materially worse on
+non-periodic patterns. If (b) ≠ (a) by more than 1e-6 in recall
+accuracy, there is an implementation bug in the unitary chain. Add
+a periodic-pattern condition: under matched periodic patterns,
+spectral matching should equal raw matching exactly.
+
+### Verdict
+
+DERIVATIVE+TESTABLE — modern Hopfield (Ramsauer 2020 arXiv:
+2008.02217) with a near-unitary basis change; by Parseval's
+theorem expected to be inert, and the experiment will distinguish
+"actually equivalent" from "implementation introduces magnitude-
+only non-unitarity" — either result is informative but neither is
+a genuinely novel mechanism.

@@ -161,3 +161,104 @@ by a learned `beta`; out of scope for v0, noted for completeness only.
 
 - 2026-05-27 — Implemented + tested (7/7 green) as a standalone G8
   primitive. Runner wiring deferred to lead per task scope.
+
+---
+
+## Addendum: Research-Scientist Critique (2026-05-27)
+
+*Reviewer: SciCritic-G8 (elite-research-scientist critic). Critiquing
+the IDEA, not the implementation (audit at `audits/G8_audit.md`).*
+
+### Prior plausibility (LOW/MED/HIGH + why)
+
+MED. The neutral recast — a learnable convex mixture of two parallel
+group-conv branches differing only in their orbit-reduction operator
+— is a vanilla 2-branch architecture (Xie, Girshick, Dollar, Tu, He
+2017 CVPR 'Aggregated Residual Transformations for Deep Neural
+Networks' (arXiv:1611.05431) — same template). The plausibility is
+capped, however, by the H58 empirical finding *on this very repo*
+that mean-pool C4 attains 65.38% vs. max-pool C4 at 69.84% — a
+~4.5 pp gap. A convex merge has no mechanism to *exceed* the better
+endpoint; at best it ties max (with `beta→1`) at 2× FLOPs.
+
+### Mechanism scrutiny — does the NEUTRAL recast match the cited real technique?
+
+The recast is a strict subset of ResNeXt-style multi-branch
+aggregation (Xie 2017 arXiv:1611.05431) with cardinality=2 and a
+learned mixing scalar. It also reduces, for `beta=1`, exactly to
+existing max-pool group conv (Cohen, Welling 2016 ICML 'Group
+Equivariant Convolutional Networks' (arXiv:1602.07576) — orbit
+pooling). So the technique is real; the question is whether the
+*Merkaba-motivated* β=0.5 init is principled. The author concedes
+the optimum is data-dependent (§1), but the dual-tetrahedra "opposite
+polarity" framing offers no defensible reason to start at the
+midpoint of an empirically asymmetric landscape.
+
+### Does the esoteric origin contaminate the implementation or framing?
+
+YES, mildly — through the β=0.5 init choice. If the author had run
+H58 first (they did) and *still* initialised β at the symmetric
+midpoint rather than `logit(0.85)` (biased toward the known-better
+max path), that is the Merkaba "dual-polarity balance" framing
+leaking into the optimiser's starting point. A data-driven design
+would init β toward the better path and let descent shift it down if
+mean-pool helps locally.
+
+### Confounds (≥2)
+
+1. **Doubled FLOPs.** Path B doubles the conv work of the block; any
+   accuracy parity vs. pure-max conflates the merge benefit with the
+   matched-compute advantage already documented for any 2-branch
+   block (ResNeXt cardinality scaling, Xie 2017 arXiv:1611.05431).
+   The fair baseline is a 2× width pure-max GroupConv2d, not a 1×
+   pure-max baseline.
+2. **Initialisation bias.** β init at 0.5 starts the network at a
+   point H58 already showed is suboptimal. A pure-max baseline
+   begins at the better endpoint; the dual-path must *recover* it,
+   which adds training-trajectory noise.
+3. **Tied weights vs. independent.** The two paths use independent
+   GroupConv2d kernels; the merge benefit could come from kernel
+   ensembling, not from the max/mean complementarity claim.
+
+### Numerology / specificity check
+
+The "dual tetrahedra of opposite polarity" framing is decorative.
+Group-conv orbit reduction has two canonical operators (max, mean);
+a learnable mixture is the obvious generalisation regardless of any
+Merkaba motif. The "12 vertices of a stellated octahedron" or
+similar Merkaba arithmetic does not appear anywhere in the
+mechanism — only the integer 2 (two paths) does, and 2 is not
+specific to the Merkaba.
+
+### Literature precedent — was the neutral recast already known?
+
+YES. Adaptive pooling / mixed-pooling has been studied repeatedly:
+Lee, Gallagher, Tu 2016 AISTATS 'Generalizing Pooling Functions in
+Convolutional Neural Networks: Mixed, Gated, and Tree' (arXiv:
+1509.08985) — *exactly* a learnable convex mixture of max and mean
+pooling, predating the Merkaba framing by a decade. This is not
+novel; it is mixed-pooling applied to a C4 orbit instead of a
+spatial window.
+
+### Expected effect size (90% CI a priori)
+
+CIFAR-10 12-ep top-1 vs. pure-max C4 GroupConv2d: [−0.6 pp, +0.2 pp]
+(re-centred down from the doc's [-0.3, +1.0] because the H58 gap
+makes a positive Δ implausible without per-channel β, and the doubled
+FLOPs do not benefit a single block). Learned β at convergence:
+expected median ≈ 0.85–0.95 (close to pure-max).
+
+### Minimum-distinguishing experiment
+
+Three-arm seed-median 12-ep CIFAR-10: (a) pure-max GroupConv2d at 1×
+width, (b) pure-max GroupConv2d at 2× channels (matched FLOPs), (c)
+the dual-path block at β-init `logit(0.85)`. The hypothesis is
+genuinely live only if (c) > (b) at 3-seed median. If (c) ≤ (b), the
+"merge" is just ResNeXt-style ensembling and the Merkaba framing
+adds nothing.
+
+### Verdict
+
+DERIVATIVE+TESTABLE — mixed-pooling (Lee 2016 arXiv:1509.08985)
+re-applied to C4 orbits; falsifier is sharp and the matched-FLOPs
+control disambiguates the merge claim from ResNeXt cardinality.

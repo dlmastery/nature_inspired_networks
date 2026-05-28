@@ -153,3 +153,111 @@ swapping the GELU/SiLU, with `omega_init=1.0` for stability.
 - 2026-05-27 — Implemented + tested (7/7 green) as a standalone G8
   primitive. Scalar and per-channel ω, learnable and fixed variants
   validated.
+
+---
+
+## Addendum: Research-Scientist Critique (2026-05-27)
+
+*Reviewer: SciCritic-G8 (elite-research-scientist critic). Critiquing
+the IDEA, not the implementation (audit at `audits/G8_audit.md`).*
+
+### Prior plausibility (LOW/MED/HIGH + why)
+
+LOW for classification. SIREN (Sitzmann, Martel, Bergman, Lindell,
+Wetzstein 2020 NeurIPS 'Implicit Neural Representations with
+Periodic Activation Functions' (arXiv:2006.09661)) was *engineered*
+for implicit-representation regression problems (image / SDF / NeRF
+coordinate-to-value mapping), where representing high-frequency
+content of a target *function* is the whole point. Image
+classification is a discriminative task; the target is a class
+label, not a high-frequency signal. The spectral-bias literature
+(Rahaman, Baratin, Arpit, Draxler, Lin, Hamprecht, Bengio, Courville
+2019 ICML 'On the Spectral Bias of Neural Networks' (arXiv:
+1806.08734)) shows ReLU networks bias toward *low-frequency
+generalisation* — which is *helpful*, not harmful, for
+classification. Switching to a high-frequency activation may
+generalise worse, not better.
+
+### Mechanism scrutiny — does the NEUTRAL recast match the cited real technique?
+
+PARTIALLY. The `sin(ω·x)` activation is exactly SIREN's. But SIREN
+requires careful weight initialisation (uniform `[−√(6/fan_in)/ω,
++√(6/fan_in)/ω]`) to keep pre-activations in `[−1, 1]`, and ω₀=30
+on the *first* layer with ω=1 on subsequent layers. The doc's
+`omega_init=1.0` everywhere bypasses the canonical SIREN recipe
+entirely — recovering at best a "near-identity smooth perturbation
+of ReLU" rather than SIREN's actual high-frequency capability. The
+80.62 % empirical result (cited in task prompt) is consistent with
+*underrating* SIREN by using ω=1 throughout: SIREN's ω₀=30 first
+layer is what gives it its frequency reach.
+
+### Does the esoteric origin contaminate the implementation or framing?
+
+PARTIALLY. The "everything is vibration / harmonic" framing leads to
+the choice of `sin` over the equally plausible `cos`, `tanh-of-sine`,
+or `sin²` — none of which would be different empirically but each of
+which has equal "vibration" claim. More importantly, the framing
+elevates sinusoidal activation above more relevant alternatives for
+classification (GELU, SiLU, Mish — Misra 2019 'Mish: A Self
+Regularized Non-Monotonic Activation Function' (arXiv:1908.08681))
+which all outperform ReLU on CIFAR-10 with proper recipes.
+
+### Confounds (≥2)
+
+1. **ω-init choice.** ω=1 makes `sin(x) ≈ x` near origin — the
+   network starts as a near-linear identity perturbation of ReLU,
+   not as a SIREN. The 80.62 % result conflates "sin activation
+   poor for classification" with "ω=1 is the wrong init for
+   SIREN".
+2. **Weight init unchanged.** SIREN's weight init (uniform with ω-
+   dependent scale) is required for the pre-activation
+   distribution to land in `[−1, 1]`. The implementation reuses
+   ReLU-era He init — every forward pass starts in the chaotic
+   regime where `sin` is approximately white noise.
+3. **No optimiser change.** SIREN typically uses Adam with reduced
+   learning rate; standard CIFAR-10 SGD at lr=0.1 likely destroys
+   the sine network within the first epoch via NaN-adjacent
+   activations.
+
+### Numerology / specificity check
+
+Sine is the natural eigenfunction of the Laplacian, so the
+"vibration" framing has *some* mathematical content. But the
+hypothesis does not distinguish sine from cosine, from
+`sin(x)·exp(-x²)` (Gabor), or from `tanh(sin(x))` — all are
+"vibrational". The specificity to `sin(ω·x)` comes from SIREN, not
+from the cymatic motif.
+
+### Literature precedent — was the neutral recast already known?
+
+YES, but in a different task family. SIREN (arXiv:2006.09661) is
+canonical for implicit representations. Periodic activations for
+classification have been tried sporadically (Parascandolo, Huttunen,
+Virtanen 2017 ICLR Workshop 'Taming the Waves: Sine as Activation
+Function in Deep Neural Networks' (https://openreview.net/forum?id=
+Sks3zF9eg)) with consistently modest-to-negative results. So the
+classification-track prior is *known* but with documented poor
+performance.
+
+### Expected effect size (90% CI a priori)
+
+CIFAR-10 12-ep top-1 vs. ReLU baseline: [−6 pp, +0.5 pp] at
+`omega_init=1.0`. With proper SIREN recipe (ω₀=30 stem,
+ω-dependent weight init): [−3 pp, +1 pp]. The 80.62 % observed
+result fits the low-init prediction.
+
+### Minimum-distinguishing experiment
+
+Three-arm sweep: (a) ReLU baseline, (b) sine ω=1 with He init
+(current implementation), (c) sine ω₀=30 stem + SIREN init
+elsewhere. The hypothesis "sine activation helps classification"
+lives only if (c) ≥ (a) at 3-seed median. If (c) < (a) too, sine
+is genuinely unsuited to classification and the SIREN paper's
+implicit-representation scope was the right scope.
+
+### Verdict
+
+DERIVATIVE+TESTABLE — SIREN (arXiv:2006.09661) applied to
+classification with a sub-optimal ω-init that hobbles the prior;
+the proper SIREN-recipe arm is the only experiment that genuinely
+tests the hypothesis.

@@ -166,3 +166,111 @@ batch-first / self-attention case.
 - 2026-05-27 — Implemented + tested (7/7 green) as a standalone G8
   primitive. Added a 1e-3 temperature floor after the unit test caught
   an inf/NaN at extreme negative `tau_raw`; documented in the module.
+
+---
+
+## Addendum: Research-Scientist Critique (2026-05-27)
+
+*Reviewer: SciCritic-G8 (elite-research-scientist critic). Critiquing
+the IDEA, not the implementation (audit at `audits/G8_audit.md`).*
+
+### Prior plausibility (LOW/MED/HIGH + why)
+
+MED-LOW. A learnable per-layer temperature is a 1-parameter
+relaxation of fixed `1/√d` scaling. The hypothesis "per-layer
+optimal temperature differs" is plausible (Lin, Wang, Li, Qiu 2021
+ACL 'A Survey of Transformers' (arXiv:2106.04554) reviews
+attention-sharpness work), but the gain is bounded: the
+scaled-dot-product attention output is already affine in the
+post-softmax distribution, and the *outer* projection W_O can
+absorb a constant per-head scale via gradient descent. The
+1-parameter τ has limited room to outperform a well-tuned outer
+projection that already exists.
+
+### Mechanism scrutiny — does the NEUTRAL recast match the cited real technique?
+
+YES, narrowly. Learnable temperature in softmax is real (Hinton,
+Vinyals, Dean 2015 NIPS Workshop 'Distilling the Knowledge in a
+Neural Network' (arXiv:1503.02531) — temperature distillation;
+Jang, Gu, Poole 2017 ICLR 'Categorical Reparameterization with
+Gumbel-Softmax' (arXiv:1611.01144) — learned temperature for
+sampling). The entmax/sparsemax citations (Martins, Astudillo 2016
+ICML 'From Softmax to Sparsemax' (arXiv:1602.02068); Peters,
+Niculae, Martins 2019 ACL 'Sparse Sequence-to-Sequence Models'
+(arXiv:1905.05702)) are *related* but operate on a *different* axis
+(α-entmax interpolates between softmax and sparsemax via the *α*
+parameter, not a softmax temperature). The doc conflates
+"temperature" with "sparsity" — these are mathematically distinct.
+
+### Does the esoteric origin contaminate the implementation or framing?
+
+PARTIALLY. The "double-slit collapse" framing motivates the
+inference-time `collapse` knob (linear interpolation toward
+argmax) which is *not* a standard idea in the literature.
+Argmax-collapse at inference is just a sharper softmax — already
+achievable with a much smaller τ — so the collapse knob is a
+redundant restatement of "lower τ". The naming inherits the
+double-slit mysticism without adding mechanism.
+
+### Confounds (≥2)
+
+1. **Redundant with W_O scale.** Multi-head attention has output
+   projection W_O which can absorb a per-head constant scalar; if
+   `1/(√d·τ)` is mostly a constant per-head scale, gradient
+   descent already had this freedom. Headline accuracy gains
+   would be hard to attribute to τ specifically.
+2. **Collapse vs. low τ overlap.** Setting `collapse=0.5` at
+   eval is empirically equivalent to halving τ for sharpening. The
+   two knobs measure overlapping effects, not orthogonal ones.
+3. **Init-recovers-baseline.** `τ_init=1.0` reproduces the
+   baseline exactly at step 0, which means the "additional
+   freedom" claim is correct only if τ moves *away from 1.0*
+   during training — the doc's "non-degenerate spread" falsifier
+   correctly captures this, but the doc accepts τ≈1 with a 5 %
+   tolerance, which is a wide noise band for a single scalar.
+
+### Numerology / specificity check
+
+The "double-slit / wave-particle" framing is purely aesthetic.
+Softmax temperature is a smooth continuous knob; calling low τ
+"particle" and high τ "wave" maps mystical vocabulary onto a
+standard hyperparameter. The framing affects only naming, not
+mechanism — but it does motivate the otherwise-redundant `collapse`
+inference knob.
+
+### Literature precedent — was the neutral recast already known?
+
+YES, repeatedly. Hinton 2015 (arXiv:1503.02531) for distillation
+temperature; Jang 2017 (arXiv:1611.01144) for Gumbel-softmax
+temperature; Niculae, Blondel 2017 NeurIPS 'A Regularized Framework
+for Sparse and Structured Neural Attention' (arXiv:1705.07704) for
+attention sharpness; many follow-ups including learned
+attention-temperature in NMT (Chorowski, Jaitly 2017 'Towards better
+decoding and language model integration in sequence to sequence
+models' (arXiv:1612.02695)). Per-layer learnable softmax τ is not
+novel.
+
+### Expected effect size (90% CI a priori)
+
+ViT CIFAR-10 12-ep top-1 vs. fixed-`1/√d`: [−0.3 pp, +0.5 pp].
+Mild positive bias because one extra parameter can rarely hurt, but
+the W_O absorption argument limits ceiling. Small-LM val PPL:
+[−0.05, +0.02] nats. `collapse=1.0` at eval: [−5 pp, +0.2 pp] —
+argmax decoding is brittle and rarely helps continuous
+classification.
+
+### Minimum-distinguishing experiment
+
+Two-arm matched-param: (a) standard MHA with `1/√d` plus learnable
+*per-head W_O scale*, (b) CollapseGatedAttention with τ. The
+hypothesis lives only if (b) > (a) — otherwise τ is just a
+redundant restatement of an output-projection freedom the model
+already has. Per-layer τ scatter plot from (b)'s checkpoint is
+the diagnostic deliverable regardless of accuracy.
+
+### Verdict
+
+DERIVATIVE+TESTABLE — learnable softmax temperature applied to
+attention; well-known (Hinton 2015 arXiv:1503.02531; Niculae 2017
+arXiv:1705.07704). The W_O-scale ablation is the necessary control
+to distinguish the τ contribution from existing model freedom.

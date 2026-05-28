@@ -141,3 +141,108 @@ perplexity and memory vs. dense.
 ## 11. Status journal
 
 - 2026-05-27 — Created; primitive + 5 unit tests green.
+
+---
+
+## Addendum: Research-Scientist Critique (2026-05-27)
+
+*Reviewer: SciCritic-G8 (elite-research-scientist critic). Critiquing
+the IDEA, not the implementation (audit at `audits/G8_audit.md`).*
+
+### Prior plausibility (LOW/MED/HIGH + why)
+
+LOW. The general sparse-attention prior is real (Child, Gray,
+Radford, Sutskever 2019 'Generating Long Sequences with Sparse
+Transformers' (arXiv:1904.10509); Beltagy, Peters, Cohan 2020
+'Longformer: The Long-Document Transformer' (arXiv:2004.05150)).
+But Voronoi/Delaunay tessellation from *random seed points* gives
+a sparsity pattern with no relation to the token semantics. Where
+local-window patterns (Longformer) and content-adaptive patterns
+(Kitaev, Kaiser, Levskaya 2020 ICLR 'Reformer: The Efficient
+Transformer' (arXiv:2001.04451) — LSH attention) have *principled*
+locality, the Voronoi mask is a fixed random planar graph
+masquerading as geometric structure.
+
+### Mechanism scrutiny — does the NEUTRAL recast match the cited real technique?
+
+PARTIALLY. The neutral primitive is "fixed sparse attention mask"
+— faithful to Child 2019 (arXiv:1904.10509). But the *specific*
+sparsity pattern (Delaunay of random seeds) is unmotivated for
+sequence/patch token problems. The cited Longformer
+(arXiv:2004.05150) uses *sliding window + global tokens* with
+proven scaling properties; Voronoi has no such properties. Also,
+the doc's §6 honestly acknowledges the FLOPs row is "future"
+(requires fused kernel) — so the *only* current claim is
+"quality-at-pattern", reducing the hypothesis to "does this random
+planar mask hurt less than dense attention".
+
+### Does the esoteric origin contaminate the implementation or framing?
+
+YES. The "polygonal masonry" / "Inca stones" / "basalt columns"
+framing motivates the Voronoi choice over the literature's
+established sparse patterns (band, BigBird's combination — Zaheer,
+Guruganesh, Dubey, Ainslie, Alberti, Ontanon, Pham, Ravula, Wang,
+Yang, Ahmed 2020 NeurIPS 'Big Bird: Transformers for Longer
+Sequences' (arXiv:2007.14062)). No empirical task motivates a
+Voronoi pattern for image patches or text tokens; the choice is
+purely aesthetic.
+
+### Confounds (≥2)
+
+1. **Seed randomness.** The mask is built from a *random* seed-
+   point set; different seeds give different masks. Any reported
+   result depends on the lucky/unlucky seed draw, requiring
+   mask-seed marginalisation that the current experimental plan
+   does not specify.
+2. **Density vs. structure.** A density-matched random sparse
+   mask (same ≈6N edges, drawn uniformly) is the proper baseline.
+   Without it, any gain over dense conflates "structure helps"
+   with "any sparsity at this density helps".
+3. **No wall-clock win.** The doc concedes (§6, §9) that current
+   FLOPs are dense (mask is applied post-hoc). So the
+   "sub-quadratic cost" claim of §2 is unrealised — the prior is
+   currently *more* expensive than dense (an extra mask
+   multiplication).
+
+### Numerology / specificity check
+
+Voronoi tessellation has a defensible mathematical identity
+(nearest-seed partition) but no defensible link to image patches
+or LM tokens. The "Inca polygonal masonry" framing is decorative.
+The doc lists "epithelial tissue, basalt columns, polygonal
+masonry" — none of which are sequence-modelling priors. The choice
+of Delaunay degree ≈6 is *itself* coincidental; a hex-lattice
+local-window attention would give degree exactly 6 with strictly
+more structure.
+
+### Literature precedent — was the neutral recast already known?
+
+YES, in superset form. Sparse Transformers (arXiv:1904.10509),
+Longformer (arXiv:2004.05150), BigBird (arXiv:2007.14062), LSH
+attention / Reformer (arXiv:2001.04451) all sit in the
+fixed-sparse-attention literature. Voronoi-specific sparse
+attention has not been published, *because nobody had reason to
+propose it*. The neutral primitive is real; the specific pattern
+is novel-but-arbitrary.
+
+### Expected effect size (90% CI a priori)
+
+ViT-Tiny CIFAR-10 12-ep top-1 vs. dense: [−2.5 pp, +0.0 pp].
+Sparse patterns at ≈6N edges (vs. ≈4096 dense edges at N=64) lose
+information without LSH's content-adaptivity to compensate.
+
+### Minimum-distinguishing experiment
+
+Four-arm sweep at matched density (≈6N edges): (a) dense, (b)
+Voronoi-Delaunay (current), (c) hex-lattice local window, (d)
+density-matched random sparse. The hypothesis lives only if (b)
+outperforms both (c) and (d) at 3-seed median — otherwise Voronoi
+adds no structural value over a random mask, and a principled
+local-window pattern dominates it anyway.
+
+### Verdict
+
+DERIVATIVE+TESTABLE — within the Sparse Transformer / Longformer /
+BigBird family with a Voronoi-specific pattern that the literature
+did not propose; sharp falsifier via the density-matched random
+baseline.

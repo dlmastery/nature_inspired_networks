@@ -140,3 +140,102 @@ delta vs. RoPE-only baseline.
 ## 11. Status journal
 
 - 2026-05-27 — Created; primitive + 5 unit tests green.
+
+---
+
+## Addendum: Research-Scientist Critique (2026-05-27)
+
+*Reviewer: SciCritic-G8 (elite-research-scientist critic). Critiquing
+the IDEA, not the implementation (audit at `audits/G8_audit.md`).*
+
+### Prior plausibility (LOW/MED/HIGH + why)
+
+LOW. Patch-token sequences on CIFAR-10 have a 2-D spatial relative
+structure (Δx, Δy), not a 1-D angular periodicity. Indexing the bias
+by `j−i` (a *linearised* token index) imposes a *spurious* angular
+periodicity along a raster-scan order — `j−i = 6` connects a patch
+to the patch six raster steps later, which is geometrically
+arbitrary. The 12-fold "angular phase" assignment to heads is
+imposed on a quantity (`j−i`) that has no angular meaning to begin
+with.
+
+### Mechanism scrutiny — does the NEUTRAL recast match the cited real technique?
+
+Partially. Per-head fixed relative-position bias is standard
+(ALiBi — Press, Smith, Lewis 2022 ICLR 'Train Short, Test Long:
+Attention with Linear Biases Enables Input Length Extrapolation'
+(arXiv:2108.12409) — uses a per-head linear-in-distance bias). The
+Shaw 2018 NAACL 'Self-Attention with Relative Position
+Representations' (arXiv:1803.02155) citation is correct that
+relative biases alter softmax outputs. But the *12-fold sinusoidal*
+phase pattern is not the canonical ALiBi/Shaw choice; canonical
+choices are monotone decay (ALiBi) or learned per-offset embeddings
+(Shaw). The cosine bias is closer to RoPE (Su 2024 Neurocomputing
+'RoFormer: Enhanced Transformer with Rotary Position Embedding'
+(arXiv:2104.09864)) without the Q/K rotation that makes RoPE work.
+
+### Does the esoteric origin contaminate the implementation or framing?
+
+YES. The number 12 has no defensible link to CIFAR-10 patch tokens.
+The doc lists "clock dial, dodecagonal quasicrystal, 12 face-normals
+of the rhombic dodecahedron, kissing number 12 in 3-D" as
+motivation — none of which apply to a 2-D image patch raster. The
+12-fold prior is "Lotus of Life" numerology projected onto a head
+count.
+
+### Confounds (≥2)
+
+1. **`n_heads` constraint.** Forcing `n_heads` to be a multiple of
+   12 is itself an architectural change vs. the canonical ViT-Tiny
+   `n_heads=3`. Any observed gain may be the head-count change, not
+   the bias.
+2. **Raster vs. 2-D.** A genuine angular bias for image patches
+   should be a function of `arctan2(Δy, Δx)` on the 2-D patch grid,
+   not `j−i` on the linearised sequence. The current
+   implementation's "12-fold radial" framing is geometrically
+   incoherent.
+3. **`1/φ` scaling.** The `(1/φ)·cos(...)` bias magnitude is a free
+   parameter masquerading as a constant — a learned scale would
+   absorb it. φ appears for aesthetic reasons, not functional ones.
+
+### Numerology / specificity check
+
+The "12 is the densest integer rosette" claim privileges 12 over 6,
+8, 10, or 16 with no falsifiable test. CIFAR-10's 64 tokens have
+no internal 12-fold structure (`64 mod 12 = 4`). A fair comparison
+sweeping `n_fold ∈ {4, 6, 8, 12, 16}` would expose whether 12 is
+special or whether *any* fold ≥ some threshold suffices. The 12 is
+chosen for "Lotus of Life", not for any property of CIFAR-10
+patches.
+
+### Literature precedent — was the neutral recast already known?
+
+YES. The neutral recast is a sinusoidal relative-position bias —
+essentially a non-rotary variant of RoPE (Su 2024 arXiv:2104.09864)
+or a fixed (non-learned) version of Shaw 2018 (arXiv:1803.02155).
+ALiBi (Press 2022 arXiv:2108.12409) achieves the same parameter-free
+goal with a *monotone* bias and is the established baseline. Adding
+"12-fold" buys nothing the literature has not already explored.
+
+### Expected effect size (90% CI a priori)
+
+ViT-Tiny CIFAR-10 12-ep top-1 vs. `radial=False`: [−1.0 pp, +0.3 pp].
+The slightly negative skew reflects that an imposed periodicity on a
+linearised raster is more likely to confuse than help on
+non-periodic image patches.
+
+### Minimum-distinguishing experiment
+
+Sweep `n_fold ∈ {3, 4, 6, 8, 12, 16}` on ViT-Tiny CIFAR-10. If 12 is
+not a clear peak (i.e. accuracy is monotone or flat in `n_fold`),
+the "12 is special" claim is falsified and the prior reduces to "a
+sinusoidal relative bias", already known. Pair with the canonical
+ALiBi baseline to check whether *any* fixed bias beats *no* fixed
+bias.
+
+### Verdict
+
+NUMEROLOGY — The 12-fold specificity has no defensible link to
+CIFAR-10 patch geometry; the neutral primitive (a fixed sinusoidal
+relative bias) is real but the "12" comes from the Lotus motif, not
+the data.
