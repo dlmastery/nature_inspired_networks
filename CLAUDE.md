@@ -347,11 +347,119 @@ If you change a gate or composite formula here, also open an issue on
 ## 9. The protocol is the deliverable
 
 The model weights are secondary. The artifact pack — manifesto +
-75 hypothesis docs + 7-step protocol entries + dashboards + per-run
-archives + committed history — is what survives. Train fewer, document
-more. Negative results are first-class citizens
-(see `FINDINGS.md`).
+84 hypothesis docs + 7-step protocol entries + dashboards + per-run
+archives + critic audits + sci-critic addenda + committed history — is
+what survives. Train fewer, document more. Negative results are
+first-class citizens (see `FINDINGS.md`).
 
 Every rule above is enforced. There are no exceptions.
 
-*Last updated: 2026-05-27. Rules 1–18 are normative invariants.*
+---
+
+## 10. Rules 20–25 — added 2026-05-27 after the audit campaign
+
+Rules 1–19 were authored before the parallel critic / sci-critic / fixer
+campaign exposed how easy it is for an implementer agent to ship code
+that compiles, passes shape-only tests, and silently doesn't implement
+the hypothesis. Rules 20–25 close those loopholes.
+
+### Rule 20 — Auto-checkpoint loop alongside long background tasks
+ANY background task expected to run > 15 min (GPU sweep, parallel agent
+team, multi-agent dispatch) MUST be paired with a background git
+auto-commit loop that pushes new artifacts every ~10 min, with
+retry-wrapped scoped commits. Stop the loop when the task completes.
+A power outage during a multi-hour sweep must lose at most ONE run.
+See [`skills/autoresearch-auto-checkpoint-loop/`](skills/autoresearch-auto-checkpoint-loop/).
+
+### Rule 21 — Post-fix re-run discipline
+After any Fixer agent patches a hypothesis module (audits identified
+the bug), the affected sweep tag MUST be re-smoked at seed 0 before
+the fix is considered complete. If the patched hypothesis was a
+Phase-4 / Phase-5 graduate (e.g., `phi_budget`), the CIFAR-100 3-seed
+re-run is also mandatory before any external claim is updated. The
+pre-fix vs post-fix number is recorded explicitly in `FINDINGS.md`.
+See [`skills/autoresearch-fixer-campaign/`](skills/autoresearch-fixer-campaign/).
+
+### Rule 22 — Dual-track audit before any external claim
+A hypothesis used in an external claim (FINDINGS headline, paper
+abstract, README badge) MUST pass BOTH:
+- (a) the implementation-critic audit — no MAJOR / BROKEN verdict in
+  `audits/G<X>_audit.md`, AND
+- (b) the sci-critic addendum — verdict ≠ NUMEROLOGY / UNFALSIFIABLE
+  in the design doc's "Addendum: Research-Scientist Critique" section.
+A "winner" with a DERIVATIVE+TESTABLE sci-verdict is permitted; a
+NUMEROLOGY-verdict winner is NOT. See
+[`skills/autoresearch-critic-team/`](skills/autoresearch-critic-team/) and
+[`skills/autoresearch-scicritic-team/`](skills/autoresearch-scicritic-team/).
+
+### Rule 23 — Compound design uses orthogonal axes
+Multi-prior stacks (combo / hybrid hypotheses) stack ONLY priors that
+touch different layers of the training stack (arch / channel /
+momentum / regulariser / weight-decay / LR / activation / ensemble /
+pruning / inference). Stacking more than two priors on the same conv-
+block forward path is forbidden — `sg_full_fib` (−11.54 pp on
+CIFAR-10) is the cautionary tale. The canonical additive test is the
+"combo ladder": N = 2, 3, 4, … rows where each next row adds exactly
+ONE new orthogonal prior. See
+[`skills/autoresearch-combo-ladder/`](skills/autoresearch-combo-ladder/).
+
+### Rule 24 — Dashboard discipline
+- Aggregate dashboard `dashboard/dashboard.html` is sectioned by
+  hypothesis group (Baseline + G1..G8 + Uncategorised) with one-line
+  group descriptions and per-group sortable mini-tables; NOT one big
+  cluttered table.
+- Every leaderboard row links to an INDEPENDENT per-experiment page
+  at `dashboard/experiments/<dataset>__<tag>_seed<N>.html` containing:
+  hypothesis-doc digest, FINDINGS verdict, reasoning blob (if any),
+  config dump, metrics, composite breakdown, per-epoch SVG training
+  curves, cross-references to other seeds + the same tag on the other
+  dataset, run footer with composite fingerprint.
+- Per-experiment pages are byte-identically mirrored to
+  `docs/dashboard/experiments/` for the GitHub Pages live demo at
+  `https://dlmastery.github.io/nature_inspired_networks/`.
+- Row click → navigate to per-experiment page. NO modals.
+See [`skills/autoresearch-per-experiment-page/`](skills/autoresearch-per-experiment-page/).
+
+### Rule 25 — Q&A-test correspondence
+Every test name listed in a design doc's "Verification checklist" /
+"Committee Q&A" block MUST exist in `tests/`. The G3 audit found 3
+hypotheses where promised test names (`test_hex_phi_radial_factor`,
+`test_phi_scaling`, `test_h08_function_preserving_growth`) were
+mentioned in the design doc Q&A but were **absent** from the actual
+test suite — the code never delivered what the doc promised. Treat
+the Q&A as a binding contract: every Q&A test name not in `tests/`
+is a MAJOR audit finding.
+
+### Cumulative checkpoint cadence (reinforcement of Rule 11)
+The auto-checkpoint loop discipline is **mandatory** during any
+multi-hour campaign. "I'll commit at the end of the turn" is a Rule-11
+violation. "I'll squash these later" is a Rule-11 violation. Many
+small retry-wrapped commits beat one big commit. A power outage during
+the project's most expensive sweep — the H08 fixer landed mid-Phase-6
+combo-ladder run — must NEVER lose more than a single training run.
+
+---
+
+## 11. Reusable skills
+
+The `skills/` directory hosts content-agnostic auto-research skills
+(Rule 10). Any future autoresearch project (tabular, medical, FX, …)
+can pick them up unchanged. The current catalogue:
+
+**Original 10 skills** (pre-audit):
+`autoresearch-ablation-sweep` · `autoresearch-checkpoint` ·
+`autoresearch-dashboard` · `autoresearch-dataset-loader` ·
+`autoresearch-experiment` · `autoresearch-experiment-archive` ·
+`autoresearch-idea-scaffold` · `autoresearch-modular-block` ·
+`autoresearch-reasoning-entry` · `autoresearch-topology-metrics`.
+
+**Added 2026-05-27 from this campaign** (audit-aware):
+- [`autoresearch-multi-agent-dispatch`](skills/autoresearch-multi-agent-dispatch/) — parallel agents with disjoint file scopes + retry-wrapped commits + index.lock handling.
+- [`autoresearch-critic-team`](skills/autoresearch-critic-team/) — implementation audit by hypothesis group, output `audits/G<X>_audit.md` with PASS / MINOR / MAJOR / BROKEN verdicts.
+- [`autoresearch-scicritic-team`](skills/autoresearch-scicritic-team/) — research-scientist critique addenda appended directly into design docs, verdict tier NOVEL / DERIVATIVE / NUMEROLOGY / UNFALSIFIABLE / FALSIFIED.
+- [`autoresearch-fixer-campaign`](skills/autoresearch-fixer-campaign/) — patch code + add mechanism-verifying tests + re-run affected sweep rows + pre-fix vs post-fix table.
+- [`autoresearch-combo-ladder`](skills/autoresearch-combo-ladder/) — orthogonal-axis additive 2→N-prior stacking on a verified-winner base.
+- [`autoresearch-per-experiment-page`](skills/autoresearch-per-experiment-page/) — independent comprehensive dashboard page per run, group-sectioned aggregate, GitHub Pages mirror.
+- [`autoresearch-auto-checkpoint-loop`](skills/autoresearch-auto-checkpoint-loop/) — background git auto-commit loop for crash safety alongside long-running sweeps and agent teams.
+
+*Last updated: 2026-05-27. Rules 1–25 are normative invariants.*
