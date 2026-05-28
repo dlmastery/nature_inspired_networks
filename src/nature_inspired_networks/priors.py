@@ -64,11 +64,38 @@ def _round8(x: int) -> int:
 # ---------------------------------------------------------------------------
 # Toroidal padding (Pittorino 2022, TopoCN)
 # ---------------------------------------------------------------------------
-def toroidal_pad(x: torch.Tensor, pad: int) -> torch.Tensor:
-    """Circular padding on the last two spatial dims → torus topology."""
+def toroidal_pad(x: torch.Tensor, pad: int, phi_scaled: bool = False) -> torch.Tensor:
+    """Circular padding on the last two spatial dims → torus topology.
+
+    H22.v2 (post-G3-audit) — when ``phi_scaled=True`` the wrapped values
+    on the four boundary strips are multiplied by ``1/phi`` (≈ 0.618),
+    making the periodic boundary "softer": contributions from across the
+    wrap are damped relative to the interior. This implements the H22
+    doc claim of a phi-scaled periodic boundary while preserving the
+    spatial shape (still ``pad`` pixels of wrap on each side).
+
+    Default ``phi_scaled=False`` reproduces plain circular padding
+    byte-for-byte so the existing T1.6 ``sg_only_toroidal`` row is
+    unchanged.
+    """
     if pad <= 0:
         return x
-    return F.pad(x, (pad, pad, pad, pad), mode="circular")
+    out = F.pad(x, (pad, pad, pad, pad), mode="circular")
+    if not phi_scaled:
+        return out
+    # Damp the four wrapped border strips by 1/phi. The interior region
+    # (the original tensor's content) is left untouched at full unit
+    # weight; only the wrap-padded pixels are attenuated.
+    scale = 1.0 / PHI
+    H, W = out.shape[-2], out.shape[-1]
+    # Avoid aliasing the input tensor — clone so we don't mutate a buffer
+    # that's still referenced upstream.
+    out = out.clone()
+    out[..., :pad, :] = out[..., :pad, :] * scale          # top strip
+    out[..., H - pad:, :] = out[..., H - pad:, :] * scale  # bottom strip
+    out[..., :, :pad] = out[..., :, :pad] * scale          # left strip
+    out[..., :, W - pad:] = out[..., :, W - pad:] * scale  # right strip
+    return out
 
 
 # ---------------------------------------------------------------------------
@@ -102,6 +129,60 @@ def hex_kernel_mask(k: int = 3) -> torch.Tensor:
     return m
 
 
+def hex_phi_radial_mask(k: int = 3) -> torch.Tensor:
+    """Hex mask weighted by phi^{-r}, where r is the hex distance from
+    the centre tap. Center (r=0) is weighted 1.0; nearest-neighbour
+    taps (r=1) are weighted 1/phi (≈ 0.618); the radius-2 ring (r=2,
+    only used when k=5) is weighted 1/phi^2 (≈ 0.382). Taps outside the
+    honeycomb (the corner positions zeroed by ``hex_kernel_mask``)
+    remain exactly zero, so the receptive field shape is unchanged —
+    only the active taps get a phi-radial reweighting.
+
+    For k=3 the mask layout
+        [ 1 1 0 ]
+        [ 1 1 1 ]
+        [ 0 1 1 ]
+    represents the centre + its 6 hex-nearest neighbours; all 6 active
+    non-centre cells are at hex distance 1 by construction (the two
+    zeroed corners are the only cells at hex distance 2). For k=5 we
+    use axial-coordinate distance ``(|q| + |r| + |q+r|) / 2`` to
+    separate the radius-1 ring (6 cells) from the radius-2 ring (12
+    cells).
+
+    This implements the H21 doc claim of ``phi^{-r/r_max}`` weighting
+    on hex-neighbours (Hoogeboom 2018 HexaConv; Kepler-conjecture
+    phi-packing).
+    """
+    m = torch.zeros(k, k)
+    if k == 3:
+        # By construction, every non-centre cell of the 7-tap honeycomb
+        # is a hex-nearest neighbour of the centre. The two cells at
+        # hex distance 2 are precisely the ones zeroed by hex_kernel_mask.
+        keep = hex_kernel_mask(3)
+        inv_phi = float(PHI) ** -1.0
+        for i in range(k):
+            for j in range(k):
+                if keep[i, j].item() == 0.0:
+                    continue
+                if i == 1 and j == 1:
+                    m[i, j] = 1.0
+                else:
+                    m[i, j] = inv_phi
+    elif k == 5:
+        keep = hex_kernel_mask(5)
+        for i in range(k):
+            for j in range(k):
+                if keep[i, j].item() == 0.0:
+                    continue
+                q, r = j - 2, i - 2
+                # axial hex distance: (|q| + |r| + |q+r|) / 2
+                dist = (abs(q) + abs(r) + abs(q + r)) // 2
+                m[i, j] = float(PHI) ** (-float(dist))
+    else:
+        raise ValueError("hex_phi_radial_mask supports k in {3, 5}")
+    return m
+
+
 # ---------------------------------------------------------------------------
 # Cymatic / Chladni wavelet init (cymatic-resonance hypothesis)
 # ---------------------------------------------------------------------------
@@ -116,9 +197,25 @@ def chladni_modes_banded(
     modes.
 
     Returns a tensor of shape (n_modes, k, k) with unit Frobenius norm
-    per mode and pairwise inner-product approximately zero. Promoted from
+    per mode and (for the first ``min(n_modes, k*k)`` slots) pairwise
+    inner-product approximately zero. Promoted from
     ``ideas/35_cymatic_wavelet/implementation.py`` (Code-Y) to the shared
     primitives module per Rule 14.
+
+    Post-G4-audit (H35 fix) — earlier versions tiled the orthonormal
+    block via ``out.repeat(...)`` when ``n_modes > k*k``, silently
+    producing literal-duplicate slices. The new behaviour:
+
+    1. Sample ``n_modes`` raw sin·sin modes from a *deterministic* RNG
+       that prefers unique ``(m, n)`` pairs within ``[lo, hi]^2`` before
+       allowing wrap-around.
+    2. QR-orthonormalise across the first ``min(n_modes, k*k)`` modes —
+       these slots are mutually orthonormal.
+    3. For any remaining slots (``n_modes > k*k``), fall back to the raw
+       sin·sin patterns (unit Frobenius-normalised) drawn from the
+       *unused* portion of the band enumeration. These slots are no
+       longer orthogonal to the QR block — they cannot be, by linear
+       dimension — but they are guaranteed pairwise distinct.
     """
     import random as _random
 
@@ -129,25 +226,52 @@ def chladni_modes_banded(
     ys = torch.linspace(0, math.pi, k + 2)[1:-1]
     X, Y = torch.meshgrid(xs, ys, indexing="ij")
 
+    # Step 1 — deterministic enumeration of (m, n) pairs. Iterate the
+    # full Cartesian band once (in a shuffled order so the seed still
+    # matters); only wrap around if n_modes exceeds the band size.
+    band_pairs = [(m, n) for m in range(lo, hi + 1) for n in range(lo, hi + 1)]
+    rng.shuffle(band_pairs)
+    n_band = len(band_pairs)
+
+    def _pair(i: int) -> tuple[int, int]:
+        # Pull unique pairs until exhausted, then wrap.
+        return band_pairs[i % n_band]
+
     modes: list[torch.Tensor] = []
-    for _ in range(n_modes):
-        m = rng.randint(lo, hi)
-        n = rng.randint(lo, hi)
+    for i in range(n_modes):
+        m, n = _pair(i)
         mode = torch.sin(m * X) * torch.sin(n * Y)
         modes.append(mode)
     stack = torch.stack(modes, dim=0)  # (n_modes, k, k)
 
-    # Gram-Schmidt across the n_modes axis via QR on (k*k, n_modes).
-    flat = stack.reshape(n_modes, -1).t()  # (k*k, n_modes)
-    q, _ = torch.linalg.qr(flat, mode="reduced")  # (k*k, min(n_modes, k*k))
+    # Step 2 — QR-orthonormalise the first min(n_modes, k*k) modes.
     n_keep = min(n_modes, k * k)
+    flat = stack[:n_keep].reshape(n_keep, -1).t()  # (k*k, n_keep)
+    q, _ = torch.linalg.qr(flat, mode="reduced")  # (k*k, n_keep)
     q = q[:, :n_keep]
     out = q.t().reshape(n_keep, k, k)
+
     if n_keep < n_modes:
-        # If we asked for more modes than k*k can support, cycle the
-        # orthonormal columns back through.
-        reps = (n_modes + n_keep - 1) // n_keep
-        out = out.repeat(reps, 1, 1)[:n_modes]
+        # Step 3 — fallback: unique raw sin·sin patterns for the
+        # remaining slots. They are distinct from the QR block because
+        # they retain their (m, n) "fingerprint" before QR's mixing, and
+        # they are distinct from each other because we keep walking the
+        # shuffled enumeration. If n_modes > n_band we DO wrap, but
+        # the wrap is across raw-mode index i — each subsequent wrap
+        # slot is multiplied by a (-1)^j sign factor so even wrapped
+        # copies are bit-distinct from their predecessors.
+        extras: list[torch.Tensor] = []
+        for i in range(n_keep, n_modes):
+            raw = stack[i]
+            norm = raw.norm() + 1e-8
+            raw = raw / norm
+            # Deterministic sign flip per wrap-around so wrapped slots
+            # are anti-symmetric copies (still distinct bit-for-bit).
+            wrap_layer = i // n_band
+            if wrap_layer % 2 == 1:
+                raw = -raw
+            extras.append(raw)
+        out = torch.cat([out, torch.stack(extras, dim=0)], dim=0)
     return out
 
 
@@ -352,6 +476,13 @@ class HexConv2d(nn.Module):
     When ``radius=2`` the constructor overrides the supplied
     ``kernel_size`` and ``padding`` to 5 and 2 so the receptive field
     matches a radius-2 hexagon and the output spatial shape is unchanged.
+
+    H21.v3 (post-G3-audit) — ``phi_radial=True`` replaces the boolean
+    hex mask with a float mask whose active taps are weighted by
+    ``phi^{-r}`` where ``r`` is the axial-hex distance from the centre
+    tap (centre→1.0; nearest-6→1/φ≈0.618; radius-2 ring→1/φ²≈0.382).
+    Default ``False`` preserves the binary-mask behaviour byte-for-byte
+    so existing CIFAR-10 smoke rows are unchanged.
     """
 
     def __init__(
@@ -364,6 +495,7 @@ class HexConv2d(nn.Module):
         toroidal: bool = False,
         bias: bool = False,
         hex_kernel_radius: int = 1,
+        phi_radial: bool = False,
     ) -> None:
         super().__init__()
         assert hex_kernel_radius in {1, 2}, (
@@ -375,6 +507,7 @@ class HexConv2d(nn.Module):
             # symmetric padding so spatial shape is preserved at stride=1
             padding = 2
         self.hex_kernel_radius = hex_kernel_radius
+        self.phi_radial = phi_radial
         self.stride = stride
         self.padding = padding
         self.toroidal = toroidal
@@ -382,7 +515,13 @@ class HexConv2d(nn.Module):
             in_channels, out_channels, kernel_size,
             stride=stride, padding=0, bias=bias,
         )
-        self.register_buffer("mask", hex_kernel_mask(kernel_size))
+        if phi_radial:
+            # Float mask: phi^{-r} on the honeycomb taps, zero elsewhere.
+            # The receptive-field shape is unchanged vs the binary mask;
+            # only the active taps get a phi-radial reweighting.
+            self.register_buffer("mask", hex_phi_radial_mask(kernel_size))
+        else:
+            self.register_buffer("mask", hex_kernel_mask(kernel_size))
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         if self.toroidal:

@@ -125,6 +125,52 @@ def test_n_points_for_validation():
         pass
 
 
+class _DifferentArchNet(nn.Module):
+    """Architecturally different net -- state_dict keys do not overlap
+    with _ToyStagedNet, so loading must fail under strict=True.
+    """
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.conv_a = nn.Conv2d(3, 16, 5, padding=2)
+        self.conv_b = nn.Conv2d(16, 32, 5, padding=2)
+        self.fc_out = nn.Linear(32, 4)
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:  # pragma: no cover
+        return self.fc_out(self.conv_b(self.conv_a(x)).mean(dim=(2, 3)))
+
+
+def test_h59_wrong_arch_checkpoint_raises():
+    """G6 audit fix: a wrong-architecture checkpoint must RAISE (not
+    silently load nothing under strict=False, leaving the model at
+    fresh-init weights).
+    """
+    # Save a DIFFERENT model's state_dict to a temp file.
+    wrong_model = _DifferentArchNet()
+    tmpdir = Path(tempfile.mkdtemp(prefix="h59_wrong_arch_"))
+    ckpt = tmpdir / "best.pt"
+    torch.save({"model_state": wrong_model.state_dict()}, ckpt)
+
+    # Loading into a _ToyStagedNet must RAISE under default strict=True.
+    target = _ToyStagedNet()
+    loader = _make_test_loader()
+    raised = False
+    try:
+        compute_trained_betti(ckpt, target, loader, n_samples=24, device="cpu")
+    except ValueError as exc:
+        msg = str(exc)
+        assert "does not match" in msg, msg
+        raised = True
+    assert raised, "compute_trained_betti must raise ValueError on arch mismatch"
+
+    # With strict=False the call should succeed (escape-hatch contract).
+    target2 = _ToyStagedNet()
+    out = compute_trained_betti(
+        ckpt, target2, loader, n_samples=24, device="cpu", strict=False
+    )
+    assert isinstance(out, dict)
+
+
 if __name__ == "__main__":
     import inspect
 

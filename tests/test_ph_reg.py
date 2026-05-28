@@ -151,6 +151,39 @@ def test_no_capture_yields_zero_loss():
     assert loss.item() == 0.0
 
 
+def test_h54_hooks_lifecycle():
+    """G6 audit fix: explicit hook lifecycle.
+
+    Register hooks, run a forward, confirm non-zero loss.
+    Call remove_hooks(), then forward_loss() MUST RAISE (not silently
+    return 0) so a misconfigured trainer cannot train without the reg.
+    """
+    torch.manual_seed(0)
+    model = _TinyCNN()
+    reg = register_ph_hooks(model)
+    assert len(reg) == 3
+    # Forward => non-zero captured + non-zero forward_loss()
+    x = torch.randn(4, 3, 8, 8)
+    _ = model(x)
+    loss = reg.forward_loss()
+    assert torch.isfinite(loss).item()
+    # remove_hooks (alias for clear_hooks) must fully release the hooks.
+    reg.remove_hooks()
+    assert reg._hooks == []
+    assert reg._n_registered == 0
+    # After removing hooks, forward_loss MUST RAISE (not silently 0).
+    raised = False
+    try:
+        reg.forward_loss()
+    except RuntimeError as exc:
+        assert "PH hooks not registered" in str(exc), str(exc)
+        raised = True
+    assert raised, "forward_loss must raise when no hooks are registered"
+    # Belt-and-braces: a subsequent forward must NOT repopulate state.
+    _ = model(x)
+    assert reg._captured == {}
+
+
 def test_constructor_validates_inputs():
     """Empty stage_targets / mismatched lambdas are rejected."""
     try:

@@ -73,6 +73,7 @@ def compute_trained_betti(
     n_samples: int = 256,
     device: str = "cuda",
     rel_thresh: float = 0.20,
+    strict: bool = True,
 ) -> dict[str, dict[str, list[int] | float]]:
     """Compute per-stage Betti curves on a *trained* checkpoint.
 
@@ -110,6 +111,15 @@ def compute_trained_betti(
     rel_thresh : float, default 0.20
         relative persistence threshold (passed through to
         :func:`betti_curve`).
+    strict : bool, default True
+        if True (the default), the checkpoint's ``state_dict`` MUST
+        match ``model`` exactly -- any missing or unexpected keys
+        raise a ``ValueError`` naming the first few mismatched keys.
+        This prevents the silent failure where a wrong-architecture
+        checkpoint loads via ``strict=False`` and the model is then
+        evaluated at fresh-init weights (which would invalidate every
+        downstream "trained" Betti claim). Set ``strict=False`` only
+        when you explicitly want to tolerate partial matches.
 
     Returns
     -------
@@ -137,7 +147,19 @@ def compute_trained_betti(
             state = raw
     else:
         state = raw
-    model.load_state_dict(state, strict=False)
+    # Capture _IncompatibleKeys so a wrong-architecture checkpoint
+    # cannot silently load nothing and leave the model at fresh-init.
+    incompatible = model.load_state_dict(state, strict=False)
+    if strict and (incompatible.missing_keys or incompatible.unexpected_keys):
+        missing_preview = list(incompatible.missing_keys)[:4]
+        unexpected_preview = list(incompatible.unexpected_keys)[:4]
+        raise ValueError(
+            "state_dict from "
+            f"{ckpt_path} does not match the supplied model: "
+            f"missing_keys[:4]={missing_preview!r}, "
+            f"unexpected_keys[:4]={unexpected_preview!r}. "
+            "Pass strict=False to tolerate partial matches."
+        )
 
     # Step 2 + 3: collect per-stage features.
     feats = collect_features(model, dataloader, device=device, n_points=n_points_for(n_samples))

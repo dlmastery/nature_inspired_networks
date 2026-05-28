@@ -1,29 +1,38 @@
-"""H53 — 2D-3D Icosahedral Unfold Bridge (GICOPix-style).
+"""H53 — 2D-3D Icosahedral Unfold Bridge (lightweight bijection).
 
 Design doc: ``hypotheses/g6_topological_bridging/H53_icosa_unfold_bridge.md``.
 
-The icosahedron has 12 vertices. A planar GICOPix-style unfold flattens
-the 12-vertex point set onto a deterministic 4x3 rectilinear grid so that
-standard 2D ``Conv2d`` weights can be reused on sphere-discretised inputs.
-The permutation is fixed at module-import time -- great-circle traversal
-order -- so two networks built with the same hyperparameters always
-unfold to the same planar layout, which is the property a bridge between
-the 2D and 3D paradigms needs.
+The icosahedron has 12 vertices. This module exposes a *deterministic
+bijection* between the 12-vertex point set and a 4x3 rectilinear grid
+so that standard 2D ``Conv2d`` weights can be reused on icosa-vertex
+inputs. The bijection is fixed at module-import time so two networks
+built with the same hyperparameters always unfold to the same planar
+layout, which is the property a bridge between the 2D and 3D paradigms
+needs.
 
-This is the *lightweight* version of the bridge. It does NOT implement
-the full 5-rhomboid-patch GICOPix scheme (that lives in the planned
-``equiv/gicopix.py`` follow-up); instead the 12 icosa vertices unfold
-to a single 4x3 planar grid that the existing ``Conv2d`` kernels can
-operate on without modification. Suitable as a feature-level bridge
-between an icosa-vertex point set and the planar conv stack.
+Honest scope (audit note). The bijection is built by sorting vertices
+by z-coordinate and slicing into 4 contiguous groups of 3. Because the
+12 icosa vertex z-coordinates are ``{+-1, +-1, +-0.618, +-0.618, 0, 0,
+0, 0}`` -- i.e. an equatorial band of 4 vertices at z=0 -- the slicing
+does NOT recover four geometrically meaningful "latitude bands" or
+preserve great-circle vertex adjacency. The permutation is a valid
+bijection (every icosa vertex appears exactly once in the planar grid)
+and round-trips exactly under ``fold(unfold(x)) == x``; downstream
+``Conv2d`` weight reuse is well-defined. But the planar grid does NOT
+honour icosa edge structure, and callers should treat this layer as a
+deterministic re-shaping bridge rather than a geometric unfold. The
+true GICOPix 5-rhomboid-patch scheme is the planned follow-up in
+``equiv/gicopix.py``.
 
 Public surface
 --------------
-- :func:`icosa_unfold_permutation` -- ``(12,)`` long tensor that maps
-  icosa vertex index -> planar grid index (great-circle order).
+- :func:`icosa_unfold_permutation` -- ``(12,)`` long tensor giving a
+  deterministic bijection from icosa-vertex index to planar grid
+  index. NOT a geometric great-circle traversal; see the audit note
+  above.
 - :class:`IcosaUnfold`             -- ``nn.Module`` that reshapes a
   ``(B, 12, D)`` vertex feature tensor to ``(B, 4, 3, D)`` using the
-  fixed permutation.
+  fixed bijection.
 - :class:`IcosaToPlane`            -- composition of ``IcosaUnfold``
   with a standard ``nn.Conv2d``; lets pretrained 2D conv weights run
   on icosa-vertex features.
@@ -85,22 +94,22 @@ def _icosa_vertex_coords() -> torch.Tensor:
 
 
 def icosa_unfold_permutation() -> torch.Tensor:
-    """Return the ``(12,)`` GICOPix-style unfold permutation.
+    """Return the ``(12,)`` deterministic unfold bijection.
 
-    The permutation walks the 12 icosa vertices in a great-circle order
-    that places vertically adjacent rows of the resulting 4x3 planar
-    grid next to vertices that share an edge on the icosahedron (i.e.,
-    the unfold approximately preserves vertex adjacency). The walk is:
+    Construction. Sort vertex indices by z-coordinate (descending),
+    then slice the sorted index list into 4 contiguous groups of 3 and
+    within each group sort by azimuth ``atan2(y, x)``. The result is a
+    deterministic permutation of ``{0, ..., 11}``.
 
-    - row 0 (top cap)   : the 3 northernmost vertices sorted by azimuth
-    - row 1 (upper band): the 3 next-most-northern vertices
-    - row 2 (lower band): the 3 next-most-southern vertices
-    - row 3 (bottom cap): the 3 southernmost vertices
-
-    Within each row, vertices are sorted by their azimuth angle so the
-    great-circle traversal is continuous. The result is deterministic
-    and bijective -- every icosa vertex appears exactly once in the
-    4x3 = 12-cell planar grid.
+    Honest scope (audit note). This is a BIJECTION, NOT a geometric
+    great-circle traversal. The 12 icosa vertex z-coordinates are
+    ``{+-1, +-1, +-0.618, +-0.618, 0, 0, 0, 0}``: an equatorial band
+    of four vertices at z=0 plus two-vertex bands at z = +-1 and
+    +-0.618. The 4-group slicing therefore mixes vertices from
+    different real latitudes (e.g. group 0 contains one z=1, one z=1
+    and one z=0.618 vertex), so the planar grid does NOT honour icosa
+    edge structure. Downstream callers should treat the layer as a
+    deterministic 12 -> (4, 3) reshape rather than a geometric unfold.
 
     Returns
     -------
@@ -109,16 +118,17 @@ def icosa_unfold_permutation() -> torch.Tensor:
         position ``k`` (flattened row-major across the 4x3 grid).
     """
     coords = _icosa_vertex_coords()
-    # Sort vertices into 4 latitude bands of 3 vertices each. The
-    # z-coordinate is monotone with latitude, so descending z is north-
-    # to-south.
+    # Sort vertex indices by z (descending); then within each contiguous
+    # group of 3, sort by azimuth. The resulting permutation is a pure
+    # bijection -- see docstring audit note about why it is NOT a
+    # latitude-band / great-circle traversal.
     z = coords[:, 2]
     order_by_z = torch.argsort(z, descending=True)
     perm = torch.empty(_N_VERTICES, dtype=torch.long)
     for band in range(_PLANE_H):
         band_idxs = order_by_z[band * _PLANE_W: (band + 1) * _PLANE_W]
-        # within the band, sort by azimuth atan2(y, x) so the traversal
-        # is great-circle-continuous
+        # within the contiguous group, sort by azimuth atan2(y, x) for
+        # determinism (NOT for geometric continuity)
         band_coords = coords[band_idxs]
         azimuth = torch.atan2(band_coords[:, 1], band_coords[:, 0])
         order_within = torch.argsort(azimuth)
@@ -128,7 +138,8 @@ def icosa_unfold_permutation() -> torch.Tensor:
 
 
 class IcosaUnfold(nn.Module):
-    """Flatten a 12-vertex icosa point set to a planar 4x3 grid.
+    """Reshape a 12-vertex icosa point set to a planar 4x3 grid via a
+    deterministic bijection.
 
     Forward signature
     -----------------
@@ -136,9 +147,14 @@ class IcosaUnfold(nn.Module):
 
     The permutation is registered as a non-trainable buffer so it
     survives ``state_dict`` round-trips and moves with the module
-    across devices. Use :meth:`fold` to invert the unfold; calling
+    across devices. Use :meth:`fold` to invert; calling
     ``unfold(fold(y)) == y`` is exact (no interpolation, the unfold
     is a pure permutation).
+
+    Honest scope (audit note). The bijection does NOT preserve icosa
+    edge structure on the planar grid -- see
+    :func:`icosa_unfold_permutation` for details. Treat as a
+    deterministic reshape, not a geometric unfold.
     """
 
     def __init__(self) -> None:

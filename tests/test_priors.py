@@ -19,6 +19,7 @@ from nature_inspired_networks.priors import (  # noqa: E402
     fibonacci_channels,
     golden_angle_phases,
     hex_kernel_mask,
+    hex_phi_radial_mask,
     toroidal_pad,
 )
 
@@ -223,6 +224,81 @@ def test_hex_conv_zero_corners_in_effective_kernel():
         for i in range(eff.shape[1]):
             assert eff[o, i, 0, 2].item() == 0.0
             assert eff[o, i, 2, 0].item() == 0.0
+
+
+def test_h21_phi_radial_factor_weights_nearest_by_inv_phi():
+    """H21 (post-G3-audit) — HexConv2d(phi_radial=True) must replace the
+    boolean hex mask with a float mask whose 6 nearest-neighbour taps are
+    weighted exactly 1/PHI relative to the centre tap.
+    """
+    conv = HexConv2d(3, 8, kernel_size=3, padding=1, toroidal=False, bias=False,
+                     phi_radial=True)
+    mask = conv.mask
+    # Centre tap (1, 1) is weighted 1.0.
+    assert abs(mask[1, 1].item() - 1.0) < 1e-6, mask[1, 1].item()
+    # The 6 nearest-neighbour active taps must each equal 1/PHI exactly.
+    inv_phi = 1.0 / PHI
+    # 7-tap honeycomb on k=3: positions (0,0), (0,1), (1,0), (1,1)=centre,
+    # (1,2), (2,1), (2,2). The 6 non-centre actives are nearest neighbours.
+    neighbours = [(0, 0), (0, 1), (1, 0), (1, 2), (2, 1), (2, 2)]
+    for i, j in neighbours:
+        assert abs(mask[i, j].item() - inv_phi) < 1e-6, (i, j, mask[i, j].item())
+    # The two corner taps (outside the honeycomb) must stay zero.
+    assert mask[0, 2].item() == 0.0
+    assert mask[2, 0].item() == 0.0
+    # And: phi_radial=False (default) must give the binary 7/2-zero mask.
+    plain = HexConv2d(3, 8, kernel_size=3, padding=1).mask
+    assert plain.sum().item() == 7
+    # Verify the standalone hex_phi_radial_mask helper agrees.
+    assert torch.allclose(hex_phi_radial_mask(3), mask, atol=1e-6)
+
+
+def test_h22_phi_scaled_attenuates_wrap():
+    """H22 (post-G3-audit) — toroidal_pad(..., phi_scaled=True) must
+    damp the four wrap-padded boundary strips by 1/PHI relative to plain
+    circular padding. The interior content is unchanged.
+    """
+    x = torch.arange(1, 17, dtype=torch.float32).view(1, 1, 4, 4)
+    plain = toroidal_pad(x, 1, phi_scaled=False)
+    phi = toroidal_pad(x, 1, phi_scaled=True)
+    # Shape: (1, 1, 6, 6) for pad=1.
+    assert plain.shape == (1, 1, 6, 6)
+    assert phi.shape == (1, 1, 6, 6)
+    # Interior region (rows 1..4, cols 1..4) must be IDENTICAL across modes
+    # — it is the unwrapped original tensor and must not be damped.
+    assert torch.allclose(plain[..., 1:5, 1:5], phi[..., 1:5, 1:5])
+    # The wrap-padded strips (top/bottom rows + left/right cols of the
+    # padded tensor) must be exactly 1/PHI times their plain-circular
+    # counterparts.
+    inv_phi = 1.0 / PHI
+    # Top row strip (row 0, cols 1..4) — wrap of bottom of original.
+    assert torch.allclose(phi[..., 0, 1:5], plain[..., 0, 1:5] * inv_phi, atol=1e-6)
+    # Bottom row strip (row 5, cols 1..4) — wrap of top of original.
+    assert torch.allclose(phi[..., 5, 1:5], plain[..., 5, 1:5] * inv_phi, atol=1e-6)
+    # Left col strip (rows 1..4, col 0) — wrap of right of original.
+    assert torch.allclose(phi[..., 1:5, 0], plain[..., 1:5, 0] * inv_phi, atol=1e-6)
+    # Right col strip (rows 1..4, col 5) — wrap of left of original.
+    assert torch.allclose(phi[..., 1:5, 5], plain[..., 1:5, 5] * inv_phi, atol=1e-6)
+    # Default (phi_scaled omitted) reproduces plain circular padding.
+    default = toroidal_pad(x, 1)
+    assert torch.allclose(default, plain)
+
+
+def test_h35_chladni_modes_banded_no_duplicates_when_n_modes_exceeds_ksq():
+    """H35 (post-G4-audit) — chladni_modes_banded(n_modes=32, k=3,
+    band=(2, 5)) used to silently cycle via ``out.repeat(...)``, producing
+    LITERAL duplicates at slot indices >= k*k. The fix guarantees no two
+    output slices are bit-identical, even when n_modes > k*k.
+    """
+    out = chladni_modes_banded(n_modes=32, k=3, band=(2, 5), seed=0)
+    assert out.shape == (32, 3, 3)
+    # Pairwise distinctness — flatten then compare every pair.
+    flat = out.reshape(32, -1)
+    for i in range(32):
+        for j in range(i + 1, 32):
+            assert not torch.equal(flat[i], flat[j]), (
+                f"slices {i} and {j} are bit-identical"
+            )
 
 
 def test_golden_angle_phases_distinct_modulo_2pi():

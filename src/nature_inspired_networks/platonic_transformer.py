@@ -28,9 +28,9 @@ Public surface
 
 References (Citation Rigor)
 ---------------------------
-    Islam, M. and others 2025 (forthcoming) 'Platonic Transformers'
-    -- the reference paper for H55; defines the Platonic-vertex head
-    partitioning we implement.
+    Islam, M. and others 2025 arXiv 'Platonic Transformers: A Solid
+    Choice For Equivariance' (arXiv:2510.03511) -- the reference paper
+    for H55; defines the Platonic-vertex head partitioning we implement.
     Vaswani, Ashish and others 2017 NeurIPS 'Attention Is All You
     Need' (arXiv:1706.03762) -- the original Transformer; vanilla
     baseline.
@@ -38,6 +38,10 @@ References (Citation Rigor)
     Petar 2021 arXiv 'Geometric Deep Learning: Grids, Groups, Graphs,
     Geodesics, and Gauges' (arXiv:2104.13478) -- GDL manifesto;
     theoretical framework for group-equivariant architectures.
+    Shaw, Peter, Uszkoreit, Jakob, Vaswani, Ashish 2018 NAACL 'Self-
+    Attention with Relative Position Representations' (arXiv:1803.02155)
+    -- relative-positional bias precedent that the per-head angular
+    bias generalises with a Platonic-vertex phase per head.
 """
 from __future__ import annotations
 
@@ -57,6 +61,39 @@ _PLATONIC_HEAD_COUNTS = {
     "icosa": 12,  # 12 vertices
     "dodeca": 20, # 20 vertices
 }
+
+
+def _platonic_head_angles(group: str) -> torch.Tensor:
+    """Return ``(n_heads,)`` Platonic-vertex angular phases.
+
+    Each head is assigned an angle in ``[0, 2*pi)`` derived from the
+    azimuth of the corresponding Platonic vertex (``atan2(y, x)``).
+    Because Platonic vertex sets are vertex-transitive, no two heads
+    share the *same* azimuth except in degenerate axis-aligned cases
+    (octa has two vertices at the poles with ``x=y=0``; those get
+    angles 0 and pi from the canonical ``atan2(0, 0)`` and ``atan2(0,
+    -0)`` -- but we offset polar vertices with a deterministic
+    head-index micro-phase so every head gets a distinct angle).
+
+    The angle is what drives the relative-positional bias in
+    :class:`PlatonicAttention`: head ``h``'s bias at relative position
+    ``delta = j - i`` is ``cos(angle_h + 2*pi*delta / N)`` where ``N``
+    is the sequence length. This mirrors the H37 PentagonalAttention
+    pattern with a Platonic-vertex phase per head instead of a 5-fold
+    one.
+    """
+    coords = platonic_vertex_coords(group)            # (n_heads, 3)
+    n_heads = coords.shape[0]
+    # Primary phase = vertex azimuth atan2(y, x). For polar vertices
+    # (x = y = 0) this returns 0; add a deterministic 2*pi*h / n_heads
+    # micro-phase to keep every head's angle distinct so the bias is
+    # genuinely per-head rather than degenerate.
+    azimuth = torch.atan2(coords[:, 1], coords[:, 0])  # (n_heads,)
+    micro = 2.0 * math.pi * torch.arange(n_heads, dtype=torch.float32) / float(n_heads)
+    # Combine: azimuth carries the geometric Platonic signature, micro
+    # breaks any axis-aligned degeneracy. Use a small weight on micro
+    # so the geometric prior dominates when distinct.
+    return azimuth + 0.25 * micro
 
 
 def platonic_vertex_coords(group: str) -> torch.Tensor:
@@ -153,14 +190,30 @@ class PlatonicAttention(nn.Module):
     """Multi-head attention with Platonic-solid head incidence.
 
     Compared to a vanilla ``nn.MultiheadAttention(num_heads=n)``, this
-    layer adds a per-head static *head bias* derived from the dot
-    products of Platonic vertex coordinates. The bias is added to the
-    attention logits, encouraging each head's attention pattern to
-    align with the geometric orbit of its associated vertex.
+    layer adds a per-head *relative-positional* angular bias derived
+    from the Platonic vertex azimuths. The bias at relative position
+    ``delta = j - i`` is
 
-    The bias is the only Platonic-specific machinery in the forward
-    pass; Q/K/V projections are the standard linear maps. This is the
-    minimal pure-torch realisation of the Islam 2025 idea.
+        ``head_bias[h, i, j] = (1 / PHI) * cos(angle_h + 2*pi*delta / N)``
+
+    where ``angle_h`` is head ``h``'s Platonic-vertex angular phase
+    (azimuth of the corresponding Platonic vertex, offset by a small
+    deterministic micro-phase to break axis-aligned degeneracy). The
+    bias is registered as a buffer (non-learnable) so the Platonic
+    symmetry is *structural*, not learned. This mirrors the H37
+    Pentagonal-attention precedent with a Platonic-vertex phase per
+    head instead of a uniform 5-fold one.
+
+    Note. The previous implementation summed ``coords @ coords.T`` and
+    took ``mean(dim=-1)``, which is identically zero for every
+    vertex-transitive Platonic solid (the vertex coordinates sum to
+    the origin). That construction was bit-equivalent to a vanilla
+    MHA -- the relative-positional cosine bias here is the genuine
+    Platonic prior.
+
+    Q/K/V projections remain the standard linear maps; the Platonic-
+    specific machinery is the per-head angular bias added to the
+    pre-softmax logits.
 
     Parameters
     ----------
@@ -192,17 +245,24 @@ class PlatonicAttention(nn.Module):
         self.dropout = nn.Dropout(dropout)
         self.qkv = nn.Linear(d_model, 3 * d_model, bias=False)
         self.out_proj = nn.Linear(d_model, d_model)
-        # Static Platonic head bias: average pairwise dot product of
-        # vertex coordinates. Stored as a (n_heads,) buffer added to
-        # the per-head logit scale.
-        coords = platonic_vertex_coords(group)
-        # Mean of pairwise dot products with the other vertices --
-        # a scalar per head that respects the icosa/dodeca symmetry
-        # orbit (all heads have identical bias when the solid is
-        # vertex-transitive, which is true for every Platonic solid).
-        gram = coords @ coords.t()                # (n_heads, n_heads)
-        bias = gram.mean(dim=-1)                  # (n_heads,)
-        self.register_buffer("head_bias", bias)
+        # Per-head Platonic-vertex angular phase. Used to build a
+        # relative-positional cosine bias at forward time. Registered
+        # as a buffer so it moves with .to(device) and is non-trainable.
+        self.register_buffer("head_angles", _platonic_head_angles(group))
+
+    def _relative_bias(self, N: int, device, dtype) -> torch.Tensor:
+        """Compute the ``(n_heads, N, N)`` relative-positional bias.
+
+        Bias at ``(h, i, j)`` is ``(1 / PHI) * cos(angle_h + 2*pi *
+        (j - i) / N)``. Periodic with period ``N`` so a cyclic shift
+        of the sequence permutes the per-head phase identically across
+        heads -- a discrete rotation-equivariance signature.
+        """
+        idx = torch.arange(N, device=device, dtype=dtype)
+        rel = idx.view(1, N) - idx.view(N, 1)        # (N, N): j - i
+        phase = 2.0 * math.pi * rel / float(N)       # (N, N)
+        angles = self.head_angles.to(device=device, dtype=dtype).view(self.n_heads, 1, 1)
+        return torch.cos(angles + phase.view(1, N, N)) / float(PHI)
 
     def forward(
         self,
@@ -226,8 +286,11 @@ class PlatonicAttention(nn.Module):
         q, k, v = qkv[0], qkv[1], qkv[2]                 # each (B, H, N, d_head)
         scale = 1.0 / math.sqrt(self.d_head)
         logits = (q @ k.transpose(-2, -1)) * scale       # (B, H, N, N)
-        # add static head bias broadcast over the (N, N) block
-        logits = logits + self.head_bias.view(1, self.n_heads, 1, 1)
+        # Per-head relative-positional Platonic angular bias broadcast
+        # over batch. Mathematically non-zero (unlike the previous
+        # gram-mean construction, which collapsed to identically 0).
+        rel_bias = self._relative_bias(N, x.device, x.dtype)  # (H, N, N)
+        logits = logits + rel_bias.unsqueeze(0)
         if attn_mask is not None:
             logits = logits + attn_mask
         attn = self.dropout(F.softmax(logits, dim=-1))

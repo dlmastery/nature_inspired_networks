@@ -8,8 +8,13 @@ import torch
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 
-from nature_inspired_networks.cymatic_hex import CymaticHexConv  # noqa: E402
-from nature_inspired_networks.priors import HexConv2d  # noqa: E402
+import math  # noqa: E402
+
+from nature_inspired_networks.cymatic_hex import (  # noqa: E402
+    CymaticHexConv,
+    _hex_tap_phases,
+)
+from nature_inspired_networks.priors import PHI, HexConv2d  # noqa: E402
 
 
 def test_cymatic_hex_forward_shape():
@@ -22,11 +27,13 @@ def test_cymatic_hex_forward_shape():
     assert torch.isfinite(y).all()
 
 
-def test_t0_reduces_to_static_hex_conv2d():
-    """At t=0 the modulation is cos(0)=1 for every channel, so the
-    block must produce *exactly* the same output as a HexConv2d that
-    shares its weights. We construct the static reference by copying
-    weights out of CymaticHexConv.hex.conv.
+def test_t0_static_gates_match_cos_phases_and_t_drifts_output():
+    """Post-G3-audit semantics: at ``t=0`` the per-tap gate equals
+    ``cos(phase_k)`` (constant across t), so the block produces a
+    DETERMINISTIC fixed-phase reweighting of the static HexConv2d
+    output. We verify the equality holds when we explicitly apply the
+    same per-tap cos(phase) reweighting to a static reference, and that
+    bumping ``t`` away from 0 changes the output.
     """
     torch.manual_seed(0)
     cym = CymaticHexConv(3, 8, kernel_size=3, padding=1, toroidal=False, bias=False)
@@ -36,6 +43,10 @@ def test_t0_reduces_to_static_hex_conv2d():
     ref = HexConv2d(3, 8, kernel_size=3, padding=1, toroidal=False, bias=False)
     with torch.no_grad():
         ref.conv.weight.copy_(cym.hex.conv.weight)
+        # Apply the t=0 per-tap gate ( = cos(phase_k) for active taps )
+        # to the static reference so the two outputs match.
+        gate = torch.cos(cym.tap_phases)
+        ref.conv.weight.mul_(gate.view(1, 1, *gate.shape))
     x = torch.randn(2, 3, 8, 8)
     y_cym = cym(x)
     y_ref = ref(x)
@@ -43,7 +54,7 @@ def test_t0_reduces_to_static_hex_conv2d():
         (y_cym - y_ref).abs().max().item()
     )
 
-    # And: bumping t away from 0 must change the output.
+    # Bumping t away from 0 must change the output.
     with torch.no_grad():
         cym.t.fill_(0.5)
     y_cym_t = cym(x)
@@ -85,28 +96,65 @@ def test_hex_corner_mask_preserved_in_effective_kernel():
     with torch.no_grad():
         cym.t.fill_(0.5)
         cym.omega.fill_(2.0)
-    mod = cym._modulation()  # (8,)
-    eff = cym.hex.conv.weight * cym.hex.mask * mod.view(-1, 1, 1, 1)
+    gate = cym._modulation()  # (k, k)
+    eff = cym.hex.conv.weight * cym.hex.mask * gate
     for o in range(eff.shape[0]):
         for i in range(eff.shape[1]):
             assert eff[o, i, 0, 2].abs().item() == 0.0, (o, i)
             assert eff[o, i, 2, 0].abs().item() == 0.0, (o, i)
 
 
-def test_per_channel_phi_spacing_distinct_modulation():
-    """At non-zero t, the per-channel modulation cos(omega*t + phi*c*t)
-    must produce distinct values across channels (PHI is irrational, so
-    consecutive channels see distinct phases).
+def test_per_tap_phi_spacing_distinct_active_modulation():
+    """Post-G3-audit: per-tap (not per-channel) modulation must produce
+    distinct values across the active hex taps when t != 0.
     """
     cym = CymaticHexConv(3, 6, kernel_size=3, padding=1, bias=False)
     with torch.no_grad():
         cym.t.fill_(1.0)
         cym.omega.fill_(0.5)
-    mod = cym._modulation()
-    assert mod.shape == (6,)
-    # No two consecutive channels should have identical modulation.
-    diffs = (mod[1:] - mod[:-1]).abs()
-    assert (diffs > 1e-6).all(), mod
+    gate = cym._modulation()  # (3, 3)
+    assert gate.shape == (3, 3)
+    # The 7 active taps should have all-distinct gate values (PHI is
+    # irrational so the golden-angle-spaced cos values are distinct).
+    active_mask = (cym.hex.mask != 0)
+    active_vals = gate[active_mask].tolist()
+    assert len(active_vals) == 7
+    for i in range(len(active_vals)):
+        for j in range(i + 1, len(active_vals)):
+            assert abs(active_vals[i] - active_vals[j]) > 1e-6, (
+                i, j, active_vals
+            )
+
+
+def test_h28_per_tap_phases_are_golden_angle_spaced():
+    """H28 (post-G3-audit) — adjacent active-tap phases differ by
+    exactly ``2 * pi * PHI / T`` where T is the number of active taps
+    (7 for radius=1, 19 for radius=2).
+    """
+    # Radius=1: T=7.
+    cym1 = CymaticHexConv(3, 8, kernel_size=3, padding=1, bias=False)
+    assert cym1.n_active_taps == 7
+    active_mask = (cym1.hex.mask != 0)
+    active_phases = cym1.tap_phases[active_mask].tolist()
+    expected_step = 2.0 * math.pi * PHI / 7.0
+    # The first three active taps' phases (in row-major scan) must be
+    # 0, expected_step, 2*expected_step.
+    assert abs(active_phases[0] - 0.0) < 1e-6, active_phases[0]
+    assert abs(active_phases[1] - expected_step) < 1e-6, (
+        active_phases[1], expected_step
+    )
+    assert abs(active_phases[2] - 2.0 * expected_step) < 1e-6, (
+        active_phases[2], expected_step
+    )
+    # Radius=2: T=19.
+    cym2 = CymaticHexConv(3, 8, hex_kernel_radius=2, padding=1, bias=False)
+    assert cym2.n_active_taps == 19
+    active_mask2 = (cym2.hex.mask != 0)
+    active_phases2 = cym2.tap_phases[active_mask2].tolist()
+    expected_step2 = 2.0 * math.pi * PHI / 19.0
+    assert abs(active_phases2[0] - 0.0) < 1e-6
+    assert abs(active_phases2[1] - expected_step2) < 1e-6
+    assert abs(active_phases2[2] - 2.0 * expected_step2) < 1e-6
 
 
 def test_radius2_19tap_mask_path_works():

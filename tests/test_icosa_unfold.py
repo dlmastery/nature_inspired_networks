@@ -82,6 +82,41 @@ def test_icosa_to_plane_param_count_matches_conv2d():
     assert n_params == n_ref, f"got {n_params}, expected {n_ref}"
 
 
+def test_h53_unfold_bijective_no_geometric_claim():
+    """G6 audit fix: the unfold is a bijection but does NOT make a
+    great-circle / latitude-band adjacency claim. Asserts the
+    bijection contract AND that the docstring no longer advertises
+    the false geometric claim (post-audit honesty).
+    """
+    perm = icosa_unfold_permutation()
+    # Bijection: permutation length 12, every index 0..11 exactly once.
+    assert perm.shape == (12,), perm.shape
+    sorted_perm, _ = torch.sort(perm)
+    assert torch.equal(sorted_perm, torch.arange(12)), (
+        f"permutation must be bijective: {perm.tolist()}"
+    )
+    # Audit-honesty: docstrings on the module + the function + the
+    # IcosaUnfold class must no longer claim "great-circle adjacency"
+    # or "latitude bands" (or equivalent geometric-preservation claims).
+    import nature_inspired_networks.icosa_unfold as mod
+
+    forbidden_phrases = (
+        "great-circle traversal order",
+        "approximately preserves vertex adjacency",
+        "great-circle traversal is continuous",
+    )
+    haystacks = (
+        mod.__doc__ or "",
+        icosa_unfold_permutation.__doc__ or "",
+        IcosaUnfold.__doc__ or "",
+    )
+    for hay in haystacks:
+        for phrase in forbidden_phrases:
+            assert phrase not in hay, (
+                f"docstring still advertises false geometric claim: {phrase!r}"
+            )
+
+
 if __name__ == "__main__":
     import inspect
 

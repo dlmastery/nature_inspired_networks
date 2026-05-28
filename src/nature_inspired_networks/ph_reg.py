@@ -168,9 +168,45 @@ class PHActivationRegularizer(nn.Module):
         self._n_registered = 0
         self._captured.clear()
 
+    def remove_hooks(self) -> None:
+        """Alias for :meth:`clear_hooks` -- explicit lifecycle name.
+
+        Use this when you want to release the hooks (e.g. between
+        training phases or at trainer-shutdown) without ambiguity
+        about whether the activation buffer is also cleared. This is
+        the canonical lifecycle method; ``clear_hooks`` is kept as a
+        back-compat alias.
+        """
+        self.clear_hooks()
+
     def clear(self) -> None:
         """Drop captured activations (call after each training step)."""
         self._captured.clear()
+
+    def __del__(self) -> None:  # pragma: no cover - safety net
+        # Safety net: ensure hooks don't outlive the regularizer if a
+        # caller forgets to call ``remove_hooks``. Wrap in try/except
+        # because the interpreter may have torn down ``self._hooks``
+        # already by the time the finaliser runs.
+        try:
+            self.remove_hooks()
+        except Exception:
+            pass
+
+    def forward_loss(self) -> torch.Tensor:
+        """Compute the auxiliary loss with explicit error on no hooks.
+
+        Unlike :meth:`loss`, this method RAISES if hooks have not been
+        registered (rather than silently returning a zero scalar). Use
+        this when you want to fail loudly on a misconfigured trainer
+        that forgot to call :func:`register_ph_hooks` before stepping.
+        """
+        if self._n_registered == 0:
+            raise RuntimeError(
+                "PH hooks not registered -- call register_ph_hooks first "
+                "(or PHActivationRegularizer.register on this regularizer)"
+            )
+        return self.loss()
 
     # ------------------------------------------------------------------
     # Loss
