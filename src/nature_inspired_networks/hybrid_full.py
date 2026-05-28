@@ -55,6 +55,12 @@ from .hybrid_cymatic_qkv import cymatic_init_linear_
 from .hybrid_liquid_jepa import LiquidCFCCell
 from .priors import PHI
 
+# Marker on the Fibottention.qkv linear -- set by ``cymatic_init_linear_``
+# below so ``which_priors_active`` can introspect whether the cymatic init
+# actually fired (rather than relying on a constructor-time hardcoded
+# boolean). See the G7 audit (H67 finding #3).
+_CYMATIC_QKV_FLAG = "_h67_cymatic_init_applied"
+
 
 __all__ = ["FullParadigmHybrid"]
 
@@ -167,6 +173,9 @@ class FullParadigmHybrid(nn.Module):
         self.attention = Fibottention(dim=width, n_heads=n_heads)
         # ---- 5: cymatic-init QKV ----
         cymatic_init_linear_(self.attention.qkv, band=(2, 5), orthonormalize=True)
+        # Tag the qkv module so ``which_priors_active`` can verify the
+        # init actually fired (G7 audit fix -- avoids hardcoded True).
+        setattr(self.attention.qkv, _CYMATIC_QKV_FLAG, True)
         # ---- 6: Golden RoPE (or sinusoidal fallback) ----
         if _HAVE_GOLDEN_ROPE:
             try:
@@ -179,9 +188,13 @@ class FullParadigmHybrid(nn.Module):
             self.pe = _SinusoidalPE(dim=width)
             self._pe_kind = "sinusoidal_fallback"
         # ---- 3: Platonic graph (or skip-connection no-op) ----
+        # H67 (G7-audit fix): MetatronGraphLayer takes ``(in_dim, out_dim)``;
+        # passing a single positional argument used to raise TypeError and
+        # silently collapse to ``nn.Identity`` via the except-Exception
+        # block. We now construct it with the correct two-arg signature.
         if _HAVE_METATRON:
             try:
-                self.platonic = MetatronGraphLayer(width)  # type: ignore[misc]
+                self.platonic = MetatronGraphLayer(in_dim=width, out_dim=width)  # type: ignore[misc]
                 self._platonic_kind = "metatron"
             except Exception:
                 self.platonic = nn.Identity()
@@ -190,38 +203,98 @@ class FullParadigmHybrid(nn.Module):
             self.platonic = nn.Identity()
             self._platonic_kind = "identity_fallback"
         # ---- 4: Liquid CFC latent ----
+        # The CFC is genuinely recurrent: rather than collapsing it to a
+        # single h=None step, we persist hidden state across forward calls
+        # via a (non-persistent) buffer.  The first forward initialises
+        # the state from zeros; subsequent calls use the running state.
         self.cfc = LiquidCFCCell(d_in=width, d_hid=width)
+        # Per-batch CFC unroll length: the pooled feature vector is fed
+        # to the CFC for ``cfc_steps`` iterations so the recurrence is
+        # genuinely exercised (otherwise a single step collapses to an
+        # affine + nonlinearity -- G7 audit finding #4).
+        self.cfc_steps = 3
         # Classifier head
         self.head = nn.Linear(width, n_classes)
+        # Persistent CFC carry-state (single-row across batches; resets
+        # whenever batch size changes). Lives in a buffer so .to(device)
+        # carries it along automatically.
+        self.register_buffer(
+            "_cfc_h", torch.zeros(0, width), persistent=False
+        )
 
     @property
     def which_priors_active(self) -> dict:
-        """Boolean activation flags for each of the six load-bearing priors."""
+        """Boolean activation flags for each of the six load-bearing priors.
+
+        Each flag is computed by actually walking ``self.modules()`` (or
+        inspecting the relevant tagged buffer / attribute) rather than
+        returning a hardcoded ``True``. This is the G7-audit fix: prior
+        attestations must be falsifiable.
+        """
+        has_npb = any(isinstance(m, NaturePriorBlock) for m in self.modules())
+        has_fib = any(isinstance(m, Fibottention) for m in self.modules())
+        has_cfc = any(isinstance(m, LiquidCFCCell) for m in self.modules())
+        # Cymatic QKV: was the marker set during construction?
+        has_cymatic = bool(
+            getattr(self.attention.qkv, _CYMATIC_QKV_FLAG, False)
+        )
+        # Golden RoPE: only true when the optional GoldenRoPE class
+        # is present AND was actually instantiated (not a fallback).
+        if _HAVE_GOLDEN_ROPE and GoldenRoPE is not None:
+            has_grope = isinstance(self.pe, GoldenRoPE)
+        else:
+            has_grope = False
+        # Platonic graph: a real MetatronGraphLayer instance (not
+        # ``nn.Identity``).
+        if _HAVE_METATRON and MetatronGraphLayer is not None:
+            has_platonic = isinstance(self.platonic, MetatronGraphLayer)
+        else:
+            has_platonic = False
         return {
-            "nature_prior_blocks": True,
-            "fibottention_attention": True,
-            "cymatic_qkv_init": True,
-            "liquid_cfc": True,
-            "golden_rope": self._pe_kind == "golden_rope",
-            "platonic_graph": self._platonic_kind == "metatron",
+            "nature_prior_blocks": has_npb,
+            "fibottention_attention": has_fib,
+            "cymatic_qkv_init": has_cymatic,
+            "liquid_cfc": has_cfc,
+            "golden_rope": has_grope,
+            "platonic_graph": has_platonic,
         }
 
     # ------------------------------------------------------------------
     def _apply_platonic(self, tokens: torch.Tensor) -> torch.Tensor:
         """Run the (optional) Platonic graph layer on a token sequence.
 
-        ``tokens`` is shape ``(B, N, D)``. The MetatronGraphLayer (when
-        available) expects a fixed 13-node graph; if N doesn't match we
-        skip the platonic layer and pass tokens through unchanged.
+        ``tokens`` is shape ``(B, N, D)``. The MetatronGraphLayer expects
+        a fixed 13-node graph. We pool the N tokens into 13 group nodes
+        (via adaptive-mean across contiguous windows), apply the Metatron
+        graph layer, then broadcast the per-node delta back to all
+        tokens in the group and add it as a residual. This guarantees
+        the platonic layer's parameters genuinely participate in the
+        forward pass (G7-audit fix: not silently swapped for Identity).
         """
         if self._platonic_kind != "metatron":
             return tokens
-        # Try to apply; if the platonic layer can't be applied at this
-        # token count (e.g., shape mismatch) fall back silently.
+        B, N, D = tokens.shape
+        # Adaptive-mean-pool the N tokens into 13 nodes (handles any N>=1).
+        # F.adaptive_avg_pool1d wants (B, D, N); we then transpose back.
         try:
-            return self.platonic(tokens)
+            pooled = F.adaptive_avg_pool1d(
+                tokens.transpose(1, 2), output_size=13
+            ).transpose(1, 2)  # (B, 13, D)
+            graph_out = self.platonic(pooled)  # (B, 13, D)
+            # Broadcast each of the 13 nodes back across its source-token
+            # group by reversing the adaptive pool with a nearest-grid
+            # repeat. Use index mapping so non-divisible N still works.
+            idx = torch.linspace(0, 12, steps=N, device=tokens.device)
+            idx = idx.round().clamp(0, 12).long()
+            scatter = graph_out[:, idx, :]  # (B, N, D)
+            return tokens + scatter
         except Exception:
             return tokens
+
+    def reset_cfc_state(self) -> None:
+        """Zero out the persistent CFC hidden state (e.g., between epochs)."""
+        if self._cfc_h.numel() > 0:
+            self._cfc_h = torch.zeros_like(self._cfc_h)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         # 1) CNN encoder.
@@ -239,6 +312,19 @@ class FullParadigmHybrid(nn.Module):
         tokens = self._apply_platonic(tokens)
         # Pool → vector.
         z = tokens.mean(dim=1)
-        # 4) Liquid CFC integrator.
-        h_state = self.cfc(z, None)
+        # 4) Liquid CFC integrator -- genuinely recurrent.
+        #    (a) Re-initialise the carry-state if the batch size changed
+        #        or no state exists yet. Detach so the carry doesn't grow
+        #        a graph across forward calls (the recurrence within a
+        #        forward call is still differentiable).
+        if self._cfc_h.shape != (B, self.cfc.d_hid):
+            h_state = z.new_zeros((B, self.cfc.d_hid))
+        else:
+            h_state = self._cfc_h.detach().to(device=z.device, dtype=z.dtype)
+        #    (b) Unroll the CFC for ``cfc_steps`` iterations so the
+        #        recurrence is actually exercised (G7-audit fix).
+        for _ in range(int(self.cfc_steps)):
+            h_state = self.cfc(z, h_state)
+        # Persist the final state for the next forward call.
+        self._cfc_h = h_state.detach()
         return self.head(h_state)

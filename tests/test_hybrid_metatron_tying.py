@@ -42,11 +42,69 @@ def test_tied_conv_alphas_init_uniform():
     assert torch.allclose(conv.alphas, torch.full((13,), 1.0 / 13.0), atol=1e-6)
 
 
-def test_tied_conv_effective_weight_scales_with_alpha_sum():
-    conv = MetatronTiedConv2d(2, 4, kernel_size=3, bias=False)
+def test_tied_conv_effective_weight_is_masked_circle_mixture():
+    """Effective weight = sum_c α_c · (W ⊙ mask_c).
+
+    The G7-audit fix introduces 13 distinct circle MASKS so the alphas
+    are not reparameterisation-redundant. The effective weight at every
+    spatial position is gated by ``Σ_c α_c · mask_c[y, x]``, which is
+    a non-constant 2-D pattern (NOT a single scalar).
+    """
+    conv = MetatronTiedConv2d(2, 4, kernel_size=5, bias=False)
     eff_w = conv.effective_weight()
-    expected = conv.weight * conv.alphas.sum()
+    # Reconstruct the expected weighted-mask combo manually.
+    combined_mask = (
+        conv.alphas.view(13, 1, 1, 1, 1) * conv.masks.view(13, 1, 1, 5, 5)
+    ).sum(dim=0)  # (1, 1, k, k)
+    expected = conv.weight * combined_mask
     assert torch.allclose(eff_w, expected)
+    # And the combined mask is NOT a constant scalar -- the per-spatial
+    # contribution genuinely varies, which is what stops the alphas from
+    # collapsing.
+    cm = combined_mask.view(5, 5)
+    assert cm.max().item() > cm.min().item() + 1e-6
+
+
+def test_h74_alphas_dont_collapse_to_scalar():
+    """Setting α = [1, 0, ..., 0] vs α = [0, 1, 0, ..., 0] must produce
+    NUMERICALLY DIFFERENT outputs.
+
+    The pre-fix implementation had ``W_eff = W · Σα_c``, so any two
+    one-hot alpha vectors yielded identical outputs (Σα_c = 1 in both
+    cases). With the 13 distinct circle MASKS, one-hot α picks out one
+    spatially-localised circle, and circles 0 (centre) vs 1 (inner-hex)
+    occupy different spatial regions of the kernel.
+    """
+    torch.manual_seed(0)
+    conv = MetatronTiedConv2d(2, 4, kernel_size=5, bias=False)
+    x = torch.randn(1, 2, 7, 7)
+    # α = [1, 0, 0, ..., 0]: only the central circle contributes.
+    with torch.no_grad():
+        conv.alphas.zero_()
+        conv.alphas[0] = 1.0
+    y0 = conv(x)
+    # α = [0, 1, 0, ..., 0]: only the first inner-hex circle.
+    with torch.no_grad():
+        conv.alphas.zero_()
+        conv.alphas[1] = 1.0
+    y1 = conv(x)
+    assert not torch.allclose(y0, y1, atol=1e-5), (
+        "α=[1,0,...] and α=[0,1,...] produced identical outputs -- "
+        "the 13 alphas collapsed to their sum (G7-audit broken-state)."
+    )
+
+
+def test_h74_masks_are_thirteen_distinct_circles():
+    """The mask bank has exactly 13 binary circle patterns, and at least
+    two of them differ pixel-wise (i.e., the masks aren't degenerate)."""
+    conv = MetatronTiedConv2d(2, 4, kernel_size=7)
+    assert conv.masks.shape == (13, 7, 7)
+    # Each mask has at least one active pixel.
+    for c in range(13):
+        assert conv.masks[c].sum().item() > 0, f"circle {c} is empty"
+    # The 13 masks are not all identical.
+    diffs = (conv.masks - conv.masks[0:1]).abs().sum(dim=(1, 2))
+    assert (diffs > 0).any().item(), "all 13 masks are identical"
 
 
 def test_tied_conv_compression_vs_untied_bank():

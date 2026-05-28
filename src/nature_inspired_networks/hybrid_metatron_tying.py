@@ -41,6 +41,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+from .metatron_kernel import metatron_basis_kernels
 from .priors import PHI
 
 
@@ -57,13 +58,20 @@ class MetatronTiedConv2d(nn.Module):
 
     The computation is::
 
-        y = sum_{c=0..12} α_c · conv2d(x, W, stride=stride, padding=padding)
-          = (sum α_c) · conv2d(x, W, ...)
+        W_eff = sum_{c=0..12} α_c · (W ⊙ mask_c)
+        y     = conv2d(x, W_eff, stride=stride, padding=padding)
 
-    Equivalently a single conv whose effective weight is
-    ``(sum α_c) · W``. The 13 ``α_c`` scalars are independently learnable,
-    so the model can downweight redundant circles while keeping a single
-    underlying weight tensor — the H74 compression mechanism.
+    where ``mask_c`` is a fixed ``(k, k)`` binary circle mask drawn from
+    :func:`metatron_basis_kernels` (the same 13-circle pattern used by
+    H40's :class:`MetatronConv2d`). Because the 13 masks are spatially
+    DISTINCT — one centre + 6 inner-hex + 6 outer-hex circles — the
+    13 ``α_c`` scalars are not reparameterisation-redundant: setting
+    ``α = [1, 0, 0, ...]`` produces a *different* effective kernel from
+    ``α = [0, 1, 0, ...]`` and therefore a different output.
+
+    G7-audit fix: the previous implementation computed ``W * Σα_c`` (a
+    scalar gate on a single tensor) which made the 13 alphas collapse
+    to their sum. The mask bank breaks that degeneracy.
 
     Parameters
     ----------
@@ -108,6 +116,15 @@ class MetatronTiedConv2d(nn.Module):
         # 13 per-circle scaling coefficients, init at 1/13 so the
         # un-trained sum has roughly identity-conv gain.
         self.alphas = nn.Parameter(torch.full((METATRON_N_CIRCLES,), 1.0 / METATRON_N_CIRCLES))
+        # ---- 13 fixed per-circle binary masks (G7-audit fix) ----
+        # ``metatron_basis_kernels`` returns ``(13, k, k)``. We use the
+        # same circle bank as H40's MetatronConv2d so the two layers
+        # share a consistent geometric basis. Registered as a
+        # non-persistent buffer (not trainable, but rides .to(device)).
+        masks = metatron_basis_kernels(
+            k=int(self.kernel_size), n_circles=METATRON_N_CIRCLES
+        )  # (13, k, k), float32, values in {0, 1}
+        self.register_buffer("masks", masks, persistent=False)
 
     @staticmethod
     def n_circles() -> int:
@@ -115,8 +132,25 @@ class MetatronTiedConv2d(nn.Module):
         return METATRON_N_CIRCLES
 
     def effective_weight(self) -> torch.Tensor:
-        """Return ``(sum α_c) · W`` — the effective conv kernel."""
-        return self.weight * self.alphas.sum()
+        """Return ``Σ_c α_c · (W ⊙ mask_c)`` — the effective conv kernel.
+
+        Because the 13 masks are spatially distinct (one centre + 6
+        inner-hex + 6 outer-hex circles), this sum is NOT equivalent to
+        ``W · Σα_c``: per-spatial-position the contribution of circle
+        ``c`` is gated by ``mask_c[y, x]``. The 13 alphas therefore
+        encode genuinely independent spatial-mask weightings and do not
+        collapse to a single scalar.
+        """
+        # masks: (13, k, k) -> (13, 1, 1, k, k)
+        m = self.masks.to(self.weight.dtype, copy=False).view(
+            METATRON_N_CIRCLES, 1, 1, self.kernel_size, self.kernel_size
+        )
+        # alphas: (13,) -> (13, 1, 1, 1, 1)
+        a = self.alphas.view(METATRON_N_CIRCLES, 1, 1, 1, 1)
+        # Sum over the circle axis: (out_c, in_c, k, k).
+        combined_mask = (a * m).sum(dim=0)  # (1, 1, k, k)
+        # Broadcast multiply with the shared (out_c, in_c, k, k) weight.
+        return self.weight * combined_mask
 
     def param_compression_ratio(self) -> float:
         """Compression vs an untied bank of 13 independent Conv2d kernels.

@@ -89,6 +89,70 @@ def test_qkv_init_is_actually_cymatic():
     assert not torch.allclose(model.attention.qkv.weight, fresh.weight)
 
 
+def test_h67_all_priors_genuinely_active():
+    """``which_priors_active`` must return True for every one of the six
+    advertised priors AND the corresponding module must actually be
+    present in ``model.modules()``.
+
+    G7-audit fix: the property used to hardcode ``True`` for four
+    priors and return False for ``golden_rope`` / ``platonic_graph``
+    because those imports were broken. This test would have caught
+    both regressions.
+    """
+    from nature_inspired_networks.golden_rope import GoldenRoPE
+    from nature_inspired_networks.platonic_graph import MetatronGraphLayer
+
+    model = FullParadigmHybrid(
+        in_channels=3, width=16, n_blocks=2, n_heads=4, n_classes=10
+    )
+    flags = model.which_priors_active
+    # All six advertised priors must report True.
+    for key in (
+        "nature_prior_blocks",
+        "fibottention_attention",
+        "cymatic_qkv_init",
+        "liquid_cfc",
+        "golden_rope",
+        "platonic_graph",
+    ):
+        assert flags[key] is True, f"prior {key!r} silently disabled"
+    # Underlying modules must be present in the module tree.
+    assert any(isinstance(m, NaturePriorBlock) for m in model.modules())
+    assert any(isinstance(m, Fibottention) for m in model.modules())
+    assert any(isinstance(m, LiquidCFCCell) for m in model.modules())
+    assert any(isinstance(m, GoldenRoPE) for m in model.modules())
+    assert any(isinstance(m, MetatronGraphLayer) for m in model.modules())
+
+
+def test_h67_cfc_state_persists_across_forward_calls():
+    """The Liquid CFC must carry non-trivial state across forward
+    calls (the recurrence is the entire point of having a CFC).
+
+    G7-audit fix: previous forward called ``self.cfc(z, None)`` once,
+    collapsing the recurrence. We now persist hidden state in a buffer
+    and unroll for ``cfc_steps`` iterations per call.
+    """
+    torch.manual_seed(0)
+    model = FullParadigmHybrid(width=16, n_blocks=2)
+    model.eval()
+    x = torch.randn(2, 3, 16, 16)
+    # Fresh model -> state is zero on the first call.
+    assert model._cfc_h.numel() == 0
+    _ = model(x)
+    h_after_one = model._cfc_h.clone()
+    assert h_after_one.shape == (2, 16)
+    assert (h_after_one.abs().sum() > 0).item(), "CFC state stayed at zero"
+    # A second forward call with the SAME input should update the state
+    # again (the recurrence reads the previous state, applies the CFC
+    # decay + drive, and emits a NEW state).
+    _ = model(x)
+    h_after_two = model._cfc_h.clone()
+    assert not torch.allclose(h_after_one, h_after_two, atol=1e-6), (
+        "CFC hidden state did not change between two forward calls -- "
+        "the recurrence appears not to be exercised."
+    )
+
+
 if __name__ == "__main__":
     import inspect
 

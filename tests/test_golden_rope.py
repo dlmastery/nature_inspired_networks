@@ -30,6 +30,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 
 from nature_inspired_networks.golden_rope import (  # noqa: E402
     GOLDEN_ANGLE,
+    GoldenRoPE,
     apply_golden_rope,
     golden_angle_rope_freqs,
 )
@@ -161,6 +162,57 @@ def test_apply_golden_rope_relative_angle_stable_under_shift():
     a = dot_at(0, 5)
     b = dot_at(7, 12)  # also offset = 5
     assert torch.allclose(a, b, atol=1e-4), (a.item(), b.item())
+
+
+def test_golden_rope_module_constructs_and_matches_apply_golden_rope():
+    """``GoldenRoPE`` is an ``nn.Module`` wrapper around the function API.
+
+    Verifies (a) the class exists and is importable; (b) the (B, H, N, D)
+    signature is bit-equivalent to calling :func:`apply_golden_rope`
+    directly; (c) buffers ride ``.to(device)`` correctly (CPU smoke).
+    """
+    import torch.nn as nn
+
+    dim = 16
+    mod = GoldenRoPE(dim=dim)
+    assert isinstance(mod, nn.Module)
+    # Buffer wiring.
+    assert hasattr(mod, "freqs") and mod.freqs.shape == (dim // 2,)
+    assert hasattr(mod, "phase_offsets") and mod.phase_offsets.shape == (dim // 2,)
+    # (B, H, N, D) call signature equivalence.
+    B, H, N, D = 2, 4, 8, dim
+    q = torch.randn(B, H, N, D)
+    k = torch.randn(B, H, N, D)
+    q_mod, k_mod = mod(q, k)
+    freqs, phases = golden_angle_rope_freqs(D)
+    q_fn, k_fn = apply_golden_rope(q, k, freqs, torch.arange(N), phases)
+    assert torch.allclose(q_mod, q_fn, atol=1e-5)
+    assert torch.allclose(k_mod, k_fn, atol=1e-5)
+
+
+def test_golden_rope_module_additive_signature_for_b_n_d():
+    """The ``forward(x)`` convenience signature lets H67 drop the
+    module into a positional-embedding slot that previously used an
+    additive sinusoidal PE.  Output shape must equal input shape.
+    """
+    B, N, D = 3, 7, 16
+    mod = GoldenRoPE(dim=D)
+    x = torch.randn(B, N, D)
+    y = mod(x)
+    assert y.shape == x.shape
+    assert torch.isfinite(y).all()
+    # Per-pair norm is preserved (RoPE is a rotation).
+    pairs_in = x.reshape(B, N, D // 2, 2).norm(dim=-1)
+    pairs_out = y.reshape(B, N, D // 2, 2).norm(dim=-1)
+    assert torch.allclose(pairs_in, pairs_out, atol=1e-5)
+
+
+def test_golden_rope_module_rejects_odd_dim():
+    try:
+        GoldenRoPE(dim=15)
+    except ValueError:
+        return
+    raise AssertionError("expected ValueError on odd dim")
 
 
 def test_apply_golden_rope_shape_validation():

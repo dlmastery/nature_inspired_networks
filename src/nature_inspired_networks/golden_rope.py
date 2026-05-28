@@ -38,6 +38,7 @@ import math
 from typing import Tuple
 
 import torch
+import torch.nn as nn
 
 from .priors import PHI
 
@@ -46,6 +47,7 @@ __all__ = [
     "GOLDEN_ANGLE",
     "golden_angle_rope_freqs",
     "apply_golden_rope",
+    "GoldenRoPE",
 ]
 
 
@@ -176,3 +178,97 @@ def apply_golden_rope(
     q_rot = q * cos_full + _rotate_half(q) * sin_full
     k_rot = k * cos_full + _rotate_half(k) * sin_full
     return q_rot, k_rot
+
+
+# ---------------------------------------------------------------------------
+# nn.Module wrapper (H67 + downstream-friendly handle)
+# ---------------------------------------------------------------------------
+class GoldenRoPE(nn.Module):
+    """Module wrapper around :func:`apply_golden_rope`.
+
+    Stores the per-pair frequency and phase-offset tensors as
+    (non-persistent) buffers and offers two call signatures:
+
+    * ``forward(q, k, positions=None)`` -- standard RoPE-to-attention
+      usage with ``(B, H, N, D)`` query / key tensors. Returns the
+      rotated ``(q_rot, k_rot)`` pair.
+    * ``forward(x)`` -- additive convenience signature accepting a
+      ``(B, N, D)`` token tensor. The module treats ``x`` as both the
+      query and key, applies golden-RoPE in-place, and returns the
+      rotated token tensor with the original shape preserved. This lets
+      callers (e.g. :class:`hybrid_full.FullParadigmHybrid`) drop the
+      module into a positional-embedding slot that previously used an
+      additive sinusoidal PE.
+
+    Parameters
+    ----------
+    dim : int
+        Per-head feature dimension. Must be even.
+    base : float, default ``PHI``
+        Frequency-schedule base. Forwarded to
+        :func:`golden_angle_rope_freqs`.
+    max_len : int, default 1024
+        Maximum sequence length the module supports without recomputing
+        the positions buffer. Longer sequences fall back to building a
+        fresh ``torch.arange`` on the fly.
+    """
+
+    def __init__(self, dim: int, base: float = PHI, max_len: int = 1024) -> None:
+        super().__init__()
+        if dim % 2 != 0:
+            raise ValueError(f"dim must be even, got {dim}")
+        self.dim = int(dim)
+        self.base = float(base)
+        self.max_len = int(max_len)
+        freqs, phases = golden_angle_rope_freqs(self.dim, base=self.base)
+        # Buffers so .to(device) carries them along but they aren't trained.
+        self.register_buffer("freqs", freqs, persistent=False)
+        self.register_buffer("phase_offsets", phases, persistent=False)
+        # Cached default positions vector for the common forward path.
+        self.register_buffer(
+            "positions",
+            torch.arange(self.max_len, dtype=torch.float32),
+            persistent=False,
+        )
+
+    def _positions(self, N: int, device, dtype) -> torch.Tensor:
+        if N <= self.max_len:
+            return self.positions[:N].to(device=device, dtype=dtype)
+        return torch.arange(N, device=device, dtype=dtype)
+
+    def forward(
+        self,
+        q: torch.Tensor,
+        k: torch.Tensor | None = None,
+        positions: torch.Tensor | None = None,
+    ) -> torch.Tensor | Tuple[torch.Tensor, torch.Tensor]:
+        # Additive (B, N, D) convenience signature -- self-rotate q.
+        if k is None and q.dim() == 3:
+            B, N, D = q.shape
+            if D != self.dim:
+                raise ValueError(
+                    f"GoldenRoPE expected last dim={self.dim}, got {D}"
+                )
+            pos = positions if positions is not None else self._positions(N, q.device, q.dtype)
+            # Wrap as (B, H=1, N, D) for the canonical rotor, then squeeze.
+            qh = q.unsqueeze(1)
+            qh_rot, _ = apply_golden_rope(
+                qh, qh, self.freqs.to(qh.dtype), pos, self.phase_offsets.to(qh.dtype)
+            )
+            return qh_rot.squeeze(1)
+        # Standard (B, H, N, D) attention signature.
+        if k is None:
+            raise ValueError("GoldenRoPE: k must be provided for (B,H,N,D) input")
+        B, H, N, D = q.shape
+        if D != self.dim:
+            raise ValueError(
+                f"GoldenRoPE expected last dim={self.dim}, got {D}"
+            )
+        pos = positions if positions is not None else self._positions(N, q.device, q.dtype)
+        return apply_golden_rope(
+            q,
+            k,
+            self.freqs.to(q.dtype),
+            pos,
+            self.phase_offsets.to(q.dtype),
+        )
