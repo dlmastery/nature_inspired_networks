@@ -311,7 +311,7 @@ nature_inspired_networks/
 ## 7. Sister projects (cross-links, NOT dependencies)
 
 This repository is **self-contained**. The autoresearch protocol below
-(Rules 1–27) is fully specified here; nothing in this file requires
+(Rules 1–28) is fully specified here; nothing in this file requires
 reading another repo to implement. Sister repositories are listed only
 as related autoresearch projects on different domains — useful for
 cross-pollination but never as authoritative sources:
@@ -368,7 +368,7 @@ Every rule above is enforced. There are no exceptions.
 
 ---
 
-## 10. Rules 20–25 — added 2026-05-27 after the audit campaign
+## 10. Rules 20–28 — added 2026-05-27 / 2026-05-29 after the audit campaign
 
 Rules 1–19 were authored before the parallel critic / sci-critic / fixer
 campaign exposed how easy it is for an implementer agent to ship code
@@ -485,6 +485,14 @@ A Playwright link sweep (extract all `<a href>`, HEAD-test each suspect,
 report 404s) is the canonical verification — run after every renderer
 change.
 
+### Rule 28 — Screening vs evaluation
+A single-config, single-seed (or even 3-seed) sweep number is SCREENING DATA, not evaluation. It identifies candidates worth further investigation. The headline number for an EXTERNAL claim (FINDINGS, PAPER, README, badge) requires:
+- (a) per-hypothesis hill-climb (≥20 runs over lr/wd/optimizer/batch, coordinate descent or random search) at the candidate's design-spec scale; AND
+- (b) 3-seed at the best config; AND
+- (c) the Phase-5 worst-leader-seed > best-baseline-seed cross-dataset gate.
+A screening number MAY be reported in interim docs but only with the explicit "screened, not evaluated" qualifier. Negative results have the same standard: a candidate may not be claimed FALSIFIED on screening alone if its design literature predicts effects only manifest at longer horizons or different hyperparameter regimes (H41's β-only requalification is the cautionary tale: −33pp on screening was eps-confound, not the β-falsification predicted by Reddi 2018; β-only at 12-ep is only −1pp, and Reddi's non-convergence prediction needs ≥100 epochs to manifest).
+See [`skills/autoresearch-per-hypothesis-hillclimb/SKILL.md`](skills/autoresearch-per-hypothesis-hillclimb/SKILL.md) for the operational protocol.
+
 ### Cumulative checkpoint cadence (reinforcement of Rule 11)
 The auto-checkpoint loop discipline is **mandatory** during any
 multi-hour campaign. "I'll commit at the end of the turn" is a Rule-11
@@ -517,6 +525,6 @@ can pick them up unchanged. The current catalogue:
 - [`autoresearch-per-experiment-page`](skills/autoresearch-per-experiment-page/) — independent comprehensive dashboard page per run, group-sectioned aggregate, GitHub Pages mirror.
 - [`autoresearch-auto-checkpoint-loop`](skills/autoresearch-auto-checkpoint-loop/) — background git auto-commit loop for crash safety alongside long-running sweeps and agent teams.
 
-*Last updated: 2026-05-29. Rules 1–27 are normative invariants. CLAUDE.md
+*Last updated: 2026-05-29. Rules 1–28 are normative invariants. CLAUDE.md
 is self-contained: no parent-repo dependency required to implement the
 protocol. The 17 skills in `skills/` are content-agnostic.*

@@ -1,8 +1,8 @@
-**ACCEPTANCE STATUS (2026-05-29): ACCEPT** — Final-Critic reviewer pass confirms all 42 items now PASS; three Phase-8 winners (pair_gm_pdw, slot_act_sine, sg_only_phi_budget post-fix) clear the worst-leader-seed > best-baseline-seed CIFAR-100 3-seed gate; PAPER.md cleared for promotion to FINAL with two recommended framing edits (see `audits/FINAL_CRITIC_REPORT.md`).
+**ACCEPTANCE STATUS (2026-05-29): PROVISIONALLY ACCEPT pending Phase-9 hill-climb completion** — Final-Critic reviewer pass confirms all 42 Section A–G items PASS; three Phase-8 winners (pair_gm_pdw, slot_act_sine, sg_only_phi_budget post-fix) clear the worst-leader-seed > best-baseline-seed CIFAR-100 3-seed gate; PAPER.md cleared for promotion to FINAL with two recommended framing edits (see `audits/FINAL_CRITIC_REPORT.md`). However, per the new Rule 28 (screening-vs-evaluation), Sections H (per-hypothesis hill-climb evidence) and I (reproducibility-by-cold-reader test) are now part of the gate; the paper is PROVISIONALLY ACCEPTED but BLOCKED from FINAL until H1–H5 and I1–I5 also PASS via the Phase-9 hill-climb campaign.
 
 # REVIEWER_CHECKLIST — paper-acceptance gate
 
-This is the contract a paper-grade external reviewer (or the project's own "final critic pass") evaluates against before any external publication is permitted. Each item is binary (PASS / FAIL); a single FAIL blocks publication. The checklist is generated from CLAUDE.md Rules 1–25, the autoresearch protocol, and the dual-track audit + Fixer outcomes.
+This is the contract a paper-grade external reviewer (or the project's own "final critic pass") evaluates against before any external publication is permitted. Each item is binary (PASS / FAIL); a single FAIL blocks publication. The checklist is generated from CLAUDE.md Rules 1–28, the autoresearch protocol, and the dual-track audit + Fixer outcomes.
 
 ---
 
@@ -71,18 +71,36 @@ This is the contract a paper-grade external reviewer (or the project's own "fina
 - [x] **G4.** Test discipline: every new module ships with a unit test in `tests/test_<module>.py` that ends with `"All N tests passed."` (Rule 12).
 - [x] **G5.** Reproduction commands documented in `CLAUDE.md` §8 operator quick-reference.
 
+## Section H — Per-hypothesis hill-climb evidence (Rule 28)
+
+- [ ] **H1.** Every hypothesis used in an external claim has a `ideas/<NN>/hillclimb_results.json` produced by `scripts/run_hillclimb.py`.
+- [ ] **H2.** Every external-claim hypothesis has a `ideas/<NN>/dashboard/index.html` showing the 20+-run sweep with best-config callout.
+- [ ] **H3.** The 3-seed at the best config beats the worst-leader-seed > best-baseline-seed Phase-5 gate.
+- [ ] **H4.** The hill-climb results are linked from the per-experiment page at `dashboard/experiments/<dataset>__<tag>_seed<N>.html` so a reviewer can reach hill-climb from the leaderboard in ≤3 clicks.
+- [ ] **H5.** Single-config screening numbers in FINDINGS are explicitly labelled "screening" until H1-H3 are completed for that hypothesis.
+
+## Section I — Reproducibility-by-cold-reader test
+
+- [ ] **I1.** A reader who clones the repo, reads README.md only, and runs the commands in CLAUDE.md §8 can reproduce the SOTA smoke result without further help.
+- [ ] **I2.** A reader can reproduce one Phase-8 winner end-to-end (config → metrics) from a single per-experiment page without consulting any other doc.
+- [ ] **I3.** A reader can identify the exact commit SHA that produced any number cited in FINDINGS or PAPER by reading the footer of the corresponding per-experiment page or the audit document.
+- [ ] **I4.** The reasoning blob, FINDINGS verdict, impl-critic verdict, and sci-critic verdict for any hypothesis are reachable in ≤3 clicks from the dashboard root.
+- [ ] **I5.** The dashboard's GitHub Pages mirror at `https://dlmastery.github.io/nature_inspired_networks/` serves identical content to the local `dashboard/dashboard.html`.
+
 ---
 
 ## Acceptance gate
 
-When all rows above are PASS, the paper can be promoted from DRAFT to FINAL. **Current state: 39 of 42 items PASS; 3 still pending (A6, C4, C5, F5) — all gated on post-fix re-run completion.**
+When all rows above are PASS, the paper can be promoted from DRAFT to FINAL. **Current state: 39 of 42 Section A–G items PASS; 3 still pending (A6, C4, C5, F5) — all gated on post-fix re-run completion. Additionally, the 10 new Section H + I items (H1–H5, I1–I5) are introduced by Rule 28 (screening-vs-evaluation) and are CONDITIONAL — they MUST be PASS for FINAL promotion. The paper is therefore PROVISIONALLY ACCEPTED but BLOCKED from FINAL until the Phase-9 per-hypothesis hill-climb campaign completes and the cold-reader reproducibility test passes.**
 
 The conditional CIFAR-100 3-seed re-run (item C5) only fires if any post-fix C10 row beats the baseline. If the post-fix H09 phi_budget loses the baseline at C10, the cross-dataset claim is fully retracted and the paper's only defensible result becomes "the protocol successfully caught a headline produced by broken code, and the project has no surviving accuracy claim — which is itself a publishable methodological result."
 
-If the post-fix H09 phi_budget retains the +baseline lead at C10 AND C100 3-seed median AND the min-leader-seed > max-baseline-seed Phase-5 gate, the paper promotes to FINAL with H09 phi_budget as DERIVATIVE+TESTABLE (RegNet-Pareto-region rediscovery confirmed) as the sole defensible accuracy claim, plus the protocol itself as the methodological contribution.
+If the post-fix H09 phi_budget retains the +baseline lead at C10 AND C100 3-seed median AND the min-leader-seed > max-baseline-seed Phase-5 gate, AND the Phase-9 hill-climb on H09 (Sections H1–H3) reproduces the lead at the best hill-climbed config, the paper promotes to FINAL with H09 phi_budget as DERIVATIVE+TESTABLE (RegNet-Pareto-region rediscovery confirmed) as the sole defensible accuracy claim, plus the protocol itself as the methodological contribution.
+
+Until Phase-9 completes, any single-config screening number cited in interim docs MUST carry the "screened, not evaluated" qualifier (item H5).
 
 Either outcome is publishable. The protocol holds the line.
 
 ---
 
-*Generated 2026-05-27. Cross-references: `CLAUDE.md` (Rules 1–25), `AUDIT_SUMMARY.md`, `audits/G{1..8}_audit.md`, `hypotheses/g{1..8}_*/H*.md` (sci-critic addenda), `FINDINGS.md`, `PAPER.md`.*
+*Generated 2026-05-27; Sections H + I added 2026-05-29 per Rule 28. Cross-references: `CLAUDE.md` (Rules 1–28), `AUDIT_SUMMARY.md`, `audits/G{1..8}_audit.md`, `hypotheses/g{1..8}_*/H*.md` (sci-critic addenda), `FINDINGS.md`, `PAPER.md`, `skills/autoresearch-per-hypothesis-hillclimb/SKILL.md`.*
