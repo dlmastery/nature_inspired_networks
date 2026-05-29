@@ -1304,6 +1304,32 @@ _EXP_PAGE_CSS = _BRUTALIST_VARS + """
  .pill.hyp{border-color:var(--v-derivative);color:var(--v-derivative);}
  .pill.grp{border-color:var(--v-novel);color:var(--v-novel);}
  .pill.ds{border-color:var(--accent-dim);color:var(--accent);}
+ /* Masthead CTA pills — repo / paper / literature survey (Phase 7) */
+ .mast-pill{display:inline-block;padding:3px 10px;margin-right:6px;
+            border:1px solid var(--accent-dim);color:var(--accent);
+            font-family:'IBM Plex Mono',monospace;font-size:10px;
+            text-transform:uppercase;letter-spacing:0.16em;font-weight:600;
+            text-decoration:none;}
+ .mast-pill:hover{background:var(--accent-dim);color:var(--ink);
+                  border-bottom-color:var(--accent-dim);}
+ .mast-pill.repo{border-color:var(--v-novel);color:var(--v-novel);}
+ .mast-pill.repo:hover{background:var(--v-novel);color:var(--ink);}
+ .mast-pill.lit{border-color:var(--v-derivative);color:var(--v-derivative);}
+ .mast-pill.lit:hover{background:var(--v-derivative);color:var(--ink);}
+ .mast-pill.paper{border-color:var(--v-pass);color:var(--v-pass);}
+ .mast-pill.paper:hover{background:var(--v-pass);color:var(--ink);}
+ .live-link{display:inline-block;padding:3px 10px;border:1px solid var(--v-pass);
+            color:var(--v-pass);font-family:'IBM Plex Mono',monospace;
+            font-size:10px;text-transform:uppercase;letter-spacing:0.18em;
+            font-weight:600;text-decoration:none;}
+ .live-link:hover{background:var(--v-pass);color:var(--ink);}
+ /* Footer cross-link row */
+ .doc-footer{margin:18px 0 6px 0;font-family:'IBM Plex Mono',monospace;
+             font-size:10px;color:var(--paper-dim);letter-spacing:0.12em;
+             text-transform:uppercase;}
+ .doc-footer a{color:var(--accent);text-decoration:none;
+               border-bottom:1px dotted var(--accent-dim);}
+ .doc-footer a:hover{color:var(--v-pass);border-bottom-color:var(--v-pass);}
  .verdict-row{display:flex;flex-wrap:wrap;gap:4px;justify-content:flex-end;}
  .card{background:var(--panel);border:1px solid var(--rule);
        padding:24px 28px;margin-bottom:24px;position:relative;}
@@ -2469,6 +2495,19 @@ def _render_footer(metrics: dict, run_dir: Path,
     except Exception:
         run_path_rel = run_dir.name
     return (
+        # Cross-link row: repo · paper · background reading · live demo · GitHub Pages.
+        "<div class='doc-footer'>"
+        "<a href='https://github.com/dlmastery/nature_inspired_networks' "
+        "target='_blank' rel='noopener'>Repo</a> &middot; "
+        "<a href='https://github.com/dlmastery/nature_inspired_networks/blob/main/PAPER.md' "
+        "target='_blank' rel='noopener'>Paper</a> &middot; "
+        "<a href='https://github.com/dlmastery/nature_inspired_networks/blob/main/paper/NATURE_INSPIRED_NETWORKS.md' "
+        "target='_blank' rel='noopener'>Background reading</a> &middot; "
+        "<a href='https://dlmastery.github.io/nature_inspired_networks/' "
+        "target='_blank' rel='noopener'>Live demo</a> &middot; "
+        "<a href='https://dlmastery.github.io/nature_inspired_networks/' "
+        "target='_blank' rel='noopener'>GitHub Pages</a>"
+        "</div>"
         "<div class='meta'>"
         f"composite formula SHA-256 &nbsp; <code>{_esc(fp)}</code><br>"
         f"epochs run &nbsp; <code>{_esc(epochs)}</code> "
@@ -2832,6 +2871,20 @@ def render_experiment_page(metrics: dict, history: list[dict] | None,
         f"{tier_badge}"
         f"&nbsp;·&nbsp; run dir <span class='mono' style='color:var(--paper)'>"
         f"{_esc(run_dir_name)}</span></div>\n"
+        # Masthead CTA pills — repo / paper / literature survey / live demo.
+        "    <div class='mast-row' style='margin-top:8px;'>"
+        "<a class='mast-pill repo' "
+        "href='https://github.com/dlmastery/nature_inspired_networks' "
+        "target='_blank' rel='noopener'>🔗 source</a>"
+        "<a class='mast-pill lit' "
+        "href='https://github.com/dlmastery/nature_inspired_networks/blob/main/paper/NATURE_INSPIRED_NETWORKS.md' "
+        "target='_blank' rel='noopener'>📚 background reading</a>"
+        "<a class='mast-pill paper' "
+        "href='https://github.com/dlmastery/nature_inspired_networks/blob/main/PAPER.md' "
+        "target='_blank' rel='noopener'>📄 paper</a>"
+        "<a class='live-link' href='https://dlmastery.github.io/nature_inspired_networks/' "
+        "target='_blank' rel='noopener'>📡 live</a>"
+        "</div>\n"
         "  </div>\n"
         "  <div class='head-right'>\n"
         "    <a class='back' href='../dashboard.html'>← back to dashboard</a>\n"
@@ -3088,6 +3141,27 @@ HTML_HEAD = """<!doctype html>
             font-weight:600;}
  .live-link:hover{background:var(--v-pass);color:var(--ink);
                   border-bottom-color:var(--v-pass);}
+ /* Masthead CTA pills — repo / paper / literature survey */
+ .mast-pill{display:inline-block;padding:3px 10px;margin-right:6px;
+            border:1px solid var(--accent-dim);color:var(--accent);
+            font-family:'IBM Plex Mono',monospace;font-size:10px;
+            text-transform:uppercase;letter-spacing:0.16em;font-weight:600;
+            text-decoration:none;}
+ .mast-pill:hover{background:var(--accent-dim);color:var(--ink);
+                  border-bottom-color:var(--accent-dim);}
+ .mast-pill.repo{border-color:var(--v-novel);color:var(--v-novel);}
+ .mast-pill.repo:hover{background:var(--v-novel);color:var(--ink);}
+ .mast-pill.lit{border-color:var(--v-derivative);color:var(--v-derivative);}
+ .mast-pill.lit:hover{background:var(--v-derivative);color:var(--ink);}
+ .mast-pill.paper{border-color:var(--v-pass);color:var(--v-pass);}
+ .mast-pill.paper:hover{background:var(--v-pass);color:var(--ink);}
+ /* Footer cross-link row */
+ .doc-footer{margin:18px 0 6px 0;font-family:'IBM Plex Mono',monospace;
+             font-size:10px;color:var(--paper-dim);letter-spacing:0.12em;
+             text-transform:uppercase;}
+ .doc-footer a{color:var(--accent);text-decoration:none;
+               border-bottom:1px dotted var(--accent-dim);}
+ .doc-footer a:hover{color:var(--v-pass);border-bottom-color:var(--v-pass);}
  .legend-row{margin:10px 0 14px 0;font-size:0.78em;color:var(--paper-dim);
              font-family:'IBM Plex Mono',monospace;letter-spacing:0.08em;}
  .legend-row .swatch{display:inline-block;width:12px;height:12px;
@@ -3512,16 +3586,33 @@ def render_dashboard(results_dir: str | Path,
     html = [HTML_HEAD]
     html.append(f"<h1>{title}</h1>")
     html.append(
-        f"<div class='sub'>{subtitle} &nbsp;·&nbsp; "
+        f"<div class='sub'>{subtitle}</div>"
+    )
+    # Masthead CTA pills — repo / paper / literature survey / live demo.
+    # Each is a styled call-to-action, opens in a new tab.
+    html.append(
+        "<div class='mast-row' style='margin:10px 0 6px 0;'>"
+        f"<a class='mast-pill repo' "
+        f"href='https://github.com/dlmastery/nature_inspired_networks' "
+        f"target='_blank' rel='noopener'>🔗 source · dlmastery/nature_inspired_networks</a>"
+        f"<a class='mast-pill lit' "
+        f"href='https://github.com/dlmastery/nature_inspired_networks/blob/main/paper/NATURE_INSPIRED_NETWORKS.md' "
+        f"target='_blank' rel='noopener'>📚 background reading · nature-inspired networks (state of the field)</a>"
+        f"<a class='mast-pill paper' "
+        f"href='https://github.com/dlmastery/nature_inspired_networks/blob/main/PAPER.md' "
+        f"target='_blank' rel='noopener'>📄 paper</a>"
         f"<a class='live-link' href='https://dlmastery.github.io/nature_inspired_networks/' "
         f"target='_blank' rel='noopener'>📡 live · GitHub Pages</a>"
-        f"&nbsp;·&nbsp; "
-        f"<a href='https://github.com/dlmastery/nature_inspired_networks'>"
-        f"GitHub</a> &nbsp;·&nbsp; "
+        "</div>"
+    )
+    # Secondary doc-link row.
+    html.append(
+        "<div class='sub' style='margin-top:4px;'>"
         f"<a href='https://github.com/dlmastery/nature_inspired_networks/blob/main/paper/FINDINGS.md'>FINDINGS.md</a> &nbsp;·&nbsp; "
         f"<a href='https://github.com/dlmastery/nature_inspired_networks/blob/main/experiments/EXPERIMENT_LOG.md'>EXPERIMENT_LOG</a> &nbsp;·&nbsp; "
-        f"<a href='https://github.com/dlmastery/nature_inspired_networks/blob/main/PAPER.md'>PAPER.md</a> &nbsp;·&nbsp; "
-        f"<a href='https://github.com/dlmastery/nature_inspired_networks/blob/main/paper/AUDIT_SUMMARY.md'>AUDIT_SUMMARY.md</a></div>"
+        f"<a href='https://github.com/dlmastery/nature_inspired_networks/blob/main/paper/AUDIT_SUMMARY.md'>AUDIT_SUMMARY.md</a> &nbsp;·&nbsp; "
+        f"<a href='https://github.com/dlmastery/nature_inspired_networks/blob/main/paper/REVIEWER_CHECKLIST.md'>REVIEWER_CHECKLIST</a> &nbsp;·&nbsp; "
+        f"<a href='https://github.com/dlmastery/nature_inspired_networks/blob/main/hypotheses/IDEA_TABLE.md'>IDEA_TABLE</a></div>"
     )
     if findings_blurb:
         # Render the FINDINGS headline through the same markdown converter
@@ -3618,6 +3709,21 @@ def render_dashboard(results_dir: str | Path,
         )
         if stamp["iso_date"]:
             sha_html += f" on <code>{_esc(stamp['iso_date'])}</code> "
+    # Cross-link row: repo · paper · background reading · live demo · GitHub Pages.
+    html.append(
+        "<div class='doc-footer'>"
+        "<a href='https://github.com/dlmastery/nature_inspired_networks' "
+        "target='_blank' rel='noopener'>Repo</a> &middot; "
+        "<a href='https://github.com/dlmastery/nature_inspired_networks/blob/main/PAPER.md' "
+        "target='_blank' rel='noopener'>Paper</a> &middot; "
+        "<a href='https://github.com/dlmastery/nature_inspired_networks/blob/main/paper/NATURE_INSPIRED_NETWORKS.md' "
+        "target='_blank' rel='noopener'>Background reading</a> &middot; "
+        "<a href='https://dlmastery.github.io/nature_inspired_networks/' "
+        "target='_blank' rel='noopener'>Live demo</a> &middot; "
+        "<a href='https://dlmastery.github.io/nature_inspired_networks/' "
+        "target='_blank' rel='noopener'>GitHub Pages</a>"
+        "</div>"
+    )
     html.append(
         "<div class='meta'>Generated by "
         "<code>nature_inspired_networks.dashboard.render_dashboard</code> "
