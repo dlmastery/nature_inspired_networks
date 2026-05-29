@@ -76,6 +76,32 @@
  .pill.hyp{border-color:var(--v-derivative);color:var(--v-derivative);}
  .pill.grp{border-color:var(--v-novel);color:var(--v-novel);}
  .pill.ds{border-color:var(--accent-dim);color:var(--accent);}
+ /* Masthead CTA pills — repo / paper / literature survey (Phase 7) */
+ .mast-pill{display:inline-block;padding:3px 10px;margin-right:6px;
+            border:1px solid var(--accent-dim);color:var(--accent);
+            font-family:'IBM Plex Mono',monospace;font-size:10px;
+            text-transform:uppercase;letter-spacing:0.16em;font-weight:600;
+            text-decoration:none;}
+ .mast-pill:hover{background:var(--accent-dim);color:var(--ink);
+                  border-bottom-color:var(--accent-dim);}
+ .mast-pill.repo{border-color:var(--v-novel);color:var(--v-novel);}
+ .mast-pill.repo:hover{background:var(--v-novel);color:var(--ink);}
+ .mast-pill.lit{border-color:var(--v-derivative);color:var(--v-derivative);}
+ .mast-pill.lit:hover{background:var(--v-derivative);color:var(--ink);}
+ .mast-pill.paper{border-color:var(--v-pass);color:var(--v-pass);}
+ .mast-pill.paper:hover{background:var(--v-pass);color:var(--ink);}
+ .live-link{display:inline-block;padding:3px 10px;border:1px solid var(--v-pass);
+            color:var(--v-pass);font-family:'IBM Plex Mono',monospace;
+            font-size:10px;text-transform:uppercase;letter-spacing:0.18em;
+            font-weight:600;text-decoration:none;}
+ .live-link:hover{background:var(--v-pass);color:var(--ink);}
+ /* Footer cross-link row */
+ .doc-footer{margin:18px 0 6px 0;font-family:'IBM Plex Mono',monospace;
+             font-size:10px;color:var(--paper-dim);letter-spacing:0.12em;
+             text-transform:uppercase;}
+ .doc-footer a{color:var(--accent);text-decoration:none;
+               border-bottom:1px dotted var(--accent-dim);}
+ .doc-footer a:hover{color:var(--v-pass);border-bottom-color:var(--v-pass);}
  .verdict-row{display:flex;flex-wrap:wrap;gap:4px;justify-content:flex-end;}
  .card{background:var(--panel);border:1px solid var(--rule);
        padding:24px 28px;margin-bottom:24px;position:relative;}
@@ -191,85 +217,20 @@
 <div class='head-grid' style='--i:0'>
   <div class='head-left'>
     <div class='tag-display'>baseline_resnet20</div>
-    <div class='sub'><span class='pill'>baseline</span><span class='pill grp'>Baselines</span><span class='pill ds'>cifar100</span><span class='pill'>seed 1</span><span class='pill' style='border-color:var(--v-minor);color:var(--v-minor)' title='Rule 28 (CLAUDE.md): SCREENING = n=1 seed; EVALUATION = n>=3 seeds AND worst-leader-seed > best-baseline-seed Phase-5 gate cleared'>tier screening &nbsp;n=3</span>&nbsp;·&nbsp; run dir <span class='mono' style='color:var(--paper)'>baseline_resnet20_seed1</span></div>
+    <div class='sub'><span class='pill'>baseline</span><span class='pill grp'>Baselines</span><span class='pill ds'>cifar100</span><span class='pill'>seed 1</span><span class='pill' style='border-color:var(--v-minor);color:var(--v-minor)' title='Rule 28 (CLAUDE.md): SCREENING = n=1 seed; EVALUATION = n>=3 seeds AND worst-leader-seed > best-baseline-seed Phase-5 gate cleared'>tier screening &nbsp;n=4</span>&nbsp;·&nbsp; run dir <span class='mono' style='color:var(--paper)'>baseline_resnet20_seed1</span></div>
+    <div class='mast-row' style='margin-top:8px;'><a class='mast-pill repo' href='https://github.com/dlmastery/nature_inspired_networks' target='_blank' rel='noopener'>🔗 source</a><a class='mast-pill lit' href='https://github.com/dlmastery/nature_inspired_networks/blob/main/paper/NATURE_INSPIRED_NETWORKS.md' target='_blank' rel='noopener'>📚 background reading</a><a class='mast-pill paper' href='https://github.com/dlmastery/nature_inspired_networks/blob/main/PAPER.md' target='_blank' rel='noopener'>📄 paper</a><a class='live-link' href='https://dlmastery.github.io/nature_inspired_networks/' target='_blank' rel='noopener'>📡 live</a></div>
   </div>
   <div class='head-right'>
     <a class='back' href='../dashboard.html'>← back to dashboard</a>
     <div class='verdict-row'></div>
   </div>
 </div>
-<div class='kn-strip' style='--i:1'><div class='kn-tile tint-pos'><div class='kn-val'>56.52%</div><div class='kn-lbl'>top-1</div></div><div class='kn-tile tint-neu'><div class='kn-val'>0.5630</div><div class='kn-lbl'>composite</div></div><div class='kn-tile tint-pos'><div class='kn-val'>+0.00pp</div><div class='kn-lbl'>Δ vs baseline (n=3, screening)</div></div><div class='kn-tile tint-neu'><div class='kn-val'>0.278M</div><div class='kn-lbl'>params</div></div><div class='kn-tile tint-neu'><div class='kn-val'>3.97ms</div><div class='kn-lbl'>latency b=1</div></div></div>
+<div class='kn-strip' style='--i:1'><div class='kn-tile tint-pos'><div class='kn-val'>56.52%</div><div class='kn-lbl'>top-1</div></div><div class='kn-tile tint-neu'><div class='kn-val'>0.5630</div><div class='kn-lbl'>composite</div></div><div class='kn-tile tint-pos'><div class='kn-val'>+0.00pp</div><div class='kn-lbl'>Δ vs baseline (n=4, screening)</div></div><div class='kn-tile tint-neu'><div class='kn-val'>0.278M</div><div class='kn-lbl'>params</div></div><div class='kn-tile tint-neu'><div class='kn-val'>3.97ms</div><div class='kn-lbl'>latency b=1</div></div></div>
 <section class='card' style='--i:2'><h2>Hypothesis</h2><p class='empty'>No matching hypothesis document — this row is a baseline reference run.</p></section>
-<section class='card' style='--i:3'><h2>Verdict <span class='mono' style='font-size:0.55em;letter-spacing:0.18em;color:var(--paper-dim);font-style:normal'>FINDINGS.md</span></h2><div class='quote md-body'><h2>✅ PHASE-8 FINAL VERDICT (2026-05-29) — THREE replicated cross-dataset positives</h2>
-<p>The audit + Fixer + post-fix re-run + 3-seed CIFAR-100 graduation cycle
-is complete. <strong>Three independent hypotheses cleared the worst-leader-seed
-best-baseline-seed Phase-5 gate</strong> on CIFAR-100 (30 ep, 3 seeds):</p>
-<table>
-<thead>
-<tr>
-<th>tag</th>
-<th style="text-align: right;">C100 median</th>
-<th style="text-align: right;">min seed</th>
-<th style="text-align: right;">baseline max</th>
-<th style="text-align: right;">Δ vs baseline median</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>pair_gm_pdw</code> (H09+H48+H44 orthogonal stack)</td>
-<td style="text-align: right;"><strong>0.5786</strong></td>
-<td style="text-align: right;">0.5761</td>
-<td style="text-align: right;">0.5662</td>
-<td style="text-align: right;"><strong>+1.34 pp</strong></td>
-</tr>
-<tr>
-<td><code>slot_act_sine</code> (H81 SIREN, single prior)</td>
-<td style="text-align: right;"><strong>0.5784</strong></td>
-<td style="text-align: right;">0.5766</td>
-<td style="text-align: right;">0.5662</td>
-<td style="text-align: right;"><strong>+1.32 pp</strong></td>
-</tr>
-<tr>
-<td><code>sg_only_phi_budget</code> (H09, post-fix 1:1.623:2.629)</td>
-<td style="text-align: right;"><strong>0.5741</strong></td>
-<td style="text-align: right;">0.5687</td>
-<td style="text-align: right;">0.5662</td>
-<td style="text-align: right;"><strong>+0.89 pp</strong></td>
-</tr>
-<tr>
-<td><code>baseline_resnet20</code> (rail)</td>
-<td style="text-align: right;">0.5652</td>
-<td style="text-align: right;">—</td>
-<td style="text-align: right;">—</td>
-<td style="text-align: right;">—</td>
-</tr>
-</tbody>
-</table>
-<p>All three lead floors are strictly above the baseline ceiling →
-<strong>leads are outside seed noise</strong>. The post-fix H09 median (57.41 %) is
-~0.6 pp LOWER than the pre-fix broken-architecture median (58.05 %),
-which is exactly what an honest audit predicts — the broken realised
-ratio happened to land a fortuitously-high seed-0 number. The corrected
-mechanism gives a more modest but statistically robust lead.</p>
-<p><strong>The dual-track audit RATIFIED, not destroyed, the project</strong>:
-- the audit caught a headline produced by broken code BEFORE publication
-- the Fixer campaign corrected 18 BROKEN/MAJOR findings with mechanism-
-  verifying tests
-- 3 of the 4 post-fix Phase-8 candidates cleared the C100 3-seed gate
-- <code>pair_gm_pdw</code> (the orthogonal-axis combo) is the project&rsquo;s first
-  experimentally-verified evidence of <em>prior compounding</em> — directly
-  refuting the H50 sg_full_fib catastrophic monolithic-hybrid result
-- H81 SIREN&rsquo;s matched performance shows that a SINGLE well-chosen
-  activation can be as effective as a 3-prior orthogonal stack</p>
-<p>Per CLAUDE.md Rule 22 (dual-track gate), all three winning hypotheses
-additionally satisfy: (a) impl-critic verdict ≠ MAJOR/BROKEN, and (b)
-sci-critic verdict ≠ NUMEROLOGY/UNFALSIFIABLE. The accuracy claims are
-defensible.</p>
-<p>Pre-AUDIT-NOTICE section below documents the pre-fix journey for
-archival completeness.</p></div><p style='margin-top:14px'><a href='https://github.com/dlmastery/nature_inspired_networks/blob/main/paper/FINDINGS.md'>↗ Full FINDINGS.md on GitHub</a></p></section>
+<section class='card' style='--i:3'><h2>Verdict <span class='mono' style='font-size:0.55em;letter-spacing:0.18em;color:var(--paper-dim);font-style:normal'>FINDINGS.md</span></h2><p class='empty'>No paragraph in FINDINGS.md mentions this tag yet.</p><p><a href='https://github.com/dlmastery/nature_inspired_networks/blob/main/FINDINGS.md'>↗ Browse FINDINGS.md</a></p></section>
 <section class='card' style='--i:4'><h2>Composite-score breakdown</h2><div class='comp-stack'><div class='seg pos' style='width:90.73%' title='top-1 = 0.56520'>top-1 +0.5652</div><div class='seg params' style='width:4.46%' title='-0.05·log10(params_M)'>params +0.02777</div><div class='seg lat' style='width:4.81%' title='-0.05·log10(latency_ms)'>lat −0.02995</div></div><div style='display:flex;justify-content:space-between;font-family:IBM Plex Mono,monospace;font-size:11px;color:var(--paper-dim);margin-top:6px'><span>Σ recomputed: <b style='color:var(--paper)'>0.56302</b></span><span>reported: <b style='color:var(--paper)'>0.56302</b> &nbsp;·&nbsp; Δ +0.000000</span></div><div class='formula-chip' style='margin-top:14px'>composite ≔ <code>top1 - 0.05*log10(params_M) - 0.05*log10(latency_ms)</code></div></section>
 <section class='card' style='--i:5'><h2>Per-epoch training curves</h2><div class='charts'><div><svg viewBox='0 0 460 320' preserveAspectRatio='xMinYMin meet' width='100%' height='auto' xmlns='http://www.w3.org/2000/svg' style='background:#0a0a0d;border:1px solid #1c1c20;display:block;font-family:"IBM Plex Mono",monospace'><text x='46' y='18' fill='#e6e1d6' font-size='14' font-family='Source Serif 4,Georgia,serif' font-weight='600'>Loss</text><line x1='46' y1='292.0' x2='446' y2='292.0' stroke='#1c1c20' stroke-width='1'/><text x='40' y='295.0' fill='#a89e8c' font-size='9' text-anchor='end'>1.868</text><line x1='46' y1='226.5' x2='446' y2='226.5' stroke='#1c1c20' stroke-width='1'/><text x='40' y='229.5' fill='#a89e8c' font-size='9' text-anchor='end'>2.453</text><line x1='46' y1='161.0' x2='446' y2='161.0' stroke='#1c1c20' stroke-width='1'/><text x='40' y='164.0' fill='#a89e8c' font-size='9' text-anchor='end'>3.037</text><line x1='46' y1='95.5' x2='446' y2='95.5' stroke='#1c1c20' stroke-width='1'/><text x='40' y='98.5' fill='#a89e8c' font-size='9' text-anchor='end'>3.622</text><line x1='46' y1='30.0' x2='446' y2='30.0' stroke='#1c1c20' stroke-width='1'/><text x='40' y='33.0' fill='#a89e8c' font-size='9' text-anchor='end'>4.207</text><text x='46.0' y='310' fill='#a89e8c' font-size='9' text-anchor='middle'>0</text><text x='446.0' y='310' fill='#a89e8c' font-size='9' text-anchor='middle'>29</text><text x='246.0' y='310' fill='#a89e8c' font-size='10' font-family='Source Serif 4,Georgia,serif' text-anchor='middle'>epoch →</text><text x='14' y='161.0' fill='#a89e8c' font-size='10' font-family='Source Serif 4,Georgia,serif' text-anchor='middle' transform='rotate(-90 14 161.0)'>loss →</text><polyline points='46.0,44.0 59.8,94.1 73.6,125.9 87.4,149.9 101.2,168.4 115.0,183.3 128.8,195.5 142.6,205.9 156.3,213.8 170.1,221.5 183.9,227.5 197.7,233.4 211.5,238.6 225.3,243.9 239.1,247.9 252.9,251.8 266.7,255.1 280.5,258.6 294.3,261.5 308.1,264.3 321.9,266.8 335.7,269.1 349.4,271.0 363.2,272.6 377.0,274.3 390.8,275.7 404.6,276.3 418.4,277.1 432.2,278.0 446.0,277.7' fill='none' stroke='#f85149' stroke-width='1.8'/><circle cx='446.0' cy='277.7' r='2.6' fill='#f85149'/><rect x='52' y='35' width='10' height='10' fill='#f85149'/><text x='68' y='44' fill='#e6e1d6' font-size='10' font-family='IBM Plex Mono,monospace'>train loss</text></svg></div><div><svg viewBox='0 0 460 320' preserveAspectRatio='xMinYMin meet' width='100%' height='auto' xmlns='http://www.w3.org/2000/svg' style='background:#0a0a0d;border:1px solid #1c1c20;display:block;font-family:"IBM Plex Mono",monospace'><text x='46' y='18' fill='#e6e1d6' font-size='14' font-family='Source Serif 4,Georgia,serif' font-weight='600'>Accuracy</text><line x1='46' y1='292.0' x2='446' y2='292.0' stroke='#1c1c20' stroke-width='1'/><text x='40' y='295.0' fill='#a89e8c' font-size='9' text-anchor='end'>4.9%</text><line x1='46' y1='226.5' x2='446' y2='226.5' stroke='#1c1c20' stroke-width='1'/><text x='40' y='229.5' fill='#a89e8c' font-size='9' text-anchor='end'>25.9%</text><line x1='46' y1='161.0' x2='446' y2='161.0' stroke='#1c1c20' stroke-width='1'/><text x='40' y='164.0' fill='#a89e8c' font-size='9' text-anchor='end'>47.0%</text><line x1='46' y1='95.5' x2='446' y2='95.5' stroke='#1c1c20' stroke-width='1'/><text x='40' y='98.5' fill='#a89e8c' font-size='9' text-anchor='end'>68.1%</text><line x1='46' y1='30.0' x2='446' y2='30.0' stroke='#1c1c20' stroke-width='1'/><text x='40' y='33.0' fill='#a89e8c' font-size='9' text-anchor='end'>89.2%</text><text x='46.0' y='310' fill='#a89e8c' font-size='9' text-anchor='middle'>0</text><text x='446.0' y='310' fill='#a89e8c' font-size='9' text-anchor='middle'>29</text><text x='246.0' y='310' fill='#a89e8c' font-size='10' font-family='Source Serif 4,Georgia,serif' text-anchor='middle'>epoch →</text><text x='14' y='161.0' fill='#a89e8c' font-size='10' font-family='Source Serif 4,Georgia,serif' text-anchor='middle' transform='rotate(-90 14 161.0)'>accuracy →</text><polyline points='46.0,278.0 59.8,252.6 73.6,232.7 87.4,216.3 101.2,203.1 115.0,192.6 128.8,182.0 142.6,174.4 156.3,168.4 170.1,161.4 183.9,156.0 197.7,151.1 211.5,147.3 225.3,142.0 239.1,138.6 252.9,135.4 266.7,132.7 280.5,129.1 294.3,127.1 308.1,124.2 321.9,121.7 335.7,119.2 349.4,117.4 363.2,115.4 377.0,115.2 390.8,113.3 404.6,112.1 418.4,111.8 432.2,111.1 446.0,111.6' fill='none' stroke='#d29922' stroke-width='1.8'/><circle cx='446.0' cy='111.6' r='2.6' fill='#d29922'/><rect x='52' y='35' width='10' height='10' fill='#d29922'/><text x='68' y='44' fill='#e6e1d6' font-size='10' font-family='IBM Plex Mono,monospace'>train top-1</text><polyline points='46.0,266.7 59.8,246.2 73.6,248.0 87.4,225.2 101.2,204.5 115.0,202.1 128.8,193.5 142.6,190.2 156.3,176.2 170.1,174.0 183.9,167.5 197.7,165.5 211.5,158.3 225.3,155.5 239.1,155.7 252.9,151.2 266.7,146.8 280.5,142.6 294.3,143.2 308.1,141.6 321.9,139.8 335.7,138.5 349.4,134.9 363.2,134.7 377.0,133.6 390.8,132.1 404.6,131.7 418.4,131.7 432.2,131.1 446.0,131.4' fill='none' stroke='#58a6ff' stroke-width='1.8'/><circle cx='446.0' cy='131.4' r='2.6' fill='#58a6ff'/><rect x='52' y='51' width='10' height='10' fill='#58a6ff'/><text x='68' y='60' fill='#e6e1d6' font-size='10' font-family='IBM Plex Mono,monospace'>test top-1</text><polyline points='46.0,188.0 59.8,160.1 73.6,165.1 87.4,132.1 101.2,103.5 115.0,98.7 128.8,94.1 142.6,94.6 156.3,73.6 170.1,73.3 183.9,71.2 197.7,68.2 211.5,63.4 225.3,61.6 239.1,59.0 252.9,57.5 266.7,53.0 280.5,50.7 294.3,51.9 308.1,51.9 321.9,50.7 335.7,48.0 349.4,46.7 363.2,46.4 377.0,45.1 390.8,45.0 404.6,44.0 418.4,44.1 432.2,44.1 446.0,44.6' fill='none' stroke='#3fb950' stroke-width='1.8'/><circle cx='446.0' cy='44.6' r='2.6' fill='#3fb950'/><rect x='52' y='67' width='10' height='10' fill='#3fb950'/><text x='68' y='76' fill='#e6e1d6' font-size='10' font-family='IBM Plex Mono,monospace'>test top-5</text></svg></div></div></section>
-<section class='card' style='--i:6'><h2>Deep inspection</h2><p style='color:var(--paper-dim);font-size:0.9em;margin-bottom:6px'>Audit excerpts, reasoning blob, raw configuration, and full metrics JSON — expand sections of interest.</p><details class='deep'><summary>Reasoning blob (reasoning.json)</summary><div class='body'><p class='empty'>No <code>reasoning.json</code> archived for this run directory &mdash; see the <b>Verdict</b> card above for the FINDINGS-derived verdict and the <b>Implementation-critic audit</b> accordion for the code-level diagnosis.</p></div></details><details class='deep'><summary>Configuration dump</summary><div class='body'><p class='mono' style='color:var(--paper-dim);font-size:0.8em;margin-bottom:8px'>inferred from experiment_log.jsonl + metrics.json</p><pre>{
+<section class='card' style='--i:6'><h2>Deep inspection</h2><p style='color:var(--paper-dim);font-size:0.9em;margin-bottom:6px'>Audit excerpts, reasoning blob, raw configuration, and full metrics JSON — expand sections of interest.</p><details class='deep'><summary>Reasoning blob (reasoning.json)</summary><div class='body'><p class='empty'>No <code>reasoning.json</code> for this run directory.</p></div></details><details class='deep'><summary>Configuration dump</summary><div class='body'><p class='mono' style='color:var(--paper-dim);font-size:0.8em;margin-bottom:8px'>inferred from experiment_log.jsonl + metrics.json</p><pre>{
   &quot;tag&quot;: &quot;baseline_resnet20&quot;,
   &quot;model&quot;: &quot;resnet20&quot;,
   &quot;dataset&quot;: &quot;cifar100&quot;,
@@ -296,6 +257,6 @@ archival completeness.</p></div><p style='margin-top:14px'><a href='https://gith
   &quot;generalization_gap&quot;: 0.06394663461538463
 }</pre></div></details></section>
 <section class='card' style='--i:7'><h2>Metrics — quick reference</h2><table><tbody><tr><td class='k'>Dataset</td><td class='v'>cifar100</td></tr><tr><td class='k'>Seed</td><td class='v'>1</td></tr><tr><td class='k'>Epochs</td><td class='v'>30</td></tr><tr><td class='k'>Top-1 accuracy</td><td class='v'>56.52%</td></tr><tr><td class='k'>Top-5 accuracy</td><td class='v'>84.45%</td></tr><tr><td class='k'>Train top-1</td><td class='v'>62.91%</td></tr><tr><td class='k'>Generalisation gap (train − test)</td><td class='v'>6.39%</td></tr><tr><td class='k'>Parameters</td><td class='v'>278,324 (0.278 M)</td></tr><tr><td class='k'>FLOPs</td><td class='v'>41.2 M MACs</td></tr><tr><td class='k'>Latency (batch=1)</td><td class='v'>3.972 ms</td></tr><tr><td class='k'>Rot-eq error</td><td class='v'>0.443792</td></tr><tr><td class='k'>Epochs-to-target</td><td class='v'>-1</td></tr><tr><td class='k'>Train wall-clock</td><td class='v'>936.3 s</td></tr><tr><td class='k'>Composite score</td><td class='v'>0.563021</td></tr><tr><td class='k'>Composite fingerprint (SHA-256)</td><td class='v'>d65565e9c7b12d14cbce30a801ecc6753aea3eb148074256bfcc051fa61d0893</td></tr></tbody></table></section>
-<section class='card' style='--i:8'><h2>Cross-references</h2><div class='xrefs-grid'><a class='xref-card' href='../experiments/cifar100__baseline_resnet20_seed0.html'><div class='xref-lbl'>↪ other seed</div><div class='xref-tag'>baseline_resnet20</div><div class='xref-meta'>cifar100 · seed 0</div></a><a class='xref-card' href='../experiments/cifar100__baseline_resnet20_seed2.html'><div class='xref-lbl'>↪ other seed</div><div class='xref-tag'>baseline_resnet20</div><div class='xref-meta'>cifar100 · seed 2</div></a><a class='xref-card' href='../experiments/cifar10__baseline_resnet20_seed0.html'><div class='xref-lbl'>↪ same tag, other dataset</div><div class='xref-tag'>baseline_resnet20</div><div class='xref-meta'>cifar10 · seed 0</div></a><a class='xref-card' href='../experiments/cifar10__baseline_resnet20_seed1.html'><div class='xref-lbl'>↪ same tag, other dataset</div><div class='xref-tag'>baseline_resnet20</div><div class='xref-meta'>cifar10 · seed 1</div></a><a class='xref-card' href='../experiments/cifar10__baseline_resnet20_seed2.html'><div class='xref-lbl'>↪ same tag, other dataset</div><div class='xref-tag'>baseline_resnet20</div><div class='xref-meta'>cifar10 · seed 2</div></a></div></section>
-<div class='meta'>composite formula SHA-256 &nbsp; <code>d65565e9c7b12d14cbce30a801ecc6753aea3eb148074256bfcc051fa61d0893</code><br>epochs run &nbsp; <code>30</code> &nbsp;·&nbsp; train wall-clock &nbsp; <code>936.3 s</code> &nbsp;·&nbsp; gen-gap (train − test) &nbsp; <code>6.39 pp</code>&nbsp;·&nbsp; metrics.json git commit: <a href='https://github.com/dlmastery/nature_inspired_networks/commit/9ecac56' style='color:#58a6ff'><code>9ecac56</code></a><br>run directory &nbsp; <code>baseline_resnet20_seed1</code><br>Generated by <code>nature_inspired_networks.dashboard.render_experiment_page</code> &middot; self-contained inline SVG, no external assets &middot; brutalist editorial lab notebook v3</div>
+<section class='card' style='--i:8'><h2>Cross-references</h2><div class='xrefs-grid'><a class='xref-card' href='../experiments/cifar100__baseline_resnet20_seed0.html'><div class='xref-lbl'>↪ other seed</div><div class='xref-tag'>baseline_resnet20</div><div class='xref-meta'>cifar100 · seed 0</div></a><a class='xref-card' href='../experiments/cifar100__baseline_resnet20_seed2.html'><div class='xref-lbl'>↪ other seed</div><div class='xref-tag'>baseline_resnet20</div><div class='xref-meta'>cifar100 · seed 2</div></a><a class='xref-card' href='../experiments/cifar100__baseline_resnet20_seed3.html'><div class='xref-lbl'>↪ other seed</div><div class='xref-tag'>baseline_resnet20</div><div class='xref-meta'>cifar100 · seed 3</div></a><a class='xref-card' href='../experiments/cifar10__baseline_resnet20_seed0.html'><div class='xref-lbl'>↪ same tag, other dataset</div><div class='xref-tag'>baseline_resnet20</div><div class='xref-meta'>cifar10 · seed 0</div></a><a class='xref-card' href='../experiments/cifar10__baseline_resnet20_seed1.html'><div class='xref-lbl'>↪ same tag, other dataset</div><div class='xref-tag'>baseline_resnet20</div><div class='xref-meta'>cifar10 · seed 1</div></a><a class='xref-card' href='../experiments/cifar10__baseline_resnet20_seed2.html'><div class='xref-lbl'>↪ same tag, other dataset</div><div class='xref-tag'>baseline_resnet20</div><div class='xref-meta'>cifar10 · seed 2</div></a></div></section>
+<div class='doc-footer'><a href='https://github.com/dlmastery/nature_inspired_networks' target='_blank' rel='noopener'>Repo</a> &middot; <a href='https://github.com/dlmastery/nature_inspired_networks/blob/main/PAPER.md' target='_blank' rel='noopener'>Paper</a> &middot; <a href='https://github.com/dlmastery/nature_inspired_networks/blob/main/paper/NATURE_INSPIRED_NETWORKS.md' target='_blank' rel='noopener'>Background reading</a> &middot; <a href='https://dlmastery.github.io/nature_inspired_networks/' target='_blank' rel='noopener'>Live demo</a> &middot; <a href='https://dlmastery.github.io/nature_inspired_networks/' target='_blank' rel='noopener'>GitHub Pages</a></div><div class='meta'>composite formula SHA-256 &nbsp; <code>d65565e9c7b12d14cbce30a801ecc6753aea3eb148074256bfcc051fa61d0893</code><br>epochs run &nbsp; <code>30</code> &nbsp;·&nbsp; train wall-clock &nbsp; <code>936.3 s</code> &nbsp;·&nbsp; gen-gap (train − test) &nbsp; <code>6.39 pp</code>&nbsp;·&nbsp; metrics.json git commit: <a href='https://github.com/dlmastery/nature_inspired_networks/commit/9ecac56' style='color:#58a6ff'><code>9ecac56</code></a><br>run directory &nbsp; <code>baseline_resnet20_seed1</code><br>Generated by <code>nature_inspired_networks.dashboard.render_experiment_page</code> &middot; self-contained inline SVG, no external assets &middot; brutalist editorial lab notebook v3</div>
 </body></html>
