@@ -1,0 +1,2249 @@
+- generic [active] [ref=e1]:
+  - heading "nature_inspired_networks — autoresearch dashboard" [level=1] [ref=e2]
+  - generic [ref=e3]: 84-hypothesis dual-track audit on CIFAR-10 + CIFAR-100 · impl-critic + sci-critic + Fixer campaign · G1..G8 hypothesis ledger
+  - generic [ref=e4]:
+    - link "🔗 source · dlmastery/nature_inspired_networks" [ref=e5] [cursor=pointer]:
+      - /url: https://github.com/dlmastery/nature_inspired_networks
+    - link "📚 background reading · nature-inspired networks (state of the field)" [ref=e6] [cursor=pointer]:
+      - /url: https://github.com/dlmastery/nature_inspired_networks/blob/main/paper/NATURE_INSPIRED_NETWORKS.md
+    - link "📄 paper" [ref=e7] [cursor=pointer]:
+      - /url: https://github.com/dlmastery/nature_inspired_networks/blob/main/PAPER.md
+    - link "📡 live · GitHub Pages" [ref=e8] [cursor=pointer]:
+      - /url: https://dlmastery.github.io/nature_inspired_networks/
+  - generic [ref=e9]:
+    - link "FINDINGS.md" [ref=e10] [cursor=pointer]:
+      - /url: https://github.com/dlmastery/nature_inspired_networks/blob/main/paper/FINDINGS.md
+    - text: ·
+    - link "EXPERIMENT_LOG" [ref=e11] [cursor=pointer]:
+      - /url: https://github.com/dlmastery/nature_inspired_networks/blob/main/experiments/EXPERIMENT_LOG.md
+    - text: ·
+    - link "AUDIT_SUMMARY.md" [ref=e12] [cursor=pointer]:
+      - /url: https://github.com/dlmastery/nature_inspired_networks/blob/main/paper/AUDIT_SUMMARY.md
+    - text: ·
+    - link "REVIEWER_CHECKLIST" [ref=e13] [cursor=pointer]:
+      - /url: https://github.com/dlmastery/nature_inspired_networks/blob/main/paper/REVIEWER_CHECKLIST.md
+    - text: ·
+    - link "IDEA_TABLE" [ref=e14] [cursor=pointer]:
+      - /url: https://github.com/dlmastery/nature_inspired_networks/blob/main/hypotheses/IDEA_TABLE.md
+  - generic [ref=e15]:
+    - text: Headline finding
+    - heading "✅ PHASE-8 FINAL VERDICT (2026-05-29) — THREE replicated cross-dataset positives" [level=2] [ref=e16]
+    - paragraph [ref=e17]:
+      - text: The audit + Fixer + post-fix re-run + 3-seed CIFAR-100 graduation cycle is complete.
+      - strong [ref=e18]: Three independent hypotheses cleared the worst-leader-seed best-baseline-seed Phase-5 gate
+      - text: "on CIFAR-100 (30 ep, 3 seeds):"
+    - table [ref=e19]:
+      - rowgroup [ref=e20]:
+        - row "tag C100 median min seed baseline max Δ vs baseline median" [ref=e21]:
+          - columnheader "tag" [ref=e22]
+          - columnheader "C100 median" [ref=e23]
+          - columnheader "min seed" [ref=e24]
+          - columnheader "baseline max" [ref=e25]
+          - columnheader "Δ vs baseline median" [ref=e26]
+      - rowgroup [ref=e27]:
+        - row "pair_gm_pdw (H09+H48+H44 orthogonal stack) 0.5786 0.5761 0.5662 +1.34 pp" [ref=e28]:
+          - cell "pair_gm_pdw (H09+H48+H44 orthogonal stack)" [ref=e29]:
+            - code [ref=e30]: pair_gm_pdw
+            - text: (H09+H48+H44 orthogonal stack)
+          - cell "0.5786" [ref=e31]:
+            - strong [ref=e32]: "0.5786"
+          - cell "0.5761" [ref=e33]
+          - cell "0.5662" [ref=e34]
+          - cell "+1.34 pp" [ref=e35]:
+            - strong [ref=e36]: +1.34 pp
+        - row "slot_act_sine (H81 SIREN, single prior) 0.5784 0.5766 0.5662 +1.32 pp" [ref=e37]:
+          - cell "slot_act_sine (H81 SIREN, single prior)" [ref=e38]:
+            - code [ref=e39]: slot_act_sine
+            - text: (H81 SIREN, single prior)
+          - cell "0.5784" [ref=e40]:
+            - strong [ref=e41]: "0.5784"
+          - cell "0.5766" [ref=e42]
+          - cell "0.5662" [ref=e43]
+          - cell "+1.32 pp" [ref=e44]:
+            - strong [ref=e45]: +1.32 pp
+        - row "sg_only_phi_budget (H09, post-fix 1:1.623:2.629) 0.5741 0.5687 0.5662 +0.89 pp" [ref=e46]:
+          - cell "sg_only_phi_budget (H09, post-fix 1:1.623:2.629)" [ref=e47]:
+            - code [ref=e48]: sg_only_phi_budget
+            - text: (H09, post-fix 1:1.623:2.629)
+          - cell "0.5741" [ref=e49]:
+            - strong [ref=e50]: "0.5741"
+          - cell "0.5687" [ref=e51]
+          - cell "0.5662" [ref=e52]
+          - cell "+0.89 pp" [ref=e53]:
+            - strong [ref=e54]: +0.89 pp
+        - row "baseline_resnet20 (rail) 0.5652 — — —" [ref=e55]:
+          - cell "baseline_resnet20 (rail)" [ref=e56]:
+            - code [ref=e57]: baseline_resnet20
+            - text: (rail)
+          - cell "0.5652" [ref=e58]
+          - cell "—" [ref=e59]
+          - cell "—" [ref=e60]
+          - cell "—" [ref=e61]
+    - paragraph [ref=e62]:
+      - text: All three lead floors are strictly above the baseline ceiling →
+      - strong [ref=e63]: leads are outside seed noise
+      - text: . The post-fix H09 median (57.41 %) is ~0.6 pp LOWER than the pre-fix broken-architecture median (58.05 %), which is exactly what an honest audit predicts — the broken realised ratio happened to land a fortuitously-high seed-0 number. The corrected mechanism gives a more modest but statistically robust lead.
+    - paragraph [ref=e64]:
+      - strong [ref=e65]: The dual-track audit RATIFIED, not destroyed, the project
+      - text: ": - the audit caught a headline produced by broken code BEFORE publication - the Fixer campaign corrected 18 BROKEN/MAJOR findings with mechanism- verifying tests - 3 of the 4 post-fix Phase-8 candidates cleared the C100 3-seed gate -"
+      - code [ref=e66]: pair_gm_pdw
+      - text: (the orthogonal-axis combo) is the project’s first experimentally-verified evidence of
+      - emphasis [ref=e67]: prior compounding
+      - text: — directly refuting the H50 sg_full_fib catastrophic monolithic-hybrid result - H81 SIREN’s matched performance shows that a SINGLE well-chosen activation can be as effective as a 3-prior orthogonal stack
+    - paragraph [ref=e68]:
+      - text: Per CLAUDE.md
+      - link "Rule 22" [ref=e69] [cursor=pointer]:
+        - /url: ../CLAUDE.md#rule-22
+      - text: "(dual-track gate), all three winning hypotheses additionally satisfy: (a) impl-critic verdict ≠ MAJOR/BROKEN, and (b) sci-critic verdict ≠ NUMEROLOGY/UNFALSIFIABLE. The accuracy claims are defensible."
+    - paragraph [ref=e70]: Pre-AUDIT-NOTICE section below documents the pre-fix journey for archival completeness.
+  - generic [ref=e71]:
+    - text: composite ≔
+    - code [ref=e72]: composite = top1 - 0.05 * log10(params_M) - 0.05 * log10(latency_ms)
+    - text: SHA-256 · d65565e9c7b12d14cbce30a801ecc6753aea3eb148074256bfcc051fa61d0893
+  - generic [ref=e73]:
+    - generic [ref=e74]:
+      - generic [ref=e75]: Baseline ResNet-20 top-1
+      - generic [ref=e76]: 84.78%
+    - generic [ref=e77]:
+      - generic [ref=e78]: Full-hybrid top-1
+      - generic [ref=e79]: 73.24%
+    - generic [ref=e80]:
+      - generic [ref=e81]: Full-hybrid latency
+      - generic [ref=e82]: 20.02 ms
+    - generic [ref=e83]:
+      - generic [ref=e84]: Fractal Δ top-1
+      - generic [ref=e85]: +2.35 pp
+    - generic [ref=e86]:
+      - generic [ref=e87]: C4-group Δ top-1
+      - generic [ref=e88]: "-10.27 pp"
+  - generic [ref=e89]:
+    - generic [ref=e90]:
+      - 'heading "Pareto: accuracy vs. params / FLOPs / latency" [level=3] [ref=e91]'
+      - img [ref=e92]
+    - generic [ref=e93]:
+      - 'heading "Ablation matrix: each nature-inspired prior toggled independently" [level=3] [ref=e94]'
+      - img [ref=e95]
+    - generic [ref=e96]:
+      - heading "Training curves" [level=3] [ref=e97]
+      - img [ref=e98]
+    - generic [ref=e99]:
+      - heading "Persistent-homology Betti collapse" [level=3] [ref=e100]
+      - img [ref=e101]
+    - generic [ref=e102]:
+      - heading "Best per dataset (by composite)" [level=3] [ref=e103]
+      - list [ref=e104]:
+        - listitem [ref=e105]:
+          - text: "cifar10: top-1 85.85%, params 0.262M, latency 3.04 ms, composite 0.8634 —"
+          - code [ref=e106]: pair_gm_pdw
+          - text: seed=0
+        - listitem [ref=e107]:
+          - text: "cifar100: top-1 56.99%, params 0.278M, latency 3.99 ms, composite 0.5676 —"
+          - code [ref=e108]: sg_only_golden_momentum
+          - text: seed=0
+    - generic [ref=e109]:
+      - heading "Hypothesis ledger — status grid (G1..G8 × hypothesis index; click a cell to view the spec)" [level=3] [ref=e110]
+      - generic [ref=e111]: 84 hypotheses · 30 done · 51 impl · 2 queued · 1 deferred
+      - generic [ref=e112]:
+        - text: "Legend:"
+        - text: done
+        - text: impl
+        - text: partial
+        - text: running
+        - text: queued
+        - text: planned
+        - text: deferred
+        - text: failed
+        - text: superseded
+      - generic [ref=e122]:
+        - generic [ref=e123]:
+          - generic [ref=e124]: G1
+          - 'generic "H01 (status: done)" [ref=e125] [cursor=pointer]': "01"
+          - 'generic "H02 (status: done)" [ref=e126] [cursor=pointer]': "02"
+          - 'generic "H03 (status: done)" [ref=e127] [cursor=pointer]': "03"
+          - 'generic "H04 (status: done)" [ref=e128] [cursor=pointer]': "04"
+          - 'generic "H05 (status: done)" [ref=e129] [cursor=pointer]': "05"
+          - 'generic "H06 (status: done)" [ref=e130] [cursor=pointer]': "06"
+          - 'generic "H07 (status: done)" [ref=e131] [cursor=pointer]': "07"
+          - 'generic "H08 (status: impl)" [ref=e132] [cursor=pointer]': "08"
+          - 'generic "H09 (status: done)" [ref=e133] [cursor=pointer]': "09"
+          - 'generic "H10 (status: done)" [ref=e134] [cursor=pointer]': "10"
+        - generic [ref=e135]:
+          - generic [ref=e136]: G2
+          - 'generic "H11 (status: impl)" [ref=e137] [cursor=pointer]': "11"
+          - 'generic "H12 (status: done)" [ref=e138] [cursor=pointer]': "12"
+          - 'generic "H13 (status: done)" [ref=e139] [cursor=pointer]': "13"
+          - 'generic "H14 (status: impl)" [ref=e140] [cursor=pointer]': "14"
+          - 'generic "H15 (status: impl)" [ref=e141] [cursor=pointer]': "15"
+          - 'generic "H16 (status: impl)" [ref=e142] [cursor=pointer]': "16"
+          - 'generic "H17 (status: done)" [ref=e143] [cursor=pointer]': "17"
+          - 'generic "H18 (status: done)" [ref=e144] [cursor=pointer]': "18"
+          - 'generic "H19 (status: done)" [ref=e145] [cursor=pointer]': "19"
+          - 'generic "H20 (status: done)" [ref=e146] [cursor=pointer]': "20"
+        - generic [ref=e147]:
+          - generic [ref=e148]: G3
+          - 'generic "H21 (status: done)" [ref=e149] [cursor=pointer]': "21"
+          - 'generic "H22 (status: done)" [ref=e150] [cursor=pointer]': "22"
+          - 'generic "H23 (status: impl)" [ref=e151] [cursor=pointer]': "23"
+          - 'generic "H24 (status: done)" [ref=e152] [cursor=pointer]': "24"
+          - 'generic "H25 (status: impl)" [ref=e153] [cursor=pointer]': "25"
+          - 'generic "H26 (status: impl)" [ref=e154] [cursor=pointer]': "26"
+          - 'generic "H27 (status: impl)" [ref=e155] [cursor=pointer]': "27"
+          - 'generic "H28 (status: impl)" [ref=e156] [cursor=pointer]': "28"
+          - 'generic "H29 (status: impl)" [ref=e157] [cursor=pointer]': "29"
+          - 'generic "H30 (status: impl)" [ref=e158] [cursor=pointer]': "30"
+        - generic [ref=e159]:
+          - generic [ref=e160]: G4
+          - 'generic "H31 (status: done)" [ref=e161] [cursor=pointer]': "31"
+          - 'generic "H32 (status: impl)" [ref=e162] [cursor=pointer]': "32"
+          - 'generic "H33 (status: impl)" [ref=e163] [cursor=pointer]': "33"
+          - 'generic "H34 (status: done)" [ref=e164] [cursor=pointer]': "34"
+          - 'generic "H35 (status: done)" [ref=e165] [cursor=pointer]': "35"
+          - 'generic "H36 (status: impl)" [ref=e166] [cursor=pointer]': "36"
+          - 'generic "H37 (status: impl)" [ref=e167] [cursor=pointer]': "37"
+          - 'generic "H38 (status: impl)" [ref=e168] [cursor=pointer]': "38"
+          - 'generic "H39 (status: done)" [ref=e169] [cursor=pointer]': "39"
+          - 'generic "H40 (status: impl)" [ref=e170] [cursor=pointer]': "40"
+        - generic [ref=e171]:
+          - generic [ref=e172]: G5
+          - 'generic "H41 (status: done)" [ref=e173] [cursor=pointer]': "41"
+          - 'generic "H42 (status: done)" [ref=e174] [cursor=pointer]': "42"
+          - 'generic "H43 (status: done)" [ref=e175] [cursor=pointer]': "43"
+          - 'generic "H44 (status: done)" [ref=e176] [cursor=pointer]': "44"
+          - 'generic "H45 (status: impl)" [ref=e177] [cursor=pointer]': "45"
+          - 'generic "H46 (status: impl)" [ref=e178] [cursor=pointer]': "46"
+          - 'generic "H47 (status: done)" [ref=e179] [cursor=pointer]': "47"
+          - 'generic "H48 (status: done)" [ref=e180] [cursor=pointer]': "48"
+          - 'generic "H49 (status: impl)" [ref=e181] [cursor=pointer]': "49"
+          - 'generic "H50 (status: done)" [ref=e182] [cursor=pointer]': "50"
+        - generic [ref=e183]:
+          - generic [ref=e184]: G6
+          - 'generic "H51 (status: impl)" [ref=e185] [cursor=pointer]': "51"
+          - 'generic "H52 (status: impl)" [ref=e186] [cursor=pointer]': "52"
+          - 'generic "H53 (status: impl)" [ref=e187] [cursor=pointer]': "53"
+          - 'generic "H54 (status: impl)" [ref=e188] [cursor=pointer]': "54"
+          - 'generic "H55 (status: impl)" [ref=e189] [cursor=pointer]': "55"
+          - 'generic "H56 (status: impl)" [ref=e190] [cursor=pointer]': "56"
+          - 'generic "H57 (status: deferred)" [ref=e191] [cursor=pointer]': "57"
+          - 'generic "H58 (status: done)" [ref=e192] [cursor=pointer]': "58"
+          - 'generic "H59 (status: queued)" [ref=e193] [cursor=pointer]': "59"
+          - 'generic "H60 (status: queued)" [ref=e194] [cursor=pointer]': "60"
+        - generic [ref=e195]:
+          - generic [ref=e196]: G7
+          - 'generic "H61 (status: impl)" [ref=e197] [cursor=pointer]': "61"
+          - 'generic "H62 (status: impl)" [ref=e198] [cursor=pointer]': "62"
+          - 'generic "H63 (status: impl)" [ref=e199] [cursor=pointer]': "63"
+          - 'generic "H64 (status: impl)" [ref=e200] [cursor=pointer]': "64"
+          - 'generic "H65 (status: impl)" [ref=e201] [cursor=pointer]': "65"
+          - 'generic "H66 (status: impl)" [ref=e202] [cursor=pointer]': "66"
+          - 'generic "H67 (status: impl)" [ref=e203] [cursor=pointer]': "67"
+          - 'generic "H68 (status: impl)" [ref=e204] [cursor=pointer]': "68"
+          - 'generic "H69 (status: impl)" [ref=e205] [cursor=pointer]': "69"
+          - 'generic "H70 (status: impl)" [ref=e206] [cursor=pointer]': "70"
+          - 'generic "H71 (status: impl)" [ref=e207] [cursor=pointer]': "71"
+          - 'generic "H72 (status: impl)" [ref=e208] [cursor=pointer]': "72"
+          - 'generic "H73 (status: impl)" [ref=e209] [cursor=pointer]': "73"
+          - 'generic "H74 (status: impl)" [ref=e210] [cursor=pointer]': "74"
+          - 'generic "H75 (status: impl)" [ref=e211] [cursor=pointer]': "75"
+        - generic [ref=e212]:
+          - generic [ref=e213]: G8
+          - generic [ref=e214]: ·
+          - generic [ref=e215]: ·
+          - generic [ref=e216]: ·
+          - generic [ref=e217]: ·
+          - generic [ref=e218]: ·
+          - 'generic "H76 (status: impl)" [ref=e219] [cursor=pointer]': "76"
+          - 'generic "H77 (status: impl)" [ref=e220] [cursor=pointer]': "77"
+          - 'generic "H78 (status: impl)" [ref=e221] [cursor=pointer]': "78"
+          - 'generic "H79 (status: impl)" [ref=e222] [cursor=pointer]': "79"
+          - 'generic "H80 (status: impl)" [ref=e223] [cursor=pointer]': "80"
+          - 'generic "H81 (status: impl)" [ref=e224] [cursor=pointer]': "81"
+          - 'generic "H82 (status: impl)" [ref=e225] [cursor=pointer]': "82"
+          - 'generic "H83 (status: impl)" [ref=e226] [cursor=pointer]': "83"
+          - 'generic "H84 (status: impl)" [ref=e227] [cursor=pointer]': "84"
+  - heading "Runs by hypothesis group click any row to expand the experiment page" [level=2] [ref=e228]
+  - generic [ref=e229]:
+    - heading "Baselines (10 runs)" [level=2] [ref=e230]
+    - generic [ref=e231]: Stock ResNet-20 plus the all-priors-off NaturePriorNet scaffold — the controls every hypothesis is judged against.
+    - img [ref=e233]:
+      - generic [ref=e234]: Baselines · top-1 distribution (n=10)
+      - generic [ref=e235]: 22%
+      - generic [ref=e236]: 45%
+      - generic [ref=e237]: 67%
+      - generic [ref=e238]: 90%
+      - generic [ref=e239]: top-1 →
+      - generic [ref=e240]: cifar10 baseline 84.8%
+      - generic [ref=e241]: cifar100 baseline 56.5%
+      - generic "baseline_resnet20 · cifar10 · seed0 · top-1 84.78% · params 0.272M · composite 0.8458" [ref=e242]
+      - generic [ref=e243]: baseline_resnet20
+      - generic [ref=e244]: 84.78%
+      - generic "baseline_resnet20 · cifar10 · seed2 · top-1 83.46% · params 0.272M · composite 0.8331" [ref=e245]
+      - generic [ref=e246]: baseline_resnet20
+      - generic [ref=e247]: 83.46%
+      - generic "baseline_resnet20 · cifar10 · seed1 · top-1 83.39% · params 0.272M · composite 0.8240" [ref=e248]
+      - generic [ref=e249]: baseline_resnet20
+      - generic [ref=e250]: 83.39%
+      - generic "baseline_sg_vanilla · cifar10 · seed1 · top-1 82.95% · params 0.186M · composite 0.8299" [ref=e251]
+      - generic [ref=e252]: baseline_sg_vanilla
+      - generic [ref=e253]: 82.95%
+      - generic "baseline_sg_vanilla · cifar10 · seed2 · top-1 82.26% · params 0.186M · composite 0.8243" [ref=e254]
+      - generic [ref=e255]: baseline_sg_vanilla
+      - generic [ref=e256]: 82.26%
+      - generic "baseline_sg_vanilla · cifar10 · seed0 · top-1 82.16% · params 0.186M · composite 0.8258" [ref=e257]
+      - generic [ref=e258]: baseline_sg_vanilla
+      - generic [ref=e259]: 82.16%
+      - generic "baseline_resnet20 · cifar100 · seed2 · top-1 56.62% · params 0.278M · composite 0.5622" [ref=e260]
+      - generic [ref=e261]: baseline_resnet20
+      - generic [ref=e262]: 56.62%
+      - generic "baseline_resnet20 · cifar100 · seed1 · top-1 56.52% · params 0.278M · composite 0.5630" [ref=e263]
+      - generic [ref=e264]: baseline_resnet20
+      - generic [ref=e265]: 56.52%
+      - generic "baseline_resnet20 · cifar100 · seed3 · top-1 56.36% · params 0.278M · composite 0.5588" [ref=e266]
+      - generic [ref=e267]: baseline_resnet20
+      - generic [ref=e268]: 56.36%
+      - generic "baseline_resnet20 · cifar100 · seed0 · top-1 56.15% · params 0.278M · composite 0.5568" [ref=e269]
+      - generic [ref=e270]: baseline_resnet20
+      - generic [ref=e271]: 56.15%
+    - img [ref=e273]:
+      - generic [ref=e274]: Baselines · composite × params
+      - generic [ref=e275]: "0.534"
+      - generic [ref=e276]: "0.619"
+      - generic [ref=e277]: "0.704"
+      - generic [ref=e278]: "0.789"
+      - generic [ref=e279]: "0.875"
+      - generic [ref=e280]: params (M) →
+      - generic [ref=e281]: composite →
+      - generic "baseline · baseline_resnet20 · cifar10 · composite 0.8458" [ref=e282]
+      - generic [ref=e283]: baseline 84.8%
+      - generic "baseline · baseline_resnet20 · cifar10 · composite 0.8331" [ref=e284]
+      - generic [ref=e285]: baseline 83.5%
+      - generic "baseline · baseline_sg_vanilla · cifar10 · composite 0.8299" [ref=e286]
+      - generic [ref=e287]: baseline 83.0%
+      - generic "baseline · baseline_sg_vanilla · cifar10 · composite 0.8258" [ref=e288]
+      - generic [ref=e289]: baseline 82.2%
+      - generic "baseline · baseline_sg_vanilla · cifar10 · composite 0.8243" [ref=e290]
+      - generic [ref=e291]: baseline 82.3%
+      - generic "baseline · baseline_resnet20 · cifar10 · composite 0.8240" [ref=e292]
+      - generic [ref=e293]: baseline 83.4%
+      - generic "baseline · baseline_resnet20 · cifar100 · composite 0.5630" [ref=e294]
+      - generic [ref=e295]: baseline 56.5%
+      - generic "baseline · baseline_resnet20 · cifar100 · composite 0.5622" [ref=e296]
+      - generic [ref=e297]: baseline 56.6%
+      - generic "baseline · baseline_resnet20 · cifar100 · composite 0.5588" [ref=e298]
+      - generic [ref=e299]: baseline 56.4%
+      - generic "baseline · baseline_resnet20 · cifar100 · composite 0.5568" [ref=e300]
+      - generic [ref=e301]: baseline 56.1%
+    - table [ref=e302]:
+      - rowgroup [ref=e303]:
+        - row "Tag DS Seed Top-1 Composite Params Hyp Curve" [ref=e304]:
+          - columnheader "Tag" [ref=e305] [cursor=pointer]
+          - columnheader "DS" [ref=e306] [cursor=pointer]
+          - columnheader "Seed" [ref=e307] [cursor=pointer]
+          - columnheader "Top-1" [ref=e308] [cursor=pointer]
+          - columnheader "Composite" [ref=e309] [cursor=pointer]
+          - columnheader "Params" [ref=e310] [cursor=pointer]
+          - columnheader "Hyp" [ref=e311] [cursor=pointer]
+          - columnheader "Curve" [ref=e312] [cursor=pointer]
+      - rowgroup [ref=e313]:
+        - row "baseline_resnet20 n=3 scre cifar10 0 84.78% 0.8458 0.272M —" [ref=e314] [cursor=pointer]:
+          - cell "baseline_resnet20 n=3 scre" [ref=e315]:
+            - link "baseline_resnet20" [ref=e316]:
+              - /url: experiments/cifar10__baseline_resnet20_seed0.html
+            - 'generic "Rule 28: SCREENING = n=1 seed; EVALUATION = n>=3 seeds AND Phase-5 gate cleared." [ref=e317]': n=3 scre
+          - cell "cifar10" [ref=e318]
+          - cell "0" [ref=e319]
+          - cell "84.78%" [ref=e320]
+          - cell "0.8458" [ref=e321]
+          - cell "0.272M" [ref=e322]
+          - cell "—" [ref=e323]
+          - cell [ref=e324]:
+            - img [ref=e325]
+        - row "baseline_resnet20 n=3 scre cifar10 2 83.46% 0.8331 0.272M —" [ref=e328] [cursor=pointer]:
+          - cell "baseline_resnet20 n=3 scre" [ref=e329]:
+            - link "baseline_resnet20" [ref=e330]:
+              - /url: experiments/cifar10__baseline_resnet20_seed2.html
+            - 'generic "Rule 28: SCREENING = n=1 seed; EVALUATION = n>=3 seeds AND Phase-5 gate cleared." [ref=e331]': n=3 scre
+          - cell "cifar10" [ref=e332]
+          - cell "2" [ref=e333]
+          - cell "83.46%" [ref=e334]
+          - cell "0.8331" [ref=e335]
+          - cell "0.272M" [ref=e336]
+          - cell "—" [ref=e337]
+          - cell [ref=e338]:
+            - img [ref=e339]
+        - row "baseline_sg_vanilla n=3 scre cifar10 1 82.95% 0.8299 0.186M —" [ref=e342] [cursor=pointer]:
+          - cell "baseline_sg_vanilla n=3 scre" [ref=e343]:
+            - link "baseline_sg_vanilla" [ref=e344]:
+              - /url: experiments/cifar10__baseline_sg_vanilla_seed1.html
+            - 'generic "Rule 28: SCREENING = n=1 seed; EVALUATION = n>=3 seeds AND Phase-5 gate cleared." [ref=e345]': n=3 scre
+          - cell "cifar10" [ref=e346]
+          - cell "1" [ref=e347]
+          - cell "82.95%" [ref=e348]
+          - cell "0.8299" [ref=e349]
+          - cell "0.186M" [ref=e350]
+          - cell "—" [ref=e351]
+          - cell [ref=e352]:
+            - img [ref=e353]
+        - row "baseline_sg_vanilla n=3 scre cifar10 0 82.16% 0.8258 0.186M —" [ref=e356] [cursor=pointer]:
+          - cell "baseline_sg_vanilla n=3 scre" [ref=e357]:
+            - link "baseline_sg_vanilla" [ref=e358]:
+              - /url: experiments/cifar10__baseline_sg_vanilla_seed0.html
+            - 'generic "Rule 28: SCREENING = n=1 seed; EVALUATION = n>=3 seeds AND Phase-5 gate cleared." [ref=e359]': n=3 scre
+          - cell "cifar10" [ref=e360]
+          - cell "0" [ref=e361]
+          - cell "82.16%" [ref=e362]
+          - cell "0.8258" [ref=e363]
+          - cell "0.186M" [ref=e364]
+          - cell "—" [ref=e365]
+          - cell [ref=e366]:
+            - img [ref=e367]
+        - row "baseline_sg_vanilla n=3 scre cifar10 2 82.26% 0.8243 0.186M —" [ref=e370] [cursor=pointer]:
+          - cell "baseline_sg_vanilla n=3 scre" [ref=e371]:
+            - link "baseline_sg_vanilla" [ref=e372]:
+              - /url: experiments/cifar10__baseline_sg_vanilla_seed2.html
+            - 'generic "Rule 28: SCREENING = n=1 seed; EVALUATION = n>=3 seeds AND Phase-5 gate cleared." [ref=e373]': n=3 scre
+          - cell "cifar10" [ref=e374]
+          - cell "2" [ref=e375]
+          - cell "82.26%" [ref=e376]
+          - cell "0.8243" [ref=e377]
+          - cell "0.186M" [ref=e378]
+          - cell "—" [ref=e379]
+          - cell [ref=e380]:
+            - img [ref=e381]
+        - row "baseline_resnet20 n=3 scre cifar10 1 83.39% 0.8240 0.272M —" [ref=e384] [cursor=pointer]:
+          - cell "baseline_resnet20 n=3 scre" [ref=e385]:
+            - link "baseline_resnet20" [ref=e386]:
+              - /url: experiments/cifar10__baseline_resnet20_seed1.html
+            - 'generic "Rule 28: SCREENING = n=1 seed; EVALUATION = n>=3 seeds AND Phase-5 gate cleared." [ref=e387]': n=3 scre
+          - cell "cifar10" [ref=e388]
+          - cell "1" [ref=e389]
+          - cell "83.39%" [ref=e390]
+          - cell "0.8240" [ref=e391]
+          - cell "0.272M" [ref=e392]
+          - cell "—" [ref=e393]
+          - cell [ref=e394]:
+            - img [ref=e395]
+        - row "baseline_resnet20 n=4 scre cifar100 1 56.52% 0.5630 0.278M —" [ref=e398] [cursor=pointer]:
+          - cell "baseline_resnet20 n=4 scre" [ref=e399]:
+            - link "baseline_resnet20" [ref=e400]:
+              - /url: experiments/cifar100__baseline_resnet20_seed1.html
+            - 'generic "Rule 28: SCREENING = n=1 seed; EVALUATION = n>=3 seeds AND Phase-5 gate cleared." [ref=e401]': n=4 scre
+          - cell "cifar100" [ref=e402]
+          - cell "1" [ref=e403]
+          - cell "56.52%" [ref=e404]
+          - cell "0.5630" [ref=e405]
+          - cell "0.278M" [ref=e406]
+          - cell "—" [ref=e407]
+          - cell [ref=e408]:
+            - img [ref=e409]
+        - row "baseline_resnet20 n=4 scre cifar100 2 56.62% 0.5622 0.278M —" [ref=e412] [cursor=pointer]:
+          - cell "baseline_resnet20 n=4 scre" [ref=e413]:
+            - link "baseline_resnet20" [ref=e414]:
+              - /url: experiments/cifar100__baseline_resnet20_seed2.html
+            - 'generic "Rule 28: SCREENING = n=1 seed; EVALUATION = n>=3 seeds AND Phase-5 gate cleared." [ref=e415]': n=4 scre
+          - cell "cifar100" [ref=e416]
+          - cell "2" [ref=e417]
+          - cell "56.62%" [ref=e418]
+          - cell "0.5622" [ref=e419]
+          - cell "0.278M" [ref=e420]
+          - cell "—" [ref=e421]
+          - cell [ref=e422]:
+            - img [ref=e423]
+        - row "baseline_resnet20 n=4 scre cifar100 3 56.36% 0.5588 0.278M —" [ref=e426] [cursor=pointer]:
+          - cell "baseline_resnet20 n=4 scre" [ref=e427]:
+            - link "baseline_resnet20" [ref=e428]:
+              - /url: experiments/cifar100__baseline_resnet20_seed3.html
+            - 'generic "Rule 28: SCREENING = n=1 seed; EVALUATION = n>=3 seeds AND Phase-5 gate cleared." [ref=e429]': n=4 scre
+          - cell "cifar100" [ref=e430]
+          - cell "3" [ref=e431]
+          - cell "56.36%" [ref=e432]
+          - cell "0.5588" [ref=e433]
+          - cell "0.278M" [ref=e434]
+          - cell "—" [ref=e435]
+          - cell [ref=e436]:
+            - img [ref=e437]
+        - row "baseline_resnet20 n=4 scre cifar100 0 56.15% 0.5568 0.278M —" [ref=e440] [cursor=pointer]:
+          - cell "baseline_resnet20 n=4 scre" [ref=e441]:
+            - link "baseline_resnet20" [ref=e442]:
+              - /url: experiments/cifar100__baseline_resnet20_seed0.html
+            - 'generic "Rule 28: SCREENING = n=1 seed; EVALUATION = n>=3 seeds AND Phase-5 gate cleared." [ref=e443]': n=4 scre
+          - cell "cifar100" [ref=e444]
+          - cell "0" [ref=e445]
+          - cell "56.15%" [ref=e446]
+          - cell "0.5568" [ref=e447]
+          - cell "0.278M" [ref=e448]
+          - cell "—" [ref=e449]
+          - cell [ref=e450]:
+            - img [ref=e451]
+  - generic [ref=e454]:
+    - heading "G1 — Scaling & Growth (45 runs)" [level=2] [ref=e455]
+    - generic [ref=e456]: φ / Fibonacci growth laws applied to depth, width, resolution, parameter budgets, and learning-rate schedulers (H01–H10).
+    - img [ref=e458]:
+      - generic [ref=e459]: G1 — Scaling & Growth · top-1 distribution (n=20)
+      - generic [ref=e460]: 23%
+      - generic [ref=e461]: 46%
+      - generic [ref=e462]: 68%
+      - generic [ref=e463]: 91%
+      - generic [ref=e464]: top-1 →
+      - generic [ref=e465]: cifar10 baseline 84.8%
+      - generic "pair_gm_pdw · cifar10 · seed0 · top-1 85.85% · params 0.262M · composite 0.8634" [ref=e466]
+      - generic [ref=e467]: pair_gm_pdw
+      - generic [ref=e468]: 85.85%
+      - generic "combo3_pb_gm_pd · cifar10 · seed0 · top-1 85.66% · params 0.262M · composite 0.8601" [ref=e469]
+      - generic [ref=e470]: combo3_pb_gm_pd
+      - generic [ref=e471]: 85.66%
+      - generic "combo2_pb_gm · cifar10 · seed0 · top-1 85.62% · params 0.262M · composite 0.8592" [ref=e472]
+      - generic [ref=e473]: combo2_pb_gm
+      - generic [ref=e474]: 85.62%
+      - generic "sg_only_phi_budget · cifar10 · seed0 · top-1 85.56% · params 0.262M · composite 0.8338" [ref=e475]
+      - generic [ref=e476]: sg_only_phi_budget
+      - generic [ref=e477]: 85.56%
+      - generic "sg_only_phi_budget · cifar10 · seed2 · top-1 85.51% · params 0.284M · composite 0.8550" [ref=e478]
+      - generic [ref=e479]: sg_only_phi_budget
+      - generic [ref=e480]: 85.51%
+      - generic "sg_only_phi_budget · cifar10 · seed1 · top-1 85.48% · params 0.284M · composite 0.8568" [ref=e481]
+      - generic [ref=e482]: sg_only_phi_budget
+      - generic [ref=e483]: 85.48%
+      - generic "combo4_pb_gm_pd_pdw · cifar10 · seed0 · top-1 85.44% · params 0.262M · composite 0.8558" [ref=e484]
+      - generic [ref=e485]: combo4_pb_gm_pd_pdw
+      - generic [ref=e486]: 85.44%
+      - generic "loo_no_pd · cifar10 · seed0 · top-1 85.37% · params 0.262M · composite 0.8494" [ref=e487]
+      - generic [ref=e488]: loo_no_pd
+      - generic [ref=e489]: 85.37%
+      - generic "loo_no_fp · cifar10 · seed0 · top-1 85.29% · params 0.262M · composite 0.8556" [ref=e490]
+      - generic [ref=e491]: loo_no_fp
+      - generic [ref=e492]: 85.29%
+      - generic "combo7_pb_gm_pd_pdw_plr_fe_sa · cifar10 · seed0 · top-1 85.29% · params 0.262M · composite 0.8536" [ref=e493]
+      - generic [ref=e494]: combo7_pb_gm_pd_pdw_plr_
+      - generic [ref=e495]: 85.29%
+      - generic "pair_pd_pdw · cifar10 · seed0 · top-1 85.24% · params 0.262M · composite 0.8562" [ref=e496]
+      - generic [ref=e497]: pair_pd_pdw
+      - generic [ref=e498]: 85.24%
+      - generic "loo_no_pdw · cifar10 · seed0 · top-1 84.97% · params 0.262M · composite 0.8456" [ref=e499]
+      - generic [ref=e500]: loo_no_pdw
+      - generic [ref=e501]: 84.97%
+      - generic "combo8_pb_gm_pd_pdw_plr_fe_sa_ · cifar10 · seed0 · top-1 84.96% · params 0.262M · composite 0.8451" [ref=e502]
+      - generic [ref=e503]: combo8_pb_gm_pd_pdw_plr_
+      - generic [ref=e504]: 84.96%
+      - generic "combo6_pb_gm_pd_pdw_plr_fe · cifar10 · seed0 · top-1 84.90% · params 0.262M · composite 0.8532" [ref=e505]
+      - generic [ref=e506]: combo6_pb_gm_pd_pdw_plr_
+      - generic [ref=e507]: 84.90%
+      - generic "loo_no_sa · cifar10 · seed0 · top-1 84.82% · params 0.262M · composite 0.8451" [ref=e508]
+      - generic [ref=e509]: loo_no_sa
+      - generic [ref=e510]: 84.82%
+      - generic "loo_no_gm · cifar10 · seed0 · top-1 84.27% · params 0.262M · composite 0.8382" [ref=e511]
+      - generic [ref=e512]: loo_no_gm
+      - generic [ref=e513]: 84.27%
+      - generic "loo_no_fe · cifar10 · seed0 · top-1 84.03% · params 0.262M · composite 0.8367" [ref=e514]
+      - generic [ref=e515]: loo_no_fe
+      - generic [ref=e516]: 84.03%
+      - generic "loo_no_plr · cifar10 · seed0 · top-1 83.83% · params 0.262M · composite 0.8341" [ref=e517]
+      - generic [ref=e518]: loo_no_plr
+      - generic [ref=e519]: 83.83%
+      - generic "sg_only_fractal · cifar10 · seed0 · top-1 82.46% · params 0.259M · composite 0.8104" [ref=e520]
+      - generic [ref=e521]: sg_only_fractal
+      - generic [ref=e522]: 82.46%
+      - generic "sg_only_fractal · cifar10 · seed2 · top-1 82.46% · params 0.259M · composite 0.8061" [ref=e523]
+      - generic [ref=e524]: sg_only_fractal
+      - generic [ref=e525]: 82.46%
+    - img [ref=e527]:
+      - generic [ref=e528]: G1 — Scaling & Growth · composite × params
+      - generic [ref=e529]: "0.458"
+      - generic [ref=e530]: "0.569"
+      - generic [ref=e531]: "0.680"
+      - generic [ref=e532]: "0.790"
+      - generic [ref=e533]: "0.901"
+      - generic [ref=e534]: 10^-1 M
+      - generic [ref=e535]: params (M) →
+      - generic [ref=e536]: composite →
+      - generic "pair_gm_pdw · cifar10 · seed0 · params 0.262M · composite 0.8634 · top-1 85.85%" [ref=e537]
+      - generic [ref=e538]: pair_gm_pdw
+      - generic "combo3_pb_gm_pd · cifar10 · seed0 · params 0.262M · composite 0.8601 · top-1 85.66%" [ref=e539]
+      - generic [ref=e540]: combo3_pb_gm_pd
+      - generic "combo2_pb_gm · cifar10 · seed0 · params 0.262M · composite 0.8592 · top-1 85.62%" [ref=e541]
+      - generic [ref=e542]: combo2_pb_gm
+      - generic "sg_only_phi_budget · cifar10 · seed1 · params 0.284M · composite 0.8568 · top-1 85.48%" [ref=e543]
+      - generic [ref=e544]: sg_only_phi_budget
+      - generic "pair_pd_pdw · cifar10 · seed0 · params 0.262M · composite 0.8562 · top-1 85.24%" [ref=e545]
+      - generic [ref=e546]: pair_pd_pdw
+      - generic "combo4_pb_gm_pd_pdw · cifar10 · seed0 · params 0.262M · composite 0.8558 · top-1 85.44%" [ref=e547]
+      - generic [ref=e548]: combo4_pb_gm_pd_pdw
+      - generic "loo_no_fp · cifar10 · seed0 · params 0.262M · composite 0.8556 · top-1 85.29%" [ref=e549]
+      - generic [ref=e550]: loo_no_fp
+      - generic "sg_only_phi_budget · cifar10 · seed2 · params 0.284M · composite 0.8550 · top-1 85.51%" [ref=e551]
+      - generic [ref=e552]: sg_only_phi_budget
+      - generic "combo7_pb_gm_pd_pdw_plr_fe_sa · cifar10 · seed0 · params 0.262M · composite 0.8536 · top-1 85.29%" [ref=e553]
+      - generic "combo6_pb_gm_pd_pdw_plr_fe · cifar10 · seed0 · params 0.262M · composite 0.8532 · top-1 84.90%" [ref=e554]
+      - generic "loo_no_pd · cifar10 · seed0 · params 0.262M · composite 0.8494 · top-1 85.37%" [ref=e555]
+      - generic [ref=e556]: loo_no_pd
+      - generic "loo_no_pdw · cifar10 · seed0 · params 0.262M · composite 0.8456 · top-1 84.97%" [ref=e557]
+      - generic [ref=e558]: loo_no_pdw
+      - generic "combo8_pb_gm_pd_pdw_plr_fe_sa_fp · cifar10 · seed0 · params 0.262M · composite 0.8451 · top-1 84.96%" [ref=e559]
+      - generic "loo_no_sa · cifar10 · seed0 · params 0.262M · composite 0.8451 · top-1 84.82%" [ref=e560]
+      - generic [ref=e561]: loo_no_sa
+      - generic "loo_no_gm · cifar10 · seed0 · params 0.262M · composite 0.8382 · top-1 84.27%" [ref=e562]
+      - generic [ref=e563]: loo_no_gm
+      - generic "loo_no_fe · cifar10 · seed0 · params 0.262M · composite 0.8367 · top-1 84.03%" [ref=e564]
+      - generic [ref=e565]: loo_no_fe
+      - generic "loo_no_plr · cifar10 · seed0 · params 0.262M · composite 0.8341 · top-1 83.83%" [ref=e566]
+      - generic [ref=e567]: loo_no_plr
+      - generic "sg_only_phi_budget · cifar10 · seed0 · params 0.262M · composite 0.8338 · top-1 85.56%" [ref=e568]
+      - generic [ref=e569]: sg_only_phi_budget
+      - generic "sg_only_fib_depth · cifar10 · seed0 · params 0.180M · composite 0.8261 · top-1 82.18%" [ref=e570]
+      - generic [ref=e571]: sg_only_fib_depth
+      - generic "pair_pd_plr · cifar10 · seed0 · params 0.262M · composite 0.8215 · top-1 81.31%" [ref=e572]
+      - generic [ref=e573]: pair_pd_plr
+      - generic "sg_chan_fib · cifar10 · seed1 · params 0.127M · composite 0.8186 · top-1 80.74%" [ref=e574]
+      - generic [ref=e575]: sg_chan_fib
+      - generic "sg_chan_fib · cifar10 · seed2 · params 0.127M · composite 0.8176 · top-1 81.21%" [ref=e576]
+      - generic [ref=e577]: sg_chan_fib
+      - generic "sg_chan_phi · cifar10 · seed1 · params 0.127M · composite 0.8158 · top-1 80.74%" [ref=e578]
+      - generic [ref=e579]: sg_chan_phi
+      - generic "sg_only_golden_resize · cifar10 · seed0 · params 0.127M · composite 0.8157 · top-1 80.67%" [ref=e580]
+      - generic [ref=e581]: sg_only_golden_resize
+      - generic "sg_chan_phi · cifar10 · seed0 · params 0.127M · composite 0.8152 · top-1 80.11%" [ref=e582]
+      - generic [ref=e583]: sg_chan_phi
+      - generic "sg_only_phi_compound · cifar10 · seed0 · params 0.127M · composite 0.8152 · top-1 80.42%" [ref=e584]
+      - generic [ref=e585]: sg_only_phi_compound
+      - generic "sg_only_phi_multiscale · cifar10 · seed0 · params 0.195M · composite 0.8151 · top-1 82.00%" [ref=e586]
+      - generic [ref=e587]: sg_only_phi_multiscale
+      - generic "sg_chan_fib · cifar10 · seed0 · params 0.127M · composite 0.8135 · top-1 80.11%" [ref=e588]
+      - generic [ref=e589]: sg_chan_fib
+      - generic "pair_pdw_plr · cifar10 · seed0 · params 0.262M · composite 0.8116 · top-1 81.55%" [ref=e590]
+      - generic [ref=e591]: pair_pdw_plr
+      - generic "sg_only_fractal · cifar10 · seed0 · params 0.259M · composite 0.8104 · top-1 82.46%" [ref=e592]
+      - generic [ref=e593]: sg_only_fractal
+      - generic "sg_only_fractal · cifar10 · seed2 · params 0.259M · composite 0.8061 · top-1 82.46%" [ref=e594]
+      - generic [ref=e595]: sg_only_fractal
+      - generic "pair_gm_plr · cifar10 · seed0 · params 0.262M · composite 0.8058 · top-1 80.36%" [ref=e596]
+      - generic [ref=e597]: pair_gm_plr
+      - generic "sg_only_phi_lr · cifar10 · seed0 · params 0.127M · composite 0.8005 · top-1 78.75%" [ref=e598]
+      - generic [ref=e599]: sg_only_phi_lr
+      - generic "combo5_pb_gm_pd_pdw_plr · cifar10 · seed0 · params 0.262M · composite 0.8000 · top-1 79.78%" [ref=e600]
+      - generic "sg_chan_phi · cifar10 · seed2 · params 0.127M · composite 0.7959 · top-1 81.21%" [ref=e601]
+      - generic [ref=e602]: sg_chan_phi
+      - generic "sg_only_fractal · cifar10 · seed1 · params 0.259M · composite 0.7871 · top-1 81.70%" [ref=e603]
+      - generic [ref=e604]: sg_only_fractal
+      - generic "sg_only_golden_bottleneck · cifar10 · seed0 · params 0.058M · composite 0.7018 · top-1 68.79%" [ref=e605]
+      - generic "pair_gm_pdw · cifar100 · seed0 · params 0.268M · composite 0.5544 · top-1 57.86%" [ref=e606]
+      - generic [ref=e607]: pair_gm_pdw
+      - generic "sg_only_phi_budget · cifar100 · seed1 · params 0.268M · composite 0.5540 · top-1 57.75%" [ref=e608]
+      - generic [ref=e609]: sg_only_phi_budget
+      - generic "pair_gm_pdw · cifar100 · seed1 · params 0.268M · composite 0.5532 · top-1 57.89%" [ref=e610]
+      - generic [ref=e611]: pair_gm_pdw
+      - generic "pair_gm_pdw · cifar100 · seed2 · params 0.268M · composite 0.5520 · top-1 57.61%" [ref=e612]
+      - generic [ref=e613]: pair_gm_pdw
+      - generic "sg_only_phi_budget · cifar100 · seed0 · params 0.268M · composite 0.5489 · top-1 57.41%" [ref=e614]
+      - generic [ref=e615]: sg_only_phi_budget
+      - generic "sg_only_phi_budget · cifar100 · seed2 · params 0.268M · composite 0.5443 · top-1 56.87%" [ref=e616]
+      - generic [ref=e617]: sg_only_phi_budget
+      - generic "sg_only_fib_depth · cifar100 · seed0 · params 0.184M · composite 0.5187 · top-1 51.78%" [ref=e618]
+      - generic [ref=e619]: sg_only_fib_depth
+      - generic "sg_only_fractal · cifar100 · seed0 · params 0.263M · composite 0.4881 · top-1 50.72%" [ref=e620]
+      - generic [ref=e621]: sg_only_fractal
+    - table [ref=e622]:
+      - rowgroup [ref=e623]:
+        - row "Tag DS Seed Top-1 Composite Params Hyp Curve" [ref=e624]:
+          - columnheader "Tag" [ref=e625] [cursor=pointer]
+          - columnheader "DS" [ref=e626] [cursor=pointer]
+          - columnheader "Seed" [ref=e627] [cursor=pointer]
+          - columnheader "Top-1" [ref=e628] [cursor=pointer]
+          - columnheader "Composite" [ref=e629] [cursor=pointer]
+          - columnheader "Params" [ref=e630] [cursor=pointer]
+          - columnheader "Hyp" [ref=e631] [cursor=pointer]
+          - columnheader "Curve" [ref=e632] [cursor=pointer]
+      - rowgroup [ref=e633]:
+        - row "pair_gm_pdw n=1 scre cifar10 0 85.85% 0.8634 0.262M H09" [ref=e634] [cursor=pointer]:
+          - cell "pair_gm_pdw n=1 scre" [ref=e635]:
+            - link "pair_gm_pdw" [ref=e636]:
+              - /url: experiments/cifar10__pair_gm_pdw_seed0.html
+            - 'generic "Rule 28: SCREENING = n=1 seed; EVALUATION = n>=3 seeds AND Phase-5 gate cleared." [ref=e637]': n=1 scre
+          - cell "cifar10" [ref=e638]
+          - cell "0" [ref=e639]
+          - cell "85.85%" [ref=e640]
+          - cell "0.8634" [ref=e641]
+          - cell "0.262M" [ref=e642]
+          - cell "H09" [ref=e643]
+          - cell [ref=e644]:
+            - img [ref=e645]
+        - row "combo3_pb_gm_pd n=1 scre cifar10 0 85.66% 0.8601 0.262M H09" [ref=e648] [cursor=pointer]:
+          - cell "combo3_pb_gm_pd n=1 scre" [ref=e649]:
+            - link "combo3_pb_gm_pd" [ref=e650]:
+              - /url: experiments/cifar10__combo3_pb_gm_pd_seed0.html
+            - 'generic "Rule 28: SCREENING = n=1 seed; EVALUATION = n>=3 seeds AND Phase-5 gate cleared." [ref=e651]': n=1 scre
+          - cell "cifar10" [ref=e652]
+          - cell "0" [ref=e653]
+          - cell "85.66%" [ref=e654]
+          - cell "0.8601" [ref=e655]
+          - cell "0.262M" [ref=e656]
+          - cell "H09" [ref=e657]
+          - cell [ref=e658]:
+            - img [ref=e659]
+        - row "combo2_pb_gm n=1 scre cifar10 0 85.62% 0.8592 0.262M H09" [ref=e662] [cursor=pointer]:
+          - cell "combo2_pb_gm n=1 scre" [ref=e663]:
+            - link "combo2_pb_gm" [ref=e664]:
+              - /url: experiments/cifar10__combo2_pb_gm_seed0.html
+            - 'generic "Rule 28: SCREENING = n=1 seed; EVALUATION = n>=3 seeds AND Phase-5 gate cleared." [ref=e665]': n=1 scre
+          - cell "cifar10" [ref=e666]
+          - cell "0" [ref=e667]
+          - cell "85.62%" [ref=e668]
+          - cell "0.8592" [ref=e669]
+          - cell "0.262M" [ref=e670]
+          - cell "H09" [ref=e671]
+          - cell [ref=e672]:
+            - img [ref=e673]
+        - row "sg_only_phi_budget n=3 scre cifar10 1 85.48% 0.8568 0.284M H09" [ref=e676] [cursor=pointer]:
+          - cell "sg_only_phi_budget n=3 scre" [ref=e677]:
+            - link "sg_only_phi_budget" [ref=e678]:
+              - /url: experiments/cifar10__sg_only_phi_budget_seed1.html
+            - 'generic "Rule 28: SCREENING = n=1 seed; EVALUATION = n>=3 seeds AND Phase-5 gate cleared." [ref=e679]': n=3 scre
+          - cell "cifar10" [ref=e680]
+          - cell "1" [ref=e681]
+          - cell "85.48%" [ref=e682]
+          - cell "0.8568" [ref=e683]
+          - cell "0.284M" [ref=e684]
+          - cell "H09" [ref=e685]
+          - cell [ref=e686]:
+            - img [ref=e687]
+        - row "pair_pd_pdw n=1 scre cifar10 0 85.24% 0.8562 0.262M H09" [ref=e690] [cursor=pointer]:
+          - cell "pair_pd_pdw n=1 scre" [ref=e691]:
+            - link "pair_pd_pdw" [ref=e692]:
+              - /url: experiments/cifar10__pair_pd_pdw_seed0.html
+            - 'generic "Rule 28: SCREENING = n=1 seed; EVALUATION = n>=3 seeds AND Phase-5 gate cleared." [ref=e693]': n=1 scre
+          - cell "cifar10" [ref=e694]
+          - cell "0" [ref=e695]
+          - cell "85.24%" [ref=e696]
+          - cell "0.8562" [ref=e697]
+          - cell "0.262M" [ref=e698]
+          - cell "H09" [ref=e699]
+          - cell [ref=e700]:
+            - img [ref=e701]
+        - row "combo4_pb_gm_pd_pdw n=1 scre cifar10 0 85.44% 0.8558 0.262M H09" [ref=e704] [cursor=pointer]:
+          - cell "combo4_pb_gm_pd_pdw n=1 scre" [ref=e705]:
+            - link "combo4_pb_gm_pd_pdw" [ref=e706]:
+              - /url: experiments/cifar10__combo4_pb_gm_pd_pdw_seed0.html
+            - 'generic "Rule 28: SCREENING = n=1 seed; EVALUATION = n>=3 seeds AND Phase-5 gate cleared." [ref=e707]': n=1 scre
+          - cell "cifar10" [ref=e708]
+          - cell "0" [ref=e709]
+          - cell "85.44%" [ref=e710]
+          - cell "0.8558" [ref=e711]
+          - cell "0.262M" [ref=e712]
+          - cell "H09" [ref=e713]
+          - cell [ref=e714]:
+            - img [ref=e715]
+        - row "loo_no_fp n=1 scre cifar10 0 85.29% 0.8556 0.262M H09" [ref=e718] [cursor=pointer]:
+          - cell "loo_no_fp n=1 scre" [ref=e719]:
+            - link "loo_no_fp" [ref=e720]:
+              - /url: experiments/cifar10__loo_no_fp_seed0.html
+            - 'generic "Rule 28: SCREENING = n=1 seed; EVALUATION = n>=3 seeds AND Phase-5 gate cleared." [ref=e721]': n=1 scre
+          - cell "cifar10" [ref=e722]
+          - cell "0" [ref=e723]
+          - cell "85.29%" [ref=e724]
+          - cell "0.8556" [ref=e725]
+          - cell "0.262M" [ref=e726]
+          - cell "H09" [ref=e727]
+          - cell [ref=e728]:
+            - img [ref=e729]
+        - row "sg_only_phi_budget n=3 scre cifar10 2 85.51% 0.8550 0.284M H09" [ref=e732] [cursor=pointer]:
+          - cell "sg_only_phi_budget n=3 scre" [ref=e733]:
+            - link "sg_only_phi_budget" [ref=e734]:
+              - /url: experiments/cifar10__sg_only_phi_budget_seed2.html
+            - 'generic "Rule 28: SCREENING = n=1 seed; EVALUATION = n>=3 seeds AND Phase-5 gate cleared." [ref=e735]': n=3 scre
+          - cell "cifar10" [ref=e736]
+          - cell "2" [ref=e737]
+          - cell "85.51%" [ref=e738]
+          - cell "0.8550" [ref=e739]
+          - cell "0.284M" [ref=e740]
+          - cell "H09" [ref=e741]
+          - cell [ref=e742]:
+            - img [ref=e743]
+        - row "combo7_pb_gm_pd_pdw_plr_fe_sa n=1 scre cifar10 0 85.29% 0.8536 0.262M H09" [ref=e746] [cursor=pointer]:
+          - cell "combo7_pb_gm_pd_pdw_plr_fe_sa n=1 scre" [ref=e747]:
+            - link "combo7_pb_gm_pd_pdw_plr_fe_sa" [ref=e748]:
+              - /url: experiments/cifar10__combo7_pb_gm_pd_pdw_plr_fe_sa_seed0.html
+            - 'generic "Rule 28: SCREENING = n=1 seed; EVALUATION = n>=3 seeds AND Phase-5 gate cleared." [ref=e749]': n=1 scre
+          - cell "cifar10" [ref=e750]
+          - cell "0" [ref=e751]
+          - cell "85.29%" [ref=e752]
+          - cell "0.8536" [ref=e753]
+          - cell "0.262M" [ref=e754]
+          - cell "H09" [ref=e755]
+          - cell [ref=e756]:
+            - img [ref=e757]
+        - row "combo6_pb_gm_pd_pdw_plr_fe n=1 scre cifar10 0 84.90% 0.8532 0.262M H09" [ref=e760] [cursor=pointer]:
+          - cell "combo6_pb_gm_pd_pdw_plr_fe n=1 scre" [ref=e761]:
+            - link "combo6_pb_gm_pd_pdw_plr_fe" [ref=e762]:
+              - /url: experiments/cifar10__combo6_pb_gm_pd_pdw_plr_fe_seed0.html
+            - 'generic "Rule 28: SCREENING = n=1 seed; EVALUATION = n>=3 seeds AND Phase-5 gate cleared." [ref=e763]': n=1 scre
+          - cell "cifar10" [ref=e764]
+          - cell "0" [ref=e765]
+          - cell "84.90%" [ref=e766]
+          - cell "0.8532" [ref=e767]
+          - cell "0.262M" [ref=e768]
+          - cell "H09" [ref=e769]
+          - cell [ref=e770]:
+            - img [ref=e771]
+        - row "loo_no_pd n=1 scre cifar10 0 85.37% 0.8494 0.262M H09" [ref=e774] [cursor=pointer]:
+          - cell "loo_no_pd n=1 scre" [ref=e775]:
+            - link "loo_no_pd" [ref=e776]:
+              - /url: experiments/cifar10__loo_no_pd_seed0.html
+            - 'generic "Rule 28: SCREENING = n=1 seed; EVALUATION = n>=3 seeds AND Phase-5 gate cleared." [ref=e777]': n=1 scre
+          - cell "cifar10" [ref=e778]
+          - cell "0" [ref=e779]
+          - cell "85.37%" [ref=e780]
+          - cell "0.8494" [ref=e781]
+          - cell "0.262M" [ref=e782]
+          - cell "H09" [ref=e783]
+          - cell [ref=e784]:
+            - img [ref=e785]
+        - row "loo_no_pdw n=1 scre cifar10 0 84.97% 0.8456 0.262M H09" [ref=e788] [cursor=pointer]:
+          - cell "loo_no_pdw n=1 scre" [ref=e789]:
+            - link "loo_no_pdw" [ref=e790]:
+              - /url: experiments/cifar10__loo_no_pdw_seed0.html
+            - 'generic "Rule 28: SCREENING = n=1 seed; EVALUATION = n>=3 seeds AND Phase-5 gate cleared." [ref=e791]': n=1 scre
+          - cell "cifar10" [ref=e792]
+          - cell "0" [ref=e793]
+          - cell "84.97%" [ref=e794]
+          - cell "0.8456" [ref=e795]
+          - cell "0.262M" [ref=e796]
+          - cell "H09" [ref=e797]
+          - cell [ref=e798]:
+            - img [ref=e799]
+        - row "combo8_pb_gm_pd_pdw_plr_fe_sa_fp n=1 scre cifar10 0 84.96% 0.8451 0.262M H09" [ref=e802] [cursor=pointer]:
+          - cell "combo8_pb_gm_pd_pdw_plr_fe_sa_fp n=1 scre" [ref=e803]:
+            - link "combo8_pb_gm_pd_pdw_plr_fe_sa_fp" [ref=e804]:
+              - /url: experiments/cifar10__combo8_pb_gm_pd_pdw_plr_fe_sa_fp_seed0.html
+            - 'generic "Rule 28: SCREENING = n=1 seed; EVALUATION = n>=3 seeds AND Phase-5 gate cleared." [ref=e805]': n=1 scre
+          - cell "cifar10" [ref=e806]
+          - cell "0" [ref=e807]
+          - cell "84.96%" [ref=e808]
+          - cell "0.8451" [ref=e809]
+          - cell "0.262M" [ref=e810]
+          - cell "H09" [ref=e811]
+          - cell [ref=e812]:
+            - img [ref=e813]
+        - row "loo_no_sa n=1 scre cifar10 0 84.82% 0.8451 0.262M H09" [ref=e816] [cursor=pointer]:
+          - cell "loo_no_sa n=1 scre" [ref=e817]:
+            - link "loo_no_sa" [ref=e818]:
+              - /url: experiments/cifar10__loo_no_sa_seed0.html
+            - 'generic "Rule 28: SCREENING = n=1 seed; EVALUATION = n>=3 seeds AND Phase-5 gate cleared." [ref=e819]': n=1 scre
+          - cell "cifar10" [ref=e820]
+          - cell "0" [ref=e821]
+          - cell "84.82%" [ref=e822]
+          - cell "0.8451" [ref=e823]
+          - cell "0.262M" [ref=e824]
+          - cell "H09" [ref=e825]
+          - cell [ref=e826]:
+            - img [ref=e827]
+        - row "loo_no_gm n=1 scre cifar10 0 84.27% 0.8382 0.262M H09" [ref=e830] [cursor=pointer]:
+          - cell "loo_no_gm n=1 scre" [ref=e831]:
+            - link "loo_no_gm" [ref=e832]:
+              - /url: experiments/cifar10__loo_no_gm_seed0.html
+            - 'generic "Rule 28: SCREENING = n=1 seed; EVALUATION = n>=3 seeds AND Phase-5 gate cleared." [ref=e833]': n=1 scre
+          - cell "cifar10" [ref=e834]
+          - cell "0" [ref=e835]
+          - cell "84.27%" [ref=e836]
+          - cell "0.8382" [ref=e837]
+          - cell "0.262M" [ref=e838]
+          - cell "H09" [ref=e839]
+          - cell [ref=e840]:
+            - img [ref=e841]
+        - row "loo_no_fe n=1 scre cifar10 0 84.03% 0.8367 0.262M H09" [ref=e844] [cursor=pointer]:
+          - cell "loo_no_fe n=1 scre" [ref=e845]:
+            - link "loo_no_fe" [ref=e846]:
+              - /url: experiments/cifar10__loo_no_fe_seed0.html
+            - 'generic "Rule 28: SCREENING = n=1 seed; EVALUATION = n>=3 seeds AND Phase-5 gate cleared." [ref=e847]': n=1 scre
+          - cell "cifar10" [ref=e848]
+          - cell "0" [ref=e849]
+          - cell "84.03%" [ref=e850]
+          - cell "0.8367" [ref=e851]
+          - cell "0.262M" [ref=e852]
+          - cell "H09" [ref=e853]
+          - cell [ref=e854]:
+            - img [ref=e855]
+        - row "loo_no_plr n=1 scre cifar10 0 83.83% 0.8341 0.262M H09" [ref=e858] [cursor=pointer]:
+          - cell "loo_no_plr n=1 scre" [ref=e859]:
+            - link "loo_no_plr" [ref=e860]:
+              - /url: experiments/cifar10__loo_no_plr_seed0.html
+            - 'generic "Rule 28: SCREENING = n=1 seed; EVALUATION = n>=3 seeds AND Phase-5 gate cleared." [ref=e861]': n=1 scre
+          - cell "cifar10" [ref=e862]
+          - cell "0" [ref=e863]
+          - cell "83.83%" [ref=e864]
+          - cell "0.8341" [ref=e865]
+          - cell "0.262M" [ref=e866]
+          - cell "H09" [ref=e867]
+          - cell [ref=e868]:
+            - img [ref=e869]
+        - row "sg_only_phi_budget n=3 scre cifar10 0 85.56% 0.8338 0.262M H09" [ref=e872] [cursor=pointer]:
+          - cell "sg_only_phi_budget n=3 scre" [ref=e873]:
+            - link "sg_only_phi_budget" [ref=e874]:
+              - /url: experiments/cifar10__sg_only_phi_budget_seed0.html
+            - 'generic "Rule 28: SCREENING = n=1 seed; EVALUATION = n>=3 seeds AND Phase-5 gate cleared." [ref=e875]': n=3 scre
+          - cell "cifar10" [ref=e876]
+          - cell "0" [ref=e877]
+          - cell "85.56%" [ref=e878]
+          - cell "0.8338" [ref=e879]
+          - cell "0.262M" [ref=e880]
+          - cell "H09" [ref=e881]
+          - cell [ref=e882]:
+            - img [ref=e883]
+        - row "sg_only_fib_depth n=1 scre cifar10 0 82.18% 0.8261 0.180M H02" [ref=e886] [cursor=pointer]:
+          - cell "sg_only_fib_depth n=1 scre" [ref=e887]:
+            - link "sg_only_fib_depth" [ref=e888]:
+              - /url: experiments/cifar10__sg_only_fib_depth_seed0.html
+            - 'generic "Rule 28: SCREENING = n=1 seed; EVALUATION = n>=3 seeds AND Phase-5 gate cleared." [ref=e889]': n=1 scre
+          - cell "cifar10" [ref=e890]
+          - cell "0" [ref=e891]
+          - cell "82.18%" [ref=e892]
+          - cell "0.8261" [ref=e893]
+          - cell "0.180M" [ref=e894]
+          - cell "H02" [ref=e895]
+          - cell [ref=e896]:
+            - img [ref=e897]
+        - row "pair_pd_plr n=1 scre cifar10 0 81.31% 0.8215 0.262M H09" [ref=e900] [cursor=pointer]:
+          - cell "pair_pd_plr n=1 scre" [ref=e901]:
+            - link "pair_pd_plr" [ref=e902]:
+              - /url: experiments/cifar10__pair_pd_plr_seed0.html
+            - 'generic "Rule 28: SCREENING = n=1 seed; EVALUATION = n>=3 seeds AND Phase-5 gate cleared." [ref=e903]': n=1 scre
+          - cell "cifar10" [ref=e904]
+          - cell "0" [ref=e905]
+          - cell "81.31%" [ref=e906]
+          - cell "0.8215" [ref=e907]
+          - cell "0.262M" [ref=e908]
+          - cell "H09" [ref=e909]
+          - cell [ref=e910]:
+            - img [ref=e911]
+        - row "sg_chan_fib n=3 scre cifar10 1 80.74% 0.8186 0.127M H04" [ref=e914] [cursor=pointer]:
+          - cell "sg_chan_fib n=3 scre" [ref=e915]:
+            - link "sg_chan_fib" [ref=e916]:
+              - /url: experiments/cifar10__sg_chan_fib_seed1.html
+            - 'generic "Rule 28: SCREENING = n=1 seed; EVALUATION = n>=3 seeds AND Phase-5 gate cleared." [ref=e917]': n=3 scre
+          - cell "cifar10" [ref=e918]
+          - cell "1" [ref=e919]
+          - cell "80.74%" [ref=e920]
+          - cell "0.8186" [ref=e921]
+          - cell "0.127M" [ref=e922]
+          - cell "H04" [ref=e923]
+          - cell [ref=e924]:
+            - img [ref=e925]
+        - row "sg_chan_fib n=3 scre cifar10 2 81.21% 0.8176 0.127M H04" [ref=e928] [cursor=pointer]:
+          - cell "sg_chan_fib n=3 scre" [ref=e929]:
+            - link "sg_chan_fib" [ref=e930]:
+              - /url: experiments/cifar10__sg_chan_fib_seed2.html
+            - 'generic "Rule 28: SCREENING = n=1 seed; EVALUATION = n>=3 seeds AND Phase-5 gate cleared." [ref=e931]': n=3 scre
+          - cell "cifar10" [ref=e932]
+          - cell "2" [ref=e933]
+          - cell "81.21%" [ref=e934]
+          - cell "0.8176" [ref=e935]
+          - cell "0.127M" [ref=e936]
+          - cell "H04" [ref=e937]
+          - cell [ref=e938]:
+            - img [ref=e939]
+        - row "sg_chan_phi n=3 scre cifar10 1 80.74% 0.8158 0.127M H04" [ref=e942] [cursor=pointer]:
+          - cell "sg_chan_phi n=3 scre" [ref=e943]:
+            - link "sg_chan_phi" [ref=e944]:
+              - /url: experiments/cifar10__sg_chan_phi_seed1.html
+            - 'generic "Rule 28: SCREENING = n=1 seed; EVALUATION = n>=3 seeds AND Phase-5 gate cleared." [ref=e945]': n=3 scre
+          - cell "cifar10" [ref=e946]
+          - cell "1" [ref=e947]
+          - cell "80.74%" [ref=e948]
+          - cell "0.8158" [ref=e949]
+          - cell "0.127M" [ref=e950]
+          - cell "H04" [ref=e951]
+          - cell [ref=e952]:
+            - img [ref=e953]
+        - row "sg_only_golden_resize n=1 scre cifar10 0 80.67% 0.8157 0.127M H03" [ref=e956] [cursor=pointer]:
+          - cell "sg_only_golden_resize n=1 scre" [ref=e957]:
+            - link "sg_only_golden_resize" [ref=e958]:
+              - /url: experiments/cifar10__sg_only_golden_resize_seed0.html
+            - 'generic "Rule 28: SCREENING = n=1 seed; EVALUATION = n>=3 seeds AND Phase-5 gate cleared." [ref=e959]': n=1 scre
+          - cell "cifar10" [ref=e960]
+          - cell "0" [ref=e961]
+          - cell "80.67%" [ref=e962]
+          - cell "0.8157" [ref=e963]
+          - cell "0.127M" [ref=e964]
+          - cell "H03" [ref=e965]
+          - cell [ref=e966]:
+            - img [ref=e967]
+        - row "sg_chan_phi n=3 scre cifar10 0 80.11% 0.8152 0.127M H04" [ref=e970] [cursor=pointer]:
+          - cell "sg_chan_phi n=3 scre" [ref=e971]:
+            - link "sg_chan_phi" [ref=e972]:
+              - /url: experiments/cifar10__sg_chan_phi_seed0.html
+            - 'generic "Rule 28: SCREENING = n=1 seed; EVALUATION = n>=3 seeds AND Phase-5 gate cleared." [ref=e973]': n=3 scre
+          - cell "cifar10" [ref=e974]
+          - cell "0" [ref=e975]
+          - cell "80.11%" [ref=e976]
+          - cell "0.8152" [ref=e977]
+          - cell "0.127M" [ref=e978]
+          - cell "H04" [ref=e979]
+          - cell [ref=e980]:
+            - img [ref=e981]
+        - row "sg_only_phi_compound n=1 scre cifar10 0 80.42% 0.8152 0.127M H01" [ref=e984] [cursor=pointer]:
+          - cell "sg_only_phi_compound n=1 scre" [ref=e985]:
+            - link "sg_only_phi_compound" [ref=e986]:
+              - /url: experiments/cifar10__sg_only_phi_compound_seed0.html
+            - 'generic "Rule 28: SCREENING = n=1 seed; EVALUATION = n>=3 seeds AND Phase-5 gate cleared." [ref=e987]': n=1 scre
+          - cell "cifar10" [ref=e988]
+          - cell "0" [ref=e989]
+          - cell "80.42%" [ref=e990]
+          - cell "0.8152" [ref=e991]
+          - cell "0.127M" [ref=e992]
+          - cell "H01" [ref=e993]
+          - cell [ref=e994]:
+            - img [ref=e995]
+        - row "sg_only_phi_multiscale n=1 scre cifar10 0 82.00% 0.8151 0.195M H07" [ref=e998] [cursor=pointer]:
+          - cell "sg_only_phi_multiscale n=1 scre" [ref=e999]:
+            - link "sg_only_phi_multiscale" [ref=e1000]:
+              - /url: experiments/cifar10__sg_only_phi_multiscale_seed0.html
+            - 'generic "Rule 28: SCREENING = n=1 seed; EVALUATION = n>=3 seeds AND Phase-5 gate cleared." [ref=e1001]': n=1 scre
+          - cell "cifar10" [ref=e1002]
+          - cell "0" [ref=e1003]
+          - cell "82.00%" [ref=e1004]
+          - cell "0.8151" [ref=e1005]
+          - cell "0.195M" [ref=e1006]
+          - cell "H07" [ref=e1007]
+          - cell [ref=e1008]:
+            - img [ref=e1009]
+        - row "sg_chan_fib n=3 scre cifar10 0 80.11% 0.8135 0.127M H04" [ref=e1012] [cursor=pointer]:
+          - cell "sg_chan_fib n=3 scre" [ref=e1013]:
+            - link "sg_chan_fib" [ref=e1014]:
+              - /url: experiments/cifar10__sg_chan_fib_seed0.html
+            - 'generic "Rule 28: SCREENING = n=1 seed; EVALUATION = n>=3 seeds AND Phase-5 gate cleared." [ref=e1015]': n=3 scre
+          - cell "cifar10" [ref=e1016]
+          - cell "0" [ref=e1017]
+          - cell "80.11%" [ref=e1018]
+          - cell "0.8135" [ref=e1019]
+          - cell "0.127M" [ref=e1020]
+          - cell "H04" [ref=e1021]
+          - cell [ref=e1022]:
+            - img [ref=e1023]
+        - row "pair_pdw_plr n=1 scre cifar10 0 81.55% 0.8116 0.262M H09" [ref=e1026] [cursor=pointer]:
+          - cell "pair_pdw_plr n=1 scre" [ref=e1027]:
+            - link "pair_pdw_plr" [ref=e1028]:
+              - /url: experiments/cifar10__pair_pdw_plr_seed0.html
+            - 'generic "Rule 28: SCREENING = n=1 seed; EVALUATION = n>=3 seeds AND Phase-5 gate cleared." [ref=e1029]': n=1 scre
+          - cell "cifar10" [ref=e1030]
+          - cell "0" [ref=e1031]
+          - cell "81.55%" [ref=e1032]
+          - cell "0.8116" [ref=e1033]
+          - cell "0.262M" [ref=e1034]
+          - cell "H09" [ref=e1035]
+          - cell [ref=e1036]:
+            - img [ref=e1037]
+        - row "sg_only_fractal n=3 scre cifar10 0 82.46% 0.8104 0.259M H05" [ref=e1040] [cursor=pointer]:
+          - cell "sg_only_fractal n=3 scre" [ref=e1041]:
+            - link "sg_only_fractal" [ref=e1042]:
+              - /url: experiments/cifar10__sg_only_fractal_seed0.html
+            - 'generic "Rule 28: SCREENING = n=1 seed; EVALUATION = n>=3 seeds AND Phase-5 gate cleared." [ref=e1043]': n=3 scre
+          - cell "cifar10" [ref=e1044]
+          - cell "0" [ref=e1045]
+          - cell "82.46%" [ref=e1046]
+          - cell "0.8104" [ref=e1047]
+          - cell "0.259M" [ref=e1048]
+          - cell "H05" [ref=e1049]
+          - cell [ref=e1050]:
+            - img [ref=e1051]
+        - row "sg_only_fractal n=3 scre cifar10 2 82.46% 0.8061 0.259M H05" [ref=e1054] [cursor=pointer]:
+          - cell "sg_only_fractal n=3 scre" [ref=e1055]:
+            - link "sg_only_fractal" [ref=e1056]:
+              - /url: experiments/cifar10__sg_only_fractal_seed2.html
+            - 'generic "Rule 28: SCREENING = n=1 seed; EVALUATION = n>=3 seeds AND Phase-5 gate cleared." [ref=e1057]': n=3 scre
+          - cell "cifar10" [ref=e1058]
+          - cell "2" [ref=e1059]
+          - cell "82.46%" [ref=e1060]
+          - cell "0.8061" [ref=e1061]
+          - cell "0.259M" [ref=e1062]
+          - cell "H05" [ref=e1063]
+          - cell [ref=e1064]:
+            - img [ref=e1065]
+        - row "pair_gm_plr n=1 scre cifar10 0 80.36% 0.8058 0.262M H09" [ref=e1068] [cursor=pointer]:
+          - cell "pair_gm_plr n=1 scre" [ref=e1069]:
+            - link "pair_gm_plr" [ref=e1070]:
+              - /url: experiments/cifar10__pair_gm_plr_seed0.html
+            - 'generic "Rule 28: SCREENING = n=1 seed; EVALUATION = n>=3 seeds AND Phase-5 gate cleared." [ref=e1071]': n=1 scre
+          - cell "cifar10" [ref=e1072]
+          - cell "0" [ref=e1073]
+          - cell "80.36%" [ref=e1074]
+          - cell "0.8058" [ref=e1075]
+          - cell "0.262M" [ref=e1076]
+          - cell "H09" [ref=e1077]
+          - cell [ref=e1078]:
+            - img [ref=e1079]
+        - row "sg_only_phi_lr n=1 scre cifar10 0 78.75% 0.8005 0.127M H10" [ref=e1082] [cursor=pointer]:
+          - cell "sg_only_phi_lr n=1 scre" [ref=e1083]:
+            - link "sg_only_phi_lr" [ref=e1084]:
+              - /url: experiments/cifar10__sg_only_phi_lr_seed0.html
+            - 'generic "Rule 28: SCREENING = n=1 seed; EVALUATION = n>=3 seeds AND Phase-5 gate cleared." [ref=e1085]': n=1 scre
+          - cell "cifar10" [ref=e1086]
+          - cell "0" [ref=e1087]
+          - cell "78.75%" [ref=e1088]
+          - cell "0.8005" [ref=e1089]
+          - cell "0.127M" [ref=e1090]
+          - cell "H10" [ref=e1091]
+          - cell [ref=e1092]:
+            - img [ref=e1093]
+        - row "combo5_pb_gm_pd_pdw_plr n=1 scre cifar10 0 79.78% 0.8000 0.262M H09" [ref=e1096] [cursor=pointer]:
+          - cell "combo5_pb_gm_pd_pdw_plr n=1 scre" [ref=e1097]:
+            - link "combo5_pb_gm_pd_pdw_plr" [ref=e1098]:
+              - /url: experiments/cifar10__combo5_pb_gm_pd_pdw_plr_seed0.html
+            - 'generic "Rule 28: SCREENING = n=1 seed; EVALUATION = n>=3 seeds AND Phase-5 gate cleared." [ref=e1099]': n=1 scre
+          - cell "cifar10" [ref=e1100]
+          - cell "0" [ref=e1101]
+          - cell "79.78%" [ref=e1102]
+          - cell "0.8000" [ref=e1103]
+          - cell "0.262M" [ref=e1104]
+          - cell "H09" [ref=e1105]
+          - cell [ref=e1106]:
+            - img [ref=e1107]
+        - row "sg_chan_phi n=3 scre cifar10 2 81.21% 0.7959 0.127M H04" [ref=e1110] [cursor=pointer]:
+          - cell "sg_chan_phi n=3 scre" [ref=e1111]:
+            - link "sg_chan_phi" [ref=e1112]:
+              - /url: experiments/cifar10__sg_chan_phi_seed2.html
+            - 'generic "Rule 28: SCREENING = n=1 seed; EVALUATION = n>=3 seeds AND Phase-5 gate cleared." [ref=e1113]': n=3 scre
+          - cell "cifar10" [ref=e1114]
+          - cell "2" [ref=e1115]
+          - cell "81.21%" [ref=e1116]
+          - cell "0.7959" [ref=e1117]
+          - cell "0.127M" [ref=e1118]
+          - cell "H04" [ref=e1119]
+          - cell [ref=e1120]:
+            - img [ref=e1121]
+        - row "sg_only_fractal n=3 scre cifar10 1 81.70% 0.7871 0.259M H05" [ref=e1124] [cursor=pointer]:
+          - cell "sg_only_fractal n=3 scre" [ref=e1125]:
+            - link "sg_only_fractal" [ref=e1126]:
+              - /url: experiments/cifar10__sg_only_fractal_seed1.html
+            - 'generic "Rule 28: SCREENING = n=1 seed; EVALUATION = n>=3 seeds AND Phase-5 gate cleared." [ref=e1127]': n=3 scre
+          - cell "cifar10" [ref=e1128]
+          - cell "1" [ref=e1129]
+          - cell "81.70%" [ref=e1130]
+          - cell "0.7871" [ref=e1131]
+          - cell "0.259M" [ref=e1132]
+          - cell "H05" [ref=e1133]
+          - cell [ref=e1134]:
+            - img [ref=e1135]
+        - row "sg_only_golden_bottleneck n=1 scre cifar10 0 68.79% 0.7018 0.058M H06" [ref=e1138] [cursor=pointer]:
+          - cell "sg_only_golden_bottleneck n=1 scre" [ref=e1139]:
+            - link "sg_only_golden_bottleneck" [ref=e1140]:
+              - /url: experiments/cifar10__sg_only_golden_bottleneck_seed0.html
+            - 'generic "Rule 28: SCREENING = n=1 seed; EVALUATION = n>=3 seeds AND Phase-5 gate cleared." [ref=e1141]': n=1 scre
+          - cell "cifar10" [ref=e1142]
+          - cell "0" [ref=e1143]
+          - cell "68.79%" [ref=e1144]
+          - cell "0.7018" [ref=e1145]
+          - cell "0.058M" [ref=e1146]
+          - cell "H06" [ref=e1147]
+          - cell [ref=e1148]:
+            - img [ref=e1149]
+        - row "pair_gm_pdw n=3 eval cifar100 0 57.86% 0.5544 0.268M H09" [ref=e1152] [cursor=pointer]:
+          - cell "pair_gm_pdw n=3 eval" [ref=e1153]:
+            - link "pair_gm_pdw" [ref=e1154]:
+              - /url: experiments/cifar100__pair_gm_pdw_seed0.html
+            - 'generic "Rule 28: SCREENING = n=1 seed; EVALUATION = n>=3 seeds AND Phase-5 gate cleared." [ref=e1155]': n=3 eval
+          - cell "cifar100" [ref=e1156]
+          - cell "0" [ref=e1157]
+          - cell "57.86%" [ref=e1158]
+          - cell "0.5544" [ref=e1159]
+          - cell "0.268M" [ref=e1160]
+          - cell "H09" [ref=e1161]
+          - cell [ref=e1162]:
+            - img [ref=e1163]
+        - row "sg_only_phi_budget n=3 eval cifar100 1 57.75% 0.5540 0.268M H09" [ref=e1166] [cursor=pointer]:
+          - cell "sg_only_phi_budget n=3 eval" [ref=e1167]:
+            - link "sg_only_phi_budget" [ref=e1168]:
+              - /url: experiments/cifar100__sg_only_phi_budget_seed1.html
+            - 'generic "Rule 28: SCREENING = n=1 seed; EVALUATION = n>=3 seeds AND Phase-5 gate cleared." [ref=e1169]': n=3 eval
+          - cell "cifar100" [ref=e1170]
+          - cell "1" [ref=e1171]
+          - cell "57.75%" [ref=e1172]
+          - cell "0.5540" [ref=e1173]
+          - cell "0.268M" [ref=e1174]
+          - cell "H09" [ref=e1175]
+          - cell [ref=e1176]:
+            - img [ref=e1177]
+        - row "pair_gm_pdw n=3 eval cifar100 1 57.89% 0.5532 0.268M H09" [ref=e1180] [cursor=pointer]:
+          - cell "pair_gm_pdw n=3 eval" [ref=e1181]:
+            - link "pair_gm_pdw" [ref=e1182]:
+              - /url: experiments/cifar100__pair_gm_pdw_seed1.html
+            - 'generic "Rule 28: SCREENING = n=1 seed; EVALUATION = n>=3 seeds AND Phase-5 gate cleared." [ref=e1183]': n=3 eval
+          - cell "cifar100" [ref=e1184]
+          - cell "1" [ref=e1185]
+          - cell "57.89%" [ref=e1186]
+          - cell "0.5532" [ref=e1187]
+          - cell "0.268M" [ref=e1188]
+          - cell "H09" [ref=e1189]
+          - cell [ref=e1190]:
+            - img [ref=e1191]
+        - row "pair_gm_pdw n=3 eval cifar100 2 57.61% 0.5520 0.268M H09" [ref=e1194] [cursor=pointer]:
+          - cell "pair_gm_pdw n=3 eval" [ref=e1195]:
+            - link "pair_gm_pdw" [ref=e1196]:
+              - /url: experiments/cifar100__pair_gm_pdw_seed2.html
+            - 'generic "Rule 28: SCREENING = n=1 seed; EVALUATION = n>=3 seeds AND Phase-5 gate cleared." [ref=e1197]': n=3 eval
+          - cell "cifar100" [ref=e1198]
+          - cell "2" [ref=e1199]
+          - cell "57.61%" [ref=e1200]
+          - cell "0.5520" [ref=e1201]
+          - cell "0.268M" [ref=e1202]
+          - cell "H09" [ref=e1203]
+          - cell [ref=e1204]:
+            - img [ref=e1205]
+        - row "sg_only_phi_budget n=3 eval cifar100 0 57.41% 0.5489 0.268M H09" [ref=e1208] [cursor=pointer]:
+          - cell "sg_only_phi_budget n=3 eval" [ref=e1209]:
+            - link "sg_only_phi_budget" [ref=e1210]:
+              - /url: experiments/cifar100__sg_only_phi_budget_seed0.html
+            - 'generic "Rule 28: SCREENING = n=1 seed; EVALUATION = n>=3 seeds AND Phase-5 gate cleared." [ref=e1211]': n=3 eval
+          - cell "cifar100" [ref=e1212]
+          - cell "0" [ref=e1213]
+          - cell "57.41%" [ref=e1214]
+          - cell "0.5489" [ref=e1215]
+          - cell "0.268M" [ref=e1216]
+          - cell "H09" [ref=e1217]
+          - cell [ref=e1218]:
+            - img [ref=e1219]
+        - row "sg_only_phi_budget n=3 eval cifar100 2 56.87% 0.5443 0.268M H09" [ref=e1222] [cursor=pointer]:
+          - cell "sg_only_phi_budget n=3 eval" [ref=e1223]:
+            - link "sg_only_phi_budget" [ref=e1224]:
+              - /url: experiments/cifar100__sg_only_phi_budget_seed2.html
+            - 'generic "Rule 28: SCREENING = n=1 seed; EVALUATION = n>=3 seeds AND Phase-5 gate cleared." [ref=e1225]': n=3 eval
+          - cell "cifar100" [ref=e1226]
+          - cell "2" [ref=e1227]
+          - cell "56.87%" [ref=e1228]
+          - cell "0.5443" [ref=e1229]
+          - cell "0.268M" [ref=e1230]
+          - cell "H09" [ref=e1231]
+          - cell [ref=e1232]:
+            - img [ref=e1233]
+        - row "sg_only_fib_depth n=1 scre cifar100 0 51.78% 0.5187 0.184M H02" [ref=e1236] [cursor=pointer]:
+          - cell "sg_only_fib_depth n=1 scre" [ref=e1237]:
+            - link "sg_only_fib_depth" [ref=e1238]:
+              - /url: experiments/cifar100__sg_only_fib_depth_seed0.html
+            - 'generic "Rule 28: SCREENING = n=1 seed; EVALUATION = n>=3 seeds AND Phase-5 gate cleared." [ref=e1239]': n=1 scre
+          - cell "cifar100" [ref=e1240]
+          - cell "0" [ref=e1241]
+          - cell "51.78%" [ref=e1242]
+          - cell "0.5187" [ref=e1243]
+          - cell "0.184M" [ref=e1244]
+          - cell "H02" [ref=e1245]
+          - cell [ref=e1246]:
+            - img [ref=e1247]
+        - row "sg_only_fractal n=1 scre cifar100 0 50.72% 0.4881 0.263M H05" [ref=e1250] [cursor=pointer]:
+          - cell "sg_only_fractal n=1 scre" [ref=e1251]:
+            - link "sg_only_fractal" [ref=e1252]:
+              - /url: experiments/cifar100__sg_only_fractal_seed0.html
+            - 'generic "Rule 28: SCREENING = n=1 seed; EVALUATION = n>=3 seeds AND Phase-5 gate cleared." [ref=e1253]': n=1 scre
+          - cell "cifar100" [ref=e1254]
+          - cell "0" [ref=e1255]
+          - cell "50.72%" [ref=e1256]
+          - cell "0.4881" [ref=e1257]
+          - cell "0.263M" [ref=e1258]
+          - cell "H05" [ref=e1259]
+          - cell [ref=e1260]:
+            - img [ref=e1261]
+  - generic [ref=e1264]:
+    - heading "G2 — Layer / Channel / Neuron (8 runs)" [level=2] [ref=e1265]
+    - generic [ref=e1266]: Fibonacci-sized MLPs, channel counts, neuron connectivity, skip scaling, head diversity, activation thresholds, ensembles (H11–H20).
+    - img [ref=e1268]:
+      - generic [ref=e1269]: G2 — Layer / Channel / Neuron · top-1 distribution (n=8)
+      - generic [ref=e1270]: 22%
+      - generic [ref=e1271]: 45%
+      - generic [ref=e1272]: 67%
+      - generic [ref=e1273]: 90%
+      - generic [ref=e1274]: top-1 →
+      - generic [ref=e1275]: cifar10 baseline 84.8%
+      - generic "sg_only_golden_skip · cifar10 · seed0 · top-1 81.63% · params 0.272M · composite 0.8014" [ref=e1276]
+      - generic [ref=e1277]: sg_only_golden_skip
+      - generic [ref=e1278]: 81.63%
+      - generic "sg_only_fib_ensemble · cifar10 · seed0 · top-1 80.11% · params 0.127M · composite 0.8132" [ref=e1279]
+      - generic [ref=e1280]: sg_only_fib_ensemble
+      - generic [ref=e1281]: 80.11%
+      - generic "sg_only_golden_modulate · cifar10 · seed0 · top-1 79.81% · params 0.127M · composite 0.8042" [ref=e1282]
+      - generic [ref=e1283]: sg_only_golden_modulate
+      - generic [ref=e1284]: 79.81%
+      - generic "sg_only_golden_modulate · cifar10 · seed1 · top-1 78.32% · params 0.127M · composite 0.7606" [ref=e1285]
+      - generic [ref=e1286]: sg_only_golden_modulate
+      - generic [ref=e1287]: 78.32%
+      - generic "sg_only_golden_modulate · cifar10 · seed2 · top-1 77.92% · params 0.127M · composite 0.7571" [ref=e1288]
+      - generic [ref=e1289]: sg_only_golden_modulate
+      - generic [ref=e1290]: 77.92%
+      - generic "sg_only_phi_sparse · cifar10 · seed0 · top-1 73.33% · params 0.259M · composite 0.6953" [ref=e1291]
+      - generic [ref=e1292]: sg_only_phi_sparse
+      - generic [ref=e1293]: 73.33%
+      - generic "sg_only_fib_stride · cifar10 · seed0 · top-1 72.55% · params 0.259M · composite 0.6872" [ref=e1294]
+      - generic [ref=e1295]: sg_only_fib_stride
+      - generic [ref=e1296]: 72.55%
+      - generic "sg_only_phi_relu · cifar10 · seed0 · top-1 71.07% · params 0.259M · composite 0.6733" [ref=e1297]
+      - generic [ref=e1298]: sg_only_phi_relu
+      - generic [ref=e1299]: 71.07%
+    - img [ref=e1301]:
+      - generic [ref=e1302]: G2 — Layer / Channel / Neuron · composite × params
+      - generic [ref=e1303]: "0.662"
+      - generic [ref=e1304]: "0.703"
+      - generic [ref=e1305]: "0.745"
+      - generic [ref=e1306]: "0.786"
+      - generic [ref=e1307]: "0.827"
+      - generic [ref=e1308]: params (M) →
+      - generic [ref=e1309]: composite →
+      - generic "sg_only_fib_ensemble · cifar10 · seed0 · params 0.127M · composite 0.8132 · top-1 80.11%" [ref=e1310]
+      - generic [ref=e1311]: sg_only_fib_ensemble
+      - generic "sg_only_golden_modulate · cifar10 · seed0 · params 0.127M · composite 0.8042 · top-1 79.81%" [ref=e1312]
+      - generic "sg_only_golden_skip · cifar10 · seed0 · params 0.272M · composite 0.8014 · top-1 81.63%" [ref=e1313]
+      - generic [ref=e1314]: sg_only_golden_skip
+      - generic "sg_only_golden_modulate · cifar10 · seed1 · params 0.127M · composite 0.7606 · top-1 78.32%" [ref=e1315]
+      - generic "sg_only_golden_modulate · cifar10 · seed2 · params 0.127M · composite 0.7571 · top-1 77.92%" [ref=e1316]
+      - generic "sg_only_phi_sparse · cifar10 · seed0 · params 0.259M · composite 0.6953 · top-1 73.33%" [ref=e1317]
+      - generic [ref=e1318]: sg_only_phi_sparse
+      - generic "sg_only_fib_stride · cifar10 · seed0 · params 0.259M · composite 0.6872 · top-1 72.55%" [ref=e1319]
+      - generic [ref=e1320]: sg_only_fib_stride
+      - generic "sg_only_phi_relu · cifar10 · seed0 · params 0.259M · composite 0.6733 · top-1 71.07%" [ref=e1321]
+      - generic [ref=e1322]: sg_only_phi_relu
+    - table [ref=e1323]:
+      - rowgroup [ref=e1324]:
+        - row "Tag DS Seed Top-1 Composite Params Hyp Curve" [ref=e1325]:
+          - columnheader "Tag" [ref=e1326] [cursor=pointer]
+          - columnheader "DS" [ref=e1327] [cursor=pointer]
+          - columnheader "Seed" [ref=e1328] [cursor=pointer]
+          - columnheader "Top-1" [ref=e1329] [cursor=pointer]
+          - columnheader "Composite" [ref=e1330] [cursor=pointer]
+          - columnheader "Params" [ref=e1331] [cursor=pointer]
+          - columnheader "Hyp" [ref=e1332] [cursor=pointer]
+          - columnheader "Curve" [ref=e1333] [cursor=pointer]
+      - rowgroup [ref=e1334]:
+        - row "sg_only_fib_ensemble n=1 scre cifar10 0 80.11% 0.8132 0.127M H20" [ref=e1335] [cursor=pointer]:
+          - cell "sg_only_fib_ensemble n=1 scre" [ref=e1336]:
+            - link "sg_only_fib_ensemble" [ref=e1337]:
+              - /url: experiments/cifar10__sg_only_fib_ensemble_seed0.html
+            - 'generic "Rule 28: SCREENING = n=1 seed; EVALUATION = n>=3 seeds AND Phase-5 gate cleared." [ref=e1338]': n=1 scre
+          - cell "cifar10" [ref=e1339]
+          - cell "0" [ref=e1340]
+          - cell "80.11%" [ref=e1341]
+          - cell "0.8132" [ref=e1342]
+          - cell "0.127M" [ref=e1343]
+          - cell "H20" [ref=e1344]
+          - cell [ref=e1345]:
+            - img [ref=e1346]
+        - row "sg_only_golden_modulate n=3 scre cifar10 0 79.81% 0.8042 0.127M H17" [ref=e1349] [cursor=pointer]:
+          - cell "sg_only_golden_modulate n=3 scre" [ref=e1350]:
+            - link "sg_only_golden_modulate" [ref=e1351]:
+              - /url: experiments/cifar10__sg_only_golden_modulate_seed0.html
+            - 'generic "Rule 28: SCREENING = n=1 seed; EVALUATION = n>=3 seeds AND Phase-5 gate cleared." [ref=e1352]': n=3 scre
+          - cell "cifar10" [ref=e1353]
+          - cell "0" [ref=e1354]
+          - cell "79.81%" [ref=e1355]
+          - cell "0.8042" [ref=e1356]
+          - cell "0.127M" [ref=e1357]
+          - cell "H17" [ref=e1358]
+          - cell [ref=e1359]:
+            - img [ref=e1360]
+        - row "sg_only_golden_skip n=1 scre cifar10 0 81.63% 0.8014 0.272M H17" [ref=e1363] [cursor=pointer]:
+          - cell "sg_only_golden_skip n=1 scre" [ref=e1364]:
+            - link "sg_only_golden_skip" [ref=e1365]:
+              - /url: experiments/cifar10__sg_only_golden_skip_seed0.html
+            - 'generic "Rule 28: SCREENING = n=1 seed; EVALUATION = n>=3 seeds AND Phase-5 gate cleared." [ref=e1366]': n=1 scre
+          - cell "cifar10" [ref=e1367]
+          - cell "0" [ref=e1368]
+          - cell "81.63%" [ref=e1369]
+          - cell "0.8014" [ref=e1370]
+          - cell "0.272M" [ref=e1371]
+          - cell "H17" [ref=e1372]
+          - cell [ref=e1373]:
+            - img [ref=e1374]
+        - row "sg_only_golden_modulate n=3 scre cifar10 1 78.32% 0.7606 0.127M H17" [ref=e1377] [cursor=pointer]:
+          - cell "sg_only_golden_modulate n=3 scre" [ref=e1378]:
+            - link "sg_only_golden_modulate" [ref=e1379]:
+              - /url: experiments/cifar10__sg_only_golden_modulate_seed1.html
+            - 'generic "Rule 28: SCREENING = n=1 seed; EVALUATION = n>=3 seeds AND Phase-5 gate cleared." [ref=e1380]': n=3 scre
+          - cell "cifar10" [ref=e1381]
+          - cell "1" [ref=e1382]
+          - cell "78.32%" [ref=e1383]
+          - cell "0.7606" [ref=e1384]
+          - cell "0.127M" [ref=e1385]
+          - cell "H17" [ref=e1386]
+          - cell [ref=e1387]:
+            - img [ref=e1388]
+        - row "sg_only_golden_modulate n=3 scre cifar10 2 77.92% 0.7571 0.127M H17" [ref=e1391] [cursor=pointer]:
+          - cell "sg_only_golden_modulate n=3 scre" [ref=e1392]:
+            - link "sg_only_golden_modulate" [ref=e1393]:
+              - /url: experiments/cifar10__sg_only_golden_modulate_seed2.html
+            - 'generic "Rule 28: SCREENING = n=1 seed; EVALUATION = n>=3 seeds AND Phase-5 gate cleared." [ref=e1394]': n=3 scre
+          - cell "cifar10" [ref=e1395]
+          - cell "2" [ref=e1396]
+          - cell "77.92%" [ref=e1397]
+          - cell "0.7571" [ref=e1398]
+          - cell "0.127M" [ref=e1399]
+          - cell "H17" [ref=e1400]
+          - cell [ref=e1401]:
+            - img [ref=e1402]
+        - row "sg_only_phi_sparse n=1 scre cifar10 0 73.33% 0.6953 0.259M H13" [ref=e1405] [cursor=pointer]:
+          - cell "sg_only_phi_sparse n=1 scre" [ref=e1406]:
+            - link "sg_only_phi_sparse" [ref=e1407]:
+              - /url: experiments/cifar10__sg_only_phi_sparse_seed0.html
+            - 'generic "Rule 28: SCREENING = n=1 seed; EVALUATION = n>=3 seeds AND Phase-5 gate cleared." [ref=e1408]': n=1 scre
+          - cell "cifar10" [ref=e1409]
+          - cell "0" [ref=e1410]
+          - cell "73.33%" [ref=e1411]
+          - cell "0.6953" [ref=e1412]
+          - cell "0.259M" [ref=e1413]
+          - cell "H13" [ref=e1414]
+          - cell [ref=e1415]:
+            - img [ref=e1416]
+        - row "sg_only_fib_stride n=1 scre cifar10 0 72.55% 0.6872 0.259M H18" [ref=e1419] [cursor=pointer]:
+          - cell "sg_only_fib_stride n=1 scre" [ref=e1420]:
+            - link "sg_only_fib_stride" [ref=e1421]:
+              - /url: experiments/cifar10__sg_only_fib_stride_seed0.html
+            - 'generic "Rule 28: SCREENING = n=1 seed; EVALUATION = n>=3 seeds AND Phase-5 gate cleared." [ref=e1422]': n=1 scre
+          - cell "cifar10" [ref=e1423]
+          - cell "0" [ref=e1424]
+          - cell "72.55%" [ref=e1425]
+          - cell "0.6872" [ref=e1426]
+          - cell "0.259M" [ref=e1427]
+          - cell "H18" [ref=e1428]
+          - cell [ref=e1429]:
+            - img [ref=e1430]
+        - row "sg_only_phi_relu n=1 scre cifar10 0 71.07% 0.6733 0.259M H19" [ref=e1433] [cursor=pointer]:
+          - cell "sg_only_phi_relu n=1 scre" [ref=e1434]:
+            - link "sg_only_phi_relu" [ref=e1435]:
+              - /url: experiments/cifar10__sg_only_phi_relu_seed0.html
+            - 'generic "Rule 28: SCREENING = n=1 seed; EVALUATION = n>=3 seeds AND Phase-5 gate cleared." [ref=e1436]': n=1 scre
+          - cell "cifar10" [ref=e1437]
+          - cell "0" [ref=e1438]
+          - cell "71.07%" [ref=e1439]
+          - cell "0.6733" [ref=e1440]
+          - cell "0.259M" [ref=e1441]
+          - cell "H19" [ref=e1442]
+          - cell [ref=e1443]:
+            - img [ref=e1444]
+  - generic [ref=e1447]:
+    - heading "G3 — Topologies & Graphs (6 runs)" [level=2] [ref=e1448]
+    - generic [ref=e1449]: Hexagonal lattices, toroidal closures, Platonic / icosahedral / dodecahedral equivariance, fractal toroidal, cymatic-hex resonance (H21–H30).
+    - img [ref=e1451]:
+      - generic [ref=e1452]: G3 — Topologies & Graphs · top-1 distribution (n=6)
+      - generic [ref=e1453]: 22%
+      - generic [ref=e1454]: 45%
+      - generic [ref=e1455]: 67%
+      - generic [ref=e1456]: 90%
+      - generic [ref=e1457]: top-1 →
+      - generic [ref=e1458]: cifar10 baseline 84.8%
+      - generic "sg_only_hex · cifar10 · seed1 · top-1 79.93% · params 0.127M · composite 0.7695" [ref=e1459]
+      - generic [ref=e1460]: sg_only_hex
+      - generic [ref=e1461]: 79.93%
+      - generic "sg_only_hex · cifar10 · seed0 · top-1 79.32% · params 0.127M · composite 0.7941" [ref=e1462]
+      - generic [ref=e1463]: sg_only_hex
+      - generic [ref=e1464]: 79.32%
+      - generic "sg_only_hex · cifar10 · seed2 · top-1 79.29% · params 0.127M · composite 0.7715" [ref=e1465]
+      - generic [ref=e1466]: sg_only_hex
+      - generic [ref=e1467]: 79.29%
+      - generic "sg_only_toroidal · cifar10 · seed1 · top-1 78.65% · params 0.127M · composite 0.7849" [ref=e1468]
+      - generic [ref=e1469]: sg_only_toroidal
+      - generic [ref=e1470]: 78.65%
+      - generic "sg_only_toroidal · cifar10 · seed0 · top-1 78.05% · params 0.127M · composite 0.7768" [ref=e1471]
+      - generic [ref=e1472]: sg_only_toroidal
+      - generic [ref=e1473]: 78.05%
+      - generic "sg_only_toroidal · cifar10 · seed2 · top-1 77.43% · params 0.127M · composite 0.7746" [ref=e1474]
+      - generic [ref=e1475]: sg_only_toroidal
+      - generic [ref=e1476]: 77.43%
+    - img [ref=e1478]:
+      - generic [ref=e1479]: G3 — Topologies & Graphs · composite × params
+      - generic [ref=e1480]: "0.768"
+      - generic [ref=e1481]: "0.775"
+      - generic [ref=e1482]: "0.782"
+      - generic [ref=e1483]: "0.789"
+      - generic [ref=e1484]: "0.797"
+      - generic [ref=e1485]: params (M) →
+      - generic [ref=e1486]: composite →
+      - generic "sg_only_hex · cifar10 · seed0 · params 0.127M · composite 0.7941 · top-1 79.32%" [ref=e1487]
+      - generic [ref=e1488]: sg_only_hex
+      - generic "sg_only_toroidal · cifar10 · seed1 · params 0.127M · composite 0.7849 · top-1 78.65%" [ref=e1489]
+      - generic [ref=e1490]: sg_only_toroidal
+      - generic "sg_only_toroidal · cifar10 · seed0 · params 0.127M · composite 0.7768 · top-1 78.05%" [ref=e1491]
+      - generic [ref=e1492]: sg_only_toroidal
+      - generic "sg_only_toroidal · cifar10 · seed2 · params 0.127M · composite 0.7746 · top-1 77.43%" [ref=e1493]
+      - generic [ref=e1494]: sg_only_toroidal
+      - generic "sg_only_hex · cifar10 · seed2 · params 0.127M · composite 0.7715 · top-1 79.29%" [ref=e1495]
+      - generic [ref=e1496]: sg_only_hex
+      - generic "sg_only_hex · cifar10 · seed1 · params 0.127M · composite 0.7695 · top-1 79.93%" [ref=e1497]
+      - generic [ref=e1498]: sg_only_hex
+    - table [ref=e1499]:
+      - rowgroup [ref=e1500]:
+        - row "Tag DS Seed Top-1 Composite Params Hyp Curve" [ref=e1501]:
+          - columnheader "Tag" [ref=e1502] [cursor=pointer]
+          - columnheader "DS" [ref=e1503] [cursor=pointer]
+          - columnheader "Seed" [ref=e1504] [cursor=pointer]
+          - columnheader "Top-1" [ref=e1505] [cursor=pointer]
+          - columnheader "Composite" [ref=e1506] [cursor=pointer]
+          - columnheader "Params" [ref=e1507] [cursor=pointer]
+          - columnheader "Hyp" [ref=e1508] [cursor=pointer]
+          - columnheader "Curve" [ref=e1509] [cursor=pointer]
+      - rowgroup [ref=e1510]:
+        - row "sg_only_hex n=3 scre cifar10 0 79.32% 0.7941 0.127M H21" [ref=e1511] [cursor=pointer]:
+          - cell "sg_only_hex n=3 scre" [ref=e1512]:
+            - link "sg_only_hex" [ref=e1513]:
+              - /url: experiments/cifar10__sg_only_hex_seed0.html
+            - 'generic "Rule 28: SCREENING = n=1 seed; EVALUATION = n>=3 seeds AND Phase-5 gate cleared." [ref=e1514]': n=3 scre
+          - cell "cifar10" [ref=e1515]
+          - cell "0" [ref=e1516]
+          - cell "79.32%" [ref=e1517]
+          - cell "0.7941" [ref=e1518]
+          - cell "0.127M" [ref=e1519]
+          - cell "H21" [ref=e1520]
+          - cell [ref=e1521]:
+            - img [ref=e1522]
+        - row "sg_only_toroidal n=3 scre cifar10 1 78.65% 0.7849 0.127M H22" [ref=e1525] [cursor=pointer]:
+          - cell "sg_only_toroidal n=3 scre" [ref=e1526]:
+            - link "sg_only_toroidal" [ref=e1527]:
+              - /url: experiments/cifar10__sg_only_toroidal_seed1.html
+            - 'generic "Rule 28: SCREENING = n=1 seed; EVALUATION = n>=3 seeds AND Phase-5 gate cleared." [ref=e1528]': n=3 scre
+          - cell "cifar10" [ref=e1529]
+          - cell "1" [ref=e1530]
+          - cell "78.65%" [ref=e1531]
+          - cell "0.7849" [ref=e1532]
+          - cell "0.127M" [ref=e1533]
+          - cell "H22" [ref=e1534]
+          - cell [ref=e1535]:
+            - img [ref=e1536]
+        - row "sg_only_toroidal n=3 scre cifar10 0 78.05% 0.7768 0.127M H22" [ref=e1539] [cursor=pointer]:
+          - cell "sg_only_toroidal n=3 scre" [ref=e1540]:
+            - link "sg_only_toroidal" [ref=e1541]:
+              - /url: experiments/cifar10__sg_only_toroidal_seed0.html
+            - 'generic "Rule 28: SCREENING = n=1 seed; EVALUATION = n>=3 seeds AND Phase-5 gate cleared." [ref=e1542]': n=3 scre
+          - cell "cifar10" [ref=e1543]
+          - cell "0" [ref=e1544]
+          - cell "78.05%" [ref=e1545]
+          - cell "0.7768" [ref=e1546]
+          - cell "0.127M" [ref=e1547]
+          - cell "H22" [ref=e1548]
+          - cell [ref=e1549]:
+            - img [ref=e1550]
+        - row "sg_only_toroidal n=3 scre cifar10 2 77.43% 0.7746 0.127M H22" [ref=e1553] [cursor=pointer]:
+          - cell "sg_only_toroidal n=3 scre" [ref=e1554]:
+            - link "sg_only_toroidal" [ref=e1555]:
+              - /url: experiments/cifar10__sg_only_toroidal_seed2.html
+            - 'generic "Rule 28: SCREENING = n=1 seed; EVALUATION = n>=3 seeds AND Phase-5 gate cleared." [ref=e1556]': n=3 scre
+          - cell "cifar10" [ref=e1557]
+          - cell "2" [ref=e1558]
+          - cell "77.43%" [ref=e1559]
+          - cell "0.7746" [ref=e1560]
+          - cell "0.127M" [ref=e1561]
+          - cell "H22" [ref=e1562]
+          - cell [ref=e1563]:
+            - img [ref=e1564]
+        - row "sg_only_hex n=3 scre cifar10 2 79.29% 0.7715 0.127M H21" [ref=e1567] [cursor=pointer]:
+          - cell "sg_only_hex n=3 scre" [ref=e1568]:
+            - link "sg_only_hex" [ref=e1569]:
+              - /url: experiments/cifar10__sg_only_hex_seed2.html
+            - 'generic "Rule 28: SCREENING = n=1 seed; EVALUATION = n>=3 seeds AND Phase-5 gate cleared." [ref=e1570]': n=3 scre
+          - cell "cifar10" [ref=e1571]
+          - cell "2" [ref=e1572]
+          - cell "79.29%" [ref=e1573]
+          - cell "0.7715" [ref=e1574]
+          - cell "0.127M" [ref=e1575]
+          - cell "H21" [ref=e1576]
+          - cell [ref=e1577]:
+            - img [ref=e1578]
+        - row "sg_only_hex n=3 scre cifar10 1 79.93% 0.7695 0.127M H21" [ref=e1581] [cursor=pointer]:
+          - cell "sg_only_hex n=3 scre" [ref=e1582]:
+            - link "sg_only_hex" [ref=e1583]:
+              - /url: experiments/cifar10__sg_only_hex_seed1.html
+            - 'generic "Rule 28: SCREENING = n=1 seed; EVALUATION = n>=3 seeds AND Phase-5 gate cleared." [ref=e1584]': n=3 scre
+          - cell "cifar10" [ref=e1585]
+          - cell "1" [ref=e1586]
+          - cell "79.93%" [ref=e1587]
+          - cell "0.7695" [ref=e1588]
+          - cell "0.127M" [ref=e1589]
+          - cell "H21" [ref=e1590]
+          - cell [ref=e1591]:
+            - img [ref=e1592]
+  - generic [ref=e1595]:
+    - heading "G4 — Kernels / Attention / Filters (8 runs)" [level=2] [ref=e1596]
+    - generic [ref=e1597]: Golden-spiral kernels, Fibonacci dilation, vesica-piscis filters, golden-angle rotary, cymatic wavelets, harmonic activations (H31–H40).
+    - img [ref=e1599]:
+      - generic [ref=e1600]: G4 — Kernels / Attention / Filters · top-1 distribution (n=8)
+      - generic [ref=e1601]: 23%
+      - generic [ref=e1602]: 45%
+      - generic [ref=e1603]: 68%
+      - generic [ref=e1604]: 91%
+      - generic [ref=e1605]: top-1 →
+      - generic [ref=e1606]: cifar10 baseline 84.8%
+      - generic "slot_init_cymatic · cifar10 · seed0 · top-1 85.40% · params 0.262M · composite 0.8254" [ref=e1607]
+      - generic [ref=e1608]: slot_init_cymatic
+      - generic [ref=e1609]: 85.40%
+      - generic "slot_init_spiral · cifar10 · seed0 · top-1 85.40% · params 0.262M · composite 0.8248" [ref=e1610]
+      - generic [ref=e1611]: slot_init_spiral
+      - generic [ref=e1612]: 85.40%
+      - generic "slot_act_phi · cifar10 · seed0 · top-1 85.37% · params 0.262M · composite 0.8278" [ref=e1613]
+      - generic [ref=e1614]: slot_act_phi
+      - generic [ref=e1615]: 85.37%
+      - generic "sg_only_golden_spiral_init · cifar10 · seed0 · top-1 80.57% · params 0.127M · composite 0.7947" [ref=e1616]
+      - generic [ref=e1617]: sg_only_golden_spiral_in
+      - generic [ref=e1618]: 80.57%
+      - generic "sg_only_phi_activation · cifar10 · seed0 · top-1 79.95% · params 0.127M · composite 0.8092" [ref=e1619]
+      - generic [ref=e1620]: sg_only_phi_activation
+      - generic [ref=e1621]: 79.95%
+      - generic "sg_only_cymatic_init · cifar10 · seed0 · top-1 77.64% · params 0.127M · composite 0.7746" [ref=e1622]
+      - generic [ref=e1623]: sg_only_cymatic_init
+      - generic [ref=e1624]: 77.64%
+      - generic "sg_only_cymatic_init · cifar10 · seed2 · top-1 76.34% · params 0.127M · composite 0.7746" [ref=e1625]
+      - generic [ref=e1626]: sg_only_cymatic_init
+      - generic [ref=e1627]: 76.34%
+      - generic "sg_only_cymatic_init · cifar10 · seed1 · top-1 75.80% · params 0.127M · composite 0.7689" [ref=e1628]
+      - generic [ref=e1629]: sg_only_cymatic_init
+      - generic [ref=e1630]: 75.80%
+    - img [ref=e1632]:
+      - generic [ref=e1633]: G4 — Kernels / Attention / Filters · composite × params
+      - generic [ref=e1634]: "0.764"
+      - generic [ref=e1635]: "0.782"
+      - generic [ref=e1636]: "0.799"
+      - generic [ref=e1637]: "0.816"
+      - generic [ref=e1638]: "0.834"
+      - generic [ref=e1639]: params (M) →
+      - generic [ref=e1640]: composite →
+      - generic "slot_act_phi · cifar10 · seed0 · params 0.262M · composite 0.8278 · top-1 85.37%" [ref=e1641]
+      - generic [ref=e1642]: slot_act_phi
+      - generic "slot_init_cymatic · cifar10 · seed0 · params 0.262M · composite 0.8254 · top-1 85.40%" [ref=e1643]
+      - generic [ref=e1644]: slot_init_cymatic
+      - generic "slot_init_spiral · cifar10 · seed0 · params 0.262M · composite 0.8248 · top-1 85.40%" [ref=e1645]
+      - generic [ref=e1646]: slot_init_spiral
+      - generic "sg_only_phi_activation · cifar10 · seed0 · params 0.127M · composite 0.8092 · top-1 79.95%" [ref=e1647]
+      - generic [ref=e1648]: sg_only_phi_activation
+      - generic "sg_only_golden_spiral_init · cifar10 · seed0 · params 0.127M · composite 0.7947 · top-1 80.57%" [ref=e1649]
+      - generic "sg_only_cymatic_init · cifar10 · seed2 · params 0.127M · composite 0.7746 · top-1 76.34%" [ref=e1650]
+      - generic [ref=e1651]: sg_only_cymatic_init
+      - generic "sg_only_cymatic_init · cifar10 · seed0 · params 0.127M · composite 0.7746 · top-1 77.64%" [ref=e1652]
+      - generic [ref=e1653]: sg_only_cymatic_init
+      - generic "sg_only_cymatic_init · cifar10 · seed1 · params 0.127M · composite 0.7689 · top-1 75.80%" [ref=e1654]
+      - generic [ref=e1655]: sg_only_cymatic_init
+    - table [ref=e1656]:
+      - rowgroup [ref=e1657]:
+        - row "Tag DS Seed Top-1 Composite Params Hyp Curve" [ref=e1658]:
+          - columnheader "Tag" [ref=e1659] [cursor=pointer]
+          - columnheader "DS" [ref=e1660] [cursor=pointer]
+          - columnheader "Seed" [ref=e1661] [cursor=pointer]
+          - columnheader "Top-1" [ref=e1662] [cursor=pointer]
+          - columnheader "Composite" [ref=e1663] [cursor=pointer]
+          - columnheader "Params" [ref=e1664] [cursor=pointer]
+          - columnheader "Hyp" [ref=e1665] [cursor=pointer]
+          - columnheader "Curve" [ref=e1666] [cursor=pointer]
+      - rowgroup [ref=e1667]:
+        - row "slot_act_phi n=1 scre cifar10 0 85.37% 0.8278 0.262M H39" [ref=e1668] [cursor=pointer]:
+          - cell "slot_act_phi n=1 scre" [ref=e1669]:
+            - link "slot_act_phi" [ref=e1670]:
+              - /url: experiments/cifar10__slot_act_phi_seed0.html
+            - 'generic "Rule 28: SCREENING = n=1 seed; EVALUATION = n>=3 seeds AND Phase-5 gate cleared." [ref=e1671]': n=1 scre
+          - cell "cifar10" [ref=e1672]
+          - cell "0" [ref=e1673]
+          - cell "85.37%" [ref=e1674]
+          - cell "0.8278" [ref=e1675]
+          - cell "0.262M" [ref=e1676]
+          - cell "H39" [ref=e1677]
+          - cell [ref=e1678]:
+            - img [ref=e1679]
+        - row "slot_init_cymatic n=1 scre cifar10 0 85.40% 0.8254 0.262M H35" [ref=e1682] [cursor=pointer]:
+          - cell "slot_init_cymatic n=1 scre" [ref=e1683]:
+            - link "slot_init_cymatic" [ref=e1684]:
+              - /url: experiments/cifar10__slot_init_cymatic_seed0.html
+            - 'generic "Rule 28: SCREENING = n=1 seed; EVALUATION = n>=3 seeds AND Phase-5 gate cleared." [ref=e1685]': n=1 scre
+          - cell "cifar10" [ref=e1686]
+          - cell "0" [ref=e1687]
+          - cell "85.40%" [ref=e1688]
+          - cell "0.8254" [ref=e1689]
+          - cell "0.262M" [ref=e1690]
+          - cell "H35" [ref=e1691]
+          - cell [ref=e1692]:
+            - img [ref=e1693]
+        - row "slot_init_spiral n=1 scre cifar10 0 85.40% 0.8248 0.262M H31" [ref=e1696] [cursor=pointer]:
+          - cell "slot_init_spiral n=1 scre" [ref=e1697]:
+            - link "slot_init_spiral" [ref=e1698]:
+              - /url: experiments/cifar10__slot_init_spiral_seed0.html
+            - 'generic "Rule 28: SCREENING = n=1 seed; EVALUATION = n>=3 seeds AND Phase-5 gate cleared." [ref=e1699]': n=1 scre
+          - cell "cifar10" [ref=e1700]
+          - cell "0" [ref=e1701]
+          - cell "85.40%" [ref=e1702]
+          - cell "0.8248" [ref=e1703]
+          - cell "0.262M" [ref=e1704]
+          - cell "H31" [ref=e1705]
+          - cell [ref=e1706]:
+            - img [ref=e1707]
+        - row "sg_only_phi_activation n=1 scre cifar10 0 79.95% 0.8092 0.127M H39" [ref=e1710] [cursor=pointer]:
+          - cell "sg_only_phi_activation n=1 scre" [ref=e1711]:
+            - link "sg_only_phi_activation" [ref=e1712]:
+              - /url: experiments/cifar10__sg_only_phi_activation_seed0.html
+            - 'generic "Rule 28: SCREENING = n=1 seed; EVALUATION = n>=3 seeds AND Phase-5 gate cleared." [ref=e1713]': n=1 scre
+          - cell "cifar10" [ref=e1714]
+          - cell "0" [ref=e1715]
+          - cell "79.95%" [ref=e1716]
+          - cell "0.8092" [ref=e1717]
+          - cell "0.127M" [ref=e1718]
+          - cell "H39" [ref=e1719]
+          - cell [ref=e1720]:
+            - img [ref=e1721]
+        - row "sg_only_golden_spiral_init n=1 scre cifar10 0 80.57% 0.7947 0.127M H31" [ref=e1724] [cursor=pointer]:
+          - cell "sg_only_golden_spiral_init n=1 scre" [ref=e1725]:
+            - link "sg_only_golden_spiral_init" [ref=e1726]:
+              - /url: experiments/cifar10__sg_only_golden_spiral_init_seed0.html
+            - 'generic "Rule 28: SCREENING = n=1 seed; EVALUATION = n>=3 seeds AND Phase-5 gate cleared." [ref=e1727]': n=1 scre
+          - cell "cifar10" [ref=e1728]
+          - cell "0" [ref=e1729]
+          - cell "80.57%" [ref=e1730]
+          - cell "0.7947" [ref=e1731]
+          - cell "0.127M" [ref=e1732]
+          - cell "H31" [ref=e1733]
+          - cell [ref=e1734]:
+            - img [ref=e1735]
+        - row "sg_only_cymatic_init n=3 scre cifar10 2 76.34% 0.7746 0.127M H35" [ref=e1738] [cursor=pointer]:
+          - cell "sg_only_cymatic_init n=3 scre" [ref=e1739]:
+            - link "sg_only_cymatic_init" [ref=e1740]:
+              - /url: experiments/cifar10__sg_only_cymatic_init_seed2.html
+            - 'generic "Rule 28: SCREENING = n=1 seed; EVALUATION = n>=3 seeds AND Phase-5 gate cleared." [ref=e1741]': n=3 scre
+          - cell "cifar10" [ref=e1742]
+          - cell "2" [ref=e1743]
+          - cell "76.34%" [ref=e1744]
+          - cell "0.7746" [ref=e1745]
+          - cell "0.127M" [ref=e1746]
+          - cell "H35" [ref=e1747]
+          - cell [ref=e1748]:
+            - img [ref=e1749]
+        - row "sg_only_cymatic_init n=3 scre cifar10 0 77.64% 0.7746 0.127M H35" [ref=e1752] [cursor=pointer]:
+          - cell "sg_only_cymatic_init n=3 scre" [ref=e1753]:
+            - link "sg_only_cymatic_init" [ref=e1754]:
+              - /url: experiments/cifar10__sg_only_cymatic_init_seed0.html
+            - 'generic "Rule 28: SCREENING = n=1 seed; EVALUATION = n>=3 seeds AND Phase-5 gate cleared." [ref=e1755]': n=3 scre
+          - cell "cifar10" [ref=e1756]
+          - cell "0" [ref=e1757]
+          - cell "77.64%" [ref=e1758]
+          - cell "0.7746" [ref=e1759]
+          - cell "0.127M" [ref=e1760]
+          - cell "H35" [ref=e1761]
+          - cell [ref=e1762]:
+            - img [ref=e1763]
+        - row "sg_only_cymatic_init n=3 scre cifar10 1 75.80% 0.7689 0.127M H35" [ref=e1766] [cursor=pointer]:
+          - cell "sg_only_cymatic_init n=3 scre" [ref=e1767]:
+            - link "sg_only_cymatic_init" [ref=e1768]:
+              - /url: experiments/cifar10__sg_only_cymatic_init_seed1.html
+            - 'generic "Rule 28: SCREENING = n=1 seed; EVALUATION = n>=3 seeds AND Phase-5 gate cleared." [ref=e1769]': n=3 scre
+          - cell "cifar10" [ref=e1770]
+          - cell "1" [ref=e1771]
+          - cell "75.80%" [ref=e1772]
+          - cell "0.7689" [ref=e1773]
+          - cell "0.127M" [ref=e1774]
+          - cell "H35" [ref=e1775]
+          - cell [ref=e1776]:
+            - img [ref=e1777]
+  - generic [ref=e1780]:
+    - heading "G5 — Optimisation / Init / Regularisation / NAS (12 runs)" [level=2] [ref=e1781]
+    - generic [ref=e1782]: Golden-ratio AdamW, φ-weight init, Fibonacci pruning, φ-dropout, golden-momentum schedulers, full-hybrid stacks (H41–H50).
+    - img [ref=e1784]:
+      - generic [ref=e1785]: G5 — Optimisation / Init / Regularisation / NAS · top-1 distribution (n=12)
+      - generic [ref=e1786]: 22%
+      - generic [ref=e1787]: 45%
+      - generic [ref=e1788]: 67%
+      - generic [ref=e1789]: 90%
+      - generic [ref=e1790]: top-1 →
+      - generic [ref=e1791]: cifar10 baseline 84.8%
+      - generic [ref=e1792]: cifar100 baseline 56.5%
+      - generic "sg_only_golden_adam · cifar10 · seed0 · top-1 83.94% · params 0.272M · composite 0.8334" [ref=e1793]
+      - generic [ref=e1794]: sg_only_golden_adam
+      - generic [ref=e1795]: 83.94%
+      - generic "sg_only_golden_momentum · cifar10 · seed0 · top-1 83.65% · params 0.272M · composite 0.8334" [ref=e1796]
+      - generic [ref=e1797]: sg_only_golden_momentum
+      - generic [ref=e1798]: 83.65%
+      - generic "slot_init_phi · cifar10 · seed0 · top-1 83.46% · params 0.262M · composite 0.8060" [ref=e1799]
+      - generic [ref=e1800]: slot_init_phi
+      - generic [ref=e1801]: 83.46%
+      - generic "sg_only_phi_dropout · cifar10 · seed0 · top-1 83.03% · params 0.272M · composite 0.8253" [ref=e1802]
+      - generic [ref=e1803]: sg_only_phi_dropout
+      - generic [ref=e1804]: 83.03%
+      - generic "sg_only_fib_prune · cifar10 · seed0 · top-1 81.15% · params 0.272M · composite 0.8004" [ref=e1805]
+      - generic [ref=e1806]: sg_only_fib_prune
+      - generic [ref=e1807]: 81.15%
+      - generic "sg_only_phi_decay · cifar10 · seed0 · top-1 79.81% · params 0.127M · composite 0.8119" [ref=e1808]
+      - generic [ref=e1809]: sg_only_phi_decay
+      - generic [ref=e1810]: 79.81%
+      - generic "sg_only_phi_init · cifar10 · seed0 · top-1 76.56% · params 0.127M · composite 0.7766" [ref=e1811]
+      - generic [ref=e1812]: sg_only_phi_init
+      - generic [ref=e1813]: 76.56%
+      - generic "sg_full_fib · cifar10 · seed0 · top-1 73.24% · params 0.259M · composite 0.6966" [ref=e1814]
+      - generic [ref=e1815]: sg_full_fib
+      - generic [ref=e1816]: 73.24%
+      - generic "sg_full_fib_avg · cifar10 · seed0 · top-1 66.86% · params 0.259M · composite 0.6330" [ref=e1817]
+      - generic [ref=e1818]: sg_full_fib_avg
+      - generic [ref=e1819]: 66.86%
+      - generic "sg_only_golden_momentum · cifar100 · seed0 · top-1 56.99% · params 0.278M · composite 0.5676" [ref=e1820]
+      - generic [ref=e1821]: sg_only_golden_momentum
+      - generic [ref=e1822]: 56.99%
+      - generic "sg_only_golden_momentum · cifar100 · seed1 · top-1 56.76% · params 0.278M · composite 0.5646" [ref=e1823]
+      - generic [ref=e1824]: sg_only_golden_momentum
+      - generic [ref=e1825]: 56.76%
+      - generic "sg_only_golden_momentum · cifar100 · seed2 · top-1 56.43% · params 0.278M · composite 0.5576" [ref=e1826]
+      - generic [ref=e1827]: sg_only_golden_momentum
+      - generic [ref=e1828]: 56.43%
+    - img [ref=e1830]:
+      - generic [ref=e1831]: G5 — Optimisation / Init / Regularisation / NAS · composite × params
+      - generic [ref=e1832]: "0.536"
+      - generic [ref=e1833]: "0.617"
+      - generic [ref=e1834]: "0.698"
+      - generic [ref=e1835]: "0.780"
+      - generic [ref=e1836]: "0.861"
+      - generic [ref=e1837]: params (M) →
+      - generic [ref=e1838]: composite →
+      - generic "sg_only_golden_adam · cifar10 · seed0 · params 0.272M · composite 0.8334 · top-1 83.94%" [ref=e1839]
+      - generic [ref=e1840]: sg_only_golden_adam
+      - generic "sg_only_golden_momentum · cifar10 · seed0 · params 0.272M · composite 0.8334 · top-1 83.65%" [ref=e1841]
+      - generic "sg_only_phi_dropout · cifar10 · seed0 · params 0.272M · composite 0.8253 · top-1 83.03%" [ref=e1842]
+      - generic [ref=e1843]: sg_only_phi_dropout
+      - generic "sg_only_phi_decay · cifar10 · seed0 · params 0.127M · composite 0.8119 · top-1 79.81%" [ref=e1844]
+      - generic [ref=e1845]: sg_only_phi_decay
+      - generic "slot_init_phi · cifar10 · seed0 · params 0.262M · composite 0.8060 · top-1 83.46%" [ref=e1846]
+      - generic [ref=e1847]: slot_init_phi
+      - generic "sg_only_fib_prune · cifar10 · seed0 · params 0.272M · composite 0.8004 · top-1 81.15%" [ref=e1848]
+      - generic [ref=e1849]: sg_only_fib_prune
+      - generic "sg_only_phi_init · cifar10 · seed0 · params 0.127M · composite 0.7766 · top-1 76.56%" [ref=e1850]
+      - generic [ref=e1851]: sg_only_phi_init
+      - generic "sg_full_fib · cifar10 · seed0 · params 0.259M · composite 0.6966 · top-1 73.24%" [ref=e1852]
+      - generic [ref=e1853]: sg_full_fib
+      - generic "sg_full_fib_avg · cifar10 · seed0 · params 0.259M · composite 0.6330 · top-1 66.86%" [ref=e1854]
+      - generic [ref=e1855]: sg_full_fib_avg
+      - generic "sg_only_golden_momentum · cifar100 · seed0 · params 0.278M · composite 0.5676 · top-1 56.99%" [ref=e1856]
+      - generic "sg_only_golden_momentum · cifar100 · seed1 · params 0.278M · composite 0.5646 · top-1 56.76%" [ref=e1857]
+      - generic "sg_only_golden_momentum · cifar100 · seed2 · params 0.278M · composite 0.5576 · top-1 56.43%" [ref=e1858]
+    - table [ref=e1859]:
+      - rowgroup [ref=e1860]:
+        - row "Tag DS Seed Top-1 Composite Params Hyp Curve" [ref=e1861]:
+          - columnheader "Tag" [ref=e1862] [cursor=pointer]
+          - columnheader "DS" [ref=e1863] [cursor=pointer]
+          - columnheader "Seed" [ref=e1864] [cursor=pointer]
+          - columnheader "Top-1" [ref=e1865] [cursor=pointer]
+          - columnheader "Composite" [ref=e1866] [cursor=pointer]
+          - columnheader "Params" [ref=e1867] [cursor=pointer]
+          - columnheader "Hyp" [ref=e1868] [cursor=pointer]
+          - columnheader "Curve" [ref=e1869] [cursor=pointer]
+      - rowgroup [ref=e1870]:
+        - row "sg_only_golden_adam n=1 scre cifar10 0 83.94% 0.8334 0.272M H41" [ref=e1871] [cursor=pointer]:
+          - cell "sg_only_golden_adam n=1 scre" [ref=e1872]:
+            - link "sg_only_golden_adam" [ref=e1873]:
+              - /url: experiments/cifar10__sg_only_golden_adam_seed0.html
+            - 'generic "Rule 28: SCREENING = n=1 seed; EVALUATION = n>=3 seeds AND Phase-5 gate cleared." [ref=e1874]': n=1 scre
+          - cell "cifar10" [ref=e1875]
+          - cell "0" [ref=e1876]
+          - cell "83.94%" [ref=e1877]
+          - cell "0.8334" [ref=e1878]
+          - cell "0.272M" [ref=e1879]
+          - cell "H41" [ref=e1880]
+          - cell [ref=e1881]:
+            - img [ref=e1882]
+        - row "sg_only_golden_momentum n=1 scre cifar10 0 83.65% 0.8334 0.272M H48" [ref=e1885] [cursor=pointer]:
+          - cell "sg_only_golden_momentum n=1 scre" [ref=e1886]:
+            - link "sg_only_golden_momentum" [ref=e1887]:
+              - /url: experiments/cifar10__sg_only_golden_momentum_seed0.html
+            - 'generic "Rule 28: SCREENING = n=1 seed; EVALUATION = n>=3 seeds AND Phase-5 gate cleared." [ref=e1888]': n=1 scre
+          - cell "cifar10" [ref=e1889]
+          - cell "0" [ref=e1890]
+          - cell "83.65%" [ref=e1891]
+          - cell "0.8334" [ref=e1892]
+          - cell "0.272M" [ref=e1893]
+          - cell "H48" [ref=e1894]
+          - cell [ref=e1895]:
+            - img [ref=e1896]
+        - row "sg_only_phi_dropout n=1 scre cifar10 0 83.03% 0.8253 0.272M H47" [ref=e1899] [cursor=pointer]:
+          - cell "sg_only_phi_dropout n=1 scre" [ref=e1900]:
+            - link "sg_only_phi_dropout" [ref=e1901]:
+              - /url: experiments/cifar10__sg_only_phi_dropout_seed0.html
+            - 'generic "Rule 28: SCREENING = n=1 seed; EVALUATION = n>=3 seeds AND Phase-5 gate cleared." [ref=e1902]': n=1 scre
+          - cell "cifar10" [ref=e1903]
+          - cell "0" [ref=e1904]
+          - cell "83.03%" [ref=e1905]
+          - cell "0.8253" [ref=e1906]
+          - cell "0.272M" [ref=e1907]
+          - cell "H47" [ref=e1908]
+          - cell [ref=e1909]:
+            - img [ref=e1910]
+        - row "sg_only_phi_decay n=1 scre cifar10 0 79.81% 0.8119 0.127M H44" [ref=e1913] [cursor=pointer]:
+          - cell "sg_only_phi_decay n=1 scre" [ref=e1914]:
+            - link "sg_only_phi_decay" [ref=e1915]:
+              - /url: experiments/cifar10__sg_only_phi_decay_seed0.html
+            - 'generic "Rule 28: SCREENING = n=1 seed; EVALUATION = n>=3 seeds AND Phase-5 gate cleared." [ref=e1916]': n=1 scre
+          - cell "cifar10" [ref=e1917]
+          - cell "0" [ref=e1918]
+          - cell "79.81%" [ref=e1919]
+          - cell "0.8119" [ref=e1920]
+          - cell "0.127M" [ref=e1921]
+          - cell "H44" [ref=e1922]
+          - cell [ref=e1923]:
+            - img [ref=e1924]
+        - row "slot_init_phi n=1 scre cifar10 0 83.46% 0.8060 0.262M H42" [ref=e1927] [cursor=pointer]:
+          - cell "slot_init_phi n=1 scre" [ref=e1928]:
+            - link "slot_init_phi" [ref=e1929]:
+              - /url: experiments/cifar10__slot_init_phi_seed0.html
+            - 'generic "Rule 28: SCREENING = n=1 seed; EVALUATION = n>=3 seeds AND Phase-5 gate cleared." [ref=e1930]': n=1 scre
+          - cell "cifar10" [ref=e1931]
+          - cell "0" [ref=e1932]
+          - cell "83.46%" [ref=e1933]
+          - cell "0.8060" [ref=e1934]
+          - cell "0.262M" [ref=e1935]
+          - cell "H42" [ref=e1936]
+          - cell [ref=e1937]:
+            - img [ref=e1938]
+        - row "sg_only_fib_prune n=1 scre cifar10 0 81.15% 0.8004 0.272M H43" [ref=e1941] [cursor=pointer]:
+          - cell "sg_only_fib_prune n=1 scre" [ref=e1942]:
+            - link "sg_only_fib_prune" [ref=e1943]:
+              - /url: experiments/cifar10__sg_only_fib_prune_seed0.html
+            - 'generic "Rule 28: SCREENING = n=1 seed; EVALUATION = n>=3 seeds AND Phase-5 gate cleared." [ref=e1944]': n=1 scre
+          - cell "cifar10" [ref=e1945]
+          - cell "0" [ref=e1946]
+          - cell "81.15%" [ref=e1947]
+          - cell "0.8004" [ref=e1948]
+          - cell "0.272M" [ref=e1949]
+          - cell "H43" [ref=e1950]
+          - cell [ref=e1951]:
+            - img [ref=e1952]
+        - row "sg_only_phi_init n=1 scre cifar10 0 76.56% 0.7766 0.127M H42" [ref=e1955] [cursor=pointer]:
+          - cell "sg_only_phi_init n=1 scre" [ref=e1956]:
+            - link "sg_only_phi_init" [ref=e1957]:
+              - /url: experiments/cifar10__sg_only_phi_init_seed0.html
+            - 'generic "Rule 28: SCREENING = n=1 seed; EVALUATION = n>=3 seeds AND Phase-5 gate cleared." [ref=e1958]': n=1 scre
+          - cell "cifar10" [ref=e1959]
+          - cell "0" [ref=e1960]
+          - cell "76.56%" [ref=e1961]
+          - cell "0.7766" [ref=e1962]
+          - cell "0.127M" [ref=e1963]
+          - cell "H42" [ref=e1964]
+          - cell [ref=e1965]:
+            - img [ref=e1966]
+        - row "sg_full_fib n=1 scre cifar10 0 73.24% 0.6966 0.259M H50" [ref=e1969] [cursor=pointer]:
+          - cell "sg_full_fib n=1 scre" [ref=e1970]:
+            - link "sg_full_fib" [ref=e1971]:
+              - /url: experiments/cifar10__sg_full_fib_seed0.html
+            - 'generic "Rule 28: SCREENING = n=1 seed; EVALUATION = n>=3 seeds AND Phase-5 gate cleared." [ref=e1972]': n=1 scre
+          - cell "cifar10" [ref=e1973]
+          - cell "0" [ref=e1974]
+          - cell "73.24%" [ref=e1975]
+          - cell "0.6966" [ref=e1976]
+          - cell "0.259M" [ref=e1977]
+          - cell "H50" [ref=e1978]
+          - cell [ref=e1979]:
+            - img [ref=e1980]
+        - row "sg_full_fib_avg n=1 scre cifar10 0 66.86% 0.6330 0.259M H50" [ref=e1983] [cursor=pointer]:
+          - cell "sg_full_fib_avg n=1 scre" [ref=e1984]:
+            - link "sg_full_fib_avg" [ref=e1985]:
+              - /url: experiments/cifar10__sg_full_fib_avg_seed0.html
+            - 'generic "Rule 28: SCREENING = n=1 seed; EVALUATION = n>=3 seeds AND Phase-5 gate cleared." [ref=e1986]': n=1 scre
+          - cell "cifar10" [ref=e1987]
+          - cell "0" [ref=e1988]
+          - cell "66.86%" [ref=e1989]
+          - cell "0.6330" [ref=e1990]
+          - cell "0.259M" [ref=e1991]
+          - cell "H50" [ref=e1992]
+          - cell [ref=e1993]:
+            - img [ref=e1994]
+        - row "sg_only_golden_momentum n=3 scre cifar100 0 56.99% 0.5676 0.278M H48" [ref=e1997] [cursor=pointer]:
+          - cell "sg_only_golden_momentum n=3 scre" [ref=e1998]:
+            - link "sg_only_golden_momentum" [ref=e1999]:
+              - /url: experiments/cifar100__sg_only_golden_momentum_seed0.html
+            - 'generic "Rule 28: SCREENING = n=1 seed; EVALUATION = n>=3 seeds AND Phase-5 gate cleared." [ref=e2000]': n=3 scre
+          - cell "cifar100" [ref=e2001]
+          - cell "0" [ref=e2002]
+          - cell "56.99%" [ref=e2003]
+          - cell "0.5676" [ref=e2004]
+          - cell "0.278M" [ref=e2005]
+          - cell "H48" [ref=e2006]
+          - cell [ref=e2007]:
+            - img [ref=e2008]
+        - row "sg_only_golden_momentum n=3 scre cifar100 1 56.76% 0.5646 0.278M H48" [ref=e2011] [cursor=pointer]:
+          - cell "sg_only_golden_momentum n=3 scre" [ref=e2012]:
+            - link "sg_only_golden_momentum" [ref=e2013]:
+              - /url: experiments/cifar100__sg_only_golden_momentum_seed1.html
+            - 'generic "Rule 28: SCREENING = n=1 seed; EVALUATION = n>=3 seeds AND Phase-5 gate cleared." [ref=e2014]': n=3 scre
+          - cell "cifar100" [ref=e2015]
+          - cell "1" [ref=e2016]
+          - cell "56.76%" [ref=e2017]
+          - cell "0.5646" [ref=e2018]
+          - cell "0.278M" [ref=e2019]
+          - cell "H48" [ref=e2020]
+          - cell [ref=e2021]:
+            - img [ref=e2022]
+        - row "sg_only_golden_momentum n=3 scre cifar100 2 56.43% 0.5576 0.278M H48" [ref=e2025] [cursor=pointer]:
+          - cell "sg_only_golden_momentum n=3 scre" [ref=e2026]:
+            - link "sg_only_golden_momentum" [ref=e2027]:
+              - /url: experiments/cifar100__sg_only_golden_momentum_seed2.html
+            - 'generic "Rule 28: SCREENING = n=1 seed; EVALUATION = n>=3 seeds AND Phase-5 gate cleared." [ref=e2028]': n=3 scre
+          - cell "cifar100" [ref=e2029]
+          - cell "2" [ref=e2030]
+          - cell "56.43%" [ref=e2031]
+          - cell "0.5576" [ref=e2032]
+          - cell "0.278M" [ref=e2033]
+          - cell "H48" [ref=e2034]
+          - cell [ref=e2035]:
+            - img [ref=e2036]
+  - generic [ref=e2039]:
+    - heading "G6 — Topological & Bridging (4 runs)" [level=2] [ref=e2040]
+    - generic [ref=e2041]: Persistent-homology losses, drop-path anytime nets, icosa-unfold bridges, C4-group avg-pool, trained-feature Betti probes (H51–H60).
+    - img [ref=e2043]:
+      - generic [ref=e2044]: G6 — Topological & Bridging · top-1 distribution (n=4)
+      - generic [ref=e2045]: 22%
+      - generic [ref=e2046]: 45%
+      - generic [ref=e2047]: 67%
+      - generic [ref=e2048]: 90%
+      - generic [ref=e2049]: top-1 →
+      - generic [ref=e2050]: cifar10 baseline 84.8%
+      - generic "sg_only_group · cifar10 · seed2 · top-1 70.33% · params 0.127M · composite 0.6786" [ref=e2051]
+      - generic [ref=e2052]: sg_only_group
+      - generic [ref=e2053]: 70.33%
+      - generic "sg_only_group · cifar10 · seed1 · top-1 69.93% · params 0.127M · composite 0.6897" [ref=e2054]
+      - generic [ref=e2055]: sg_only_group
+      - generic [ref=e2056]: 69.93%
+      - generic "sg_only_group · cifar10 · seed0 · top-1 69.84% · params 0.127M · composite 0.6937" [ref=e2057]
+      - generic [ref=e2058]: sg_only_group
+      - generic [ref=e2059]: 69.84%
+      - generic "sg_only_group_avg · cifar10 · seed0 · top-1 65.38% · params 0.127M · composite 0.6513" [ref=e2060]
+      - generic [ref=e2061]: sg_only_group_avg
+      - generic [ref=e2062]: 65.38%
+    - img [ref=e2064]:
+      - generic [ref=e2065]: G6 — Topological & Bridging · composite × params
+      - generic [ref=e2066]: "0.648"
+      - generic [ref=e2067]: "0.660"
+      - generic [ref=e2068]: "0.673"
+      - generic [ref=e2069]: "0.685"
+      - generic [ref=e2070]: "0.698"
+      - generic [ref=e2071]: params (M) →
+      - generic [ref=e2072]: composite →
+      - generic "sg_only_group · cifar10 · seed0 · params 0.127M · composite 0.6937 · top-1 69.84%" [ref=e2073]
+      - generic [ref=e2074]: sg_only_group
+      - generic "sg_only_group · cifar10 · seed1 · params 0.127M · composite 0.6897 · top-1 69.93%" [ref=e2075]
+      - generic [ref=e2076]: sg_only_group
+      - generic "sg_only_group · cifar10 · seed2 · params 0.127M · composite 0.6786 · top-1 70.33%" [ref=e2077]
+      - generic [ref=e2078]: sg_only_group
+      - generic "sg_only_group_avg · cifar10 · seed0 · params 0.127M · composite 0.6513 · top-1 65.38%" [ref=e2079]
+      - generic [ref=e2080]: sg_only_group_avg
+    - table [ref=e2081]:
+      - rowgroup [ref=e2082]:
+        - row "Tag DS Seed Top-1 Composite Params Hyp Curve" [ref=e2083]:
+          - columnheader "Tag" [ref=e2084] [cursor=pointer]
+          - columnheader "DS" [ref=e2085] [cursor=pointer]
+          - columnheader "Seed" [ref=e2086] [cursor=pointer]
+          - columnheader "Top-1" [ref=e2087] [cursor=pointer]
+          - columnheader "Composite" [ref=e2088] [cursor=pointer]
+          - columnheader "Params" [ref=e2089] [cursor=pointer]
+          - columnheader "Hyp" [ref=e2090] [cursor=pointer]
+          - columnheader "Curve" [ref=e2091] [cursor=pointer]
+      - rowgroup [ref=e2092]:
+        - row "sg_only_group n=3 scre cifar10 0 69.84% 0.6937 0.127M H58" [ref=e2093] [cursor=pointer]:
+          - cell "sg_only_group n=3 scre" [ref=e2094]:
+            - link "sg_only_group" [ref=e2095]:
+              - /url: experiments/cifar10__sg_only_group_seed0.html
+            - 'generic "Rule 28: SCREENING = n=1 seed; EVALUATION = n>=3 seeds AND Phase-5 gate cleared." [ref=e2096]': n=3 scre
+          - cell "cifar10" [ref=e2097]
+          - cell "0" [ref=e2098]
+          - cell "69.84%" [ref=e2099]
+          - cell "0.6937" [ref=e2100]
+          - cell "0.127M" [ref=e2101]
+          - cell "H58" [ref=e2102]
+          - cell [ref=e2103]:
+            - img [ref=e2104]
+        - row "sg_only_group n=3 scre cifar10 1 69.93% 0.6897 0.127M H58" [ref=e2107] [cursor=pointer]:
+          - cell "sg_only_group n=3 scre" [ref=e2108]:
+            - link "sg_only_group" [ref=e2109]:
+              - /url: experiments/cifar10__sg_only_group_seed1.html
+            - 'generic "Rule 28: SCREENING = n=1 seed; EVALUATION = n>=3 seeds AND Phase-5 gate cleared." [ref=e2110]': n=3 scre
+          - cell "cifar10" [ref=e2111]
+          - cell "1" [ref=e2112]
+          - cell "69.93%" [ref=e2113]
+          - cell "0.6897" [ref=e2114]
+          - cell "0.127M" [ref=e2115]
+          - cell "H58" [ref=e2116]
+          - cell [ref=e2117]:
+            - img [ref=e2118]
+        - row "sg_only_group n=3 scre cifar10 2 70.33% 0.6786 0.127M H58" [ref=e2121] [cursor=pointer]:
+          - cell "sg_only_group n=3 scre" [ref=e2122]:
+            - link "sg_only_group" [ref=e2123]:
+              - /url: experiments/cifar10__sg_only_group_seed2.html
+            - 'generic "Rule 28: SCREENING = n=1 seed; EVALUATION = n>=3 seeds AND Phase-5 gate cleared." [ref=e2124]': n=3 scre
+          - cell "cifar10" [ref=e2125]
+          - cell "2" [ref=e2126]
+          - cell "70.33%" [ref=e2127]
+          - cell "0.6786" [ref=e2128]
+          - cell "0.127M" [ref=e2129]
+          - cell "H58" [ref=e2130]
+          - cell [ref=e2131]:
+            - img [ref=e2132]
+        - row "sg_only_group_avg n=1 scre cifar10 0 65.38% 0.6513 0.127M H58" [ref=e2135] [cursor=pointer]:
+          - cell "sg_only_group_avg n=1 scre" [ref=e2136]:
+            - link "sg_only_group_avg" [ref=e2137]:
+              - /url: experiments/cifar10__sg_only_group_avg_seed0.html
+            - 'generic "Rule 28: SCREENING = n=1 seed; EVALUATION = n>=3 seeds AND Phase-5 gate cleared." [ref=e2138]': n=1 scre
+          - cell "cifar10" [ref=e2139]
+          - cell "0" [ref=e2140]
+          - cell "65.38%" [ref=e2141]
+          - cell "0.6513" [ref=e2142]
+          - cell "0.127M" [ref=e2143]
+          - cell "H58" [ref=e2144]
+          - cell [ref=e2145]:
+            - img [ref=e2146]
+  - generic [ref=e2149]:
+    - heading "G7 — Cross-Paradigm Hybrids (0 runs)" [level=2] [ref=e2150]
+    - generic [ref=e2151]: Liquid / JEPA / KAN / Transformer / GNN cross-paradigm hybrids (H61–H75). No CIFAR sweep rows yet — placeholder section.
+    - generic [ref=e2152]: No sweep rows yet in this group.
+  - generic [ref=e2153]:
+    - heading "G8 — Esoteric Extensions (6 runs)" [level=2] [ref=e2154]
+    - generic [ref=e2155]: Reuleaux constant-width kernels, SIREN sinusoidal activations, tetrahedral dual paths, radial-12 attention, spectral Hopfield (H76–H84).
+    - img [ref=e2157]:
+      - generic [ref=e2158]: G8 — Esoteric Extensions · top-1 distribution (n=6)
+      - generic [ref=e2159]: 23%
+      - generic [ref=e2160]: 45%
+      - generic [ref=e2161]: 68%
+      - generic [ref=e2162]: 91%
+      - generic [ref=e2163]: top-1 →
+      - generic [ref=e2164]: cifar10 baseline 84.8%
+      - generic [ref=e2165]: cifar100 baseline 56.5%
+      - generic "slot_act_sine · cifar10 · seed0 · top-1 85.56% · params 0.262M · composite 0.8618" [ref=e2166]
+      - generic [ref=e2167]: slot_act_sine
+      - generic [ref=e2168]: 85.56%
+      - generic "sg_only_sine_act · cifar10 · seed0 · top-1 80.62% · params 0.127M · composite 0.8197" [ref=e2169]
+      - generic [ref=e2170]: sg_only_sine_act
+      - generic [ref=e2171]: 80.62%
+      - generic "sg_only_constant_width · cifar10 · seed0 · top-1 75.95% · params 0.127M · composite 0.7629" [ref=e2172]
+      - generic [ref=e2173]: sg_only_constant_width
+      - generic [ref=e2174]: 75.95%
+      - generic "slot_act_sine · cifar100 · seed0 · top-1 57.96% · params 0.268M · composite 0.5545" [ref=e2175]
+      - generic [ref=e2176]: slot_act_sine
+      - generic [ref=e2177]: 57.96%
+      - generic "slot_act_sine · cifar100 · seed1 · top-1 57.84% · params 0.268M · composite 0.5537" [ref=e2178]
+      - generic [ref=e2179]: slot_act_sine
+      - generic [ref=e2180]: 57.84%
+      - generic "slot_act_sine · cifar100 · seed2 · top-1 57.66% · params 0.268M · composite 0.5511" [ref=e2181]
+      - generic [ref=e2182]: slot_act_sine
+      - generic [ref=e2183]: 57.66%
+    - img [ref=e2185]:
+      - generic [ref=e2186]: G8 — Esoteric Extensions · composite × params
+      - generic [ref=e2187]: "0.526"
+      - generic [ref=e2188]: "0.618"
+      - generic [ref=e2189]: "0.710"
+      - generic [ref=e2190]: "0.801"
+      - generic [ref=e2191]: "0.893"
+      - generic [ref=e2192]: params (M) →
+      - generic [ref=e2193]: composite →
+      - generic "slot_act_sine · cifar10 · seed0 · params 0.262M · composite 0.8618 · top-1 85.56%" [ref=e2194]
+      - generic [ref=e2195]: slot_act_sine
+      - generic "sg_only_sine_act · cifar10 · seed0 · params 0.127M · composite 0.8197 · top-1 80.62%" [ref=e2196]
+      - generic [ref=e2197]: sg_only_sine_act
+      - generic "sg_only_constant_width · cifar10 · seed0 · params 0.127M · composite 0.7629 · top-1 75.95%" [ref=e2198]
+      - generic [ref=e2199]: sg_only_constant_width
+      - generic "slot_act_sine · cifar100 · seed0 · params 0.268M · composite 0.5545 · top-1 57.96%" [ref=e2200]
+      - generic [ref=e2201]: slot_act_sine
+      - generic "slot_act_sine · cifar100 · seed1 · params 0.268M · composite 0.5537 · top-1 57.84%" [ref=e2202]
+      - generic [ref=e2203]: slot_act_sine
+      - generic "slot_act_sine · cifar100 · seed2 · params 0.268M · composite 0.5511 · top-1 57.66%" [ref=e2204]
+      - generic [ref=e2205]: slot_act_sine
+    - table [ref=e2206]:
+      - rowgroup [ref=e2207]:
+        - row "Tag DS Seed Top-1 Composite Params Hyp Curve" [ref=e2208]:
+          - columnheader "Tag" [ref=e2209] [cursor=pointer]
+          - columnheader "DS" [ref=e2210] [cursor=pointer]
+          - columnheader "Seed" [ref=e2211] [cursor=pointer]
+          - columnheader "Top-1" [ref=e2212] [cursor=pointer]
+          - columnheader "Composite" [ref=e2213] [cursor=pointer]
+          - columnheader "Params" [ref=e2214] [cursor=pointer]
+          - columnheader "Hyp" [ref=e2215] [cursor=pointer]
+          - columnheader "Curve" [ref=e2216] [cursor=pointer]
+      - rowgroup [ref=e2217]:
+        - row "slot_act_sine n=1 scre cifar10 0 85.56% 0.8618 0.262M H81" [ref=e2218] [cursor=pointer]:
+          - cell "slot_act_sine n=1 scre" [ref=e2219]:
+            - link "slot_act_sine" [ref=e2220]:
+              - /url: experiments/cifar10__slot_act_sine_seed0.html
+            - 'generic "Rule 28: SCREENING = n=1 seed; EVALUATION = n>=3 seeds AND Phase-5 gate cleared." [ref=e2221]': n=1 scre
+          - cell "cifar10" [ref=e2222]
+          - cell "0" [ref=e2223]
+          - cell "85.56%" [ref=e2224]
+          - cell "0.8618" [ref=e2225]
+          - cell "0.262M" [ref=e2226]
+          - cell "H81" [ref=e2227]
+          - cell [ref=e2228]:
+            - img [ref=e2229]
+        - row "sg_only_sine_act n=1 scre cifar10 0 80.62% 0.8197 0.127M H81" [ref=e2232] [cursor=pointer]:
+          - cell "sg_only_sine_act n=1 scre" [ref=e2233]:
+            - link "sg_only_sine_act" [ref=e2234]:
+              - /url: experiments/cifar10__sg_only_sine_act_seed0.html
+            - 'generic "Rule 28: SCREENING = n=1 seed; EVALUATION = n>=3 seeds AND Phase-5 gate cleared." [ref=e2235]': n=1 scre
+          - cell "cifar10" [ref=e2236]
+          - cell "0" [ref=e2237]
+          - cell "80.62%" [ref=e2238]
+          - cell "0.8197" [ref=e2239]
+          - cell "0.127M" [ref=e2240]
+          - cell "H81" [ref=e2241]
+          - cell [ref=e2242]:
+            - img [ref=e2243]
+        - row "sg_only_constant_width n=1 scre cifar10 0 75.95% 0.7629 0.127M H80" [ref=e2246] [cursor=pointer]:
+          - cell "sg_only_constant_width n=1 scre" [ref=e2247]:
+            - link "sg_only_constant_width" [ref=e2248]:
+              - /url: experiments/cifar10__sg_only_constant_width_seed0.html
+            - 'generic "Rule 28: SCREENING = n=1 seed; EVALUATION = n>=3 seeds AND Phase-5 gate cleared." [ref=e2249]': n=1 scre
+          - cell "cifar10" [ref=e2250]
+          - cell "0" [ref=e2251]
+          - cell "75.95%" [ref=e2252]
+          - cell "0.7629" [ref=e2253]
+          - cell "0.127M" [ref=e2254]
+          - cell "H80" [ref=e2255]
+          - cell [ref=e2256]:
+            - img [ref=e2257]
+        - row "slot_act_sine n=3 eval cifar100 0 57.96% 0.5545 0.268M H81" [ref=e2260] [cursor=pointer]:
+          - cell "slot_act_sine n=3 eval" [ref=e2261]:
+            - link "slot_act_sine" [ref=e2262]:
+              - /url: experiments/cifar100__slot_act_sine_seed0.html
+            - 'generic "Rule 28: SCREENING = n=1 seed; EVALUATION = n>=3 seeds AND Phase-5 gate cleared." [ref=e2263]': n=3 eval
+          - cell "cifar100" [ref=e2264]
+          - cell "0" [ref=e2265]
+          - cell "57.96%" [ref=e2266]
+          - cell "0.5545" [ref=e2267]
+          - cell "0.268M" [ref=e2268]
+          - cell "H81" [ref=e2269]
+          - cell [ref=e2270]:
+            - img [ref=e2271]
+        - row "slot_act_sine n=3 eval cifar100 1 57.84% 0.5537 0.268M H81" [ref=e2274] [cursor=pointer]:
+          - cell "slot_act_sine n=3 eval" [ref=e2275]:
+            - link "slot_act_sine" [ref=e2276]:
+              - /url: experiments/cifar100__slot_act_sine_seed1.html
+            - 'generic "Rule 28: SCREENING = n=1 seed; EVALUATION = n>=3 seeds AND Phase-5 gate cleared." [ref=e2277]': n=3 eval
+          - cell "cifar100" [ref=e2278]
+          - cell "1" [ref=e2279]
+          - cell "57.84%" [ref=e2280]
+          - cell "0.5537" [ref=e2281]
+          - cell "0.268M" [ref=e2282]
+          - cell "H81" [ref=e2283]
+          - cell [ref=e2284]:
+            - img [ref=e2285]
+        - row "slot_act_sine n=3 eval cifar100 2 57.66% 0.5511 0.268M H81" [ref=e2288] [cursor=pointer]:
+          - cell "slot_act_sine n=3 eval" [ref=e2289]:
+            - link "slot_act_sine" [ref=e2290]:
+              - /url: experiments/cifar100__slot_act_sine_seed2.html
+            - 'generic "Rule 28: SCREENING = n=1 seed; EVALUATION = n>=3 seeds AND Phase-5 gate cleared." [ref=e2291]': n=3 eval
+          - cell "cifar100" [ref=e2292]
+          - cell "2" [ref=e2293]
+          - cell "57.66%" [ref=e2294]
+          - cell "0.5511" [ref=e2295]
+          - cell "0.268M" [ref=e2296]
+          - cell "H81" [ref=e2297]
+          - cell [ref=e2298]:
+            - img [ref=e2299]
+  - generic [ref=e2302]:
+    - link "Repo" [ref=e2303] [cursor=pointer]:
+      - /url: https://github.com/dlmastery/nature_inspired_networks
+    - text: ·
+    - link "Paper" [ref=e2304] [cursor=pointer]:
+      - /url: https://github.com/dlmastery/nature_inspired_networks/blob/main/PAPER.md
+    - text: ·
+    - link "Background reading" [ref=e2305] [cursor=pointer]:
+      - /url: https://github.com/dlmastery/nature_inspired_networks/blob/main/paper/NATURE_INSPIRED_NETWORKS.md
+    - text: ·
+    - link "Live demo" [ref=e2306] [cursor=pointer]:
+      - /url: https://dlmastery.github.io/nature_inspired_networks/
+    - text: ·
+    - link "GitHub Pages" [ref=e2307] [cursor=pointer]:
+      - /url: https://dlmastery.github.io/nature_inspired_networks/
+  - generic [ref=e2308]:
+    - text: Generated by
+    - code [ref=e2309]: nature_inspired_networks.dashboard.render_dashboard
+    - text: · Brutalist Editorial Lab Notebook v3 · Source Serif 4 / IBM Plex Mono · all SVG + CSS inline; no external CDN besides Google Fonts · leaderboard sectioned by hypothesis group; each row navigates to its own per-experiment page.
+    - text: · built at commit
+    - link "6f57453" [ref=e2310] [cursor=pointer]:
+      - /url: https://github.com/dlmastery/nature_inspired_networks/commit/6f574530e006419bab0059cdaeb89867131e8dad
+      - code [ref=e2311]: 6f57453
+    - text: "on"
+    - code [ref=e2312]: 2026-05-29T16:50:23-07:00
+    - text: "· live demo:"
+    - link "https://dlmastery.github.io/nature_inspired_networks/" [ref=e2313] [cursor=pointer]:
+      - /url: https://dlmastery.github.io/nature_inspired_networks/
