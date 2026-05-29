@@ -478,6 +478,139 @@ def build_matrix(curated: bool = True) -> list[dict]:
     rows.append(dict(tag="slot_init_cymatic",
                      overrides=dict(**PB,
                                     flags=base_flags.copy() | dict(cymatic_init=True))))
+
+    # ---------------------------------------------------------------
+    # POST-FIX-CAPABILITY ROWS — added 2026-05-28 by Next-Sweep-Designer.
+    # Each row exercises a Fixer-introduced API that previously had no
+    # sweep row. All Rule-1 atomic (single-flag delta vs the documented
+    # base). Five rows in total; the first three target the
+    # Fixer-Priors patches (HexConv2d.phi_radial, toroidal_pad.phi_scaled,
+    # CymaticHexConv per-tap phi-phases), the fourth tests
+    # Fixer-Growth's function-preserving grow_model, and the fifth
+    # tests Fixer-InitFilter's even-k-pad-fix on the H38
+    # FractalGoldenFilter.
+    #
+    # Of these five, only ``sg_only_hex_phi_radial`` is launchable as-is
+    # in the current runner (it falls back to plain hex if make_flags
+    # doesn't forward ``hex_phi_radial`` — the row is still kept so the
+    # ladder is documented and the wiring TODO is explicit). The other
+    # four require a small additive runner / make_flags / _GenericConv
+    # patch which is described inline; the rows are intentionally LEFT
+    # IN the matrix (not commented out) because the wiring patches are
+    # planned as the next deliverable. Existing rows continue to behave
+    # byte-for-byte the same (each new flag defaults to its legacy
+    # value); only tags that opt-in see the new behaviour once the
+    # corresponding wiring patch lands.
+    # ---------------------------------------------------------------
+
+    # H21 — Hex phi-radial weighting (Fixer-Priors 253dc94).
+    # HexConv2d(phi_radial=True) reweights the 7-tap honeycomb mask by
+    # phi^{-r} (centre=1.0, nearest-6=1/phi, radius-2 ring=1/phi^2).
+    #
+    # TODO runner wiring (additive, single-file patch):
+    #   1. blocks.NaturePriorFlags — add ``hex_phi_radial: bool = False``.
+    #   2. runner.make_flags — forward ``hex_phi_radial`` from cfg.
+    #   3. blocks._GenericConv — pass ``phi_radial=flags.hex_phi_radial``
+    #      to HexConv2d() in the ``elif flags.hex:`` branch.
+    # The mask-shape contract is preserved (same active-tap set), so the
+    # downstream BN / fractal / residual contract is unchanged.
+    f = base_flags.copy(); f["hex"] = True; f["hex_phi_radial"] = True
+    rows.append(dict(tag="sg_only_hex_phi_radial",
+                     overrides=dict(model="NaturePrior",
+                                    channel_mode="fib", flags=f)))
+
+    # H22 — Toroidal phi-scaled wrap (Fixer-Priors).
+    # toroidal_pad(phi_scaled=True) damps the four wrap-padded boundary
+    # strips by 1/phi.
+    #
+    # TODO runner wiring (additive, single-file patch):
+    #   1. blocks.NaturePriorFlags — add ``toroidal_phi_scaled: bool = False``.
+    #   2. runner.make_flags — forward ``toroidal_phi_scaled`` from cfg.
+    #   3. blocks._GenericConv.forward — when ``self.toroidal`` (the
+    #      plain-Conv2d branch), pass the new flag through to
+    #      toroidal_pad(x, self.padding, phi_scaled=flags.toroidal_phi_scaled).
+    #   4. (Optional) priors.HexConv2d.forward — same plumbing inside the
+    #      ``if self.toroidal:`` branch so the hex+toroidal compound also
+    #      picks up the phi-scaled wrap; for this single-flag row only
+    #      the non-hex branch is required.
+    # Default ``False`` preserves byte-for-byte legacy behaviour.
+    f = base_flags.copy(); f["toroidal"] = True; f["toroidal_phi_scaled"] = True
+    rows.append(dict(tag="sg_only_toroidal_phi_scaled",
+                     overrides=dict(model="NaturePrior",
+                                    channel_mode="fib", flags=f)))
+
+    # H28 — Cymatic hex per-tap phi-phases (Fixer-Priors).
+    # CymaticHexConv applies cos(omega*t + 2*pi*phi*k/T) per-tap phases.
+    #
+    # TODO runner wiring (additive, blocks._GenericConv patch):
+    #   1. blocks.NaturePriorFlags — add ``cymatic_hex: bool = False``.
+    #   2. runner.make_flags — forward ``cymatic_hex`` from cfg.
+    #   3. blocks._GenericConv.__init__ — when ``flags.hex and
+    #      flags.cymatic_hex``, swap HexConv2d() for
+    #      ``from .cymatic_hex import CymaticHexConv``; everything
+    #      downstream (BN, mask shape) is unchanged because
+    #      CymaticHexConv wraps HexConv2d internally.
+    f = base_flags.copy(); f["hex"] = True; f["cymatic_hex"] = True
+    rows.append(dict(tag="sg_only_cymatic_hex",
+                     overrides=dict(model="NaturePrior",
+                                    channel_mode="fib", flags=f)))
+
+    # H08 — Dynamic phi-growth (Fixer-Growth afac553).
+    # grow_model() is now function-preserving via BN gamma=0 init so a
+    # freshly appended NaturePriorBlock is an identity at grow time;
+    # the Fibonacci-spaced schedule (3, 5, 8, 13) drives the callback.
+    #
+    # TODO runner wiring (additive, runner + train patch):
+    #   1. train.TrainConfig — add ``growth_schedule: str = ""`` field
+    #      and a ``growth_schedule_obj`` (the DynamicGrowthCallback or
+    #      compatible GrowthPruningSchedule); the existing
+    #      ``growth_pruning_schedule`` plumbing in Trainer is the
+    #      template — copy that branch for the new ``growth_schedule``
+    #      key.
+    #   2. runner.run_one — forward cfg["growth_schedule"] +
+    #      cfg["growth_schedule_kwargs"] (n_events, start_index) into
+    #      TrainConfig; instantiate
+    #      ``DynamicGrowthCallback(model_factory=lambda m=model: m,
+    #      schedule=fib_growth_schedule(...))`` and pass via
+    #      ``growth_schedule_obj``.
+    #   3. train.Trainer._epoch_loop — at end-of-epoch, after the
+    #      existing ``growth_pruning_schedule`` step, also call
+    #      ``self.growth_schedule.step(epoch, self.model)`` and rebuild
+    #      the optimizer if the model was mutated.
+    # The row below documents the desired override-key shape so the
+    # wiring patch is purely additive.
+    rows.append(dict(tag="sg_only_dynamic_growth",
+                     overrides=dict(model="NaturePrior",
+                                    channel_mode="fib",
+                                    flags=base_flags.copy(),
+                                    growth_schedule="fib",
+                                    growth_schedule_kwargs=dict(
+                                        n_events=4, start_index=3))))
+
+    # H38 — Fractal-golden filter (Fixer-InitFilter).
+    # FractalGoldenFilter applies kernels of Fibonacci sizes (3, 5, 8)
+    # in parallel with per-path learnable scales; the Fixer corrected
+    # the even-k=8 padding so output spatial shape matches the input.
+    #
+    # TODO runner wiring (additive, blocks._GenericConv patch):
+    #   1. blocks.NaturePriorFlags — add ``fractal_filter: bool = False``
+    #      and ``fractal_filter_kernels: tuple[int, ...] = (3, 5, 8)``.
+    #   2. runner.make_flags — forward both keys from cfg.
+    #   3. blocks._GenericConv.__init__ — when ``flags.fractal_filter``
+    #      and neither group nor hex is on, swap nn.Conv2d() for
+    #      ``from .fractal_filter import FractalGoldenFilter;
+    #      FractalGoldenFilter(c_in, c_out, kernel_sizes=
+    #      flags.fractal_filter_kernels, stride=stride)``.
+    #      Note: this flag composes with the existing ``fractal`` flag
+    #      (FractalNet recursive path) — they are orthogonal axes
+    #      (kernel multi-scale vs path multi-scale) so a future row
+    #      could stack both.
+    rows.append(dict(tag="sg_only_fractal_filter",
+                     overrides=dict(model="NaturePrior",
+                                    channel_mode="fib",
+                                    flags=base_flags.copy()
+                                          | dict(fractal_filter=True,
+                                                 fractal_filter_kernels=[3, 5, 8]))))
     return rows
 
 
