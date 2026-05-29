@@ -1,0 +1,89 @@
+# Control 2 — non-sine activation ablation.
+#
+# Reviewer-pass item 5 (audits/REVIEWER_PASS_PAPER.md).
+# Defends: slot_act_sine (PAPER.md:138).
+#
+# Replaces ReLU at the same SLOT recipe with {tanh, softplus, gelu, swish}.
+# slot_act_sine on CIFAR-100 already exists at 3 seeds (sin); only the
+# 4 non-sine activations are launched here. 4 rows × 3 seeds = 12 runs.
+#
+# Implementation status: BLOCKED on a generic activation-swap helper.
+# `src/nature_inspired_networks/sinusoidal_activation.py` provides
+# `swap_relu_with_sine`; `src/nature_inspired_networks/activations.py`
+# provides `swap_relu_with_phigelu`. For the four control activations,
+# a generic `swap_relu_with(model, factory)` helper plus a `slot_activation`
+# cfg dispatch in `runner.post_build_mutators` is required. Documented
+# below; NOT applied per scope constraint.
+
+dataset: cifar100
+data_root: ./data
+batch_size: 256
+num_workers: 0
+epochs: 30
+lr: 1.0e-3
+weight_decay: 5.0e-4
+label_smoothing: 0.1
+target_top1: 0.60
+use_bf16: true
+
+control_id: 2
+seeds: [0, 1, 2]
+
+# Shared base = the phi_budget verified-winner (matches slot_act_sine's base
+# in scripts/run_sweep.py line 467). Each row toggles ONE activation swap.
+shared_base:
+  model: phi_budget
+  phi_model: phi_budget
+  phi_budget_total: 270000
+  phi_budget_n_stages: 3
+  phi_budget_mode: phi
+
+# 4 rows × 3 seeds.
+matrix:
+  - tag: slot_act_tanh
+    overrides:
+      slot_activation: tanh            # NEW KEY — needs generic swap helper.
+  - tag: slot_act_softplus
+    overrides:
+      slot_activation: softplus        # NEW KEY
+  - tag: slot_act_gelu
+    overrides:
+      slot_activation: gelu            # NEW KEY
+  - tag: slot_act_swish
+    overrides:
+      slot_activation: swish           # NEW KEY (equiv to SiLU; nn.SiLU)
+
+# Comparison anchor (already exists; not launched by this control):
+#   slot_act_sine_cifar100_seed{0,1,2}  — sin(ωx), ω=1 init.
+#
+# Headline survives if median(slot_act_sine) > max of {tanh, softplus, gelu, swish}
+# medians by ≥ 0.5 pp at n=3. Otherwise drop from headlines per item 5.
+
+preflight:
+  required_baseline_tag: baseline_resnet20
+  required_baseline_top1: 0.60
+
+# Wiring spec (additive 30-line patch to sinusoidal_activation.py or new
+# controls/lib_act_swap.py + 5 lines in runner.post_build_mutators):
+#
+#   def swap_relu_with(model, factory):
+#       for name, child in list(model.named_children()):
+#           if isinstance(child, nn.ReLU):
+#               setattr(model, name, factory())
+#           else:
+#               swap_relu_with(child, factory)
+#       return model
+#
+#   _ACT_FACTORIES = {
+#       "tanh":     lambda: nn.Tanh(),
+#       "softplus": lambda: nn.Softplus(),
+#       "gelu":     lambda: nn.GELU(),
+#       "swish":    lambda: nn.SiLU(),     # canonical "Swish-1" = SiLU
+#       # "sine" stays routed via the existing swap_relu_with_sine path.
+#   }
+#
+#   # In runner.post_build_mutators, after the existing sine_activation branch:
+#   slot_act = str(cfg.get("slot_activation", "")).lower()
+#   if slot_act in _ACT_FACTORIES:
+#       from .activations_swap import swap_relu_with, _ACT_FACTORIES
+#       swap_relu_with(model, _ACT_FACTORIES[slot_act])

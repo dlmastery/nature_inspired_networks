@@ -1,0 +1,114 @@
+# Control 4 — H71 IcosaRoPE3D ViT-Tiny smoke on rotated-CIFAR-10.
+#
+# Reviewer-pass item 14 (audits/REVIEWER_PASS_PAPER.md).
+# Defends: H71 (PAPER.md:111, sole NOVEL+TESTABLE survivor).
+#
+# Even a 3-seed smoke that produces a number converts H71 from
+# "research proposal" to "we tested our best idea."
+#
+# Design doc: hypotheses/g7_cross_paradigm_hybrids/H71_icosa_rope_3d.md.
+# IcosaRoPE3D module: src/nature_inspired_networks/hybrid_icosa_rope.py
+# (already implemented — provides icosa_vertices_unit + rotor).
+#
+# Implementation status: FUTURE_WORK / BLOCKED_ON_VIT_TINY_AND_ROTCIFAR10.
+# Three missing primitives:
+#   (i)   ViT-Tiny backbone in models.build_model.
+#   (ii)  rotated-CIFAR-10 dataset variant in data.load_dataset.
+#   (iii) head_dim % 3 == 0 constraint resolved (6 heads × dim 33 = 198).
+
+dataset: rotated_cifar10        # NEW dataset name — needs (ii) wiring.
+data_root: ./data
+batch_size: 256
+num_workers: 0
+epochs: 30
+lr: 1.0e-3
+weight_decay: 5.0e-4
+label_smoothing: 0.1
+target_top1: 0.50              # rotated-CIFAR-10 ViT-Tiny smoke target.
+use_bf16: true
+
+control_id: 4
+seeds: [0, 1, 2]
+
+# Architecture: ViT-Tiny with head_dim chosen so head_dim % 3 == 0.
+#   - num_heads = 6, head_dim = 33, embed_dim = 198 (instead of 192).
+#   - depth = 12 layers, patch_size = 4 (CIFAR 32×32 → 64 patches).
+#   - MLP ratio = 4.0.
+#   - ~5.7M params.
+shared_base:
+  model: vit_tiny_icosa           # NEW model name — needs (i) wiring.
+  vit_embed_dim: 198
+  vit_num_heads: 6
+  vit_depth: 12
+  vit_patch_size: 4
+  vit_mlp_ratio: 4.0
+  vit_head_dim: 33               # 33 % 3 == 0 ✓ for IcosaRoPE3D.
+
+# Headline row (H71 IcosaRoPE3D).
+matrix:
+  - tag: h71_icosa_rope3d_vit_tiny_rotcifar10
+    overrides:
+      vit_rope_kind: icosa3d      # IcosaRoPE3D(head_dim=33, base=PHI)
+  # Reference row — single seed only (cheap), provides the head-to-head
+  # comparison the reviewer needs to interpret the H71 number.
+  - tag: vit_tiny_1d_rope_rotcifar10
+    seeds_override: [0]           # 1 seed only (cheap reference).
+    overrides:
+      vit_rope_kind: rope1d       # standard 1-D RoPE.
+
+# Rotated-CIFAR-10 spec: applies torchvision.transforms.RandomRotation
+# to BOTH train and test pipelines. Test rotations use a deterministic
+# per-image angle derived from index hashing so the test set is fixed
+# across runs (otherwise the eval is itself stochastic).
+dataset_spec:
+  base: cifar10
+  rotation_degrees: 180          # uniform random in [-180, 180].
+  rotation_test_deterministic: true
+  rotation_fill: 0               # zero-fill rotated corners.
+
+# H71 falsifier (from design doc §3):
+#   If Δ(rotation-equivariance-aware accuracy) ≤ +1 pp at 3-seed median
+#   vs standard 1-D RoPE, H71 is DISCARDED.
+#   Reference paper §7.4: predicted +2–5 pp on 3-D nav QA.
+#   This smoke uses 2-D rotation as cheapest proxy; signal expected ≤ §7.4.
+
+preflight:
+  # No phi_budget pre-flight here — control 4 uses a different
+  # architecture and dataset. Replace with a ViT-Tiny 1-D RoPE smoke
+  # asserting plain CIFAR-10 top1 ≥ 0.65 at 30 ep (~ViT-Tiny stock band).
+  required_smoke_tag: vit_tiny_1d_rope_cifar10_smoke
+  required_smoke_top1: 0.65
+
+# Wiring spec (3 patches, all additive — NOT applied per scope constraint):
+#
+# Patch 1 — src/nature_inspired_networks/models.py:
+#   if n in ("vit_tiny", "vit_tiny_icosa"):
+#       from .vit_tiny import build_vit_tiny
+#       return build_vit_tiny(num_classes=num_classes,
+#                             embed_dim=kwargs.get("vit_embed_dim", 198),
+#                             num_heads=kwargs.get("vit_num_heads", 6),
+#                             depth=kwargs.get("vit_depth", 12),
+#                             patch_size=kwargs.get("vit_patch_size", 4),
+#                             rope_kind=kwargs.get("vit_rope_kind", "rope1d"))
+#
+# Patch 2 — new file src/nature_inspired_networks/vit_tiny.py (~120 LOC):
+#   - Standard ViT-Tiny (patch_embed → blocks → norm → head).
+#   - Each block: LayerNorm, MHSA-with-RoPE, MLP, residual.
+#   - MHSA dispatches on rope_kind:
+#       * "rope1d"  → existing GoldenRoPE with base=10000.0 (vanilla).
+#       * "icosa3d" → hybrid_icosa_rope.IcosaRoPE3D(head_dim=33, base=PHI).
+#   - For "icosa3d", positions are 1-D sequence indices (the 3-D scene QA
+#     dataset specified in the design doc is out of scope for this smoke);
+#     this is a documented downscaling, not a defect — H71's mechanism
+#     is the discrete SO(3) rotation per triple, which fires regardless
+#     of the position dimensionality.
+#
+# Patch 3 — src/nature_inspired_networks/data.py:
+#   if name == "rotated_cifar10":
+#       return rotated_cifar_loaders(root, batch_size, num_workers,
+#                                    variant="cifar10",
+#                                    rotation_degrees=180,
+#                                    test_deterministic=True)
+#   Inside rotated_cifar_loaders: wrap _cifar_tfs with
+#   T.RandomRotation(degrees=180, fill=0) on both train and test
+#   pipelines; for test, seed the rotation via a per-sample index hash.

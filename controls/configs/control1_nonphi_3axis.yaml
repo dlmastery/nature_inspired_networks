@@ -1,0 +1,69 @@
+# Control 1 — non-φ 3-axis regularizer stack.
+#
+# Reviewer-pass item 4 (audits/REVIEWER_PASS_PAPER.md).
+# Defends: pair_gm_pdw (PAPER.md:130–134).
+#
+# Mirrors pair_gm_pdw's structure but replaces each φ-axis with the
+# closest non-φ analog at iso-params / iso-recipe cost. 1 row × 3 seeds.
+#
+# Implementation status: BLOCKED on three additive wiring patches —
+#   (a) phi_budget_widths(..., budget_mode="uniform") branch
+#   (b) train.TrainConfig.const_beta1 field
+#   (c) phi_decay.linear_decay_param_groups builder
+# Until these land, scripts/run_control_sweeps.py --control 1 --launch
+# raises NotImplementedError with a pointer to controls/PLAN.md.
+
+dataset: cifar100
+data_root: ./data
+batch_size: 256
+num_workers: 0
+epochs: 30
+lr: 1.0e-3
+weight_decay: 5.0e-4
+label_smoothing: 0.1
+target_top1: 0.60
+use_bf16: true
+
+# Sweep matrix — single row, 3 seeds.
+control_id: 1
+seeds: [0, 1, 2]
+
+# The row that replaces pair_gm_pdw's 3-axis φ stack with non-φ axes.
+matrix:
+  - tag: pair_nonphi_3axis
+    overrides:
+      # Axis 1 — uniform width allocator at iso-params (replaces phi_budget).
+      # phi_budget at B_total=270k, n_stages=3, phi mode → widths [37, 48, 61].
+      # Uniform allocator at same B_total/n_stages → c_uniform ≈ 50, so
+      # widths ≈ [50, 50, 50] (final value resolved by the allocator under
+      # the param-budget constraint; this row sets the SPEC).
+      model: phi_budget
+      phi_model: phi_budget
+      phi_budget_total: 270000
+      phi_budget_n_stages: 3
+      phi_budget_mode: uniform        # NEW MODE — needs (a) wiring patch.
+      # Axis 2 — constant β1 = 0.4 (replaces golden_momentum schedule).
+      # H48 golden_momentum anneals β1 from 1/φ≈0.618 to 1/φ²≈0.382 across
+      # 30 epochs. The control fixes β1 at 0.4 (close to H48's terminal
+      # value) for the entire run. NO schedule, NO golden ratio.
+      momentum_schedule: ""           # disable H48
+      const_beta1: 0.4                # NEW KEY — needs (b) wiring patch.
+      # Axis 3 — linear-decay per-layer wd (replaces phi_decay_wd geometric).
+      # phi_decay_wd applies wd_k = base_wd / phi^k (geometric).
+      # Linear decay: wd_k = base_wd · (1 - k/(K-1))/2 (arithmetic).
+      # Same base_wd; the schedule shape differs.
+      phi_decay_wd: false             # disable H44
+      wd_schedule: linear             # NEW KEY — needs (c) wiring patch.
+      wd_schedule_base: 5.0e-4
+
+# Pre-flight: scripts/run_control_sweeps.py --launch first runs a
+# baseline_resnet20 CIFAR-100 30-ep at seed 0 and asserts top1 ≥ 0.60
+# (Rule-13 SOTA-smoke gate) before launching this row.
+preflight:
+  required_baseline_tag: baseline_resnet20
+  required_baseline_top1: 0.60
+
+# Expected reading:
+#   Δ vs pair_gm_pdw → 0 pp        ⇒ φ-content has signal (defend)
+#   Δ vs pair_gm_pdw → +1 pp       ⇒ φ-content is decorative (drop headline)
+#   Δ vs pair_gm_pdw ∈ [-0.3, +0.7] pp ⇒ partial; report decomposition

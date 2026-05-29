@@ -1,0 +1,97 @@
+# Control 3 — tuned ResNet-20 + RegNetX-200MF baseline.
+#
+# Reviewer-pass item 13 (audits/REVIEWER_PASS_PAPER.md).
+# Defends: H09 phi_budget (PAPER.md:179, line 23 "rediscovery of RegNet").
+#
+# Two sub-controls:
+#   3a — Tuned ResNet-20 hill-climb (12 LR×WD seed-0 runs + 3-seed best).
+#   3b — RegNetX-200MF shrunk to ~270k params (3 seeds).
+# Total: 18 runs.
+#
+# Implementation status:
+#   3a — READY (lr, weight_decay are first-class cfg keys).
+#   3b — BLOCKED_ON_REGNETX_DISPATCH (models.build_model needs a
+#        regnetx branch; torchvision.models.regnet_x_200mf is ~2.7M
+#        params, must be shrunk to ~270k for iso-param comparison).
+
+dataset: cifar100
+data_root: ./data
+batch_size: 256
+num_workers: 0
+epochs: 30
+label_smoothing: 0.1
+target_top1: 0.60
+use_bf16: true
+model: resnet20
+channel_mode: fib
+
+control_id: 3
+seeds: [0, 1, 2]
+
+# ---------------------------------------------------------------------------
+# 3a. Tuned ResNet-20 hill-climb (12 LR×WD combos × 1 seed = 12 runs).
+# ---------------------------------------------------------------------------
+hillclimb:
+  enabled: true
+  base:
+    model: resnet20
+    # epochs / batch / scheduler all inherited from top-level.
+  grid:
+    lr: [0.003, 0.01, 0.03, 0.1]
+    weight_decay: [1.0e-4, 5.0e-4, 1.0e-3]
+  seed: 0
+  tag_template: "baseline_resnet20_tuned_lr{lr}_wd{wd}"
+
+# After the hill-climb, scripts/run_control_sweeps.py picks the (lr, wd)
+# with the highest top1 and runs 3 seeds at the best point.
+hillclimb_final:
+  tag: baseline_resnet20_tuned
+  seeds: [0, 1, 2]   # at the best (lr, wd) discovered by the hill-climb.
+
+# ---------------------------------------------------------------------------
+# 3b. RegNetX-200MF at iso-params (~270k).
+# ---------------------------------------------------------------------------
+regnetx:
+  enabled: true
+  status: BLOCKED_ON_REGNETX_DISPATCH
+  tag: baseline_regnetx_200mf
+  seeds: [0, 1, 2]
+  # Spec: torchvision.models.regnet_x_200mf with custom RegNetParams to
+  # hit ~270k params (10× smaller than the stock 2.7M). Specifically:
+  #   - depth: keep 4 stages
+  #   - widths: shrink each stage by sqrt(10) ≈ 3.16x (e.g., default
+  #     [24, 56, 152, 368] → [8, 18, 48, 116]) until param count ∈
+  #     [256k, 284k] (B_total ± 5% of phi_budget's 270k).
+  # The exact shrunk widths must be resolved at runner-load time via a
+  # tiny binary search on RegNetParams; orchestrator emits a clear
+  # NotImplementedError until the dispatch branch is added to
+  # `nature_inspired_networks.models.build_model`.
+  overrides:
+    model: regnetx_200mf_shrunk
+    regnetx_param_budget: 270000
+    regnetx_width_multiplier_search: true
+
+preflight:
+  required_baseline_tag: baseline_resnet20
+  required_baseline_top1: 0.60
+
+# Wiring spec for 3b (in src/nature_inspired_networks/models.py
+# build_model, before the final raise):
+#
+#   if n in ("regnetx_200mf_shrunk", "regnetx_200mf"):
+#       from torchvision.models.regnet import RegNet, BlockParams
+#       # Binary-search width_multiplier such that count_params() ∈
+#       # [budget*0.95, budget*1.05]. Use bottleneck_ratio=1, group_width=8
+#       # (RegNetX-200MF defaults).
+#       params = _shrunk_regnetx_params(kwargs["regnetx_param_budget"])
+#       return RegNet(params, num_classes=num_classes)
+
+# Expected outcome for H09 defence:
+#   - If tuned ResNet-20 > phi_budget at iso-compute, H09's +0.78 pp lift
+#     is a tuning artifact (must drop H09 from the contributions list).
+#   - If RegNetX-200MF at 270k params > phi_budget by ≥ 0.5 pp, H09 is
+#     a RegNet rediscovery — paper line 23 stands and the headline must
+#     reflect this honestly.
+#   - If phi_budget still leads both ≥ 0.5 pp, H09 survives as a small
+#     niche win at this regime; the paper can keep H09 as "comparable
+#     to RegNet at <300k params" without claiming SOTA.
