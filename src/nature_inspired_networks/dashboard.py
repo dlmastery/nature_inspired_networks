@@ -89,6 +89,34 @@ TAG_TO_HYP: dict[str, tuple[str | None, str]] = {
     # G8 Esoteric Extensions
     "sg_only_constant_width": ("H80", "G8"),
     "sg_only_sine_act": ("H81", "G8"),
+    # Combo ladder (additive stacks on phi_budget H09 base — G1)
+    "combo2_pb_gm": ("H09", "G1"),
+    "combo3_pb_gm_pd": ("H09", "G1"),
+    "combo4_pb_gm_pd_pdw": ("H09", "G1"),
+    "combo5_pb_gm_pd_pdw_plr": ("H09", "G1"),
+    "combo6_pb_gm_pd_pdw_plr_fe": ("H09", "G1"),
+    "combo7_pb_gm_pd_pdw_plr_fe_sa": ("H09", "G1"),
+    "combo8_pb_gm_pd_pdw_plr_fe_sa_fp": ("H09", "G1"),
+    # LOO subtractive from combo8 (phi_budget H09 base)
+    "loo_no_gm": ("H09", "G1"),
+    "loo_no_pd": ("H09", "G1"),
+    "loo_no_pdw": ("H09", "G1"),
+    "loo_no_plr": ("H09", "G1"),
+    "loo_no_fe": ("H09", "G1"),
+    "loo_no_sa": ("H09", "G1"),
+    "loo_no_fp": ("H09", "G1"),
+    # Two-at-a-time PAIR interaction matrix (phi_budget H09 base)
+    "pair_gm_pdw": ("H09", "G1"),
+    "pair_gm_plr": ("H09", "G1"),
+    "pair_pd_pdw": ("H09", "G1"),
+    "pair_pd_plr": ("H09", "G1"),
+    "pair_pdw_plr": ("H09", "G1"),
+    # Mutually-exclusive SLOT ablation (phi_budget H09 base × one axis)
+    "slot_act_sine": ("H81", "G8"),
+    "slot_act_phi": ("H39", "G4"),
+    "slot_init_spiral": ("H31", "G4"),
+    "slot_init_phi": ("H42", "G5"),
+    "slot_init_cymatic": ("H35", "G4"),
 }
 
 
@@ -239,6 +267,57 @@ _STATUS_GLYPH_MAP = {
     "✓": "done", "▶": "running", "⏸": "queued",
     "○": "planned", "✗": "failed", "♻": "superseded",
 }
+
+
+def parse_idea_table_status(idea_table_md: str | Path) -> dict[str, str]:
+    """Parse IDEA_TABLE.md status column into {H<NN>: status}.
+
+    Returns one of ``"done"`` (✓ done — implemented + at least one CIFAR row),
+    ``"impl"`` (✓ impl — module + tests, no CIFAR row), ``"partial"``
+    (~ partial), ``"planned"`` (○ not started), or ``"deferred"`` (× deferred).
+
+    The IDEA_TABLE.md table rows look like::
+
+        | 1 | **H01** | φ-Compound Scaling — ... | ✓ done (`phi_compound` .8042) | ...
+        | 2 | **H02** | Fibonacci Depth Progression — ... | ✓ impl | ...
+
+    Missing hypotheses default to ``"planned"`` upstream — this function only
+    returns the rows it can parse.
+    """
+    p = Path(idea_table_md)
+    out: dict[str, str] = {}
+    if not p.exists():
+        return out
+    text = p.read_text(encoding="utf-8", errors="ignore")
+    hid_re = re.compile(r"\*\*H(\d{2})\*\*")
+    for line in text.splitlines():
+        if "|" not in line:
+            continue
+        m = hid_re.search(line)
+        if not m:
+            continue
+        hid = "H" + m.group(1)
+        cells = [c.strip() for c in line.strip().strip("|").split("|")]
+        if len(cells) < 4:
+            continue
+        # Status is conventionally the 4th column; scan all cells defensively
+        # for the legend glyphs so off-by-one schema drift doesn't lose status.
+        status = "planned"
+        for c in cells:
+            low = c.lower()
+            if "✓ done" in c or "done" == low or low.startswith("done ") \
+                    or "✓done" in c:
+                status = "done"; break
+            if "✓ impl" in c or low.startswith("impl"):
+                status = "impl"; break
+            if "~ partial" in c or "partial" in low:
+                status = "partial"; break
+            if "× deferred" in c or "deferred" in low:
+                status = "deferred"; break
+            if "○ not started" in c:
+                status = "planned"; break
+        out[hid] = status
+    return out
 
 
 def parse_hypothesis_index(index_md: str | Path) -> list[dict]:
@@ -2597,11 +2676,19 @@ HTML_HEAD = """<!doctype html>
  .meta code{background:var(--ink);padding:1px 5px;color:var(--paper);
             border:1px solid var(--rule);}
  .status-done{background:var(--v-pass);}
+ .status-impl{background:var(--v-derivative);}
+ .status-partial{background:var(--v-minor);}
  .status-running{background:var(--v-minor);animation:pulse 1.5s infinite;}
- .status-queued{background:var(--v-derivative);}
+ .status-queued{background:var(--v-derivative);opacity:0.7;}
  .status-planned{background:#484f58;}
+ .status-deferred{background:#4d3a1f;}
  .status-failed{background:var(--v-broken);}
  .status-superseded{background:#6e7681;}
+ .hyp-grid-summary{font-family:var(--font-mono,monospace);font-size:0.82em;
+   color:var(--paper-dim,#a89e8c);padding:6px 0 12px 0;
+   border-bottom:1px solid var(--rule,#1c1c20);margin-bottom:10px;
+   letter-spacing:0.02em;}
+ .hyp-grid-summary b{color:var(--paper,#e6e1d6);font-weight:600;}
  @keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.45;}}
  @keyframes reveal{from{opacity:0;transform:translateY(8px);}
                    to{opacity:1;transform:translateY(0);}}
@@ -2725,12 +2812,25 @@ document.addEventListener('keydown',function(e){
 # ---------------------------------------------------------------------------
 
 def _hypothesis_grid_html(index_rows: list[dict],
-                          tag_status: dict[str, dict]) -> str:
+                          tag_status: dict[str, dict],
+                          idea_table_status: dict[str, str] | None = None,
+                          run_dirs_root: Path | None = None) -> str:
     if not index_rows:
         return "<i style='color:#8b949e'>hypotheses/INDEX.md not found.</i>"
 
-    status_for: dict[str, str] = {h["id"]: "planned" for h in index_rows}
-    order = ["done", "running", "queued", "failed", "superseded", "planned"]
+    # Tier ordering — lower index wins on collision.
+    order = ["done", "running", "queued", "impl", "partial",
+             "failed", "superseded", "deferred", "planned"]
+
+    # 1) Seed from IDEA_TABLE.md (the canonical per-hypothesis status column).
+    #    Falls back to "planned" if the table is missing / un-parseable.
+    idea_table_status = idea_table_status or {}
+    status_for: dict[str, str] = {}
+    for h in index_rows:
+        hid = h["id"]
+        status_for[hid] = idea_table_status.get(hid, "planned")
+
+    # 2) Overlay EXPERIMENT_LOG.md tier rows (a tag → tier → hyp lookup).
     for tag, meta in tag_status.items():
         idea = meta.get("idea", "")
         for m in re.finditer(r"H(\d{2})", idea):
@@ -2741,32 +2841,54 @@ def _hypothesis_grid_html(index_rows: list[dict],
                 if order.index(new) < order.index(cur):
                     status_for[hid] = new
 
-    direct = {
-        "H04": ["sg_chan_fib", "sg_chan_phi"],
-        "H05": ["sg_only_fractal"],
-        "H17": ["sg_only_golden_modulate"],
-        "H21": ["sg_only_hex"],
-        "H22": ["sg_only_toroidal"],
-        "H35": ["sg_only_cymatic_init"],
-        "H50": ["sg_full_fib"],
-        "H58": ["sg_only_group_avg"],
-    }
-    for hid, tags in direct.items():
-        if hid not in status_for:
-            continue
-        for t in tags:
-            meta = tag_status.get(t)
-            if not meta:
+    # 3) Promote every hypothesis with at least one COMPLETED CIFAR-10/-100
+    #    run directory (metrics.json on disk) from "impl" → "done".
+    #    The TAG_TO_HYP map drives the tag → hypothesis edge.
+    if run_dirs_root is not None and Path(run_dirs_root).exists():
+        seen_runs: set[str] = set()
+        for ds_dir in Path(run_dirs_root).glob("*/"):
+            for run_dir in ds_dir.glob("*_seed*/"):
+                if (run_dir / "metrics.json").exists():
+                    # tag is the run-dir name minus the trailing _seed<N>.
+                    name = run_dir.name
+                    tag = re.sub(r"_seed\d+$", "", name)
+                    seen_runs.add(tag)
+        for tag in seen_runs:
+            hid_pair = TAG_TO_HYP.get(tag)
+            if not hid_pair:
                 continue
-            if meta["status"] == "done" and status_for[hid] != "done":
-                status_for[hid] = "done"
+            hid = hid_pair[0]
+            if hid and hid in status_for:
+                cur = status_for[hid]
+                if order.index("done") < order.index(cur):
+                    status_for[hid] = "done"
 
     by_group: dict[str, list[dict]] = {}
     for h in index_rows:
         by_group.setdefault(h["group"], []).append(h)
 
-    out = ["<div class='legend-row'>Legend:"]
-    for s in ("done", "running", "queued", "planned", "failed", "superseded"):
+    # Counts per status — helpful at-a-glance summary.
+    counts: dict[str, int] = {}
+    for s in status_for.values():
+        counts[s] = counts.get(s, 0) + 1
+    total = sum(counts.values())
+    summary_bits = []
+    for s in ("done", "impl", "partial", "running", "queued",
+              "planned", "failed", "superseded", "deferred"):
+        n = counts.get(s, 0)
+        if n:
+            summary_bits.append(f"<b>{n}</b>&nbsp;{s}")
+    summary = (
+        "<div class='hyp-grid-summary'>"
+        f"<b>{total}</b>&nbsp;hypotheses · "
+        + " · ".join(summary_bits)
+        + "</div>"
+    )
+
+    out = [summary]
+    out.append("<div class='legend-row'>Legend:")
+    for s in ("done", "impl", "partial", "running", "queued",
+              "planned", "deferred", "failed", "superseded"):
         out.append(f"<span class='swatch status-{s}'></span>{s}")
     out.append("</div>")
     out.append("<div id='hyp-grid'>")
@@ -3009,6 +3131,7 @@ def render_dashboard(results_dir: str | Path,
 
     tag_to_tier = parse_experiment_log_tiers(root / "EXPERIMENT_LOG.md")
     index_rows = parse_hypothesis_index(root / "hypotheses" / "INDEX.md")
+    idea_table_status = parse_idea_table_status(root / "IDEA_TABLE.md")
     findings_blurb = parse_findings_headline(root / "FINDINGS.md")
     findings_metrics = parse_findings_metrics(root / "FINDINGS.md")
 
@@ -3077,7 +3200,9 @@ def render_dashboard(results_dir: str | Path,
     html.append(
         "<div class='card panel-2col'><h3>Hypothesis ledger — status grid "
         "(G1..G8 × hypothesis index; click a cell to view the spec)</h3>"
-        + _hypothesis_grid_html(index_rows, tag_to_tier)
+        + _hypothesis_grid_html(index_rows, tag_to_tier,
+                                idea_table_status=idea_table_status,
+                                run_dirs_root=root)
         + "</div>"
     )
     html.append("</div>")  # end .grid
