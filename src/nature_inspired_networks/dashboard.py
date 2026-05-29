@@ -389,21 +389,29 @@ def parse_experiment_log_tiers(log_md: str | Path) -> dict[str, dict]:
     return out
 
 
-def parse_findings_headline(findings_md: str | Path, max_chars: int = 600) -> str:
+def parse_findings_headline(findings_md: str | Path,
+                            max_chars: int = 4000) -> str:
+    """Return the first contiguous ``>``-blockquoted headline block.
+
+    Preserves the original line breaks (NEW: 2026-05-29 fix). The
+    previous implementation joined the lines with a single space, which
+    destroyed the GFM-table row separators and made the markdown
+    converter unable to parse the embedded headline table. The
+    downstream ``_md_to_html`` call strips the leading ``>`` markers
+    and parses the inner Markdown faithfully — preserving the table.
+    """
     p = Path(findings_md)
     if not p.exists():
         return ""
     text = p.read_text(encoding="utf-8", errors="ignore")
     lines: list[str] = []
     for ln in text.splitlines():
-        s = ln.strip()
-        if s.startswith(">"):
-            cleaned = re.sub(r"^>+\s*", "", s)
-            if cleaned:
-                lines.append(cleaned)
+        # Match any line that starts (possibly after spaces) with ``>``.
+        if ln.lstrip().startswith(">"):
+            lines.append(ln)
         elif lines:
             break
-    return " ".join(lines)[:max_chars]
+    return "\n".join(lines)[:max_chars]
 
 
 def parse_findings_metrics(findings_md: str | Path) -> list[tuple[str, str, str]]:
@@ -806,7 +814,13 @@ def _git_short_sha(repo_root: Path, target: Path | None) -> str:
 
 
 def parse_findings_for_tag(findings_md: Path, tag: str) -> str:
-    """Extract a short verdict blurb for the given tag from FINDINGS.md."""
+    """Extract a verdict blurb for the given tag from FINDINGS.md.
+
+    NEW (2026-05-29 fix): preserve newlines so embedded GFM tables /
+    bullet lists inside the matched paragraph survive into the markdown
+    converter (the previous implementation collapsed all whitespace to
+    a single space, which destroyed the table structure).
+    """
     if not findings_md.exists() or not tag:
         return ""
     text = findings_md.read_text(encoding="utf-8", errors="ignore")
@@ -818,7 +832,9 @@ def parse_findings_for_tag(findings_md: Path, tag: str) -> str:
     candidates: list[str] = []
     for para in paragraphs:
         if f"`{tag}`" in para or short in para:
-            cleaned = re.sub(r"\s+", " ", para).strip()
+            # Preserve newlines — only trim trailing/leading whitespace
+            # so the markdown converter sees the original block structure.
+            cleaned = para.rstrip()
             if len(cleaned) > 30:
                 candidates.append(cleaned)
     if not candidates:
@@ -830,8 +846,8 @@ def parse_findings_for_tag(findings_md: Path, tag: str) -> str:
     )
     for c in candidates:
         if any(t.lower() in c.lower() for t in verdict_terms):
-            return c[:1200]
-    return candidates[0][:1200]
+            return c[:2400]
+    return candidates[0][:2400]
 
 
 # ---------------------------------------------------------------------------
@@ -1165,6 +1181,34 @@ def _md_to_html(text: str, *, inline_only: bool = False,
         return ""
     if strip_blockquote:
         text = _strip_blockquote_markers(text)
+    # Normalise stray un-paired bold/italic delimiters left over from
+    # source-doc typos. ``****`` parses as empty bold; ``***`` at the
+    # end of a phrase produces the ``</em>**`` literal the audit flagged
+    # on the H09 sci-critic preamble; lone ``*`` after a balanced bold/
+    # italic block survives as raw text. Strategy: collapse 4+ stars to
+    # ``**``, rewrite ``***`` (which markdown spec defines as bold+italic
+    # but in source-doc malformed pairs always intends bold-closure) to
+    # ``**`` whenever it appears at the END of an emphasised word
+    # (...word.*** → ...word.**), then balance odd parity by dropping the
+    # last unmatched delimiter in each paragraph.
+    def _fix_stars(line: str) -> str:
+        line = re.sub(r"\*{4,}", "**", line)
+        # ``word.***`` or ``word.***\s`` → ``word.**``
+        line = re.sub(r"\*\*\*(\W|$)", r"**\1", line)
+        # ``***word`` → ``**word`` (opener variant)
+        line = re.sub(r"(^|\W)\*\*\*", r"\1**", line)
+        return line
+    text = "\n".join(_fix_stars(ln) for ln in text.splitlines())
+    # Drop unbalanced ``**`` and stray lone ``*`` at end of a paragraph.
+    cleaned_paras: list[str] = []
+    for para in text.split("\n\n"):
+        if para.count("**") % 2 == 1:
+            idx = para.rfind("**")
+            para = para[:idx] + para[idx + 2:]
+        # Then collapse trailing lone ``*`` adjacent to whitespace / EOL.
+        para = re.sub(r"(?<!\*)\*(?=\s*$)", "", para)
+        cleaned_paras.append(para)
+    text = "\n\n".join(cleaned_paras)
     try:
         import markdown as _md
         html = _md.markdown(
@@ -1319,7 +1363,12 @@ _EXP_PAGE_CSS = _BRUTALIST_VARS + """
                        white-space:pre-wrap;line-height:1.6;}
  .quote{border-left:2px solid var(--accent);padding:10px 18px;
         background:var(--ink);font-size:0.95em;color:var(--paper);
-        margin:10px 0;font-style:italic;font-family:'Newsreader',serif;
+        margin:10px 0;font-family:'Source Serif 4',Georgia,serif;
+        font-weight:400;line-height:1.55;}
+ .quote.md-body{font-style:normal;}
+ .findings-quote{border-left:2px solid var(--accent);padding:10px 18px;
+        background:var(--ink);font-size:0.95em;color:var(--paper);
+        margin:10px 0;font-family:'Source Serif 4',Georgia,serif;
         font-weight:400;line-height:1.55;}
  .verdict-label{color:var(--accent);font-weight:600;}
  .empty{color:var(--paper-dim);font-style:italic;font-size:0.9em;}
@@ -1972,8 +2021,17 @@ def _render_verdict_section(repo_root: Path, tag: str) -> str:
     )
 
 
-def _render_reasoning_section(reasoning_path: Path | None) -> str:
+def _render_reasoning_section(reasoning_path: Path | None,
+                              has_findings_verdict: bool = False) -> str:
     if reasoning_path is None or not reasoning_path.exists():
+        if has_findings_verdict:
+            return (
+                "<p class='empty'>No <code>reasoning.json</code> archived "
+                "for this run directory &mdash; see the <b>Verdict</b> card "
+                "above for the FINDINGS-derived verdict and the "
+                "<b>Implementation-critic audit</b> accordion for the "
+                "code-level diagnosis.</p>"
+            )
         return (
             "<p class='empty'>No <code>reasoning.json</code> for this run "
             "directory.</p>"
@@ -2646,7 +2704,8 @@ def render_experiment_page(metrics: dict, history: list[dict] | None,
     # ---- reasoning + config (accordion bodies) -------------------------
     reasoning_path = run_dir / "reasoning.json"
     reasoning_body = _render_reasoning_section(
-        reasoning_path if reasoning_path.exists() else None
+        reasoning_path if reasoning_path.exists() else None,
+        has_findings_verdict=flags["verdict"],
     )
     flags["reasoning"] = reasoning_path.exists()
 
@@ -2670,7 +2729,14 @@ def render_experiment_page(metrics: dict, history: list[dict] | None,
 
     # ---- key numbers strip (per-experiment quick read) -----------------
     baseline_top1 = BASELINE_TOP1.get(dataset)
-    key_strip = _render_key_numbers_strip(metrics, baseline_top1)
+    # Rule 28 — seed-count framing (n=1 SCREENING vs n>=3 EVALUATION).
+    seed_count = _seed_count_for_tag(results_dir, tag, dataset)
+    if seed_count < 1:
+        seed_count = 1  # at minimum this run itself
+    tier = _evaluation_tier(tag, dataset, seed_count)
+    key_strip = _render_key_numbers_strip(
+        metrics, baseline_top1, tier=tier, seed_count=seed_count,
+    )
 
     # ---- composite stacked bar -----------------------------------------
     composite_stack = _render_composite_stacked_bar(metrics, formula)
@@ -2684,16 +2750,32 @@ def render_experiment_page(metrics: dict, history: list[dict] | None,
         metrics_pretty = str(metrics)
 
     # ---- header pills + verdicts ---------------------------------------
-    hyp_pill = (
-        f"<span class='pill hyp'>{_esc(hid)}</span>"
-        if hid else "<span class='pill'>baseline</span>"
-    )
+    # Multi-hypothesis aware pill list — combo / loo / pair / slot tags
+    # contribute more than one H-ID (per Rule 23 orthogonal-axes stacks);
+    # show ALL of them rather than just the leading one.
+    all_hids = hypotheses_for_tag(tag)
+    if all_hids:
+        hyp_pill = "".join(
+            f"<span class='pill hyp'>{_esc(h)}</span>" for h in all_hids
+        )
+    else:
+        hyp_pill = "<span class='pill'>baseline</span>"
     grp_pill = (
         f"<span class='pill grp'>{_esc(grp_header)}</span>"
         if group != "Uncategorized" else ""
     )
     ds_pill = f"<span class='pill ds'>{_esc(dataset)}</span>"
     seed_pill = f"<span class='pill'>seed {_esc(seed)}</span>"
+    # Rule-28 tier badge: SCREENING (n=1) or EVALUATION (n>=3 Phase-5 gate).
+    tier_color = "var(--v-pass)" if tier == "EVALUATION" else "var(--v-minor)"
+    tier_badge = (
+        f"<span class='pill' style='border-color:{tier_color};"
+        f"color:{tier_color}' title='Rule 28 (CLAUDE.md): SCREENING = "
+        f"n=1 seed; EVALUATION = n>=3 seeds AND worst-leader-seed > "
+        f"best-baseline-seed Phase-5 gate cleared'>"
+        f"tier {_esc(tier.lower())} &nbsp;n={seed_count}"
+        f"</span>"
+    )
 
     # ---- accordions ----------------------------------------------------
     accordions: list[str] = []
@@ -2746,6 +2828,7 @@ def render_experiment_page(metrics: dict, history: list[dict] | None,
         "  <div class='head-left'>\n"
         f"    <div class='tag-display'>{_esc(tag)}</div>\n"
         f"    <div class='sub'>{hyp_pill}{grp_pill}{ds_pill}{seed_pill}"
+        f"{tier_badge}"
         f"&nbsp;·&nbsp; run dir <span class='mono' style='color:var(--paper)'>"
         f"{_esc(run_dir_name)}</span></div>\n"
         "  </div>\n"
@@ -2853,18 +2936,19 @@ HTML_HEAD = """<!doctype html>
 """ + _BRUTALIST_VARS + """
  *{margin:0;padding:0;box-sizing:border-box;}
  html,body{background:var(--ink);}
- body{font-family:'IBM Plex Serif','Charter',Georgia,serif;color:var(--paper);
+ body{font-family:'Source Serif 4','Charter','Source Serif Pro',Georgia,serif;
+      color:var(--paper);
       padding:32px 36px 80px;line-height:1.55;max-width:1340px;margin:0 auto;
       font-size:16px;font-variant-numeric:tabular-nums;position:relative;}
  a{color:var(--v-derivative);text-decoration:none;
    border-bottom:1px solid transparent;transition:border-color 160ms ease;}
  a:hover{border-bottom-color:var(--v-derivative);text-decoration:none;}
- h1{font-family:'Newsreader',serif;font-weight:600;font-style:italic;
-    font-size:54px;line-height:1.02;color:var(--paper);
-    letter-spacing:-0.015em;margin-bottom:8px;}
- h2{font-family:'Newsreader',serif;font-weight:600;font-style:italic;
-    font-size:24px;color:var(--paper);margin:36px 0 10px 0;
-    letter-spacing:-0.005em;}
+ h1{font-family:'Source Serif 4',Georgia,serif;font-weight:600;
+    font-size:42px;line-height:1.10;color:var(--paper);
+    letter-spacing:-0.005em;margin-bottom:8px;}
+ h2{font-family:'Source Serif 4',Georgia,serif;font-weight:600;
+    font-size:22px;color:var(--paper);margin:36px 0 10px 0;
+    letter-spacing:-0.003em;}
  h3{font-family:'IBM Plex Mono',monospace;font-size:11px;
     text-transform:uppercase;letter-spacing:0.18em;color:var(--paper-dim);
     margin:14px 0 8px 0;font-weight:600;}
@@ -2872,8 +2956,8 @@ HTML_HEAD = """<!doctype html>
       margin-bottom:18px;font-size:11px;text-transform:uppercase;
       letter-spacing:0.18em;}
  .group-desc{color:var(--paper-dim);font-size:0.93em;margin:4px 0 14px 0;
-             max-width:980px;line-height:1.6;font-style:italic;
-             font-family:'Newsreader',serif;}
+             max-width:980px;line-height:1.6;
+             font-family:'Source Serif 4',Georgia,serif;}
  .ribbon{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
          gap:1px;background:var(--rule);border:1px solid var(--rule);
          margin:14px 0 24px 0;}
@@ -2881,9 +2965,9 @@ HTML_HEAD = """<!doctype html>
  .kpi .label{color:var(--paper-dim);font-size:9.5px;
              font-family:'IBM Plex Mono',monospace;
              text-transform:uppercase;letter-spacing:0.18em;}
- .kpi .value{font-family:'Newsreader',serif;font-style:italic;font-size:28px;
+ .kpi .value{font-family:'Source Serif 4',Georgia,serif;font-size:26px;
              font-weight:600;margin-top:4px;color:var(--paper);
-             letter-spacing:-0.01em;}
+             letter-spacing:-0.005em;}
  .kpi.positive{box-shadow:inset 3px 0 0 var(--v-pass);}
  .kpi.negative{box-shadow:inset 3px 0 0 var(--v-broken);}
  .kpi.neutral{box-shadow:inset 3px 0 0 var(--accent-dim);}
@@ -2953,9 +3037,9 @@ HTML_HEAD = """<!doctype html>
                 border:1px solid var(--rule);padding:22px 26px;position:relative;}
  .group-section::before{content:"";position:absolute;top:0;left:0;width:64px;
                         height:1px;background:var(--accent);}
- .group-section h2{margin-top:0;color:var(--paper);font-size:24px;}
+ .group-section h2{margin-top:0;color:var(--paper);font-size:22px;}
  .group-empty{color:var(--paper-dim);font-style:italic;font-size:0.93em;
-              padding:8px 0;font-family:'Newsreader',serif;}
+              padding:8px 0;font-family:'Source Serif 4',Georgia,serif;}
  .group-chart{margin:14px 0;}
  table.runs.compact{font-size:0.78em;}
  table.runs.compact th{padding:6px 9px;font-size:9px;}
@@ -2966,30 +3050,43 @@ HTML_HEAD = """<!doctype html>
                   border-left:2px solid var(--accent);
                   padding:16px 22px;margin:14px 0 18px 0;
                   font-size:0.96em;color:var(--paper);
-                  font-family:'Newsreader',serif;font-style:italic;line-height:1.55;}
- .headline-ribbon b{font-family:'IBM Plex Mono',monospace;font-style:normal;
+                  font-family:'Source Serif 4',Georgia,serif;line-height:1.55;}
+ .headline-ribbon b{font-family:'IBM Plex Mono',monospace;
                     font-weight:600;color:var(--accent);font-size:10px;
                     text-transform:uppercase;letter-spacing:0.18em;
                     margin-right:8px;}
- /* side panel (hypothesis quick-open) */
- #side-panel{position:fixed;top:0;right:-580px;width:560px;height:100vh;
-             background:var(--ink);border-left:1px solid var(--rule);
-             box-shadow:-4px 0 24px rgba(0,0,0,0.6);
-             padding:24px 26px;overflow-y:auto;transition:right 0.25s ease;
-             z-index:50;}
- #side-panel.open{right:0;}
- #side-panel h3{color:var(--paper);font-size:18px;margin-bottom:12px;
-                font-family:'Newsreader',serif;font-style:italic;
-                font-weight:600;letter-spacing:normal;}
- #side-panel pre{background:var(--panel);border:1px solid var(--rule);
-                 padding:14px 16px;white-space:pre-wrap;color:var(--paper);
-                 font-size:11px;font-family:'IBM Plex Mono',monospace;
-                 line-height:1.6;border-left:2px solid var(--accent-dim);}
- .close-btn{background:transparent;border:1px solid var(--rule-bright);
-            color:var(--paper-dim);padding:5px 14px;cursor:pointer;
-            font-family:'IBM Plex Mono',monospace;font-size:10px;
-            text-transform:uppercase;letter-spacing:0.18em;float:right;}
- .close-btn:hover{border-color:var(--accent);color:var(--accent);}
+ .headline-ribbon h2{font-family:'Source Serif 4',Georgia,serif;
+                     font-size:22px;font-weight:600;margin:0 0 10px 0;}
+ .headline-ribbon table{border-collapse:collapse;margin:8px 0;font-size:0.92em;
+                        width:auto;}
+ .headline-ribbon th,.headline-ribbon td{border:1px solid var(--rule-bright);
+                                         padding:4px 10px;text-align:left;}
+ .headline-ribbon th{background:var(--panel2);font-weight:600;
+                     font-family:'IBM Plex Mono',monospace;font-size:0.86em;
+                     text-transform:uppercase;letter-spacing:0.08em;
+                     color:var(--paper-dim);}
+ .headline-ribbon code{background:var(--ink);padding:1px 5px;
+                       font-family:'IBM Plex Mono',monospace;
+                       border:1px solid var(--rule);font-size:0.86em;}
+ .headline-ribbon ul{margin:8px 0 8px 22px;}
+ .headline-ribbon li{margin:3px 0;}
+ .headline-ribbon p{margin:6px 0;}
+ .headline-ribbon blockquote{border-left:3px solid var(--accent-dim);
+                              padding:4px 14px;margin:8px 0;color:var(--paper-dim);}
+ /* Rule-28 seed-count chips on leaderboard tag cells */
+ .n-chip{display:inline-block;padding:1px 6px;font-size:9px;
+         font-family:'IBM Plex Mono',monospace;letter-spacing:0.10em;
+         text-transform:uppercase;border:1px solid;margin-left:6px;
+         vertical-align:middle;}
+ .n-chip.eval{color:var(--v-pass);border-color:var(--v-pass);}
+ .n-chip.scr{color:var(--v-minor);border-color:var(--v-minor);}
+ /* Pages-live ribbon and build-stamp footer */
+ .live-link{display:inline-block;padding:3px 10px;border:1px solid var(--v-pass);
+            color:var(--v-pass);font-family:'IBM Plex Mono',monospace;
+            font-size:10px;text-transform:uppercase;letter-spacing:0.18em;
+            font-weight:600;}
+ .live-link:hover{background:var(--v-pass);color:var(--ink);
+                  border-bottom-color:var(--v-pass);}
  .legend-row{margin:10px 0 14px 0;font-size:0.78em;color:var(--paper-dim);
              font-family:'IBM Plex Mono',monospace;letter-spacing:0.08em;}
  .legend-row .swatch{display:inline-block;width:12px;height:12px;
@@ -3040,13 +3137,6 @@ function openHypothesis(hid,fname){
   var url='https://github.com/dlmastery/nature_inspired_networks/blob/main/hypotheses/'+fname;
   window.open(url,'_blank','noopener,noreferrer');
 }
-function closeSide(){
-  var sp=document.getElementById('side-panel');
-  if(sp){sp.classList.remove('open');}
-}
-document.addEventListener('keydown',function(e){
-  if(e.key==='Escape'){closeSide();}
-});
 </script>
 """
 
@@ -3231,7 +3321,8 @@ def _group_section_html(group_letter: str,
                         best_idx: set,
                         table_id: str,
                         history_map: dict[str, list[dict]] | None = None,
-                        repo_root: Path | None = None) -> str:
+                        repo_root: Path | None = None,
+                        results_dir: Path | None = None) -> str:
     """Render one ``<section>`` for a hypothesis-group block.
 
     Now renders 2 diagrams per group (top-1 bars + composite-vs-params
@@ -3308,8 +3399,25 @@ def _group_section_html(group_letter: str,
                     if page_href else
                     f"<span class='tag-pill'>{_esc(disp)}</span>"
                 )
+                # Rule-28 seed-count chip: n=1 (screening) / n>=3 (evaluation)
+                n_chip = ""
+                if results_dir is not None:
+                    ds = str(r.get("dataset", "")) or ""
+                    raw_tag = str(r.get("tag", ""))
+                    sc = _seed_count_for_tag(results_dir, raw_tag, ds)
+                    tier = _evaluation_tier(raw_tag, ds, sc)
+                    chip_cls = "eval" if tier == "EVALUATION" else "scr"
+                    tip = (
+                        f"Rule 28: SCREENING = n=1 seed; EVALUATION = "
+                        f"n&gt;=3 seeds AND Phase-5 gate cleared."
+                    )
+                    n_chip = (
+                        f"<span class='n-chip {chip_cls}' title=\"{tip}\">"
+                        f"n={sc} {tier.lower()[:4]}</span>"
+                    )
                 parts.append(
-                    f"<td data-v='{_esc(dv)}' style='text-align:left'>{tag_html}</td>"
+                    f"<td data-v='{_esc(dv)}' style='text-align:left'>"
+                    f"{tag_html}{n_chip}</td>"
                 )
             else:
                 parts.append(
@@ -3346,7 +3454,7 @@ def _group_section_html(group_letter: str,
 def render_dashboard(results_dir: str | Path,
                      out_html: Path,
                      extra_sections: list[tuple[str, str]] | None = None,
-                     title: str = "NaturePriorBlock — autoresearch dashboard",
+                     title: str = "nature_inspired_networks — autoresearch dashboard",
                      subtitle: str = "84-hypothesis dual-track audit on CIFAR-10 + CIFAR-100 / Pareto / hypothesis ledger",
                      repo_root: str | Path | None = None) -> None:
     """Render the rich dark-theme dashboard.
@@ -3404,6 +3512,9 @@ def render_dashboard(results_dir: str | Path,
     html.append(f"<h1>{title}</h1>")
     html.append(
         f"<div class='sub'>{subtitle} &nbsp;·&nbsp; "
+        f"<a class='live-link' href='https://dlmastery.github.io/nature_inspired_networks/' "
+        f"target='_blank' rel='noopener'>📡 live · GitHub Pages</a>"
+        f"&nbsp;·&nbsp; "
         f"<a href='https://github.com/dlmastery/nature_inspired_networks'>"
         f"GitHub</a> &nbsp;·&nbsp; "
         f"<a href='https://github.com/dlmastery/nature_inspired_networks/blob/main/FINDINGS.md'>FINDINGS.md</a> &nbsp;·&nbsp; "
@@ -3412,9 +3523,13 @@ def render_dashboard(results_dir: str | Path,
         f"<a href='https://github.com/dlmastery/nature_inspired_networks/blob/main/AUDIT_SUMMARY.md'>AUDIT_SUMMARY.md</a></div>"
     )
     if findings_blurb:
+        # Render the FINDINGS headline through the same markdown converter
+        # used everywhere else — the blockquote-stripped table + bold
+        # text + code spans all parse correctly.
+        headline_html = _md_to_html(findings_blurb)
         html.append(
-            "<div class='headline-ribbon' style='--i:1'>"
-            f"<b>Headline finding</b>{findings_blurb}</div>"
+            "<div class='headline-ribbon md-body' style='--i:1'>"
+            f"<b>Headline finding</b>{headline_html}</div>"
         )
     html.append(_composite_formula_chip(df))
     html.append(_ribbon_html(findings_metrics))
@@ -3476,33 +3591,47 @@ def render_dashboard(results_dir: str | Path,
 
     for g in GROUP_ORDER:
         rows = rows_by_group.get(g, [])
+        # Hide the Uncategorised section when empty (cosmetic cleanup —
+        # otherwise a 0-row group renders an empty "No sweep rows yet"
+        # box that reviewers will fixate on).
+        if g == "Uncategorized" and not rows:
+            continue
         html.append(
             _group_section_html(
                 g, rows, best_idx,
                 table_id=f"runs-{g.lower()}",
                 history_map=history_map,
                 repo_root=root,
+                results_dir=p,
             )
         )
 
+    # Build-stamp footer — Rule 27 + audit fix 5.
+    stamp = _build_stamp(root)
+    sha_html = ""
+    if stamp["sha_short"]:
+        sha_html = (
+            f"&middot; built at commit "
+            f"<a href='{_esc(stamp['url'])}' style='color:#bb8c4d'>"
+            f"<code>{_esc(stamp['sha_short'])}</code></a>"
+        )
+        if stamp["iso_date"]:
+            sha_html += f" on <code>{_esc(stamp['iso_date'])}</code> "
     html.append(
         "<div class='meta'>Generated by "
         "<code>nature_inspired_networks.dashboard.render_dashboard</code> "
         "&middot; Brutalist Editorial Lab Notebook v3 "
-        "&middot; Newsreader / IBM Plex Serif / IBM Plex Mono "
+        "&middot; Source Serif 4 / IBM Plex Mono "
         "&middot; all SVG + CSS inline; no external CDN besides Google Fonts "
         "&middot; leaderboard sectioned by hypothesis group; each row navigates "
-        "to its own per-experiment page.</div>"
+        "to its own per-experiment page."
+        f"<br>{sha_html}"
+        "&middot; live demo: "
+        "<a href='https://dlmastery.github.io/nature_inspired_networks/' "
+        "target='_blank' rel='noopener'>"
+        "https://dlmastery.github.io/nature_inspired_networks/</a>"
+        "</div>"
     )
-
-    # Side panel (kept — hypothesis-cell quick-open; NOT a modal)
-    html.append("""
-<div id='side-panel'>
-  <button class='close-btn' onclick='closeSide()'>close · Esc</button>
-  <h3 id='side-panel-title'>Hypothesis spec</h3>
-  <pre id='side-panel-body'>—</pre>
-</div>
-""")
 
     html.append(HTML_JS)
     html.append("</body></html>")

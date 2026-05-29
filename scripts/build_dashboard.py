@@ -527,7 +527,7 @@ def main(argv=None) -> int:
         results,
         out_dir / "dashboard.html",
         extra_sections=extra,
-        title="NaturePriorBlock &mdash; autoresearch dashboard",
+        title="nature_inspired_networks &mdash; autoresearch dashboard",
         subtitle=(
             "84-hypothesis dual-track audit on CIFAR-10 + CIFAR-100 &middot; "
             "impl-critic + sci-critic + Fixer campaign &middot; "
