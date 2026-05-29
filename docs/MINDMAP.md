@@ -22,18 +22,18 @@ Read these six files in order; they cover the entire submission.
 
 1. [`README.md`](README.md) — elevator pitch, headline claims, quick-start, repo map.
 2. [`PAPER.md`](PAPER.md) — draft submission paper.
-3. [`paper_abstract.md`](paper_abstract.md) — stand-alone 1-page abstract.
-4. [`FINDINGS.md`](FINDINGS.md) — per-tag verdicts (KEEP / NEAR-MISS / DISCARD) including all negatives.
-5. [`AUDIT_SUMMARY.md`](AUDIT_SUMMARY.md) — dual-track audit dashboard (implementation-critic ∩ research-critic).
-6. [`REVIEWER_CHECKLIST.md`](REVIEWER_CHECKLIST.md) — per-claim evidence pointers (reproduction command + log file).
+3. [`paper_abstract.md`](../paper/paper_abstract.md) — stand-alone 1-page abstract.
+4. [`FINDINGS.md`](../paper/FINDINGS.md) — per-tag verdicts (KEEP / NEAR-MISS / DISCARD) including all negatives.
+5. [`AUDIT_SUMMARY.md`](../paper/AUDIT_SUMMARY.md) — dual-track audit dashboard (implementation-critic ∩ research-critic).
+6. [`REVIEWER_CHECKLIST.md`](../paper/REVIEWER_CHECKLIST.md) — per-claim evidence pointers (reproduction command + log file).
 
 **Adversarial-review supplements:**
 
-- [`NEURIPS_CHECKLIST.md`](NEURIPS_CHECKLIST.md) — 17-question NeurIPS Paper Checklist filled with file/line evidence.
-- [`LIMITATIONS.md`](LIMITATIONS.md) — honest scope & multiplicity caveats.
-- [`ETHICS_STATEMENT.md`](ETHICS_STATEMENT.md) — data licensing, compute, dual-use, IRB.
-- [`SOTA_COMPARISON.md`](SOTA_COMPARISON.md) — honest map of our numbers to the published literature.
-- [`PARADIGM_COMPARISON.md`](PARADIGM_COMPARISON.md) — Liquid / JEPA / KAN / Transformer / GNN synthesis.
+- [`NEURIPS_CHECKLIST.md`](../paper/NEURIPS_CHECKLIST.md) — 17-question NeurIPS Paper Checklist filled with file/line evidence.
+- [`LIMITATIONS.md`](../paper/LIMITATIONS.md) — honest scope & multiplicity caveats.
+- [`ETHICS_STATEMENT.md`](../paper/ETHICS_STATEMENT.md) — data licensing, compute, dual-use, IRB.
+- [`SOTA_COMPARISON.md`](../paper/SOTA_COMPARISON.md) — honest map of our numbers to the published literature.
+- [`PARADIGM_COMPARISON.md`](../paper/PARADIGM_COMPARISON.md) — Liquid / JEPA / KAN / Transformer / GNN synthesis.
 
 ---
 
@@ -43,14 +43,14 @@ For someone reproducing or extending the results.
 
 **Environment & operator commands:**
 
-- [`SETUP.md`](SETUP.md) — Windows / Linux bring-up, corporate-SSL workaround, smoke verification.
+- [`SETUP.md`](../docs/SETUP.md) — Windows / Linux bring-up, corporate-SSL workaround, smoke verification.
 - [`CLAUDE.md`](CLAUDE.md) — 27 normative invariants (refusal table, hardware contract).
-- [`AUTORESEARCH_PROCESS.md`](AUTORESEARCH_PROCESS.md) — 7-step refusal-to-launch ritual + gate stack.
+- [`AUTORESEARCH_PROCESS.md`](../docs/AUTORESEARCH_PROCESS.md) — 7-step refusal-to-launch ritual + gate stack.
 - [`pyproject.toml`](pyproject.toml) — package metadata (Python ≥ 3.10, MIT licence).
 
 **Architecture & shared primitives:**
 
-- [`ARCHITECTURE.md`](ARCHITECTURE.md) — module + tensor-shape tables.
+- [`ARCHITECTURE.md`](../docs/ARCHITECTURE.md) — module + tensor-shape tables.
 - [`src/nature_inspired_networks/`](src/nature_inspired_networks/) — 80 source modules (shared import surface).
 - [`tests/`](tests/) — 87 test files, 780+ unit tests (all green).
 
@@ -75,11 +75,11 @@ Anyone designing a new hypothesis or skill belongs here.
 
 **Design-space single source of truth:**
 
-- [`IDEA_TABLE.md`](IDEA_TABLE.md) — 84-hypothesis status table (G1–G8).
-- [`EXPERIMENT_LOG.md`](EXPERIMENT_LOG.md) — master long-list (Tiers 0–6).
-- [`EXPERIMENT_LEDGER.md`](EXPERIMENT_LEDGER.md) — chunk-by-chunk audit of source documents (Rule 17).
-- [`NATURE_INSPIRED_NETWORKS.md`](NATURE_INSPIRED_NETWORKS.md) — state-of-the-field reference (May 2026).
-- [`MANIFESTO.md`](MANIFESTO.md) — research argument, committee-grade.
+- [`IDEA_TABLE.md`](../hypotheses/IDEA_TABLE.md) — 84-hypothesis status table (G1–G8).
+- [`EXPERIMENT_LOG.md`](../experiments/EXPERIMENT_LOG.md) — master long-list (Tiers 0–6).
+- [`EXPERIMENT_LEDGER.md`](../experiments/EXPERIMENT_LEDGER.md) — chunk-by-chunk audit of source documents (Rule 17).
+- [`NATURE_INSPIRED_NETWORKS.md`](../paper/NATURE_INSPIRED_NETWORKS.md) — state-of-the-field reference (May 2026).
+- [`MANIFESTO.md`](../paper/MANIFESTO.md) — research argument, committee-grade.
 
 **Hypothesis design docs (84 files, 8 thematic groups):**
 
@@ -234,8 +234,8 @@ experiments/
 | `sg_only_fib_depth` (H02) | 82.18 % | 0.8261 | 0.66× params (efficiency) |
 | `sg_only_golden_adam` (H41) | 51.96 % | 0.5142 | clean falsification (last) |
 
-Full verdicts → [FINDINGS.md](FINDINGS.md); per-run narratives →
-[RESULTS.md](RESULTS.md).
+Full verdicts → [FINDINGS.md](../paper/FINDINGS.md); per-run narratives →
+[RESULTS.md](../experiments/RESULTS.md).
 
 ---
 

@@ -21,7 +21,7 @@ The mystical motivation is acknowledged in prose only; artifact names
 are academic / neutral.
 
 The single source of truth for the design space is
-[`IDEA_TABLE.md`](IDEA_TABLE.md) (75 hypotheses across 7 thematic
+[`IDEA_TABLE.md`](hypotheses/IDEA_TABLE.md) (75 hypotheses across 7 thematic
 groups). Per-hypothesis design documents live under
 `hypotheses/g<N>_<group>/H<NN>_<short>.md`. Each implemented
 hypothesis has a self-contained sub-project under `ideas/<NN>_<short>/`.
@@ -140,7 +140,7 @@ See [`memory/feedback_naming_preference.md`](../.claude/projects/C--Users-evija-
 ### Rule 17 — Source-document audit must be chunk-by-chunk
 When the user provides multiple source documents (PDFs, transcripts),
 they are read in ≤ 250-line chunks with an
-[`EXPERIMENT_LEDGER.md`](EXPERIMENT_LEDGER.md) row appended after
+[`EXPERIMENT_LEDGER.md`](experiments/EXPERIMENT_LEDGER.md) row appended after
 each chunk. No source document is treated as read-once-and-summarised
 from memory; the chunked audit is the deliverable.
 

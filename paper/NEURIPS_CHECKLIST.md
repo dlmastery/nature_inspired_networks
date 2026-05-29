@@ -11,7 +11,7 @@
 > **Submission stance:** the campaign is a *methodology + screening*
 > contribution. The three Phase-5 graduates carry seed-median + error
 > bars; the bulk of the 84-hypothesis design space is screening data
-> by construction (see [`LIMITATIONS.md`](LIMITATIONS.md)).
+> by construction (see [`LIMITATIONS.md`](../paper/LIMITATIONS.md)).
 >
 > **Date filled:** 2026-05-29. **Author:** dlmastery
 > (`eranti@gmail.com`), anonymised for blind review.
@@ -21,7 +21,7 @@
 ## 1. Claims & contributions
 
 ### 1.1 — Does the abstract and introduction accurately reflect the paper's contributions and scope?
-**[Yes]** The abstract in [`paper_abstract.md`](paper_abstract.md) and
+**[Yes]** The abstract in [`paper_abstract.md`](../paper/paper_abstract.md) and
 introduction in [`PAPER.md`](PAPER.md) frame the work as a
 *screening-grade, audit-traced* empirical study of nature-inspired
 inductive biases; both call out the three Phase-5 graduates and the
@@ -37,7 +37,7 @@ dual-track audit). [`README.md`](README.md) §1 mirrors them.
 ## 2. Limitations
 
 ### 2.1 — Does the paper discuss the limitations of the work performed by the authors?
-**[Yes]** A dedicated [`LIMITATIONS.md`](LIMITATIONS.md) enumerates
+**[Yes]** A dedicated [`LIMITATIONS.md`](../paper/LIMITATIONS.md) enumerates
 single-hardware scope, screening-only single-seed bulk, 12-epoch
 horizon, CIFAR-only scale, image-classification-only empirical track,
 composite-metric specificity, and absence of multiplicity correction.
@@ -66,12 +66,12 @@ is a design choice, not a theorem.
 (`ideas/<NN>/experiments/expNNN_*/`) carrying the seed, config,
 reasoning blob, metrics, history, and `best.pt`, per [`CLAUDE.md`](CLAUDE.md)
 Rules 8 & 9. The append-only `experiments/experiment_log.jsonl` is
-the master ledger. [`REVIEWER_CHECKLIST.md`](REVIEWER_CHECKLIST.md)
+the master ledger. [`REVIEWER_CHECKLIST.md`](../paper/REVIEWER_CHECKLIST.md)
 maps every paper claim to its reproduction command + log file.
 
 ### 4.2 — Are the exact commands to reproduce results provided?
 **[Yes]** [`README.md`](README.md) §2 (4-command clone → smoke),
-[`SETUP.md`](SETUP.md) §7–§9, and per-archive READMEs all include the
+[`SETUP.md`](../docs/SETUP.md) §7–§9, and per-archive READMEs all include the
 PowerShell command line.
 
 ---
@@ -89,7 +89,7 @@ permissive licences (§9.1).
 
 ### 5.2 — Are the datasets and pre-trained models referenced?
 **[Yes]** CIFAR-10 / CIFAR-100 ([Krizhevsky 2009]) are downloaded at
-runtime from the canonical Toronto host (see [`SETUP.md`](SETUP.md)
+runtime from the canonical Toronto host (see [`SETUP.md`](../docs/SETUP.md)
 §4). No pre-trained weights are used; every run trains from scratch.
 
 ---
@@ -120,11 +120,11 @@ will pre-register its ranges before launch.
 **[Partial — Yes for graduates, No for bulk screening]** The three
 Phase-5 graduates (`phi_budget`, `fib_depth`, `golden_momentum`)
 carry seed-median + per-seed numbers across seeds {0, 1, 2}; see
-[`FINDINGS.md`](FINDINGS.md) and the per-experiment dashboard pages.
+[`FINDINGS.md`](../paper/FINDINGS.md) and the per-experiment dashboard pages.
 **~80 % of the 35-tag screening sweep is single-seed by design**
 (CLAUDE.md Rule 19, Phase 2) — these are not publication claims and
 are explicitly framed as screening data in
-[`LIMITATIONS.md`](LIMITATIONS.md). No multiplicity correction is
+[`LIMITATIONS.md`](../paper/LIMITATIONS.md). No multiplicity correction is
 applied to the 84-hypothesis design space; this is the headline
 limitation.
 
@@ -136,7 +136,7 @@ limitation.
 **[Yes]** Hardware: 1× NVIDIA RTX 4090 Laptop, 16 GB VRAM, Windows 11
 ([`CLAUDE.md`](CLAUDE.md) §2). Total compute: ≈ **50 GPU-hours** across
 the 35-tag screening sweep + Phase-5 3-seed re-runs (see
-[`ETHICS_STATEMENT.md`](ETHICS_STATEMENT.md) and per-run `metrics.json`
+[`ETHICS_STATEMENT.md`](../paper/ETHICS_STATEMENT.md) and per-run `metrics.json`
 files which record wall-clock).
 
 ### 8.2 — Per-run compute disclosed?
@@ -154,14 +154,14 @@ Toronto; permissively licensed for non-commercial research, in
 universal use across the ML benchmark literature). MedMNIST
 PathMNIST (Yang et al. 2023, CC-BY-4.0) is downloaded but not part
 of the headline campaign; usage is gated by the upstream licence. See
-[`ETHICS_STATEMENT.md`](ETHICS_STATEMENT.md).
+[`ETHICS_STATEMENT.md`](../paper/ETHICS_STATEMENT.md).
 
 ### 9.2 — Is responsible use of the data demonstrated?
 **[Yes]** Both CIFAR datasets are derived from labelled natural
 photographs with no personally identifying information; usage is
 restricted to image-classification benchmarking. No data is
 re-distributed from this repo; only download instructions to the
-canonical upstream hosts are provided ([`SETUP.md`](SETUP.md) §4).
+canonical upstream hosts are provided ([`SETUP.md`](../docs/SETUP.md) §4).
 
 ---
 
@@ -184,7 +184,7 @@ pre-existing public datasets.
 
 ### 11.2 — IRB approval?
 **[N/A]** No human-subjects research; IRB is not applicable. See
-[`ETHICS_STATEMENT.md`](ETHICS_STATEMENT.md).
+[`ETHICS_STATEMENT.md`](../paper/ETHICS_STATEMENT.md).
 
 ---
 
@@ -212,7 +212,7 @@ reproduction instructions.
 ## 14. Broader impacts
 
 ### 14.1 — Does the paper discuss both potential positive societal impacts and negative societal impacts of the work performed?
-**[Yes]** [`ETHICS_STATEMENT.md`](ETHICS_STATEMENT.md) §3 explicitly
+**[Yes]** [`ETHICS_STATEMENT.md`](../paper/ETHICS_STATEMENT.md) §3 explicitly
 addresses dual-use: the contribution is methodological (a protocol
 for auditing geometric inductive biases) and the empirical artefacts
 (CIFAR-scale classifiers) have negligible direct societal impact
@@ -226,10 +226,10 @@ reproducibility hygiene.
 
 ### 15.1 — Does the paper preserve the anonymity of authors (where applicable for double-blind review)?
 **[Yes — for submission]** The submission camera in
-[`PAPER.md`](PAPER.md) and [`paper_abstract.md`](paper_abstract.md)
+[`PAPER.md`](PAPER.md) and [`paper_abstract.md`](../paper/paper_abstract.md)
 is anonymised for blind review. The codebase author in git history
 (`dlmastery <eranti@gmail.com>`) is disclosed in
-[`ETHICS_STATEMENT.md`](ETHICS_STATEMENT.md) for the camera-ready /
+[`ETHICS_STATEMENT.md`](../paper/ETHICS_STATEMENT.md) for the camera-ready /
 final-decision phase only.
 
 ---
@@ -241,7 +241,7 @@ final-decision phase only.
 in [`CLAUDE.md`](CLAUDE.md) §6: no PII, no PHI, no closed datasets,
 no re-uploaded pre-trained weights, no secrets / API keys in the
 repo. The dual-use, IRB, and data-licensing posture is covered in
-[`ETHICS_STATEMENT.md`](ETHICS_STATEMENT.md).
+[`ETHICS_STATEMENT.md`](../paper/ETHICS_STATEMENT.md).
 
 ---
 
@@ -259,7 +259,7 @@ quick-start on a 4090-class GPU can:
    published GitHub Pages version byte-for-byte.
 
 Per-claim evidence pointers (file + line + reproduction command) are
-in [`REVIEWER_CHECKLIST.md`](REVIEWER_CHECKLIST.md). The append-only
+in [`REVIEWER_CHECKLIST.md`](../paper/REVIEWER_CHECKLIST.md). The append-only
 `experiments/experiment_log.jsonl` is the canonical ground truth that
 all dashboards and reports derive from.
 

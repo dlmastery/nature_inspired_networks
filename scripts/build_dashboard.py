@@ -242,7 +242,7 @@ def _docs_index_html(repo_root: Path) -> str:
   error); a 31-run post-fix re-run is in flight. All H09/H41/H48 claims are
   <b>PROVISIONAL</b> until the post-fix numbers land.
   &nbsp;&nbsp;
-  <a href='https://github.com/dlmastery/nature_inspired_networks/blob/main/AUDIT_SUMMARY.md'>↗ Full AUDIT_SUMMARY.md</a>
+  <a href='https://github.com/dlmastery/nature_inspired_networks/blob/main/paper/AUDIT_SUMMARY.md'>↗ Full AUDIT_SUMMARY.md</a>
 </div>
 
 <h2 style='--i:2'><span class='lbl'>section 01</span>Audit verdict at a glance</h2>
@@ -317,8 +317,8 @@ def _docs_index_html(repo_root: Path) -> str:
 <div class='cta-row' style='--i:4'>
   <a class='cta primary' href='dashboard/dashboard.html'>↗ Live dashboard</a>
   <a class='cta' href='https://github.com/dlmastery/nature_inspired_networks/blob/main/PAPER.md'>↗ PAPER.md</a>
-  <a class='cta' href='https://github.com/dlmastery/nature_inspired_networks/blob/main/AUDIT_SUMMARY.md'>↗ AUDIT_SUMMARY.md</a>
-  <a class='cta' href='https://github.com/dlmastery/nature_inspired_networks/blob/main/REVIEWER_CHECKLIST.md'>↗ Reviewer checklist</a>
+  <a class='cta' href='https://github.com/dlmastery/nature_inspired_networks/blob/main/paper/AUDIT_SUMMARY.md'>↗ AUDIT_SUMMARY.md</a>
+  <a class='cta' href='https://github.com/dlmastery/nature_inspired_networks/blob/main/paper/REVIEWER_CHECKLIST.md'>↗ Reviewer checklist</a>
 </div>
 
 <h2 style='--i:5'><span class='lbl'>section 03</span>Deep information &middot; click to expand</h2>
@@ -470,20 +470,20 @@ README.md</a></b> — quick-start, reproduction commands, project orientation.</
 <li><b><a href='https://github.com/dlmastery/nature_inspired_networks/blob/main/PAPER.md'>
 PAPER.md</a></b> — post-audit paper draft. <i>The contribution is the protocol,
 not the priors.</i></li>
-<li><b><a href='https://github.com/dlmastery/nature_inspired_networks/blob/main/AUDIT_SUMMARY.md'>
+<li><b><a href='https://github.com/dlmastery/nature_inspired_networks/blob/main/paper/AUDIT_SUMMARY.md'>
 AUDIT_SUMMARY.md</a></b> — paper-grade synthesis of impl-critic + sci-critic +
 Fixer campaign outputs.</li>
-<li><b><a href='https://github.com/dlmastery/nature_inspired_networks/blob/main/REVIEWER_CHECKLIST.md'>
+<li><b><a href='https://github.com/dlmastery/nature_inspired_networks/blob/main/paper/REVIEWER_CHECKLIST.md'>
 REVIEWER_CHECKLIST.md</a></b> — 42-item paper-acceptance gate; <b>39 PASS, 3
 gated</b> on the post-fix re-run.</li>
-<li><b><a href='https://github.com/dlmastery/nature_inspired_networks/blob/main/FINDINGS.md'>
+<li><b><a href='https://github.com/dlmastery/nature_inspired_networks/blob/main/paper/FINDINGS.md'>
 FINDINGS.md</a></b> — curated CIFAR-10 / CIFAR-100 verdicts with AUDIT NOTICE
 prefix marking provisional claims.</li>
 <li><b><a href='https://github.com/dlmastery/nature_inspired_networks/blob/main/CLAUDE.md'>
 CLAUDE.md</a></b> — 25 normative rules. Rules 20–25 added during this campaign
 codify auto-checkpoint loops, post-fix re-run, dual-track audit, orthogonal-
 axes compounds, dashboard discipline, and Q&amp;A-test correspondence.</li>
-<li><b><a href='https://github.com/dlmastery/nature_inspired_networks/blob/main/IDEA_TABLE.md'>
+<li><b><a href='https://github.com/dlmastery/nature_inspired_networks/blob/main/hypotheses/IDEA_TABLE.md'>
 IDEA_TABLE.md</a></b> — full 84-hypothesis design space (G1..G8 groups).</li>
 <li><b><a href='https://github.com/dlmastery/nature_inspired_networks/tree/main/hypotheses'>
 hypotheses/</a></b> — committee-grade <code>H&lt;NN&gt;_*.md</code> spec per

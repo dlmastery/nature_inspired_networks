@@ -72,7 +72,7 @@
 > NUMEROLOGY + 3 EMPIRICALLY-FALSIFIED + 2 UNFALSIFIABLE sci-critic
 > verdicts across 81 hypotheses; ZERO NOVEL+TESTABLE sci verdicts on
 > any implemented + smoked hypothesis (H71 IcosaRoPE3D is NOVEL+TESTABLE
-> but has no CIFAR row). See [`AUDIT_SUMMARY.md`](AUDIT_SUMMARY.md) and
+> but has no CIFAR row). See [`AUDIT_SUMMARY.md`](../paper/AUDIT_SUMMARY.md) and
 > [`audits/G{1..8}_audit.md`](audits/) for the full account.
 >
 > Until the post-fix re-run lands, **the project has NO defensible

@@ -234,5 +234,5 @@ python -m nature_inspired_networks.runner \
 
 *Last refreshed: 2026-05-29. See [`README.md`](README.md) §11 for
 broader reproducibility pointers and
-[`NEURIPS_CHECKLIST.md`](NEURIPS_CHECKLIST.md) for the per-question
+[`NEURIPS_CHECKLIST.md`](../paper/NEURIPS_CHECKLIST.md) for the per-question
 NeurIPS Paper Checklist.*

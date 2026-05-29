@@ -3518,10 +3518,10 @@ def render_dashboard(results_dir: str | Path,
         f"&nbsp;·&nbsp; "
         f"<a href='https://github.com/dlmastery/nature_inspired_networks'>"
         f"GitHub</a> &nbsp;·&nbsp; "
-        f"<a href='https://github.com/dlmastery/nature_inspired_networks/blob/main/FINDINGS.md'>FINDINGS.md</a> &nbsp;·&nbsp; "
-        f"<a href='https://github.com/dlmastery/nature_inspired_networks/blob/main/EXPERIMENT_LOG.md'>EXPERIMENT_LOG</a> &nbsp;·&nbsp; "
+        f"<a href='https://github.com/dlmastery/nature_inspired_networks/blob/main/paper/FINDINGS.md'>FINDINGS.md</a> &nbsp;·&nbsp; "
+        f"<a href='https://github.com/dlmastery/nature_inspired_networks/blob/main/experiments/EXPERIMENT_LOG.md'>EXPERIMENT_LOG</a> &nbsp;·&nbsp; "
         f"<a href='https://github.com/dlmastery/nature_inspired_networks/blob/main/PAPER.md'>PAPER.md</a> &nbsp;·&nbsp; "
-        f"<a href='https://github.com/dlmastery/nature_inspired_networks/blob/main/AUDIT_SUMMARY.md'>AUDIT_SUMMARY.md</a></div>"
+        f"<a href='https://github.com/dlmastery/nature_inspired_networks/blob/main/paper/AUDIT_SUMMARY.md'>AUDIT_SUMMARY.md</a></div>"
     )
     if findings_blurb:
         # Render the FINDINGS headline through the same markdown converter

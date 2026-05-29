@@ -2,8 +2,8 @@
 
 > Honest, reviewer-facing enumeration of the campaign's scope, design
 > choices, and statistical caveats. Companion to [`PAPER.md`](PAPER.md),
-> [`ETHICS_STATEMENT.md`](ETHICS_STATEMENT.md), and
-> [`NEURIPS_CHECKLIST.md`](NEURIPS_CHECKLIST.md). Every limitation is
+> [`ETHICS_STATEMENT.md`](../paper/ETHICS_STATEMENT.md), and
+> [`NEURIPS_CHECKLIST.md`](../paper/NEURIPS_CHECKLIST.md). Every limitation is
 > stated up front rather than left for a reviewer to find.
 
 The contribution is a *methodology + screening* paper, **not** a SOTA
@@ -36,7 +36,7 @@ graduate to expensive evaluation, not to publish numbers.
 
 Only the **three Phase-5 graduates** (`phi_budget`, `fib_depth`,
 `golden_momentum`) carry seed-median + per-seed numbers across seeds
-{0, 1, 2} (see [`FINDINGS.md`](FINDINGS.md) and the live dashboard).
+{0, 1, 2} (see [`FINDINGS.md`](../paper/FINDINGS.md) and the live dashboard).
 A single-seed number for any other tag is **not a publication claim**
 and should be read as calibration evidence, not as a competitive
 benchmark.
@@ -51,7 +51,7 @@ expected-band: top-1 ≥ 80 % @ 12 epochs). This horizon may
   was based on Reddi-2018 (ICLR) convergence behaviour at long
   horizons, and the 12-epoch falsification (−33 pp) was later
   re-qualified to a much milder −1 pp under a Reddi-2018-style
-  β-only test (see [`FINDINGS.md`](FINDINGS.md)).
+  β-only test (see [`FINDINGS.md`](../paper/FINDINGS.md)).
 - Any "late convergence" prior (e.g., curriculum-style growth
   schedules, slow-emerging regularisers) is therefore at risk of a
   premature negative verdict.
@@ -125,18 +125,18 @@ hypotheses**. This is the single most important statistical limitation:
 
 We recommend any reader who wishes to make a hardline statistical
 claim apply the appropriate correction to the raw numbers in
-[`FINDINGS.md`](FINDINGS.md) and the live dashboard.
+[`FINDINGS.md`](../paper/FINDINGS.md) and the live dashboard.
 
 ## 8. Honest disclosure of motivation
 
 The campaign was *inspired* by an exploratory private PDF on sacred
 geometry. Per CLAUDE.md Rule 16 every artifact name is neutral /
-academic, and per [`MANIFESTO.md`](MANIFESTO.md) every empirical claim
+academic, and per [`MANIFESTO.md`](../paper/MANIFESTO.md) every empirical claim
 is grounded in a peer-reviewed paper and a pre-registered falsifier.
 **The mystical framing has zero load-bearing role in any reported
 number** — but readers deserve to know it influenced *which*
 hypotheses were enumerated in the first place. See
-[`ETHICS_STATEMENT.md`](ETHICS_STATEMENT.md) §5.
+[`ETHICS_STATEMENT.md`](../paper/ETHICS_STATEMENT.md) §5.
 
 ## 9. Audit traceability rests on author-internal review
 
@@ -154,7 +154,7 @@ audit has not been performed.
 Per the Fixer campaign (Rule 21), several initial negatives were
 later requalified after an implementation bug was patched (e.g.,
 H08, H41). Some currently-DISCARD verdicts in
-[`FINDINGS.md`](FINDINGS.md) **may flip** under a future Fixer pass
+[`FINDINGS.md`](../paper/FINDINGS.md) **may flip** under a future Fixer pass
 or a Phase-9 hill-climb. We err on the side of reporting both the
 pre-fix and post-fix numbers explicitly so a reader can see the
 trajectory; the post-fix verdict is the operative one.

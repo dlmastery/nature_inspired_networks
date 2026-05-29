@@ -1,7 +1,7 @@
 # Ethics Statement — `nature_inspired_networks`
 
-> Companion to [`PAPER.md`](PAPER.md), [`LIMITATIONS.md`](LIMITATIONS.md),
-> and [`NEURIPS_CHECKLIST.md`](NEURIPS_CHECKLIST.md). One page; designed
+> Companion to [`PAPER.md`](PAPER.md), [`LIMITATIONS.md`](../paper/LIMITATIONS.md),
+> and [`NEURIPS_CHECKLIST.md`](../paper/NEURIPS_CHECKLIST.md). One page; designed
 > to satisfy a NeurIPS / ICML / ICLR Ethics-AC pass without further
 > reading.
 
@@ -17,7 +17,7 @@ datasets**:
 
 Neither dataset is re-distributed from this repository; only download
 instructions to the canonical upstream hosts are provided in
-[`SETUP.md`](SETUP.md) §4. torchvision verifies tarball MD5 integrity
+[`SETUP.md`](../docs/SETUP.md) §4. torchvision verifies tarball MD5 integrity
 on every download.
 
 **(Optional, not part of headline campaign):** MedMNIST PathMNIST
@@ -66,12 +66,12 @@ We are aware of no foreseeable misuse pathway that is distinguishable
 from the misuse pathway of CIFAR classification in general. Indirect
 positive impact: the protocol itself nudges the field toward more
 rigorously audited screening pipelines for inductive-bias claims —
-see [`MANIFESTO.md`](MANIFESTO.md) for the long-form argument.
+see [`MANIFESTO.md`](../paper/MANIFESTO.md) for the long-form argument.
 
 ## 4. Anonymity / author identification
 
 For **blind review** the submission cameras
-([`PAPER.md`](PAPER.md), [`paper_abstract.md`](paper_abstract.md)) are
+([`PAPER.md`](PAPER.md), [`paper_abstract.md`](../paper/paper_abstract.md)) are
 anonymised. The codebase author, recoverable from git history (and
 disclosed here for the camera-ready / final-decision phase), is:
 
@@ -88,7 +88,7 @@ during review.
 This work was motivated, in part, by an exploratory reading of an
 earlier private PDF (*Sacred Geometry and Neural Networks*) that
 framed the program in mystical / aesthetic terms. The honest position
-of the project — set out at length in [`MANIFESTO.md`](MANIFESTO.md) —
+of the project — set out at length in [`MANIFESTO.md`](../paper/MANIFESTO.md) —
 is:
 
 - The **inspiration** is acknowledged in prose only.
@@ -103,8 +103,8 @@ is:
   "sacred-geometry"-named class exists in the codebase.
 
 We disclose this background so a reviewer reading
-[`MANIFESTO.md`](MANIFESTO.md) is not surprised. The empirical claims
-in [`FINDINGS.md`](FINDINGS.md), [`PAPER.md`](PAPER.md), and the live
+[`MANIFESTO.md`](../paper/MANIFESTO.md) is not surprised. The empirical claims
+in [`FINDINGS.md`](../paper/FINDINGS.md), [`PAPER.md`](PAPER.md), and the live
 dashboard stand on the composite metric + dual-track audit alone,
 **independently of the inspiration**.
 

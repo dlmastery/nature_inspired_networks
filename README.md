@@ -4,9 +4,9 @@
 [![pages](https://img.shields.io/badge/GitHub_Pages-live-blue)](https://dlmastery.github.io/nature_inspired_networks/)
 [![hypotheses](https://img.shields.io/badge/hypotheses-84_docs_(74_impl)-orange)](hypotheses/INDEX.md)
 [![tests](https://img.shields.io/badge/unit_tests-780%2B_green-green)](tests/)
-[![smoke](https://img.shields.io/badge/CIFAR--10_smoke-35_tags_passed-success)](FINDINGS.md)
+[![smoke](https://img.shields.io/badge/CIFAR--10_smoke-35_tags_passed-success)](paper/FINDINGS.md)
 [![checkpoint-cadence](https://img.shields.io/badge/checkpoint-≤15min-success)](CLAUDE.md)
-[![dual-track-audit](https://img.shields.io/badge/dual--track_audit-pass-brightgreen)](AUDIT_SUMMARY.md)
+[![dual-track-audit](https://img.shields.io/badge/dual--track_audit-pass-brightgreen)](paper/AUDIT_SUMMARY.md)
 [![acceptance](https://img.shields.io/badge/status-submission_candidate-yellow)](PAPER.md)
 [![license](https://img.shields.io/badge/license-MIT-lightgrey)](pyproject.toml)
 
@@ -25,7 +25,7 @@
 > live dashboard regenerates on every commit:
 > **https://dlmastery.github.io/nature_inspired_networks/**.
 
-**Quick links:** [PAPER](PAPER.md) · [FINDINGS](FINDINGS.md) · [AUDIT_SUMMARY](AUDIT_SUMMARY.md) · [REVIEWER_CHECKLIST](REVIEWER_CHECKLIST.md) · [NEURIPS_CHECKLIST](NEURIPS_CHECKLIST.md) · [LIMITATIONS](LIMITATIONS.md) · [ETHICS_STATEMENT](ETHICS_STATEMENT.md) · [MINDMAP](MINDMAP.md) · [MANIFESTO](MANIFESTO.md) · [84 hypotheses](hypotheses/INDEX.md) · [SOTA comparison](SOTA_COMPARISON.md)
+**Quick links:** [PAPER](PAPER.md) · [FINDINGS](paper/FINDINGS.md) · [AUDIT_SUMMARY](paper/AUDIT_SUMMARY.md) · [REVIEWER_CHECKLIST](paper/REVIEWER_CHECKLIST.md) · [NEURIPS_CHECKLIST](paper/NEURIPS_CHECKLIST.md) · [LIMITATIONS](paper/LIMITATIONS.md) · [ETHICS_STATEMENT](paper/ETHICS_STATEMENT.md) · [MINDMAP](docs/MINDMAP.md) · [MANIFESTO](paper/MANIFESTO.md) · [84 hypotheses](hypotheses/INDEX.md) · [SOTA comparison](paper/SOTA_COMPARISON.md)
 
 ---
 
@@ -58,14 +58,14 @@ engineering advantage when imposed explicitly on a network, rather
 than waiting for them to emerge from scale?** Each prior is mapped to
 a peer-reviewed geometric / topological deep-learning paper; the
 historical / aesthetic motivation is disclosed honestly in
-[`MANIFESTO.md`](MANIFESTO.md) but every artifact carries a neutral,
+[`MANIFESTO.md`](paper/MANIFESTO.md) but every artifact carries a neutral,
 academic name (CLAUDE.md Rule 16).
 
 The core artifact is **`NaturePriorBlock`** — a residual / attention
 block whose inductive biases are each Boolean-toggleable, so a clean
 ablation matrix isolates each prior's marginal effect on a
 ResNet-20-shaped CIFAR scaffold. The design space is **84
-hypotheses across 8 thematic groups** ([`IDEA_TABLE.md`](IDEA_TABLE.md)).
+hypotheses across 8 thematic groups** ([`IDEA_TABLE.md`](hypotheses/IDEA_TABLE.md)).
 **74 are implemented** with code + tests; **35 have been
 smoke-trained** on CIFAR-10; **3 graduate to deeper evaluation**
 ([§4](#4-headline-claims-post-fix)). Every run passes a
@@ -80,7 +80,7 @@ inherited from
 The four commands below take a clean Windows 11 + RTX 4090 Laptop box
 from nothing to a reproduced SOTA-baseline smoke. Detailed bring-up
 (including the Python 3.13 corporate-SSL workaround) is in
-[`SETUP.md`](SETUP.md).
+[`SETUP.md`](docs/SETUP.md).
 
 ```powershell
 # 1) Clone
@@ -106,7 +106,7 @@ $env:OMP_NUM_THREADS=2; $env:MKL_NUM_THREADS=2; $env:KMP_DUPLICATE_LIB_OK="TRUE"
 
 Expected wall-clock: < 5 min on a 4090 Laptop. If the baseline misses
 the 80 % band, STOP and diagnose your environment per
-[`SETUP.md`](SETUP.md) — do not run any nature-inspired variant
+[`SETUP.md`](docs/SETUP.md) — do not run any nature-inspired variant
 (CLAUDE.md Rule 13).
 
 ## 3. What's in this repo
@@ -114,26 +114,26 @@ the 80 % band, STOP and diagnose your environment per
 | Document | Purpose |
 |---|---|
 | [`PAPER.md`](PAPER.md) | Draft submission paper (abstract → conclusion). |
-| [`paper_abstract.md`](paper_abstract.md) | Stand-alone 1-page abstract for circulation. |
-| [`MANIFESTO.md`](MANIFESTO.md) | Committee-grade research argument & honest disclosure of motivation. |
-| [`FINDINGS.md`](FINDINGS.md) | Per-tag campaign verdicts: KEEP / NEAR-MISS / DISCARD with full reasoning. |
-| [`AUDIT_SUMMARY.md`](AUDIT_SUMMARY.md) | Dual-track audit dashboard (implementation-critic ∩ sci-critic verdicts). |
-| [`REVIEWER_CHECKLIST.md`](REVIEWER_CHECKLIST.md) | Per-claim evidence pointers for an adversarial reviewer. |
-| [`NEURIPS_CHECKLIST.md`](NEURIPS_CHECKLIST.md) | Filled-in NeurIPS Paper Checklist (17 questions, each with file/line evidence). |
-| [`LIMITATIONS.md`](LIMITATIONS.md) | Honest enumeration of scope and statistical caveats. |
-| [`ETHICS_STATEMENT.md`](ETHICS_STATEMENT.md) | Data licensing, compute, dual-use, IRB statement. |
-| [`IDEA_TABLE.md`](IDEA_TABLE.md) | Single source of truth for the 84-hypothesis design space (G1–G8). |
-| [`EXPERIMENT_LOG.md`](EXPERIMENT_LOG.md) | Master long-list (Tiers 0–6) of every planned and executed run. |
-| [`EXPERIMENT_LEDGER.md`](EXPERIMENT_LEDGER.md) | Chunk-by-chunk audit of source documents (CLAUDE.md Rule 17). |
-| [`RESULTS.md`](RESULTS.md) | Auto-generated per-run narratives from `experiment_log.jsonl`. |
-| [`SOTA_COMPARISON.md`](SOTA_COMPARISON.md) | Honest map from our numbers to the published literature. |
-| [`PARADIGM_COMPARISON.md`](PARADIGM_COMPARISON.md) | Liquid / JEPA / KAN / Transformer / GNN synthesis. |
-| [`ARCHITECTURE.md`](ARCHITECTURE.md) | Module + tensor-shape tables. |
-| [`AUTORESEARCH_PROCESS.md`](AUTORESEARCH_PROCESS.md) | The 7-step refusal-to-launch ritual + gate stack. |
-| [`NATURE_INSPIRED_NETWORKS.md`](NATURE_INSPIRED_NETWORKS.md) | State-of-the-field reference (May 2026). |
-| [`MINDMAP.md`](MINDMAP.md) | One-page link map of every artifact in the repo. |
+| [`paper_abstract.md`](paper/paper_abstract.md) | Stand-alone 1-page abstract for circulation. |
+| [`MANIFESTO.md`](paper/MANIFESTO.md) | Committee-grade research argument & honest disclosure of motivation. |
+| [`FINDINGS.md`](paper/FINDINGS.md) | Per-tag campaign verdicts: KEEP / NEAR-MISS / DISCARD with full reasoning. |
+| [`AUDIT_SUMMARY.md`](paper/AUDIT_SUMMARY.md) | Dual-track audit dashboard (implementation-critic ∩ sci-critic verdicts). |
+| [`REVIEWER_CHECKLIST.md`](paper/REVIEWER_CHECKLIST.md) | Per-claim evidence pointers for an adversarial reviewer. |
+| [`NEURIPS_CHECKLIST.md`](paper/NEURIPS_CHECKLIST.md) | Filled-in NeurIPS Paper Checklist (17 questions, each with file/line evidence). |
+| [`LIMITATIONS.md`](paper/LIMITATIONS.md) | Honest enumeration of scope and statistical caveats. |
+| [`ETHICS_STATEMENT.md`](paper/ETHICS_STATEMENT.md) | Data licensing, compute, dual-use, IRB statement. |
+| [`IDEA_TABLE.md`](hypotheses/IDEA_TABLE.md) | Single source of truth for the 84-hypothesis design space (G1–G8). |
+| [`EXPERIMENT_LOG.md`](experiments/EXPERIMENT_LOG.md) | Master long-list (Tiers 0–6) of every planned and executed run. |
+| [`EXPERIMENT_LEDGER.md`](experiments/EXPERIMENT_LEDGER.md) | Chunk-by-chunk audit of source documents (CLAUDE.md Rule 17). |
+| [`RESULTS.md`](experiments/RESULTS.md) | Auto-generated per-run narratives from `experiment_log.jsonl`. |
+| [`SOTA_COMPARISON.md`](paper/SOTA_COMPARISON.md) | Honest map from our numbers to the published literature. |
+| [`PARADIGM_COMPARISON.md`](paper/PARADIGM_COMPARISON.md) | Liquid / JEPA / KAN / Transformer / GNN synthesis. |
+| [`ARCHITECTURE.md`](docs/ARCHITECTURE.md) | Module + tensor-shape tables. |
+| [`AUTORESEARCH_PROCESS.md`](docs/AUTORESEARCH_PROCESS.md) | The 7-step refusal-to-launch ritual + gate stack. |
+| [`NATURE_INSPIRED_NETWORKS.md`](paper/NATURE_INSPIRED_NETWORKS.md) | State-of-the-field reference (May 2026). |
+| [`MINDMAP.md`](docs/MINDMAP.md) | One-page link map of every artifact in the repo. |
 | [`CLAUDE.md`](CLAUDE.md) | 27 normative invariants (refusal table, hardware contract). |
-| [`SETUP.md`](SETUP.md) | Detailed environment bring-up (Windows / Linux). |
+| [`SETUP.md`](docs/SETUP.md) | Detailed environment bring-up (Windows / Linux). |
 
 ## 4. Headline claims (post-fix)
 
@@ -164,7 +164,7 @@ audit, and dashboard page as the winners.
 |---|---|---|---|
 | **H50 full sacred hybrid** | `sg_full_fib` | **−11.54 pp top-1** vs baseline | DISCARD — cautionary tale, motivates Rule 23 (orthogonal-axis stacking only). |
 | **H41 golden Adam** | `sg_only_golden_adam` | **−33 pp** in single-config, **REQUALIFIED to −1 pp** when isolated to β-schedule only under Reddi-2018 conditions | DISCARD — original prediction stands disproved; the β-only requalification is logged as a separate, narrower row. |
-| **H80 Reuleaux constant-width kernel** | `sg_only_reuleaux` | **−8.83 pp top-1** vs baseline | DISCARD — falsified hypothesis with a publishable mechanism explanation in [`FINDINGS.md`](FINDINGS.md). |
+| **H80 Reuleaux constant-width kernel** | `sg_only_reuleaux` | **−8.83 pp top-1** vs baseline | DISCARD — falsified hypothesis with a publishable mechanism explanation in [`FINDINGS.md`](paper/FINDINGS.md). |
 
 ## 6. Methodological notes — screening vs evaluation
 
@@ -182,16 +182,16 @@ hypotheses earn the expensive deep dive (CLAUDE.md Rule 19, Phase 2
   retire the residual single-config dependency.
 - **No multiplicity correction** has been applied across the
   84-hypothesis design space — this is acknowledged in
-  [`LIMITATIONS.md`](LIMITATIONS.md) and is the headline reason the
+  [`LIMITATIONS.md`](paper/LIMITATIONS.md) and is the headline reason the
   paper frames itself as a *methodology + screening* contribution.
 - The composite metric is a project-specific aggregation; raw top-1
   rankings agree with the composite ranking for the three Phase-5
   winners but may diverge elsewhere — see
-  [`SOTA_COMPARISON.md`](SOTA_COMPARISON.md).
+  [`SOTA_COMPARISON.md`](paper/SOTA_COMPARISON.md).
 
 ## 7. The 8 hypothesis groups (g1–g8)
 
-The design space ([`IDEA_TABLE.md`](IDEA_TABLE.md), index at
+The design space ([`IDEA_TABLE.md`](hypotheses/IDEA_TABLE.md), index at
 [`hypotheses/INDEX.md`](hypotheses/INDEX.md)) splits into 8 thematic
 groups, each its own subdirectory under `hypotheses/`:
 
@@ -235,7 +235,7 @@ Channel widths follow a Fibonacci, φ-geometric, or linear schedule
 [`src/nature_inspired_networks/`](src/nature_inspired_networks/) (80
 modules) and every `ideas/<NN>/implementation.py` imports from there
 rather than duplicating code (CLAUDE.md Rule 14). See
-[`ARCHITECTURE.md`](ARCHITECTURE.md) for the full module + shape table.
+[`ARCHITECTURE.md`](docs/ARCHITECTURE.md) for the full module + shape table.
 
 ## 9. Modular `ideas/` taxonomy
 
@@ -263,7 +263,7 @@ The full taxonomy & per-sub-project status is in
 
 Every experiment passes a refusal-to-launch gate stack
 (full 7-step ritual in
-[`AUTORESEARCH_PROCESS.md`](AUTORESEARCH_PROCESS.md)):
+[`AUTORESEARCH_PROCESS.md`](docs/AUTORESEARCH_PROCESS.md)):
 
 1. **SOTA smoke first** — a known-good ResNet-20 baseline must clear
    the expected band before any nature-inspired variant runs
@@ -289,15 +289,15 @@ the entry, you do not disable the gate.
 Reproducibility is treated as a first-class deliverable.
 
 - **NeurIPS-style paper checklist:** filled in line-by-line at
-  [`NEURIPS_CHECKLIST.md`](NEURIPS_CHECKLIST.md), with file/line
+  [`NEURIPS_CHECKLIST.md`](paper/NEURIPS_CHECKLIST.md), with file/line
   evidence per item.
 - **Reviewer evidence pointers:** every paper claim is mapped to its
   reproduction command + log file in
-  [`REVIEWER_CHECKLIST.md`](REVIEWER_CHECKLIST.md).
+  [`REVIEWER_CHECKLIST.md`](paper/REVIEWER_CHECKLIST.md).
 - **Limitations & multiplicity:** explicit in
-  [`LIMITATIONS.md`](LIMITATIONS.md).
+  [`LIMITATIONS.md`](paper/LIMITATIONS.md).
 - **Ethics, data licensing, compute budget:** in
-  [`ETHICS_STATEMENT.md`](ETHICS_STATEMENT.md).
+  [`ETHICS_STATEMENT.md`](paper/ETHICS_STATEMENT.md).
 - **Hardware contract:** 1× RTX 4090 Laptop, 16 GB VRAM, Windows 11.
   bf16 AMP, batch 256, `num_workers=0`, `OMP_NUM_THREADS=2`,
   `MKL_NUM_THREADS=2`, `KMP_DUPLICATE_LIB_OK=TRUE`
@@ -337,7 +337,7 @@ jumps phases.
 **License:** MIT (declared in [`pyproject.toml`](pyproject.toml)).
 **Author (git history):** dlmastery (`eranti@gmail.com`). For
 submission the author identification is **anonymised for blind
-review** (see [`ETHICS_STATEMENT.md`](ETHICS_STATEMENT.md)).
+review** (see [`ETHICS_STATEMENT.md`](paper/ETHICS_STATEMENT.md)).
 
 ```bibtex
 @misc{dlmastery_nature_inspired_networks_2026,

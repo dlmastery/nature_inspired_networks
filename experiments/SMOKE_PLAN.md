@@ -1,8 +1,8 @@
 # CIFAR-10 Smoke Plan (Phase 2 of Rule 19)
 
 > Planning document — produced by Smoke-Planner, 2026-05-26. No code edits.
-> Authoritative tables: [`IDEA_TABLE.md`](IDEA_TABLE.md),
-> [`EXPERIMENT_LOG.md`](EXPERIMENT_LOG.md). Sweep matrix lives in
+> Authoritative tables: [`IDEA_TABLE.md`](../hypotheses/IDEA_TABLE.md),
+> [`EXPERIMENT_LOG.md`](../experiments/EXPERIMENT_LOG.md). Sweep matrix lives in
 > [`scripts/run_sweep.py`](scripts/run_sweep.py) `build_matrix()`.
 
 Per **Rule 19 Phase 2** the smoke must cover **ALL 75 hypotheses** before any
