@@ -1,0 +1,227 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - generic [ref=e3]:
+      - generic [ref=e4]: baseline_resnet20
+      - generic [ref=e5]:
+        - generic [ref=e6]: baseline
+        - generic [ref=e7]: Baselines
+        - generic [ref=e8]: cifar10
+        - generic [ref=e9]: seed 0
+        - 'generic "Rule 28 (CLAUDE.md): SCREENING = n=1 seed; EVALUATION = n>=3 seeds AND worst-leader-seed > best-baseline-seed Phase-5 gate cleared" [ref=e10]': tier screening n=3
+        - text: · run dir baseline_resnet20_seed0
+      - generic [ref=e11]:
+        - link "🔗 source" [ref=e12] [cursor=pointer]:
+          - /url: https://github.com/dlmastery/nature_inspired_networks
+        - link "📚 background reading" [ref=e13] [cursor=pointer]:
+          - /url: https://github.com/dlmastery/nature_inspired_networks/blob/main/paper/NATURE_INSPIRED_NETWORKS.md
+        - link "📄 paper" [ref=e14] [cursor=pointer]:
+          - /url: https://github.com/dlmastery/nature_inspired_networks/blob/main/PAPER.md
+        - link "📡 live" [ref=e15] [cursor=pointer]:
+          - /url: https://dlmastery.github.io/nature_inspired_networks/
+    - link "← back to dashboard" [ref=e17] [cursor=pointer]:
+      - /url: ../dashboard.html
+  - generic [ref=e18]:
+    - generic [ref=e19]:
+      - generic [ref=e20]: 84.78%
+      - generic [ref=e21]: top-1
+    - generic [ref=e22]:
+      - generic [ref=e23]: "0.8458"
+      - generic [ref=e24]: composite
+    - generic [ref=e25]:
+      - generic [ref=e26]: +0.00pp
+      - generic [ref=e27]: Δ vs baseline (n=3, screening)
+    - generic [ref=e28]:
+      - generic [ref=e29]: 0.272M
+      - generic [ref=e30]: params
+    - generic [ref=e31]:
+      - generic [ref=e32]: 4.03ms
+      - generic [ref=e33]: latency b=1
+  - generic [ref=e34]:
+    - heading "Hypothesis" [level=2] [ref=e35]
+    - paragraph [ref=e36]: No matching hypothesis document — this row is a baseline reference run.
+  - generic [ref=e37]:
+    - heading "Verdict FINDINGS.md" [level=2] [ref=e38]
+    - paragraph [ref=e39]: No paragraph in FINDINGS.md mentions this tag yet.
+    - paragraph [ref=e40]:
+      - link "↗ Browse FINDINGS.md" [ref=e41] [cursor=pointer]:
+        - /url: https://github.com/dlmastery/nature_inspired_networks/blob/main/FINDINGS.md
+  - generic [ref=e42]:
+    - heading "Composite-score breakdown" [level=2] [ref=e43]
+    - generic [ref=e44]:
+      - generic "top-1 = 0.84780" [ref=e45]: top-1 +0.8478
+      - generic "-0.05·log10(params_M)" [ref=e46]: params +0.02823
+      - generic "-0.05·log10(latency_ms)" [ref=e47]: lat −0.03027
+    - generic [ref=e48]:
+      - generic [ref=e49]: "Σ recomputed: 0.84577"
+      - generic [ref=e50]: "reported: 0.84577 · Δ +0.000000"
+    - generic [ref=e51]:
+      - text: composite ≔
+      - code [ref=e52]: top1 - 0.05*log10(params_M) - 0.05*log10(latency_ms)
+  - generic [ref=e53]:
+    - heading "Per-epoch training curves" [level=2] [ref=e54]
+    - generic [ref=e55]:
+      - img [ref=e57]:
+        - generic [ref=e58]: Loss
+        - generic [ref=e59]: "0.753"
+        - generic [ref=e60]: "0.999"
+        - generic [ref=e61]: "1.245"
+        - generic [ref=e62]: "1.492"
+        - generic [ref=e63]: "1.738"
+        - generic [ref=e64]: "0"
+        - generic [ref=e65]: "14"
+        - generic [ref=e66]: epoch →
+        - generic [ref=e67]: loss →
+        - generic [ref=e71]: train loss
+      - img [ref=e73]:
+        - generic [ref=e74]: Accuracy
+        - generic [ref=e75]: 41.0%
+        - generic [ref=e76]: 56.4%
+        - generic [ref=e77]: 71.8%
+        - generic [ref=e78]: 87.2%
+        - generic [ref=e79]: 102.7%
+        - generic [ref=e80]: "0"
+        - generic [ref=e81]: "14"
+        - generic [ref=e82]: epoch →
+        - generic [ref=e83]: accuracy →
+        - generic [ref=e87]: train top-1
+        - generic [ref=e91]: test top-1
+        - generic [ref=e95]: test top-5
+  - generic [ref=e96]:
+    - heading "Deep inspection" [level=2] [ref=e97]
+    - paragraph [ref=e98]: Audit excerpts, reasoning blob, raw configuration, and full metrics JSON — expand sections of interest.
+    - group [ref=e99]:
+      - generic "▸ Reasoning blob (reasoning.json)" [ref=e100] [cursor=pointer]
+    - group [ref=e101]:
+      - generic "▸ Configuration dump" [ref=e102] [cursor=pointer]
+    - group [ref=e103]:
+      - generic "▸ Full metrics JSON" [ref=e104] [cursor=pointer]
+  - generic [ref=e105]:
+    - heading "Metrics — quick reference" [level=2] [ref=e106]
+    - table [ref=e107]:
+      - rowgroup [ref=e108]:
+        - row "Dataset cifar10" [ref=e109]:
+          - cell "Dataset" [ref=e110]
+          - cell "cifar10" [ref=e111]
+        - row "Seed 0" [ref=e112]:
+          - cell "Seed" [ref=e113]
+          - cell "0" [ref=e114]
+        - row "Epochs 15" [ref=e115]:
+          - cell "Epochs" [ref=e116]
+          - cell "15" [ref=e117]
+        - row "Top-1 accuracy 84.78%" [ref=e118]:
+          - cell "Top-1 accuracy" [ref=e119]
+          - cell "84.78%" [ref=e120]
+        - row "Top-5 accuracy 99.35%" [ref=e121]:
+          - cell "Top-5 accuracy" [ref=e122]
+          - cell "99.35%" [ref=e123]
+        - row "Train top-1 87.24%" [ref=e124]:
+          - cell "Train top-1" [ref=e125]
+          - cell "87.24%" [ref=e126]
+        - row "Generalisation gap (train − test) 2.46%" [ref=e127]:
+          - cell "Generalisation gap (train − test)" [ref=e128]
+          - cell "2.46%" [ref=e129]
+        - row "Parameters 272,474 (0.272 M)" [ref=e130]:
+          - cell "Parameters" [ref=e131]
+          - cell "272,474 (0.272 M)" [ref=e132]
+        - row "FLOPs 41.2 M MACs" [ref=e133]:
+          - cell "FLOPs" [ref=e134]
+          - cell "41.2 M MACs" [ref=e135]
+        - row "Latency (batch=1) 4.030 ms" [ref=e136]:
+          - cell "Latency (batch=1)" [ref=e137]
+          - cell "4.030 ms" [ref=e138]
+        - row "Rot-eq error 0.887535" [ref=e139]:
+          - cell "Rot-eq error" [ref=e140]
+          - cell "0.887535" [ref=e141]
+        - row "Epochs-to-target -1" [ref=e142]:
+          - cell "Epochs-to-target" [ref=e143]
+          - cell "-1" [ref=e144]
+        - row "Train wall-clock 194.4 s" [ref=e145]:
+          - cell "Train wall-clock" [ref=e146]
+          - cell "194.4 s" [ref=e147]
+        - row "Composite score 0.845767" [ref=e148]:
+          - cell "Composite score" [ref=e149]
+          - cell "0.845767" [ref=e150]
+        - row "Composite fingerprint (SHA-256) d65565e9c7b12d14cbce30a801ecc6753aea3eb148074256bfcc051fa61d0893" [ref=e151]:
+          - cell "Composite fingerprint (SHA-256)" [ref=e152]
+          - cell "d65565e9c7b12d14cbce30a801ecc6753aea3eb148074256bfcc051fa61d0893" [ref=e153]
+  - generic [ref=e154]:
+    - heading "Cross-references" [level=2] [ref=e155]
+    - generic [ref=e156]:
+      - link "↪ other seed baseline_resnet20 cifar10 · seed 1" [ref=e157] [cursor=pointer]:
+        - /url: ../experiments/cifar10__baseline_resnet20_seed1.html
+        - generic [ref=e158]: ↪ other seed
+        - generic [ref=e159]: baseline_resnet20
+        - generic [ref=e160]: cifar10 · seed 1
+      - link "↪ other seed baseline_resnet20 cifar10 · seed 2" [ref=e161] [cursor=pointer]:
+        - /url: ../experiments/cifar10__baseline_resnet20_seed2.html
+        - generic [ref=e162]: ↪ other seed
+        - generic [ref=e163]: baseline_resnet20
+        - generic [ref=e164]: cifar10 · seed 2
+      - link "↪ same tag, other dataset baseline_resnet20 cifar100 · seed 0" [ref=e165] [cursor=pointer]:
+        - /url: ../experiments/cifar100__baseline_resnet20_seed0.html
+        - generic [ref=e166]: ↪ same tag, other dataset
+        - generic [ref=e167]: baseline_resnet20
+        - generic [ref=e168]: cifar100 · seed 0
+      - link "↪ same tag, other dataset baseline_resnet20 cifar100 · seed 1" [ref=e169] [cursor=pointer]:
+        - /url: ../experiments/cifar100__baseline_resnet20_seed1.html
+        - generic [ref=e170]: ↪ same tag, other dataset
+        - generic [ref=e171]: baseline_resnet20
+        - generic [ref=e172]: cifar100 · seed 1
+      - link "↪ same tag, other dataset baseline_resnet20 cifar100 · seed 2" [ref=e173] [cursor=pointer]:
+        - /url: ../experiments/cifar100__baseline_resnet20_seed2.html
+        - generic [ref=e174]: ↪ same tag, other dataset
+        - generic [ref=e175]: baseline_resnet20
+        - generic [ref=e176]: cifar100 · seed 2
+      - link "↪ same tag, other dataset baseline_resnet20 cifar100 · seed 3" [ref=e177] [cursor=pointer]:
+        - /url: ../experiments/cifar100__baseline_resnet20_seed3.html
+        - generic [ref=e178]: ↪ same tag, other dataset
+        - generic [ref=e179]: baseline_resnet20
+        - generic [ref=e180]: cifar100 · seed 3
+      - link "↪ nearest in Baseline baseline_sg_vanilla 82.95% · Δ-comp −0.0159" [ref=e181] [cursor=pointer]:
+        - /url: ../experiments/cifar10__baseline_sg_vanilla_seed1.html
+        - generic [ref=e182]: ↪ nearest in Baseline
+        - generic [ref=e183]: baseline_sg_vanilla
+        - generic [ref=e184]: 82.95% · Δ-comp −0.0159
+      - link "↪ nearest in Baseline baseline_sg_vanilla 82.16% · Δ-comp −0.0200" [ref=e185] [cursor=pointer]:
+        - /url: ../experiments/cifar10__baseline_sg_vanilla_seed0.html
+        - generic [ref=e186]: ↪ nearest in Baseline
+        - generic [ref=e187]: baseline_sg_vanilla
+        - generic [ref=e188]: 82.16% · Δ-comp −0.0200
+      - link "↪ nearest in Baseline baseline_sg_vanilla 82.26% · Δ-comp −0.0214" [ref=e189] [cursor=pointer]:
+        - /url: ../experiments/cifar10__baseline_sg_vanilla_seed2.html
+        - generic [ref=e190]: ↪ nearest in Baseline
+        - generic [ref=e191]: baseline_sg_vanilla
+        - generic [ref=e192]: 82.26% · Δ-comp −0.0214
+  - generic [ref=e193]:
+    - link "Repo" [ref=e194] [cursor=pointer]:
+      - /url: https://github.com/dlmastery/nature_inspired_networks
+    - text: ·
+    - link "Paper" [ref=e195] [cursor=pointer]:
+      - /url: https://github.com/dlmastery/nature_inspired_networks/blob/main/PAPER.md
+    - text: ·
+    - link "Background reading" [ref=e196] [cursor=pointer]:
+      - /url: https://github.com/dlmastery/nature_inspired_networks/blob/main/paper/NATURE_INSPIRED_NETWORKS.md
+    - text: ·
+    - link "Live demo" [ref=e197] [cursor=pointer]:
+      - /url: https://dlmastery.github.io/nature_inspired_networks/
+    - text: ·
+    - link "GitHub Pages" [ref=e198] [cursor=pointer]:
+      - /url: https://dlmastery.github.io/nature_inspired_networks/
+  - generic [ref=e199]:
+    - text: composite formula SHA-256
+    - code [ref=e200]: d65565e9c7b12d14cbce30a801ecc6753aea3eb148074256bfcc051fa61d0893
+    - text: epochs run
+    - code [ref=e201]: "15"
+    - text: · train wall-clock
+    - code [ref=e202]: 194.4 s
+    - text: · gen-gap (train − test)
+    - code [ref=e203]: 2.46 pp
+    - text: "· metrics.json git commit:"
+    - link "9bd993f" [ref=e204] [cursor=pointer]:
+      - /url: https://github.com/dlmastery/nature_inspired_networks/commit/9bd993f
+      - code [ref=e205]: 9bd993f
+    - text: run directory
+    - code [ref=e206]: baseline_resnet20_seed0
+    - text: Generated by
+    - code [ref=e207]: nature_inspired_networks.dashboard.render_experiment_page
+    - text: · self-contained inline SVG, no external assets · brutalist editorial lab notebook v3
