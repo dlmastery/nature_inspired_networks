@@ -1,0 +1,18 @@
+{
+  "tag": "slot_init_phi",
+  "dataset": "cifar10",
+  "seed": 0,
+  "epochs": 12,
+  "top1": 0.8346,
+  "top5": 0.9914,
+  "params": 262078,
+  "flops": 80810722.0,
+  "latency_ms": 14.22963000004529,
+  "rot_eq_err": 0.909553105632464,
+  "composite": 0.8060187913236734,
+  "composite_fingerprint": "d65565e9c7b12d14cbce30a801ecc6753aea3eb148074256bfcc051fa61d0893",
+  "epochs_to_target": -1,
+  "train_seconds": 1250.8759147000019,
+  "train_top1": 0.8494391025641026,
+  "generalization_gap": 0.014839102564102591
+}
