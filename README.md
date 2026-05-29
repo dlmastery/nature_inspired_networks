@@ -29,6 +29,31 @@
 
 ---
 
+## Start here (for reviewers)
+
+> If you only have ten minutes, read these four things — in this order.
+
+1. **[paper/NATURE_INSPIRED_NETWORKS.md](paper/NATURE_INSPIRED_NETWORKS.md)** &nbsp;**← state-of-the-field literature survey (May 2026).**<br>
+   A two-part reference: an 8 000-word prose state-of-the-field
+   (mathematical foundations · neuroscience grounding · 2024–2026
+   GDL/TDL literature · cross-paradigm landscape) plus a curated
+   awesome-list of arXiv papers, repos, demos, datasets, blogs,
+   talks, and community hubs that motivate the 84-hypothesis design
+   space in this repo. **This is the document to read if you want to
+   understand WHY any of the priors in this repo were chosen.**
+2. **[PAPER.md](PAPER.md)** — the draft submission, abstract to
+   conclusion, with the 3-winner headline table, the protocol-as-
+   contribution framing, and the explicit statistical caveats.
+3. **[paper/FINDINGS.md](paper/FINDINGS.md)** — per-tag verdicts:
+   KEEP / NEAR-MISS / DISCARD. Negative results are first-class.
+4. **[paper/REVIEWER_CHECKLIST.md](paper/REVIEWER_CHECKLIST.md)** —
+   per-claim file/line evidence pointers for an adversarial
+   reviewer; pairs with [`paper/NEURIPS_CHECKLIST.md`](paper/NEURIPS_CHECKLIST.md).
+
+**Live demo:** <https://dlmastery.github.io/nature_inspired_networks/> (regenerated on every commit).
+
+---
+
 ## Table of contents
 
 1. [What this is](#1-what-this-is)
@@ -111,29 +136,58 @@ the 80 % band, STOP and diagnose your environment per
 
 ## 3. What's in this repo
 
+### 3.1 Top-level documents
+
 | Document | Purpose |
 |---|---|
 | [`PAPER.md`](PAPER.md) | Draft submission paper (abstract → conclusion). |
-| [`paper_abstract.md`](paper/paper_abstract.md) | Stand-alone 1-page abstract for circulation. |
-| [`MANIFESTO.md`](paper/MANIFESTO.md) | Committee-grade research argument & honest disclosure of motivation. |
-| [`FINDINGS.md`](paper/FINDINGS.md) | Per-tag campaign verdicts: KEEP / NEAR-MISS / DISCARD with full reasoning. |
-| [`AUDIT_SUMMARY.md`](paper/AUDIT_SUMMARY.md) | Dual-track audit dashboard (implementation-critic ∩ sci-critic verdicts). |
-| [`REVIEWER_CHECKLIST.md`](paper/REVIEWER_CHECKLIST.md) | Per-claim evidence pointers for an adversarial reviewer. |
-| [`NEURIPS_CHECKLIST.md`](paper/NEURIPS_CHECKLIST.md) | Filled-in NeurIPS Paper Checklist (17 questions, each with file/line evidence). |
-| [`LIMITATIONS.md`](paper/LIMITATIONS.md) | Honest enumeration of scope and statistical caveats. |
-| [`ETHICS_STATEMENT.md`](paper/ETHICS_STATEMENT.md) | Data licensing, compute, dual-use, IRB statement. |
-| [`IDEA_TABLE.md`](hypotheses/IDEA_TABLE.md) | Single source of truth for the 84-hypothesis design space (G1–G8). |
-| [`EXPERIMENT_LOG.md`](experiments/EXPERIMENT_LOG.md) | Master long-list (Tiers 0–6) of every planned and executed run. |
-| [`EXPERIMENT_LEDGER.md`](experiments/EXPERIMENT_LEDGER.md) | Chunk-by-chunk audit of source documents (CLAUDE.md Rule 17). |
-| [`RESULTS.md`](experiments/RESULTS.md) | Auto-generated per-run narratives from `experiment_log.jsonl`. |
-| [`SOTA_COMPARISON.md`](paper/SOTA_COMPARISON.md) | Honest map from our numbers to the published literature. |
-| [`PARADIGM_COMPARISON.md`](paper/PARADIGM_COMPARISON.md) | Liquid / JEPA / KAN / Transformer / GNN synthesis. |
-| [`ARCHITECTURE.md`](docs/ARCHITECTURE.md) | Module + tensor-shape tables. |
-| [`AUTORESEARCH_PROCESS.md`](docs/AUTORESEARCH_PROCESS.md) | The 7-step refusal-to-launch ritual + gate stack. |
-| [`NATURE_INSPIRED_NETWORKS.md`](paper/NATURE_INSPIRED_NETWORKS.md) | State-of-the-field reference (May 2026). |
-| [`MINDMAP.md`](docs/MINDMAP.md) | One-page link map of every artifact in the repo. |
-| [`CLAUDE.md`](CLAUDE.md) | 27 normative invariants (refusal table, hardware contract). |
-| [`SETUP.md`](docs/SETUP.md) | Detailed environment bring-up (Windows / Linux). |
+| [`paper/NATURE_INSPIRED_NETWORKS.md`](paper/NATURE_INSPIRED_NETWORKS.md) | **State-of-the-field literature survey + curated awesome-list (May 2026).** Read this first to understand the motivation for every prior in this repo. |
+| [`paper/paper_abstract.md`](paper/paper_abstract.md) | Stand-alone 1-page abstract for circulation. |
+| [`paper/MANIFESTO.md`](paper/MANIFESTO.md) | Committee-grade research argument & honest disclosure of motivation. |
+| [`paper/FINDINGS.md`](paper/FINDINGS.md) | Per-tag campaign verdicts: KEEP / NEAR-MISS / DISCARD with full reasoning. |
+| [`paper/AUDIT_SUMMARY.md`](paper/AUDIT_SUMMARY.md) | Dual-track audit dashboard (implementation-critic ∩ sci-critic verdicts). |
+| [`paper/REVIEWER_CHECKLIST.md`](paper/REVIEWER_CHECKLIST.md) | Per-claim evidence pointers for an adversarial reviewer. |
+| [`paper/NEURIPS_CHECKLIST.md`](paper/NEURIPS_CHECKLIST.md) | Filled-in NeurIPS Paper Checklist (17 questions, each with file/line evidence). |
+| [`paper/LIMITATIONS.md`](paper/LIMITATIONS.md) | Honest enumeration of scope and statistical caveats. |
+| [`paper/ETHICS_STATEMENT.md`](paper/ETHICS_STATEMENT.md) | Data licensing, compute, dual-use, IRB statement. |
+| [`paper/STATISTICAL_TESTS.md`](paper/STATISTICAL_TESTS.md) | Wilcoxon W/p + bootstrap CI + Holm-Bonferroni gate (n=3 → n=7 in flight). |
+| [`paper/SOTA_COMPARISON.md`](paper/SOTA_COMPARISON.md) | Honest map from our numbers to the published literature. |
+| [`paper/PARADIGM_COMPARISON.md`](paper/PARADIGM_COMPARISON.md) | Liquid / JEPA / KAN / Transformer / GNN synthesis. |
+| [`hypotheses/IDEA_TABLE.md`](hypotheses/IDEA_TABLE.md) | Single source of truth for the 84-hypothesis design space (G1–G8). |
+| [`hypotheses/INDEX.md`](hypotheses/INDEX.md) | Per-group index into the 84 design docs. |
+| [`experiments/EXPERIMENT_LOG.md`](experiments/EXPERIMENT_LOG.md) | Master long-list (Tiers 0–6) of every planned and executed run. |
+| [`experiments/EXPERIMENT_LEDGER.md`](experiments/EXPERIMENT_LEDGER.md) | Chunk-by-chunk audit of source documents (CLAUDE.md Rule 17). |
+| [`experiments/RESULTS.md`](experiments/RESULTS.md) | Auto-generated per-run narratives from `experiment_log.jsonl`. |
+| [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) | Module + tensor-shape tables. |
+| [`docs/AUTORESEARCH_PROCESS.md`](docs/AUTORESEARCH_PROCESS.md) | The 7-step refusal-to-launch ritual + gate stack. |
+| [`docs/MINDMAP.md`](docs/MINDMAP.md) | One-page link map of every artifact in the repo. |
+| [`docs/SETUP.md`](docs/SETUP.md) | Detailed environment bring-up (Windows / Linux). |
+| [`CLAUDE.md`](CLAUDE.md) | 28 normative invariants (refusal table, hardware contract). |
+
+### 3.2 Repository map
+
+```
+nature_inspired_networks/
+├── README.md                ← this file
+├── CLAUDE.md                ← 28 normative rules
+├── PAPER.md                 ← main research deliverable
+├── pyproject.toml
+├── paper/                   ← 12 research-deliverable docs (literature survey, FINDINGS, audits…)
+├── hypotheses/              ← 84 design docs in 8 groups + IDEA_TABLE.md + INDEX.md
+├── experiments/             ← sweep results + registry (EXPERIMENT_LOG, RESULTS, ledger…)
+│   └── cifar100/            ← multi-seed Phase-5 runs (DO NOT modify in flight)
+├── ideas/                   ← modular sub-projects (1 per implemented hypothesis)
+├── src/nature_inspired_networks/   ← shared infrastructure (priors, runner, dashboard)
+├── scripts/                 ← run_sweep, build_dashboard, build_report, compute_topology
+├── tests/                   ← 780+ unit + mechanism-verifying tests
+├── skills/                  ← 17 content-agnostic autoresearch skills (Rule 10)
+├── audits/                  ← dual-track + paper-gap + reviewer-pass audit outputs
+├── controls/                ← reviewer-flagged control-sweep specs
+├── configs/                 ← shared YAML configs (smoke / quick / sota_smoke)
+├── dashboard/               ← generated aggregate + per-experiment pages
+└── docs/                    ← project docs + GitHub Pages root (sota_catalog.yaml, MINDMAP…)
+    └── dashboard/           ← byte-identical mirror of dashboard/ for live Pages
+```
 
 ## 4. Headline claims (post-fix)
 
