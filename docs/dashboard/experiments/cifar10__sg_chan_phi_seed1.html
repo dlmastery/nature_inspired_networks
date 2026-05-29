@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang='en'><head><meta charset='utf-8'>
 <title>sg_chan_phi · seed 1 · cifar10 — experiment page</title>
-<link rel='preconnect' href='https://fonts.googleapis.com'><link rel='preconnect' href='https://fonts.gstatic.com' crossorigin><link href='https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;0,6..72,800;1,6..72,400;1,6..72,600&family=IBM+Plex+Serif:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap' rel='stylesheet'>
+<link rel='preconnect' href='https://fonts.googleapis.com'><link rel='preconnect' href='https://fonts.gstatic.com' crossorigin><link href='https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600;8..60,700&family=IBM+Plex+Mono:wght@400;500;600&display=swap' rel='stylesheet'>
 <style>
  :root{
    --ink:#0a0a0d; --paper:#e6e1d6; --paper-dim:#a89e8c;
@@ -23,20 +23,38 @@
 
  *{margin:0;padding:0;box-sizing:border-box;}
  html,body{background:var(--ink);}
- body{font-family:'IBM Plex Serif','Charter',Georgia,serif;color:var(--paper);
-      padding:32px 36px 80px;line-height:1.55;max-width:1180px;margin:0 auto;
-      font-size:16px;font-variant-numeric:tabular-nums;position:relative;}
+ body{font-family:'Source Serif 4','Charter','Source Serif Pro',Georgia,serif;
+      color:var(--paper);padding:32px 36px 80px;line-height:1.6;
+      max-width:1180px;margin:0 auto;font-size:16px;
+      font-variant-numeric:tabular-nums;position:relative;}
  a{color:var(--v-derivative);text-decoration:none;border-bottom:1px solid transparent;
    transition:border-color 160ms ease;}
  a:hover{border-bottom-color:var(--v-derivative);text-decoration:none;}
- h1{font-family:'Newsreader',serif;font-weight:600;font-style:italic;
-    font-size:42px;line-height:1.05;color:var(--paper);letter-spacing:-0.01em;
+ h1{font-family:'Source Serif 4',Georgia,serif;font-weight:600;
+    font-size:34px;line-height:1.15;color:var(--paper);letter-spacing:-0.005em;
     margin-bottom:6px;}
- h2{font-family:'Newsreader',serif;font-weight:600;font-style:italic;
-    font-size:22px;color:var(--paper);margin-bottom:14px;letter-spacing:-0.005em;}
+ h2{font-family:'Source Serif 4',Georgia,serif;font-weight:600;
+    font-size:20px;color:var(--paper);margin-bottom:14px;letter-spacing:-0.003em;}
  h3{font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:11px;
-    text-transform:uppercase;letter-spacing:0.18em;color:var(--paper-dim);
+    text-transform:uppercase;letter-spacing:0.16em;color:var(--paper-dim);
     margin:18px 0 8px 0;}
+ .md-body p{margin:8px 0 12px 0;}
+ .md-body p:first-child{margin-top:0;} .md-body p:last-child{margin-bottom:0;}
+ .md-body strong,.md-body b{color:var(--paper);font-weight:600;}
+ .md-body em,.md-body i{font-style:italic;}
+ .md-body code{font-family:'IBM Plex Mono',monospace;font-size:0.86em;
+    background:var(--panel2);padding:1px 5px;border-radius:3px;}
+ .md-body pre{font-family:'IBM Plex Mono',monospace;font-size:0.85em;
+    background:var(--panel2);padding:10px 12px;border-radius:5px;
+    border:1px solid var(--rule);overflow-x:auto;margin:10px 0;}
+ .md-body ul,.md-body ol{margin:8px 0 12px 22px;}
+ .md-body li{margin:3px 0;}
+ .md-body blockquote{border-left:3px solid var(--accent-dim);
+    padding:6px 14px;margin:10px 0;color:var(--paper-dim);font-style:italic;}
+ .md-body table{border-collapse:collapse;margin:10px 0;font-size:0.92em;}
+ .md-body th,.md-body td{border:1px solid var(--rule);padding:6px 10px;
+    text-align:left;}
+ .md-body th{background:var(--panel2);font-weight:600;}
  .mono{font-family:'IBM Plex Mono',monospace;font-size:0.85em;}
  .head-grid{display:grid;grid-template-columns:1fr auto;gap:24px;
             align-items:start;padding-bottom:18px;
@@ -177,89 +195,76 @@
 </div>
 <div class='kn-strip' style='--i:1'><div class='kn-tile tint-neg'><div class='kn-val'>80.74%</div><div class='kn-lbl'>top-1</div></div><div class='kn-tile tint-neu'><div class='kn-val'>0.8158</div><div class='kn-lbl'>composite</div></div><div class='kn-tile tint-neg'><div class='kn-val'>−4.04pp</div><div class='kn-lbl'>Δ vs baseline</div></div><div class='kn-tile tint-neu'><div class='kn-val'>0.127M</div><div class='kn-lbl'>params</div></div><div class='kn-tile tint-neu'><div class='kn-val'>5.35ms</div><div class='kn-lbl'>latency b=1</div></div></div>
 <section class='card' style='--i:2'><h2>Hypothesis H04 — <i>H04 — phi-Self-Similar Width (channel counts multiplied by phi, rounded to Fib)</i></h2><div style='margin:2px 0 18px 0'><a href='https://github.com/dlmastery/nature_inspired_networks/blob/main/audits/G1_audit.md#h04-g1' style='text-decoration:none;border-bottom:none;margin-right:4px;display:inline-block'><span class='vbadge' style='display:inline-block;padding:3px 10px;border:1px solid #d29922;color:#d29922;font-weight:600;font-size:10px;font-family:"IBM Plex Mono",monospace;text-transform:uppercase;letter-spacing:0.16em;transition:transform 160ms ease,filter 160ms ease;background:transparent' title='`fibonacci_channels(c0, n, mode=&#39;fib&#39;)` uses fib sequence `[1, 2, 3, 5, 8, 13, ...]` (starting `[1, 2]`, base=fib[1]=2) and computes `c = round(c0 * fib[k+1] / 2)` round-to-8 (priors.py:34– 41). For c0=32, n=4: produces `[32, 48, 80, 128]` ✓. `mode=&#39;phi&#39;` produces `[round8(c0 * phi**k)]` — for c0=32 n=4: `[32, 48, 80, 136]`.'><span style='opacity:0.65'>impl</span> &nbsp;MINOR</span></a><span style='margin-right:4px;display:inline-block'><span class='vbadge' style='display:inline-block;padding:3px 10px;border:1px solid #8b949e;color:#8b949e;font-weight:600;font-size:10px;font-family:"IBM Plex Mono",monospace;text-transform:uppercase;letter-spacing:0.16em;transition:transform 160ms ease,filter 160ms ease;background:transparent' title='**NUMEROLOGY** — Already disconfirmed at single seed and the disconfirmation is consistent with RegNet&#39;s literature finding that width-exponents ~2.5-2.9 (not φ) dominate. The &quot;mod-8 collapse&quot; excuse is technically valid but irrelevant: the prior loses at every config tested so far.'><span style='opacity:0.65'>sci</span> &nbsp;NUMEROLOGY</span></span></div><p style='font-family:Newsreader,serif;font-style:italic;font-size:1.08em;color:#e6e1d6;line-height:1.5;border-left:2px solid var(--accent);padding-left:14px;margin:6px 0 16px 0'>Channel widths grown by successive multiplication by phi and rounded to the nearest Fibonacci number match or beat linear-doubling channel schedules at iso-parameter budget.</p><h3>Motivation</h3><p>When a growing organism must add capacity stage-by-stage with bounded resource overhead, the optimum width-growth rule is one where the ratio between successive widths converges to a fixed value. Phi is the unique positive real that satisfies the additive recurrence phi**2 = phi + 1, which means doubling capacity by phi compounds with geometric efficiency. Botanical structures whose successive layers must accommodate both the previous layer&#39;s output and a new contribution -- spiral phyllotaxis, mollusc shell chambers, ammonite septa -- consistently exhibit phi-ratio width growth. The Fibonacci sequence is the discrete projection of phi-growth onto the integers: F(n+1)/F(n) converges to phi from below and above alternately. For a CNN, channel counts must be integers (and ideally multiples of 8 for tensor-core throughput); the closest discrete approximation to a phi-scaled width schedule is therefore the Fibonacci sequence quantised to multiples of 8. The hypothesis is that this discretised phi growth preserves enough of the underlying continuous prior to lift accuracy or reduce parameters at iso-accuracy. The single rounding mode is critical: mod-8 rounding can collapse phi and Fib variants to the same widths.</p><h3>Formal hypothesis</h3><p style='font-family:Newsreader,serif;font-style:italic;color:#e6e1d6'>Because successive channel widths multiplied by phi and rounded to the nearest Fibonacci number impose the discrete phi-growth lattice on the network&#39;s expressive capacity, the mechanism through which this should improve over geometric (2x) doubling is finer per-stage capacity granularity (ratio 1.618 vs 2.0) and better matching of effective rank growth to the data manifold&#39;s intrinsic-dimension increase. Per the phi-scaling literature we expect CIFAR-10 top-1 to lift by 0.5-1.5 pp at iso-parameter budget (~127k params at depth 9).</p><details class='deep'><summary>Read the full design-doc digest</summary><div class='body'><h3>Mechanism (because…)</h3><p>Concrete widths from c0 = 16 (the same c0 used in T1.1/T1.2):</p><h3>Numeric falsifier</h3><p>If a phi-width schedule does NOT beat the linear-doubling baseline at 3-seed median on CIFAR-10 by &gt;= 0.3 pp top-1, OR if mod-8 rounding collapses phi and Fib to identical widths (as actually observed in T1.1 and T1.2 at single seed, top-1 = 80.11 percent identical), the prior is FALSIFIED in the small-net regime and moved to `~ partial`.</p><h3>Predicted Δ</h3><p>| metric | Delta vs baseline | rationale | |---|---|---| | composite | [-0.012, +0.005] | currently slightly negative at single seed (T1.1/T1.2 vs vanilla 0.8258) | | top-1 (CIFAR-10, CNN) | **observed: -2.05 pp vs vanilla** | T1.1=80.11%, T1.2=80.11% (mod-8 collapsed); baseline_sg_vanilla=82.16% | | perplexity (WikiText-103 LLM) | [-0.4, -0.1] | unverified; pre-reg | | params | [-31, -28] pct vs vanilla | T1.1/T1.2: 127k vs vanilla 186k | | FLOPs | [-25, -20] pct | proportional to params | | GPU latency (batch=1) | [-1, +2] pct | T1.1: 4.43 ms vs 4.42 ms (essentially equal) | | rotation-equivariance err | [-0.005, +0.005] | not affected by width | | KV cache @ 32k (LLM) | [+25, +35] pct | per-layer growth penalises cache | | Betti collapse rate | [-0.02, +0.02] | unclear effect |</p><p style='margin-top:14px'><a href='https://github.com/dlmastery/nature_inspired_networks/blob/main/hypotheses/g1_scaling_growth/H04_phi_self_similar_width.md'>↗ Full design doc on GitHub</a> <span class='mono' style='color:var(--paper-dim);font-size:0.78em'>hypotheses/g1_scaling_growth/H04_phi_self_similar_width.md</span></p></div></details></section>
-<section class='card' style='--i:3'><h2>Verdict <span class='mono' style='font-size:0.55em;letter-spacing:0.18em;color:var(--paper-dim);font-style:normal'>FINDINGS.md</span></h2><div class='quote'>| rank | tag | top-1 | params | latency ms | composite | Δ vs `sg_chan_fib` | |---|---|---|---|---|---|---| | 1 | `baseline_resnet20` | 84.78 % | 272 k | 4.03 | **0.8458** | (different scaffold) | | 2 | `baseline_sg_vanilla` | 82.16 % | 186 k | 4.42 | 0.8258 | +0.0123 | | 3 | `sg_chan_phi` | 80.11 % | 127 k | 4.11 | 0.8152 | +0.0017 | | 4 | `sg_chan_fib` | 80.11 % | 127 k | 4.43 | **0.8135** | — (reference) | | 5 | `sg_only_fractal` | 82.46 % | 259 k | 7.42 | 0.8104 | -0.0031 | | 6 | `sg_only_golden_modulate` | 79.81 % | 127 k | 5.95 | 0.8042 | -0.0093 | | 7 | `sg_only_hex` | 79.32 % | 127 k | 7.55 | 0.7941 | -0.0194 | | 8 | `sg_only_cymatic_init` | 77.44 % | 127 k | 4.14 | 0.7883 | -0.0252 | | 9 | `sg_only_toroidal` | 78.05 % | 127 k | 9.34 | 0.7768 | -0.0367 | | 10 | `sg_only_group` | 69.84 % | 127 k | 9.75 | **0.6937** | -0.1198 | | 11 | `sg_full_fib` | 73.24 % | 259 k | 20.02 | **0.6966** | -0.1169 |</div><p style='margin-top:14px'><a href='https://github.com/dlmastery/nature_inspired_networks/blob/main/FINDINGS.md'>↗ Full FINDINGS.md on GitHub</a></p></section>
+<section class='card' style='--i:3'><h2>Verdict <span class='mono' style='font-size:0.55em;letter-spacing:0.18em;color:var(--paper-dim);font-style:normal'>FINDINGS.md</span></h2><div class='quote md-body'><p>| rank | tag | top-1 | params | latency ms | composite | Δ vs <code>sg_chan_fib</code> | |&mdash;|&mdash;|&mdash;|&mdash;|&mdash;|&mdash;|&mdash;| | 1 | <code>baseline_resnet20</code> | 84.78 % | 272 k | 4.03 | <strong>0.8458</strong> | (different scaffold) | | 2 | <code>baseline_sg_vanilla</code> | 82.16 % | 186 k | 4.42 | 0.8258 | +0.0123 | | 3 | <code>sg_chan_phi</code> | 80.11 % | 127 k | 4.11 | 0.8152 | +0.0017 | | 4 | <code>sg_chan_fib</code> | 80.11 % | 127 k | 4.43 | <strong>0.8135</strong> | — (reference) | | 5 | <code>sg_only_fractal</code> | 82.46 % | 259 k | 7.42 | 0.8104 | -0.0031 | | 6 | <code>sg_only_golden_modulate</code> | 79.81 % | 127 k | 5.95 | 0.8042 | -0.0093 | | 7 | <code>sg_only_hex</code> | 79.32 % | 127 k | 7.55 | 0.7941 | -0.0194 | | 8 | <code>sg_only_cymatic_init</code> | 77.44 % | 127 k | 4.14 | 0.7883 | -0.0252 | | 9 | <code>sg_only_toroidal</code> | 78.05 % | 127 k | 9.34 | 0.7768 | -0.0367 | | 10 | <code>sg_only_group</code> | 69.84 % | 127 k | 9.75 | <strong>0.6937</strong> | -0.1198 | | 11 | <code>sg_full_fib</code> | 73.24 % | 259 k | 20.02 | <strong>0.6966</strong> | -0.1169 |</p></div><p style='margin-top:14px'><a href='https://github.com/dlmastery/nature_inspired_networks/blob/main/FINDINGS.md'>↗ Full FINDINGS.md on GitHub</a></p></section>
 <section class='card' style='--i:4'><h2>Composite-score breakdown</h2><div class='comp-stack'><div class='seg pos' style='width:90.86%' title='top-1 = 0.80740'>top-1 +0.8074</div><div class='seg params' style='width:5.04%' title='-0.05·log10(params_M)'>params +0.04478</div><div class='seg lat' style='width:4.10%' title='-0.05·log10(latency_ms)'>lat −0.03643</div></div><div style='display:flex;justify-content:space-between;font-family:IBM Plex Mono,monospace;font-size:11px;color:var(--paper-dim);margin-top:6px'><span>Σ recomputed: <b style='color:var(--paper)'>0.81575</b></span><span>reported: <b style='color:var(--paper)'>0.81575</b> &nbsp;·&nbsp; Δ +0.000000</span></div><div class='formula-chip' style='margin-top:14px'>composite ≔ <code>top1 - 0.05*log10(params_M) - 0.05*log10(latency_ms)</code></div></section>
 <section class='card' style='--i:5'><h2>Per-epoch training curves</h2><div class='charts'><div><svg viewBox='0 0 460 320' preserveAspectRatio='xMinYMin meet' width='100%' height='auto' xmlns='http://www.w3.org/2000/svg' style='background:#0a0a0d;border:1px solid #1c1c20;display:block;font-family:"IBM Plex Mono",monospace'><text x='46' y='18' fill='#e6e1d6' font-size='14' font-family='Newsreader,serif' font-style='italic' font-weight='600'>Loss</text><line x1='46' y1='292.0' x2='446' y2='292.0' stroke='#1c1c20' stroke-width='1'/><text x='40' y='295.0' fill='#a89e8c' font-size='9' text-anchor='end'>0.867</text><line x1='46' y1='226.5' x2='446' y2='226.5' stroke='#1c1c20' stroke-width='1'/><text x='40' y='229.5' fill='#a89e8c' font-size='9' text-anchor='end'>1.104</text><line x1='46' y1='161.0' x2='446' y2='161.0' stroke='#1c1c20' stroke-width='1'/><text x='40' y='164.0' fill='#a89e8c' font-size='9' text-anchor='end'>1.342</text><line x1='46' y1='95.5' x2='446' y2='95.5' stroke='#1c1c20' stroke-width='1'/><text x='40' y='98.5' fill='#a89e8c' font-size='9' text-anchor='end'>1.579</text><line x1='46' y1='30.0' x2='446' y2='30.0' stroke='#1c1c20' stroke-width='1'/><text x='40' y='33.0' fill='#a89e8c' font-size='9' text-anchor='end'>1.817</text><text x='46.0' y='310' fill='#a89e8c' font-size='9' text-anchor='middle'>0</text><text x='446.0' y='310' fill='#a89e8c' font-size='9' text-anchor='middle'>11</text><text x='246.0' y='310' fill='#a89e8c' font-size='10' font-family='Newsreader,serif' font-style='italic' text-anchor='middle'>epoch →</text><text x='14' y='161.0' fill='#a89e8c' font-size='10' font-family='Newsreader,serif' font-style='italic' text-anchor='middle' transform='rotate(-90 14 161.0)'>loss →</text><polyline points='46.0,44.0 82.4,143.8 118.7,183.2 155.1,207.9 191.5,225.6 227.8,238.9 264.2,250.5 300.5,259.2 336.9,267.2 373.3,272.0 409.6,274.9 446.0,278.0' fill='none' stroke='#f85149' stroke-width='1.8'/><circle cx='446.0' cy='278.0' r='2.6' fill='#f85149'/><rect x='52' y='35' width='10' height='10' fill='#f85149'/><text x='68' y='44' fill='#e6e1d6' font-size='10' font-family='IBM Plex Mono,monospace'>train loss</text></svg></div><div><svg viewBox='0 0 460 320' preserveAspectRatio='xMinYMin meet' width='100%' height='auto' xmlns='http://www.w3.org/2000/svg' style='background:#0a0a0d;border:1px solid #1c1c20;display:block;font-family:"IBM Plex Mono",monospace'><text x='46' y='18' fill='#e6e1d6' font-size='14' font-family='Newsreader,serif' font-style='italic' font-weight='600'>Accuracy</text><line x1='46' y1='292.0' x2='446' y2='292.0' stroke='#1c1c20' stroke-width='1'/><text x='40' y='295.0' fill='#a89e8c' font-size='9' text-anchor='end'>36.2%</text><line x1='46' y1='226.5' x2='446' y2='226.5' stroke='#1c1c20' stroke-width='1'/><text x='40' y='229.5' fill='#a89e8c' font-size='9' text-anchor='end'>52.8%</text><line x1='46' y1='161.0' x2='446' y2='161.0' stroke='#1c1c20' stroke-width='1'/><text x='40' y='164.0' fill='#a89e8c' font-size='9' text-anchor='end'>69.3%</text><line x1='46' y1='95.5' x2='446' y2='95.5' stroke='#1c1c20' stroke-width='1'/><text x='40' y='98.5' fill='#a89e8c' font-size='9' text-anchor='end'>85.9%</text><line x1='46' y1='30.0' x2='446' y2='30.0' stroke='#1c1c20' stroke-width='1'/><text x='40' y='33.0' fill='#a89e8c' font-size='9' text-anchor='end'>102.5%</text><text x='46.0' y='310' fill='#a89e8c' font-size='9' text-anchor='middle'>0</text><text x='446.0' y='310' fill='#a89e8c' font-size='9' text-anchor='middle'>11</text><text x='246.0' y='310' fill='#a89e8c' font-size='10' font-family='Newsreader,serif' font-style='italic' text-anchor='middle'>epoch →</text><text x='14' y='161.0' fill='#a89e8c' font-size='10' font-family='Newsreader,serif' font-style='italic' text-anchor='middle' transform='rotate(-90 14 161.0)'>accuracy →</text><polyline points='46.0,278.0 82.4,203.6 118.7,174.6 155.1,157.9 191.5,145.7 227.8,136.4 264.2,128.2 300.5,122.5 336.9,117.4 373.3,114.0 409.6,112.5 446.0,109.9' fill='none' stroke='#d29922' stroke-width='1.8'/><circle cx='446.0' cy='109.9' r='2.6' fill='#d29922'/><rect x='52' y='35' width='10' height='10' fill='#d29922'/><text x='68' y='44' fill='#e6e1d6' font-size='10' font-family='IBM Plex Mono,monospace'>train top-1</text><polyline points='46.0,226.7 82.4,211.3 118.7,167.9 155.1,165.9 191.5,146.5 227.8,150.6 264.2,133.3 300.5,128.8 336.9,124.2 373.3,120.4 409.6,116.1 446.0,115.9' fill='none' stroke='#58a6ff' stroke-width='1.8'/><circle cx='446.0' cy='115.9' r='2.6' fill='#58a6ff'/><rect x='52' y='51' width='10' height='10' fill='#58a6ff'/><text x='68' y='60' fill='#e6e1d6' font-size='10' font-family='IBM Plex Mono,monospace'>test top-1</text><polyline points='46.0,62.4 82.4,60.8 118.7,50.6 155.1,51.5 191.5,47.4 227.8,47.8 264.2,46.8 300.5,47.4 336.9,44.8 373.3,44.9 409.6,44.6 446.0,44.0' fill='none' stroke='#3fb950' stroke-width='1.8'/><circle cx='446.0' cy='44.0' r='2.6' fill='#3fb950'/><rect x='52' y='67' width='10' height='10' fill='#3fb950'/><text x='68' y='76' fill='#e6e1d6' font-size='10' font-family='IBM Plex Mono,monospace'>test top-5</text></svg></div></div></section>
-<section class='card' style='--i:6'><h2>Deep inspection</h2><p style='color:var(--paper-dim);font-size:0.9em;margin-bottom:6px'>Audit excerpts, reasoning blob, raw configuration, and full metrics JSON — expand sections of interest.</p><details class='deep'><summary>Research-scientist critique (addendum)</summary><div class='body'><div style='margin-bottom:12px'><span style='margin-right:4px;display:inline-block'><span class='vbadge' style='display:inline-block;padding:3px 10px;border:1px solid #8b949e;color:#8b949e;font-weight:600;font-size:10px;font-family:"IBM Plex Mono",monospace;text-transform:uppercase;letter-spacing:0.16em;transition:transform 160ms ease,filter 160ms ease;background:transparent' title='**NUMEROLOGY** — Already disconfirmed at single seed and the disconfirmation is consistent with RegNet&#39;s literature finding that width-exponents ~2.5-2.9 (not φ) dominate. The &quot;mod-8 collapse&quot; excuse is technically valid but irrelevant: the prior loses at every config tested so far.'><span style='opacity:0.65'>sci-critic</span> &nbsp;NUMEROLOGY</span></span></div><pre style='border-left:2px solid var(--v-novel)'>*Reviewer: SciCritic-G1 (elite-research-scientist critic). Critiquing the IDEA, not the implementation (that audit lives at `audits/G1_audit.md`).*
-
-### Prior plausibility (independent of nature-inspired framing)
-**LOW.** The doc itself documents that the prior already failed at single seed: T1.1 and T1.2 both produced top-1=80.11% (vs 82.16% vanilla), a **−2.05pp regression**. The author&#39;s response is to claim the mod-8 rounding collapsed phi and Fib to the same widths, which is true — but the deeper finding is that *neither* schedule beat linear doubling, even before the collapse mattered. The honest read is: at c0=16 the prior has been tested and lost.
-
-### Mechanism scrutiny — does the claimed mechanism predict the effect?
-The &quot;because&quot; clause: *&quot;finer per-stage capacity granularity (ratio 1.618 vs 2.0) and better matching of effective rank growth to the data manifold&#39;s intrinsic-dimension increase.&quot;* The &quot;effective rank growth&quot; claim is unsupported — there is no measurement of effective rank in the protocol, no prediction of the manifold intrinsic dimension at each stage, and no theoretical reason the manifold dimension should grow by φ (Pope et al 2021 *Intrinsic Dimension of Images and Its Impact on Learning* arXiv:2104.08894 found ID is roughly constant or decreasing across CNN stages, not growing).
-
-### Confounds — what else could explain a positive (or negative) result?
-1. **Param-count drop**: T1.1/T1.2 used 127k vs 186k vanilla (−32%); the top-1 regression is largely a capacity loss confound.
-2. **Mod-8 alignment**: at small c0 the φ and Fib schedules quantise to identical channels — the prior is operationally invisible.
-3. **Stage-count interaction**: with only 3 stages the φ-ratio compounds twice (16 → 26 → 42); the geometric mean ratio (42/16)^(1/2) ≈ 1.62 — *exactly* φ in the limit but with only 2 transitions, statistical power is near zero.
-
-### Numerology check — does φ specifically matter?
-**The experiment already says no**: mod-8 rounding collapsed φ and Fib to identical configurations and both lost. **Kill-or-confirm**: at c0=64, n_stages=4, run {linear-2, φ, 1.5, 1.7, Fib} all with mod-8 rounding *and* a separate set with mod-1 (no rounding) to see if rounding is what matters. If mod-1 still gives Δ &lt; 0.3pp across {1.5, φ, 1.7}, φ is decorative.
-
-### Literature: precedent or rediscovery?
-**Direct precedent**: Howard et al 2019 *Searching for MobileNetV3* (arXiv:1905.02244) and Radosavovic et al 2020 *Designing Network Design Spaces — RegNet* (arXiv:2003.13678) explicitly parametrise width-progression and empirically find non-power-of-two width schedules optimal — but the optimal exponents found by RegNet are **2.5 to 2.9**, not φ ≈ 1.618. The RegNet finding is essentially the falsifier the doc dodges.
-
-### Expected effect size — skeptical a-priori re-prediction
-Doc predicts +0.5 to +1.5 pp at iso-params. Observed data says −2.05 pp at non-iso-params. My prior at *strictly iso-params* with separated widths: Δ(top-1) ∈ [−0.4, +0.4] pp (90% CI). RegNet&#39;s finding of width-exponent ~2.6 actively argues against φ.
-
-### Minimum-distinguishing experiment
-**Already half-done — finish it**: c0=64, n_stages=4, mod-8 widths {[64,128,256,512], [64,104,168,272], [64,96,144,216], [64,112,192,328]} corresponding to ratios {2.0, φ, 1.5, 1.7}, at iso-param via depth-tuning, 12 epochs, 3 seeds. If any of {1.5, 1.7} matches or beats φ, the φ-specificity claim dies.
-
-### Verdict
-**NUMEROLOGY** — Already disconfirmed at single seed and the disconfirmation is consistent with RegNet&#39;s literature finding that width-exponents ~2.5-2.9 (not φ) dominate. The &quot;mod-8 collapse&quot; excuse is technically valid but irrelevant: the prior loses at every config tested so far.</pre></div></details><details class='deep'><summary>Implementation-critic audit (audits/G1_audit.md)</summary><div class='body'><div style='margin-bottom:12px'><a href='https://github.com/dlmastery/nature_inspired_networks/blob/main/audits/G1_audit.md#h04-g1' style='text-decoration:none;border-bottom:none;margin-right:4px;display:inline-block'><span class='vbadge' style='display:inline-block;padding:3px 10px;border:1px solid #d29922;color:#d29922;font-weight:600;font-size:10px;font-family:"IBM Plex Mono",monospace;text-transform:uppercase;letter-spacing:0.16em;transition:transform 160ms ease,filter 160ms ease;background:transparent' title='`fibonacci_channels(c0, n, mode=&#39;fib&#39;)` uses fib sequence `[1, 2, 3, 5, 8, 13, ...]` (starting `[1, 2]`, base=fib[1]=2) and computes `c = round(c0 * fib[k+1] / 2)` round-to-8 (priors.py:34– 41). For c0=32, n=4: produces `[32, 48, 80, 128]` ✓. `mode=&#39;phi&#39;` produces `[round8(c0 * phi**k)]` — for c0=32 n=4: `[32, 48, 80, 136]`.'><span style='opacity:0.65'>impl-critic</span> &nbsp;MINOR</span></a></div><div class='quote'>**Module:** `src/nature_inspired_networks/priors.py:fibonacci_channels`
-**Verdict:** MINOR
-
-**Mechanism check:** `fibonacci_channels(c0, n, mode=&#39;fib&#39;)` uses fib
-sequence `[1, 2, 3, 5, 8, 13, ...]` (starting `[1, 2]`, base=fib[1]=2)
-and computes `c = round(c0 * fib[k+1] / 2)` round-to-8 (priors.py:34–
-41). For c0=32, n=4: produces `[32, 48, 80, 128]` ✓.
-`mode=&#39;phi&#39;` produces `[round8(c0 * phi**k)]` — for c0=32 n=4:
-`[32, 48, 80, 136]`.
-
-**Math correctness:** Both modes are mathematically faithful to their
-respective recurrences. The H04 doc&#39;s &quot;mod-8 collapse at c0=16, n=3&quot;
-is **reproducible exactly** here (`fib` and `phi` both yield
-`[16, 24, 40]`). That is the **acknowledged methodological lesson**
+<section class='card' style='--i:6'><h2>Deep inspection</h2><p style='color:var(--paper-dim);font-size:0.9em;margin-bottom:6px'>Audit excerpts, reasoning blob, raw configuration, and full metrics JSON — expand sections of interest.</p><details class='deep'><summary>Research-scientist critique (addendum)</summary><div class='body'><div style='margin-bottom:12px'><span style='margin-right:4px;display:inline-block'><span class='vbadge' style='display:inline-block;padding:3px 10px;border:1px solid #8b949e;color:#8b949e;font-weight:600;font-size:10px;font-family:"IBM Plex Mono",monospace;text-transform:uppercase;letter-spacing:0.16em;transition:transform 160ms ease,filter 160ms ease;background:transparent' title='**NUMEROLOGY** — Already disconfirmed at single seed and the disconfirmation is consistent with RegNet&#39;s literature finding that width-exponents ~2.5-2.9 (not φ) dominate. The &quot;mod-8 collapse&quot; excuse is technically valid but irrelevant: the prior loses at every config tested so far.'><span style='opacity:0.65'>sci-critic</span> &nbsp;NUMEROLOGY</span></span></div><div class='md-body' style='border-left:2px solid var(--v-novel);padding:8px 14px;background:var(--panel2);border-radius:5px'><p><em>Reviewer: SciCritic-G1 (elite-research-scientist critic). Critiquing the IDEA, not the implementation (that audit lives at <code>audits/G1_audit.md</code>).</em></p>
+<h3>Prior plausibility (independent of nature-inspired framing)</h3>
+<p><strong>LOW.</strong> The doc itself documents that the prior already failed at single seed: T1.1 and T1.2 both produced top-1=80.11% (vs 82.16% vanilla), a <strong>−2.05pp regression</strong>. The author&rsquo;s response is to claim the mod-8 rounding collapsed phi and Fib to the same widths, which is true — but the deeper finding is that <em>neither</em> schedule beat linear doubling, even before the collapse mattered. The honest read is: at c0=16 the prior has been tested and lost.</p>
+<h3>Mechanism scrutiny — does the claimed mechanism predict the effect?</h3>
+<p>The &ldquo;because&rdquo; clause: <em>&ldquo;finer per-stage capacity granularity (ratio 1.618 vs 2.0) and better matching of effective rank growth to the data manifold&rsquo;s intrinsic-dimension increase.&rdquo;</em> The &ldquo;effective rank growth&rdquo; claim is unsupported — there is no measurement of effective rank in the protocol, no prediction of the manifold intrinsic dimension at each stage, and no theoretical reason the manifold dimension should grow by φ (Pope et al 2021 <em>Intrinsic Dimension of Images and Its Impact on Learning</em> arXiv:2104.08894 found ID is roughly constant or decreasing across CNN stages, not growing).</p>
+<h3>Confounds — what else could explain a positive (or negative) result?</h3>
+<ol>
+<li><strong>Param-count drop</strong>: T1.1/T1.2 used 127k vs 186k vanilla (−32%); the top-1 regression is largely a capacity loss confound.</li>
+<li><strong>Mod-8 alignment</strong>: at small c0 the φ and Fib schedules quantise to identical channels — the prior is operationally invisible.</li>
+<li><strong>Stage-count interaction</strong>: with only 3 stages the φ-ratio compounds twice (16 → 26 → 42); the geometric mean ratio (42/16)^(1/2) ≈ 1.62 — <em>exactly</em> φ in the limit but with only 2 transitions, statistical power is near zero.</li>
+</ol>
+<h3>Numerology check — does φ specifically matter?</h3>
+<p><strong>The experiment already says no</strong>: mod-8 rounding collapsed φ and Fib to identical configurations and both lost. <strong>Kill-or-confirm</strong>: at c0=64, n_stages=4, run {linear-2, φ, 1.5, 1.7, Fib} all with mod-8 rounding <em>and</em> a separate set with mod-1 (no rounding) to see if rounding is what matters. If mod-1 still gives Δ &lt; 0.3pp across {1.5, φ, 1.7}, φ is decorative.</p>
+<h3>Literature: precedent or rediscovery?</h3>
+<p><strong>Direct precedent</strong>: Howard et al 2019 <em>Searching for MobileNetV3</em> (arXiv:1905.02244) and Radosavovic et al 2020 <em>Designing Network Design Spaces — RegNet</em> (arXiv:2003.13678) explicitly parametrise width-progression and empirically find non-power-of-two width schedules optimal — but the optimal exponents found by RegNet are <strong>2.5 to 2.9</strong>, not φ ≈ 1.618. The RegNet finding is essentially the falsifier the doc dodges.</p>
+<h3>Expected effect size — skeptical a-priori re-prediction</h3>
+<p>Doc predicts +0.5 to +1.5 pp at iso-params. Observed data says −2.05 pp at non-iso-params. My prior at <em>strictly iso-params</em> with separated widths: Δ(top-1) ∈ [−0.4, +0.4] pp (90% CI). RegNet&rsquo;s finding of width-exponent ~2.6 actively argues against φ.</p>
+<h3>Minimum-distinguishing experiment</h3>
+<p><strong>Already half-done — finish it</strong>: c0=64, n_stages=4, mod-8 widths {[64,128,256,512], [64,104,168,272], [64,96,144,216], [64,112,192,328]} corresponding to ratios {2.0, φ, 1.5, 1.7}, at iso-param via depth-tuning, 12 epochs, 3 seeds. If any of {1.5, 1.7} matches or beats φ, the φ-specificity claim dies.</p>
+<h3>Verdict</h3>
+<p><strong>NUMEROLOGY</strong> — Already disconfirmed at single seed and the disconfirmation is consistent with RegNet&rsquo;s literature finding that width-exponents ~2.5-2.9 (not φ) dominate. The &ldquo;mod-8 collapse&rdquo; excuse is technically valid but irrelevant: the prior loses at every config tested so far.</p></div></div></details><details class='deep'><summary>Implementation-critic audit (audits/G1_audit.md)</summary><div class='body'><div style='margin-bottom:12px'><a href='https://github.com/dlmastery/nature_inspired_networks/blob/main/audits/G1_audit.md#h04-g1' style='text-decoration:none;border-bottom:none;margin-right:4px;display:inline-block'><span class='vbadge' style='display:inline-block;padding:3px 10px;border:1px solid #d29922;color:#d29922;font-weight:600;font-size:10px;font-family:"IBM Plex Mono",monospace;text-transform:uppercase;letter-spacing:0.16em;transition:transform 160ms ease,filter 160ms ease;background:transparent' title='`fibonacci_channels(c0, n, mode=&#39;fib&#39;)` uses fib sequence `[1, 2, 3, 5, 8, 13, ...]` (starting `[1, 2]`, base=fib[1]=2) and computes `c = round(c0 * fib[k+1] / 2)` round-to-8 (priors.py:34– 41). For c0=32, n=4: produces `[32, 48, 80, 128]` ✓. `mode=&#39;phi&#39;` produces `[round8(c0 * phi**k)]` — for c0=32 n=4: `[32, 48, 80, 136]`.'><span style='opacity:0.65'>impl-critic</span> &nbsp;MINOR</span></a></div><div class='quote md-body'><p><strong>Module:</strong> <code>src/nature_inspired_networks/priors.py:fibonacci_channels</code>
+<strong>Verdict:</strong> MINOR</p>
+<p><strong>Mechanism check:</strong> <code>fibonacci_channels(c0, n, mode='fib')</code> uses fib
+sequence <code>[1, 2, 3, 5, 8, 13, ...]</code> (starting <code>[1, 2]</code>, base=fib[1]=2)
+and computes <code>c = round(c0 * fib[k+1] / 2)</code> round-to-8 (priors.py:34–
+41). For c0=32, n=4: produces <code>[32, 48, 80, 128]</code> ✓.
+<code>mode='phi'</code> produces <code>[round8(c0 * phi**k)]</code> — for c0=32 n=4:
+<code>[32, 48, 80, 136]</code>.</p>
+<p><strong>Math correctness:</strong> Both modes are mathematically faithful to their
+respective recurrences. The H04 doc&rsquo;s &ldquo;mod-8 collapse at c0=16, n=3&rdquo;
+is <strong>reproducible exactly</strong> here (<code>fib</code> and <code>phi</code> both yield
+<code>[16, 24, 40]</code>). That is the <strong>acknowledged methodological lesson</strong>
 in the doc, not a bug — but the doc says the planned re-run should
-use **c0=32, n=4** to separate the variants.
-
-**Test rigor:** `test_fibonacci_channels_phi_grows_geometrically`
-asserts `1.2 &lt; b/a &lt; 2.2` (test_priors.py:39–42) — this is **far too
-loose**; `1.2 &lt; 2 &lt; 2.2` would let a 2x doubling baseline pass as
-&quot;phi-grown&quot;. The bound should be tightened to `1.5 &lt; b/a &lt; 1.75`
-to be mechanism-discriminating. `test_fibonacci_channels_fib_monotonic_and_div8`
-only asserts monotonicity, not the Fibonacci ratio (e.g., `(F[k+1] /
-F[k])` should approach phi from above/below alternately). **No test
-asserts that `mode=&#39;fib&#39;` actually produces a Fibonacci-derived
-sequence** rather than any monotone div-8 sequence — a regression
-where someone replaces `fib[k+1] / 2` with `2**k` would pass all
-existing tests.
-
-**Citation alignment:** EfficientNet (Tan &amp; Le 2019), ResNet (He
-2016), MobileNets (Howard 2017). All correct.
-
-**Bugs / cargo-cult:**
-- **`phi_compound` mode is a verbatim copy of `phi` mode** (priors.py:
-  45–51 with the comment &quot;identical to &#39;phi&#39; at k=0 but kept as a
-  distinct mode so the H01 sweep row carries a non-overlapping tag&quot;).
-  This is a **documentation/labelling hack**, not a real H01 mechanism
-  implementation in this function — H01&#39;s true mechanism lives in
-  `scaling.phi_compound_channels`. A sweep row tagged `phi_compound`
-  via `fibonacci_channels(mode=&#39;phi_compound&#39;)` is **bit-identical to
-  the `phi` row**. If experiments rely on this tag to distinguish H01
-  from H04, the experimental design is **observationally
-  underdetermined**.
-
-**Concrete fix:**
-1. Tighten `test_fibonacci_channels_phi_grows_geometrically` to
-   `1.55 &lt; b/a &lt; 1.75` (around `PHI ± 0.07`).
-2. Add `test_fibonacci_channels_fib_matches_fibonacci_recurrence`
-   that asserts `widths[k] / widths[k-1] → phi` as k → ∞.
-3. Either delete the `phi_compound` mode (it adds nothing over
-   `phi`) or make it actually call `scaling.phi_compound_channels`
-   so H01-tagged sweep rows really invoke the H01 width recurrence.
-
----</div><p style='margin-top:12px'><a href='https://github.com/dlmastery/nature_inspired_networks/blob/main/audits/G1_audit.md#h04-g1'>↗ Full audit on GitHub</a> <span class='mono' style='color:var(--paper-dim);font-size:0.78em'>audits/G1_audit.md</span></p></div></details><details class='deep'><summary>Reasoning blob (reasoning.json)</summary><div class='body'><p class='empty'>No <code>reasoning.json</code> for this run directory.</p></div></details><details class='deep'><summary>Configuration dump</summary><div class='body'><p class='mono' style='color:var(--paper-dim);font-size:0.8em;margin-bottom:8px'>inferred from experiment_log.jsonl + metrics.json</p><pre>{
+use <strong>c0=32, n=4</strong> to separate the variants.</p>
+<p><strong>Test rigor:</strong> <code>test_fibonacci_channels_phi_grows_geometrically</code>
+asserts <code>1.2 &lt; b/a &lt; 2.2</code> (test_priors.py:39–42) — this is <strong>far too
+loose</strong>; <code>1.2 &lt; 2 &lt; 2.2</code> would let a 2x doubling baseline pass as
+&ldquo;phi-grown&rdquo;. The bound should be tightened to <code>1.5 &lt; b/a &lt; 1.75</code>
+to be mechanism-discriminating. <code>test_fibonacci_channels_fib_monotonic_and_div8</code>
+only asserts monotonicity, not the Fibonacci ratio (e.g., <code>(F[k+1] /
+F[k])</code> should approach phi from above/below alternately). <strong>No test
+asserts that <code>mode='fib'</code> actually produces a Fibonacci-derived
+sequence</strong> rather than any monotone div-8 sequence — a regression
+where someone replaces <code>fib[k+1] / 2</code> with <code>2**k</code> would pass all
+existing tests.</p>
+<p><strong>Citation alignment:</strong> EfficientNet (Tan &amp; Le 2019), ResNet (He
+2016), MobileNets (Howard 2017). All correct.</p>
+<p><strong>Bugs / cargo-cult:</strong>
+- <strong><code>phi_compound</code> mode is a verbatim copy of <code>phi</code> mode</strong> (priors.py:
+  45–51 with the comment &ldquo;identical to &lsquo;phi&rsquo; at k=0 but kept as a
+  distinct mode so the H01 sweep row carries a non-overlapping tag&rdquo;).
+  This is a <strong>documentation/labelling hack</strong>, not a real H01 mechanism
+  implementation in this function — H01&rsquo;s true mechanism lives in
+  <code>scaling.phi_compound_channels</code>. A sweep row tagged <code>phi_compound</code>
+  via <code>fibonacci_channels(mode='phi_compound')</code> is <strong>bit-identical to
+  the <code>phi</code> row</strong>. If experiments rely on this tag to distinguish H01
+  from H04, the experimental design is <strong>observationally
+  underdetermined</strong>.</p>
+<p><strong>Concrete fix:</strong>
+1. Tighten <code>test_fibonacci_channels_phi_grows_geometrically</code> to
+   <code>1.55 &lt; b/a &lt; 1.75</code> (around <code>PHI ± 0.07</code>).
+2. Add <code>test_fibonacci_channels_fib_matches_fibonacci_recurrence</code>
+   that asserts <code>widths[k] / widths[k-1] → phi</code> as k → ∞.
+3. Either delete the <code>phi_compound</code> mode (it adds nothing over
+   <code>phi</code>) or make it actually call <code>scaling.phi_compound_channels</code>
+   so H01-tagged sweep rows really invoke the H01 width recurrence.</p>
+<hr></div><p style='margin-top:12px'><a href='https://github.com/dlmastery/nature_inspired_networks/blob/main/audits/G1_audit.md#h04-g1'>↗ Full audit on GitHub</a> <span class='mono' style='color:var(--paper-dim);font-size:0.78em'>audits/G1_audit.md</span></p></div></details><details class='deep'><summary>Reasoning blob (reasoning.json)</summary><div class='body'><p class='empty'>No <code>reasoning.json</code> for this run directory.</p></div></details><details class='deep'><summary>Configuration dump</summary><div class='body'><p class='mono' style='color:var(--paper-dim);font-size:0.8em;margin-bottom:8px'>inferred from experiment_log.jsonl + metrics.json</p><pre>{
   &quot;tag&quot;: &quot;sg_chan_phi&quot;,
   &quot;model&quot;: &quot;NaturePrior&quot;,
   &quot;dataset&quot;: &quot;cifar10&quot;,

@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang='en'><head><meta charset='utf-8'>
 <title>sg_only_fib_depth · seed 0 · cifar100 — experiment page</title>
-<link rel='preconnect' href='https://fonts.googleapis.com'><link rel='preconnect' href='https://fonts.gstatic.com' crossorigin><link href='https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;0,6..72,800;1,6..72,400;1,6..72,600&family=IBM+Plex+Serif:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap' rel='stylesheet'>
+<link rel='preconnect' href='https://fonts.googleapis.com'><link rel='preconnect' href='https://fonts.gstatic.com' crossorigin><link href='https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600;8..60,700&family=IBM+Plex+Mono:wght@400;500;600&display=swap' rel='stylesheet'>
 <style>
  :root{
    --ink:#0a0a0d; --paper:#e6e1d6; --paper-dim:#a89e8c;
@@ -23,20 +23,38 @@
 
  *{margin:0;padding:0;box-sizing:border-box;}
  html,body{background:var(--ink);}
- body{font-family:'IBM Plex Serif','Charter',Georgia,serif;color:var(--paper);
-      padding:32px 36px 80px;line-height:1.55;max-width:1180px;margin:0 auto;
-      font-size:16px;font-variant-numeric:tabular-nums;position:relative;}
+ body{font-family:'Source Serif 4','Charter','Source Serif Pro',Georgia,serif;
+      color:var(--paper);padding:32px 36px 80px;line-height:1.6;
+      max-width:1180px;margin:0 auto;font-size:16px;
+      font-variant-numeric:tabular-nums;position:relative;}
  a{color:var(--v-derivative);text-decoration:none;border-bottom:1px solid transparent;
    transition:border-color 160ms ease;}
  a:hover{border-bottom-color:var(--v-derivative);text-decoration:none;}
- h1{font-family:'Newsreader',serif;font-weight:600;font-style:italic;
-    font-size:42px;line-height:1.05;color:var(--paper);letter-spacing:-0.01em;
+ h1{font-family:'Source Serif 4',Georgia,serif;font-weight:600;
+    font-size:34px;line-height:1.15;color:var(--paper);letter-spacing:-0.005em;
     margin-bottom:6px;}
- h2{font-family:'Newsreader',serif;font-weight:600;font-style:italic;
-    font-size:22px;color:var(--paper);margin-bottom:14px;letter-spacing:-0.005em;}
+ h2{font-family:'Source Serif 4',Georgia,serif;font-weight:600;
+    font-size:20px;color:var(--paper);margin-bottom:14px;letter-spacing:-0.003em;}
  h3{font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:11px;
-    text-transform:uppercase;letter-spacing:0.18em;color:var(--paper-dim);
+    text-transform:uppercase;letter-spacing:0.16em;color:var(--paper-dim);
     margin:18px 0 8px 0;}
+ .md-body p{margin:8px 0 12px 0;}
+ .md-body p:first-child{margin-top:0;} .md-body p:last-child{margin-bottom:0;}
+ .md-body strong,.md-body b{color:var(--paper);font-weight:600;}
+ .md-body em,.md-body i{font-style:italic;}
+ .md-body code{font-family:'IBM Plex Mono',monospace;font-size:0.86em;
+    background:var(--panel2);padding:1px 5px;border-radius:3px;}
+ .md-body pre{font-family:'IBM Plex Mono',monospace;font-size:0.85em;
+    background:var(--panel2);padding:10px 12px;border-radius:5px;
+    border:1px solid var(--rule);overflow-x:auto;margin:10px 0;}
+ .md-body ul,.md-body ol{margin:8px 0 12px 22px;}
+ .md-body li{margin:3px 0;}
+ .md-body blockquote{border-left:3px solid var(--accent-dim);
+    padding:6px 14px;margin:10px 0;color:var(--paper-dim);font-style:italic;}
+ .md-body table{border-collapse:collapse;margin:10px 0;font-size:0.92em;}
+ .md-body th,.md-body td{border:1px solid var(--rule);padding:6px 10px;
+    text-align:left;}
+ .md-body th{background:var(--panel2);font-weight:600;}
  .mono{font-family:'IBM Plex Mono',monospace;font-size:0.85em;}
  .head-grid{display:grid;grid-template-columns:1fr auto;gap:24px;
             align-items:start;padding-bottom:18px;
@@ -177,76 +195,63 @@
 </div>
 <div class='kn-strip' style='--i:1'><div class='kn-tile tint-neg'><div class='kn-val'>51.78%</div><div class='kn-lbl'>top-1</div></div><div class='kn-tile tint-neu'><div class='kn-val'>0.5187</div><div class='kn-lbl'>composite</div></div><div class='kn-tile tint-neg'><div class='kn-val'>−4.74pp</div><div class='kn-lbl'>Δ vs baseline</div></div><div class='kn-tile tint-neu'><div class='kn-val'>0.184M</div><div class='kn-lbl'>params</div></div><div class='kn-tile tint-neu'><div class='kn-val'>5.22ms</div><div class='kn-lbl'>latency b=1</div></div></div>
 <section class='card' style='--i:2'><h2>Hypothesis H02 — <i>H02 — Fibonacci Depth Progression (stage block counts 3-5-8-13-21)</i></h2><div style='margin:2px 0 18px 0'><a href='https://github.com/dlmastery/nature_inspired_networks/blob/main/audits/G1_audit.md#h02-g1' style='text-decoration:none;border-bottom:none;margin-right:4px;display:inline-block'><span class='vbadge' style='display:inline-block;padding:3px 10px;border:1px solid #d29922;color:#d29922;font-weight:600;font-size:10px;font-family:"IBM Plex Mono",monospace;text-transform:uppercase;letter-spacing:0.16em;transition:transform 160ms ease,filter 160ms ease;background:transparent' title='`fibonacci_sequence(n)` returns the canonical `(1, 1)`-start sequence (scaling.py:84–92). `fibonacci_depths(n_stages=4, start_index=3)` correctly produces `[3, 5, 8, 13]` (the H02 spec schedule). `resolve_blocks_schedule` correctly dispatches uniform / fib / linear.'><span style='opacity:0.65'>impl</span> &nbsp;MINOR</span></a><span style='margin-right:4px;display:inline-block'><span class='vbadge' style='display:inline-block;padding:3px 10px;border:1px solid #58a6ff;color:#58a6ff;font-weight:600;font-size:10px;font-family:"IBM Plex Mono",monospace;text-transform:uppercase;letter-spacing:0.16em;transition:transform 160ms ease,filter 160ms ease;background:transparent' title='**DERIVATIVE+TESTABLE** — Re-labelling of the known &quot;deeper-stage-3/4 is good&quot; finding as a Fibonacci recurrence. The composite-formula manipulation in §7.1 is a Rule 2 violation that should be flagged separately to the audit agent.'><span style='opacity:0.65'>sci</span> &nbsp;DERIVATIVE+TESTABLE</span></span></div><p style='font-family:Newsreader,serif;font-style:italic;font-size:1.08em;color:#e6e1d6;line-height:1.5;border-left:2px solid var(--accent);padding-left:14px;margin:6px 0 16px 0'>Allocating per-stage block counts to consecutive Fibonacci numbers (3, 5, 8, 13, 21) converges 1.5x to 2x faster than uniform or linearly-spaced depth schedules at iso-parameter budget.</p><h3>Motivation</h3><p>The Fibonacci sequence F(n) = F(n-1) + F(n-2) emerges wherever an additive recurrence governs growth: rabbit population dynamics (the original Pisa monk problem, 1202), branching of trees and lung bronchioles, the spiral of mollusc shells, and crucially the segmental patterning of vertebrate somites. The biological precedent is striking: in early embryogenesis, somite pair counts follow Fibonacci-like progressions because each new segment inherits the resource budget of the two previous segments. ResNet-style backbones already place more blocks in deeper stages -- ResNet-50 uses 3-4-6-3 -- but the allocation is found by trial and error. We hypothesise that Fibonacci allocation is not an aesthetic accident but the unique discrete sequence that satisfies (a) monotone growth, (b) bounded ratio (F(n+1)/F(n) -&gt; phi), and (c) sum_{i=1}^{n} F(i) = F(n+2) - 1, which means total depth budget can be predicted in closed form. The information-theoretic optimum for layer allocation in a representation hierarchy follows the same Fibonacci recurrence because each stage&#39;s expressive capacity is the sum of what the previous two stages introduced.</p><h3>Formal hypothesis</h3><p style='font-family:Newsreader,serif;font-style:italic;color:#e6e1d6'>Because Fibonacci depth progression imposes a F(n) = F(n-1) + F(n-2) recurrence on per-stage block counts, the mechanism through which it should reduce time-to-target is that each new stage receives an expressive-capacity budget equal to the sum of the two prior stages (matching biological somite resource inheritance) per Larsson et al 2017. We expect epochs-to-72-pct-top-1 on CIFAR-100 to drop by 30-50 pct vs a uniform 8-8-8-8 schedule at iso-parameter budget, with no loss in final accuracy.</p><details class='deep'><summary>Read the full design-doc digest</summary><div class='body'><h3>Mechanism (because…)</h3><p>Stage configurations:</p><h3>Numeric falsifier</h3><p>If a Fibonacci-staged backbone (3-5-8-13 blocks, depth 29) reaches top-1 = 72 percent on CIFAR-100 at epoch_F, and a uniform 7-7-7-8 schedule (depth 29) reaches the same accuracy at epoch_U, with epoch_F &gt;= 0.85 * epoch_U at 3-seed median, the convergence-speedup claim is FALSIFIED and Status moves to `x disproved`.</p><h3>Predicted Δ</h3><p>| metric | Delta vs baseline | rationale | |---|---|---| | composite | [+0.000, +0.020] | accuracy preserved, params slightly higher | | top-1 (CIFAR-100, CNN) | [+0.2, +0.8] pp | better hierarchy after equal training time | | perplexity (WikiText-103 LLM) | [-0.3, +0.1] | tied tiers may help or hurt depending on data | | params | [+30, +80] pct vs uniform iso-depth | Fib widening dominates | | FLOPs | [+25, +60] pct | same reason | | GPU latency (batch=1) | [+15, +40] pct | more deep-stage blocks | | rotation-equivariance err | [-0.005, +0.005] | prior is depth-symmetric | | KV cache @ 32k (LLM) | [-50, -20] pct | weight tying compresses KV | | Betti collapse rate | [+0.05, +0.15] | hierarchy compresses faster |</p><p style='margin-top:14px'><a href='https://github.com/dlmastery/nature_inspired_networks/blob/main/hypotheses/g1_scaling_growth/H02_fibonacci_depth_progression.md'>↗ Full design doc on GitHub</a> <span class='mono' style='color:var(--paper-dim);font-size:0.78em'>hypotheses/g1_scaling_growth/H02_fibonacci_depth_progression.md</span></p></div></details></section>
-<section class='card' style='--i:3'><h2>Verdict <span class='mono' style='font-size:0.55em;letter-spacing:0.18em;color:var(--paper-dim);font-style:normal'>FINDINGS.md</span></h2><div class='quote'>`fib_depth` reaches the #3 composite slot at **0.66× the baseline parameter count** — the priors that touch *scaling* (depth schedule, channel schedule) are consistently the most parameter-efficient family, even when raw top-1 trails. Worth a CIFAR-100 look as the &quot;small-model&quot; graduate.</div><p style='margin-top:14px'><a href='https://github.com/dlmastery/nature_inspired_networks/blob/main/FINDINGS.md'>↗ Full FINDINGS.md on GitHub</a></p></section>
+<section class='card' style='--i:3'><h2>Verdict <span class='mono' style='font-size:0.55em;letter-spacing:0.18em;color:var(--paper-dim);font-style:normal'>FINDINGS.md</span></h2><div class='quote md-body'><p><code>fib_depth</code> reaches the #3 composite slot at <strong>0.66× the baseline parameter count</strong> — the priors that touch <em>scaling</em> (depth schedule, channel schedule) are consistently the most parameter-efficient family, even when raw top-1 trails. Worth a CIFAR-100 look as the &ldquo;small-model&rdquo; graduate.</p></div><p style='margin-top:14px'><a href='https://github.com/dlmastery/nature_inspired_networks/blob/main/FINDINGS.md'>↗ Full FINDINGS.md on GitHub</a></p></section>
 <section class='card' style='--i:4'><h2>Composite-score breakdown</h2><div class='comp-stack'><div class='seg pos' style='width:87.70%' title='top-1 = 0.51780'>top-1 +0.5178</div><div class='seg params' style='width:6.22%' title='-0.05·log10(params_M)'>params +0.03675</div><div class='seg lat' style='width:6.07%' title='-0.05·log10(latency_ms)'>lat −0.03587</div></div><div style='display:flex;justify-content:space-between;font-family:IBM Plex Mono,monospace;font-size:11px;color:var(--paper-dim);margin-top:6px'><span>Σ recomputed: <b style='color:var(--paper)'>0.51868</b></span><span>reported: <b style='color:var(--paper)'>0.51868</b> &nbsp;·&nbsp; Δ +0.000000</span></div><div class='formula-chip' style='margin-top:14px'>composite ≔ <code>top1 - 0.05*log10(params_M) - 0.05*log10(latency_ms)</code></div></section>
 <section class='card' style='--i:5'><h2>Per-epoch training curves</h2><div class='charts'><div><svg viewBox='0 0 460 320' preserveAspectRatio='xMinYMin meet' width='100%' height='auto' xmlns='http://www.w3.org/2000/svg' style='background:#0a0a0d;border:1px solid #1c1c20;display:block;font-family:"IBM Plex Mono",monospace'><text x='46' y='18' fill='#e6e1d6' font-size='14' font-family='Newsreader,serif' font-style='italic' font-weight='600'>Loss</text><line x1='46' y1='292.0' x2='446' y2='292.0' stroke='#1c1c20' stroke-width='1'/><text x='40' y='295.0' fill='#a89e8c' font-size='9' text-anchor='end'>2.098</text><line x1='46' y1='226.5' x2='446' y2='226.5' stroke='#1c1c20' stroke-width='1'/><text x='40' y='229.5' fill='#a89e8c' font-size='9' text-anchor='end'>2.662</text><line x1='46' y1='161.0' x2='446' y2='161.0' stroke='#1c1c20' stroke-width='1'/><text x='40' y='164.0' fill='#a89e8c' font-size='9' text-anchor='end'>3.227</text><line x1='46' y1='95.5' x2='446' y2='95.5' stroke='#1c1c20' stroke-width='1'/><text x='40' y='98.5' fill='#a89e8c' font-size='9' text-anchor='end'>3.791</text><line x1='46' y1='30.0' x2='446' y2='30.0' stroke='#1c1c20' stroke-width='1'/><text x='40' y='33.0' fill='#a89e8c' font-size='9' text-anchor='end'>4.355</text><text x='46.0' y='310' fill='#a89e8c' font-size='9' text-anchor='middle'>0</text><text x='446.0' y='310' fill='#a89e8c' font-size='9' text-anchor='middle'>29</text><text x='246.0' y='310' fill='#a89e8c' font-size='10' font-family='Newsreader,serif' font-style='italic' text-anchor='middle'>epoch →</text><text x='14' y='161.0' fill='#a89e8c' font-size='10' font-family='Newsreader,serif' font-style='italic' text-anchor='middle' transform='rotate(-90 14 161.0)'>loss →</text><polyline points='46.0,44.0 59.8,97.1 73.6,126.1 87.4,151.3 101.2,169.6 115.0,184.4 128.8,195.7 142.6,204.9 156.3,214.8 170.1,221.3 183.9,228.8 197.7,234.6 211.5,239.5 225.3,244.6 239.1,249.1 252.9,252.5 266.7,256.5 280.5,259.1 294.3,262.9 308.1,265.1 321.9,267.4 335.7,269.8 349.4,271.5 363.2,273.5 377.0,274.4 390.8,275.6 404.6,276.6 418.4,277.7 432.2,277.8 446.0,278.0' fill='none' stroke='#f85149' stroke-width='1.8'/><circle cx='446.0' cy='278.0' r='2.6' fill='#f85149'/><rect x='52' y='35' width='10' height='10' fill='#f85149'/><text x='68' y='44' fill='#e6e1d6' font-size='10' font-family='IBM Plex Mono,monospace'>train loss</text></svg></div><div><svg viewBox='0 0 460 320' preserveAspectRatio='xMinYMin meet' width='100%' height='auto' xmlns='http://www.w3.org/2000/svg' style='background:#0a0a0d;border:1px solid #1c1c20;display:block;font-family:"IBM Plex Mono",monospace'><text x='46' y='18' fill='#e6e1d6' font-size='14' font-family='Newsreader,serif' font-style='italic' font-weight='600'>Accuracy</text><line x1='46' y1='292.0' x2='446' y2='292.0' stroke='#1c1c20' stroke-width='1'/><text x='40' y='295.0' fill='#a89e8c' font-size='9' text-anchor='end'>2.0%</text><line x1='46' y1='226.5' x2='446' y2='226.5' stroke='#1c1c20' stroke-width='1'/><text x='40' y='229.5' fill='#a89e8c' font-size='9' text-anchor='end'>23.0%</text><line x1='46' y1='161.0' x2='446' y2='161.0' stroke='#1c1c20' stroke-width='1'/><text x='40' y='164.0' fill='#a89e8c' font-size='9' text-anchor='end'>44.1%</text><line x1='46' y1='95.5' x2='446' y2='95.5' stroke='#1c1c20' stroke-width='1'/><text x='40' y='98.5' fill='#a89e8c' font-size='9' text-anchor='end'>65.1%</text><line x1='46' y1='30.0' x2='446' y2='30.0' stroke='#1c1c20' stroke-width='1'/><text x='40' y='33.0' fill='#a89e8c' font-size='9' text-anchor='end'>86.1%</text><text x='46.0' y='310' fill='#a89e8c' font-size='9' text-anchor='middle'>0</text><text x='446.0' y='310' fill='#a89e8c' font-size='9' text-anchor='middle'>29</text><text x='246.0' y='310' fill='#a89e8c' font-size='10' font-family='Newsreader,serif' font-style='italic' text-anchor='middle'>epoch →</text><text x='14' y='161.0' fill='#a89e8c' font-size='10' font-family='Newsreader,serif' font-style='italic' text-anchor='middle' transform='rotate(-90 14 161.0)'>accuracy →</text><polyline points='46.0,278.0 59.8,253.6 73.6,236.7 87.4,220.5 101.2,208.8 115.0,197.8 128.8,190.8 142.6,183.0 156.3,176.5 170.1,171.0 183.9,165.1 197.7,160.4 211.5,156.6 225.3,152.4 239.1,149.1 252.9,146.3 266.7,143.4 280.5,141.0 294.3,138.0 308.1,135.8 321.9,133.2 335.7,131.8 349.4,130.1 363.2,128.5 377.0,127.4 390.8,125.9 404.6,125.5 418.4,125.0 432.2,125.2 446.0,124.4' fill='none' stroke='#d29922' stroke-width='1.8'/><circle cx='446.0' cy='124.4' r='2.6' fill='#d29922'/><rect x='52' y='35' width='10' height='10' fill='#d29922'/><text x='68' y='44' fill='#e6e1d6' font-size='10' font-family='IBM Plex Mono,monospace'>train top-1</text><polyline points='46.0,266.9 59.8,250.7 73.6,230.5 87.4,220.5 101.2,207.9 115.0,206.4 128.8,197.9 142.6,189.9 156.3,183.3 170.1,173.7 183.9,168.5 197.7,169.8 211.5,167.3 225.3,157.3 239.1,161.2 252.9,157.5 266.7,149.4 280.5,151.3 294.3,148.4 308.1,145.8 321.9,145.5 335.7,141.7 349.4,140.9 363.2,139.7 377.0,138.8 390.8,137.5 404.6,138.1 418.4,137.9 432.2,137.4 446.0,136.9' fill='none' stroke='#58a6ff' stroke-width='1.8'/><circle cx='446.0' cy='136.9' r='2.6' fill='#58a6ff'/><rect x='52' y='51' width='10' height='10' fill='#58a6ff'/><text x='68' y='60' fill='#e6e1d6' font-size='10' font-family='IBM Plex Mono,monospace'>test top-1</text><polyline points='46.0,195.8 59.8,165.7 73.6,136.0 87.4,122.8 101.2,108.1 115.0,104.4 128.8,98.4 142.6,90.9 156.3,81.3 170.1,74.4 183.9,69.1 197.7,69.8 211.5,64.8 225.3,60.1 239.1,65.1 252.9,59.7 266.7,52.4 280.5,53.2 294.3,53.2 308.1,50.6 321.9,50.3 335.7,47.6 349.4,46.5 363.2,46.1 377.0,45.7 390.8,45.2 404.6,44.3 418.4,44.1 432.2,44.0 446.0,44.5' fill='none' stroke='#3fb950' stroke-width='1.8'/><circle cx='446.0' cy='44.5' r='2.6' fill='#3fb950'/><rect x='52' y='67' width='10' height='10' fill='#3fb950'/><text x='68' y='76' fill='#e6e1d6' font-size='10' font-family='IBM Plex Mono,monospace'>test top-5</text></svg></div></div></section>
-<section class='card' style='--i:6'><h2>Deep inspection</h2><p style='color:var(--paper-dim);font-size:0.9em;margin-bottom:6px'>Audit excerpts, reasoning blob, raw configuration, and full metrics JSON — expand sections of interest.</p><details class='deep'><summary>Research-scientist critique (addendum)</summary><div class='body'><div style='margin-bottom:12px'><span style='margin-right:4px;display:inline-block'><span class='vbadge' style='display:inline-block;padding:3px 10px;border:1px solid #58a6ff;color:#58a6ff;font-weight:600;font-size:10px;font-family:"IBM Plex Mono",monospace;text-transform:uppercase;letter-spacing:0.16em;transition:transform 160ms ease,filter 160ms ease;background:transparent' title='**DERIVATIVE+TESTABLE** — Re-labelling of the known &quot;deeper-stage-3/4 is good&quot; finding as a Fibonacci recurrence. The composite-formula manipulation in §7.1 is a Rule 2 violation that should be flagged separately to the audit agent.'><span style='opacity:0.65'>sci-critic</span> &nbsp;DERIVATIVE+TESTABLE</span></span></div><pre style='border-left:2px solid var(--v-novel)'>*Reviewer: SciCritic-G1 (elite-research-scientist critic). Critiquing the IDEA, not the implementation (that audit lives at `audits/G1_audit.md`).*
-
-### Prior plausibility (independent of nature-inspired framing)
-**LOW.** ResNet-50&#39;s 3-4-6-3 schedule was empirically optimised; ResNet-101 uses 3-4-23-3 and ResNet-152 uses 3-8-36-3 — none of these are Fibonacci, none are even monotone within stage. The &quot;3-5-8-13&quot; schedule increases total depth from 16 (ResNet-18) or 50 (ResNet-50) to a regime where stage-4 (13 blocks) is doing the bulk of representational work; this contradicts the empirical finding (He 2016, arXiv:1512.03385) that stage-3 of ResNet-50 (6 blocks) is *already* doing most of the representational work.
-
-### Mechanism scrutiny — does the claimed mechanism predict the effect?
-The &quot;because&quot; clause: *&quot;each new stage receives an expressive-capacity budget equal to the sum of the two prior stages (matching biological somite resource inheritance) per Larsson et al 2017.&quot;* This is wrong on two counts: (i) Larsson 2017 (FractalNet) uses **doubling**, not Fibonacci summation — the citation is being conscripted to support the opposite recurrence; (ii) &quot;expressive-capacity budget = block count&quot; is a category error — capacity in residual networks does not add linearly with depth (cf. Veit et al 2016, arXiv:1605.06431 *&quot;Residual Networks Behave Like Ensembles of Relatively Shallow Networks&quot;*).
-
-### Confounds — what else could explain a positive (or negative) result?
-1. **Param-count drift**: doc admits 0.95M vs ResNet-32&#39;s 0.46M (~2×); any positive result is confounded with raw capacity.
-2. **Stage-4 dominance**: putting 13 blocks at stage-4 with the smallest spatial resolution may simply mean the test set fits better — small spatial maps + many blocks ≈ over-parameterised classifier head.
-3. **Composite-formula gaming**: the doc introduces a new composite term `0.15 * (1 - epochs_to_72/50)` that is *bespoke to this hypothesis*, violating Rule 2 (composite formula is fingerprinted). This is a methodological red flag.
-
-### Numerology check — does φ specifically matter?
-The discrete Fibonacci sequence converges to φ only in the *ratio limit*. At the proposed indices [3,5,8,13] the ratios are 1.67, 1.60, 1.625 — none are φ to better than 3%. **Kill-or-confirm**: compare [3,5,8,13] vs [3,5,9,14] (slightly off-Fibonacci, ratios [1.67, 1.80, 1.56]) vs [4,5,8,13] vs [3,6,9,12] (linear). If [3,5,8,13] does not win by ≥0.5pp at 3-seed, Fibonacci-specificity is unsupported.
-
-### Literature: precedent or rediscovery?
-**Direct rediscovery, mislabelled**. This is functionally equivalent to *trying a deeper stage-4 ResNet variant*, which has been done many times (e.g., ResNet-101&#39;s 3-4-23-3, EfficientNet&#39;s progressive depth scaling). The &quot;Fibonacci&quot; framing adds no testable content beyond &quot;more blocks in stage-4 helps small datasets.&quot; Liu et al 2018 *Progressive Neural Architecture Search* (arXiv:1712.00559) explored this space exhaustively; Fibonacci is in their hypothesis space and was *not* discovered by NAS as optimal.
-
-### Expected effect size — skeptical a-priori re-prediction
-Doc claims 30-50% reduction in epochs-to-72%-top-1. My prior: Δ(epochs) ∈ [−10%, +20%] (90% CI), dominated by the param-count confound. The fairer comparison — iso-param Fibonacci vs iso-param uniform — will show |Δtop-1| &lt; 0.3pp.
-
-### Minimum-distinguishing experiment
-**Two configs, CIFAR-100, 50 epochs, 3 seeds at strictly iso-param (±2%) and iso-FLOPs (±5%)**: (i) [3,5,8,13] Fibonacci; (ii) uniform [7,7,7,8] with channel-widths *adjusted* to match params. If Δ(epochs-to-72%) &lt; 15%, the hypothesis is reduced to &quot;redistribute params to stage-4 (a known finding).&quot;
-
-### Verdict
-**DERIVATIVE+TESTABLE** — Re-labelling of the known &quot;deeper-stage-3/4 is good&quot; finding as a Fibonacci recurrence. The composite-formula manipulation in §7.1 is a Rule 2 violation that should be flagged separately to the audit agent.</pre></div></details><details class='deep'><summary>Implementation-critic audit (audits/G1_audit.md)</summary><div class='body'><div style='margin-bottom:12px'><a href='https://github.com/dlmastery/nature_inspired_networks/blob/main/audits/G1_audit.md#h02-g1' style='text-decoration:none;border-bottom:none;margin-right:4px;display:inline-block'><span class='vbadge' style='display:inline-block;padding:3px 10px;border:1px solid #d29922;color:#d29922;font-weight:600;font-size:10px;font-family:"IBM Plex Mono",monospace;text-transform:uppercase;letter-spacing:0.16em;transition:transform 160ms ease,filter 160ms ease;background:transparent' title='`fibonacci_sequence(n)` returns the canonical `(1, 1)`-start sequence (scaling.py:84–92). `fibonacci_depths(n_stages=4, start_index=3)` correctly produces `[3, 5, 8, 13]` (the H02 spec schedule). `resolve_blocks_schedule` correctly dispatches uniform / fib / linear.'><span style='opacity:0.65'>impl-critic</span> &nbsp;MINOR</span></a></div><div class='quote'>**Module:** `src/nature_inspired_networks/scaling.py`
-(`fibonacci_sequence`, `fibonacci_depths`, `resolve_blocks_schedule`)
-**Verdict:** MINOR
-
-**Mechanism check:** `fibonacci_sequence(n)` returns the canonical
-`(1, 1)`-start sequence (scaling.py:84–92). `fibonacci_depths(n_stages=4,
-start_index=3)` correctly produces `[3, 5, 8, 13]` (the H02 spec
-schedule). `resolve_blocks_schedule` correctly dispatches uniform /
-fib / linear.
-
-**Math correctness:** Verified. `fibonacci_sequence(8)` ==
-`[1, 1, 2, 3, 5, 8, 13, 21]` (test_scaling.py:99) and
-`fibonacci_depths(5, 2)` == `[2, 3, 5, 8, 13]`.
-
-**Test rigor:** Seven H02 tests cover the explicit Fibonacci values,
+<section class='card' style='--i:6'><h2>Deep inspection</h2><p style='color:var(--paper-dim);font-size:0.9em;margin-bottom:6px'>Audit excerpts, reasoning blob, raw configuration, and full metrics JSON — expand sections of interest.</p><details class='deep'><summary>Research-scientist critique (addendum)</summary><div class='body'><div style='margin-bottom:12px'><span style='margin-right:4px;display:inline-block'><span class='vbadge' style='display:inline-block;padding:3px 10px;border:1px solid #58a6ff;color:#58a6ff;font-weight:600;font-size:10px;font-family:"IBM Plex Mono",monospace;text-transform:uppercase;letter-spacing:0.16em;transition:transform 160ms ease,filter 160ms ease;background:transparent' title='**DERIVATIVE+TESTABLE** — Re-labelling of the known &quot;deeper-stage-3/4 is good&quot; finding as a Fibonacci recurrence. The composite-formula manipulation in §7.1 is a Rule 2 violation that should be flagged separately to the audit agent.'><span style='opacity:0.65'>sci-critic</span> &nbsp;DERIVATIVE+TESTABLE</span></span></div><div class='md-body' style='border-left:2px solid var(--v-novel);padding:8px 14px;background:var(--panel2);border-radius:5px'><p><em>Reviewer: SciCritic-G1 (elite-research-scientist critic). Critiquing the IDEA, not the implementation (that audit lives at <code>audits/G1_audit.md</code>).</em></p>
+<h3>Prior plausibility (independent of nature-inspired framing)</h3>
+<p><strong>LOW.</strong> ResNet-50&rsquo;s 3-4-6-3 schedule was empirically optimised; ResNet-101 uses 3-4-23-3 and ResNet-152 uses 3-8-36-3 — none of these are Fibonacci, none are even monotone within stage. The &ldquo;3-5-8-13&rdquo; schedule increases total depth from 16 (ResNet-18) or 50 (ResNet-50) to a regime where stage-4 (13 blocks) is doing the bulk of representational work; this contradicts the empirical finding (He 2016, arXiv:1512.03385) that stage-3 of ResNet-50 (6 blocks) is <em>already</em> doing most of the representational work.</p>
+<h3>Mechanism scrutiny — does the claimed mechanism predict the effect?</h3>
+<p>The &ldquo;because&rdquo; clause: <em>&ldquo;each new stage receives an expressive-capacity budget equal to the sum of the two prior stages (matching biological somite resource inheritance) per Larsson et al 2017.&rdquo;</em> This is wrong on two counts: (i) Larsson 2017 (FractalNet) uses <strong>doubling</strong>, not Fibonacci summation — the citation is being conscripted to support the opposite recurrence; (ii) &ldquo;expressive-capacity budget = block count&rdquo; is a category error — capacity in residual networks does not add linearly with depth (cf. Veit et al 2016, arXiv:1605.06431 <em>&ldquo;Residual Networks Behave Like Ensembles of Relatively Shallow Networks&rdquo;</em>).</p>
+<h3>Confounds — what else could explain a positive (or negative) result?</h3>
+<ol>
+<li><strong>Param-count drift</strong>: doc admits 0.95M vs ResNet-32&rsquo;s 0.46M (~2×); any positive result is confounded with raw capacity.</li>
+<li><strong>Stage-4 dominance</strong>: putting 13 blocks at stage-4 with the smallest spatial resolution may simply mean the test set fits better — small spatial maps + many blocks ≈ over-parameterised classifier head.</li>
+<li><strong>Composite-formula gaming</strong>: the doc introduces a new composite term <code>0.15 * (1 - epochs_to_72/50)</code> that is <em>bespoke to this hypothesis</em>, violating Rule 2 (composite formula is fingerprinted). This is a methodological red flag.</li>
+</ol>
+<h3>Numerology check — does φ specifically matter?</h3>
+<p>The discrete Fibonacci sequence converges to φ only in the <em>ratio limit</em>. At the proposed indices [3,5,8,13] the ratios are 1.67, 1.60, 1.625 — none are φ to better than 3%. <strong>Kill-or-confirm</strong>: compare [3,5,8,13] vs [3,5,9,14] (slightly off-Fibonacci, ratios [1.67, 1.80, 1.56]) vs [4,5,8,13] vs [3,6,9,12] (linear). If [3,5,8,13] does not win by ≥0.5pp at 3-seed, Fibonacci-specificity is unsupported.</p>
+<h3>Literature: precedent or rediscovery?</h3>
+<p><strong>Direct rediscovery, mislabelled</strong>. This is functionally equivalent to <em>trying a deeper stage-4 ResNet variant</em>, which has been done many times (e.g., ResNet-101&rsquo;s 3-4-23-3, EfficientNet&rsquo;s progressive depth scaling). The &ldquo;Fibonacci&rdquo; framing adds no testable content beyond &ldquo;more blocks in stage-4 helps small datasets.&rdquo; Liu et al 2018 <em>Progressive Neural Architecture Search</em> (arXiv:1712.00559) explored this space exhaustively; Fibonacci is in their hypothesis space and was <em>not</em> discovered by NAS as optimal.</p>
+<h3>Expected effect size — skeptical a-priori re-prediction</h3>
+<p>Doc claims 30-50% reduction in epochs-to-72%-top-1. My prior: Δ(epochs) ∈ [−10%, +20%] (90% CI), dominated by the param-count confound. The fairer comparison — iso-param Fibonacci vs iso-param uniform — will show |Δtop-1| &lt; 0.3pp.</p>
+<h3>Minimum-distinguishing experiment</h3>
+<p><strong>Two configs, CIFAR-100, 50 epochs, 3 seeds at strictly iso-param (±2%) and iso-FLOPs (±5%)</strong>: (i) [3,5,8,13] Fibonacci; (ii) uniform [7,7,7,8] with channel-widths <em>adjusted</em> to match params. If Δ(epochs-to-72%) &lt; 15%, the hypothesis is reduced to &ldquo;redistribute params to stage-4 (a known finding).&rdquo;</p>
+<h3>Verdict</h3>
+<p><strong>DERIVATIVE+TESTABLE</strong> — Re-labelling of the known &ldquo;deeper-stage-3/4 is good&rdquo; finding as a Fibonacci recurrence. The composite-formula manipulation in §7.1 is a Rule 2 violation that should be flagged separately to the audit agent.</p></div></div></details><details class='deep'><summary>Implementation-critic audit (audits/G1_audit.md)</summary><div class='body'><div style='margin-bottom:12px'><a href='https://github.com/dlmastery/nature_inspired_networks/blob/main/audits/G1_audit.md#h02-g1' style='text-decoration:none;border-bottom:none;margin-right:4px;display:inline-block'><span class='vbadge' style='display:inline-block;padding:3px 10px;border:1px solid #d29922;color:#d29922;font-weight:600;font-size:10px;font-family:"IBM Plex Mono",monospace;text-transform:uppercase;letter-spacing:0.16em;transition:transform 160ms ease,filter 160ms ease;background:transparent' title='`fibonacci_sequence(n)` returns the canonical `(1, 1)`-start sequence (scaling.py:84–92). `fibonacci_depths(n_stages=4, start_index=3)` correctly produces `[3, 5, 8, 13]` (the H02 spec schedule). `resolve_blocks_schedule` correctly dispatches uniform / fib / linear.'><span style='opacity:0.65'>impl-critic</span> &nbsp;MINOR</span></a></div><div class='quote md-body'><p><strong>Module:</strong> <code>src/nature_inspired_networks/scaling.py</code>
+(<code>fibonacci_sequence</code>, <code>fibonacci_depths</code>, <code>resolve_blocks_schedule</code>)
+<strong>Verdict:</strong> MINOR</p>
+<p><strong>Mechanism check:</strong> <code>fibonacci_sequence(n)</code> returns the canonical
+<code>(1, 1)</code>-start sequence (scaling.py:84–92). <code>fibonacci_depths(n_stages=4,
+start_index=3)</code> correctly produces <code>[3, 5, 8, 13]</code> (the H02 spec
+schedule). <code>resolve_blocks_schedule</code> correctly dispatches uniform /
+fib / linear.</p>
+<p><strong>Math correctness:</strong> Verified. <code>fibonacci_sequence(8)</code> ==
+<code>[1, 1, 2, 3, 5, 8, 13, 21]</code> (test_scaling.py:99) and
+<code>fibonacci_depths(5, 2)</code> == <code>[2, 3, 5, 8, 13]</code>.</p>
+<p><strong>Test rigor:</strong> Seven H02 tests cover the explicit Fibonacci values,
 both start-index variants, all three modes of
-`resolve_blocks_schedule`, the list-length-mismatch ValueError, the
+<code>resolve_blocks_schedule</code>, the list-length-mismatch ValueError, the
 end-to-end NaturePriorNet wiring smoke, and the default-mode
-regression. Strong.
-
-**Citation alignment:** Larsson et al. 2017 arXiv:1605.07648 is the
+regression. Strong.</p>
+<p><strong>Citation alignment:</strong> Larsson et al. 2017 arXiv:1605.07648 is the
 correct FractalNet reference (closest analogue). He et al. 2016 is
-the ResNet anchor. Correct.
-
-**Bugs / cargo-cult:** None at the primitive layer. **However**, the
-H02 falsifier (section 3) requires a **convergence-speed metric**
-(`epochs-to-72-pct-top-1`), and there is no place in the runner where
+the ResNet anchor. Correct.</p>
+<p><strong>Bugs / cargo-cult:</strong> None at the primitive layer. <strong>However</strong>, the
+H02 falsifier (section 3) requires a <strong>convergence-speed metric</strong>
+(<code>epochs-to-72-pct-top-1</code>), and there is no place in the runner where
 that metric is emitted or scored. The composite formula
-in sec. 7.1 (&quot;0.15 * (1 - epochs_to_72/50)&quot;) is unimplemented. This
-means the **falsifier is not currently reachable** with the existing
+in sec. 7.1 (&ldquo;0.15 * (1 - epochs_to_72/50)&rdquo;) is unimplemented. This
+means the <strong>falsifier is not currently reachable</strong> with the existing
 gates: a Fibonacci-depth run can only be scored on the static top-1,
-which H02 explicitly says is NOT the key novelty. **MINOR** because
-the primitive itself is correct; the harness gap demotes it.
-
-**Concrete fix:** Either (a) implement an `epochs_to_target` metric
-hook in the runner and a `convergence_composite` formula behind a new
+which H02 explicitly says is NOT the key novelty. <strong>MINOR</strong> because
+the primitive itself is correct; the harness gap demotes it.</p>
+<p><strong>Concrete fix:</strong> Either (a) implement an <code>epochs_to_target</code> metric
+hook in the runner and a <code>convergence_composite</code> formula behind a new
 fingerprint, or (b) downgrade the H02 status journal to acknowledge
 that only the iso-accuracy/iso-params dimension is currently
-evaluable.
-
----</div><p style='margin-top:12px'><a href='https://github.com/dlmastery/nature_inspired_networks/blob/main/audits/G1_audit.md#h02-g1'>↗ Full audit on GitHub</a> <span class='mono' style='color:var(--paper-dim);font-size:0.78em'>audits/G1_audit.md</span></p></div></details><details class='deep'><summary>Reasoning blob (reasoning.json)</summary><div class='body'><p class='empty'>No <code>reasoning.json</code> for this run directory.</p></div></details><details class='deep'><summary>Configuration dump</summary><div class='body'><p class='mono' style='color:var(--paper-dim);font-size:0.8em;margin-bottom:8px'>inferred from experiment_log.jsonl + metrics.json</p><pre>{
+evaluable.</p>
+<hr></div><p style='margin-top:12px'><a href='https://github.com/dlmastery/nature_inspired_networks/blob/main/audits/G1_audit.md#h02-g1'>↗ Full audit on GitHub</a> <span class='mono' style='color:var(--paper-dim);font-size:0.78em'>audits/G1_audit.md</span></p></div></details><details class='deep'><summary>Reasoning blob (reasoning.json)</summary><div class='body'><p class='empty'>No <code>reasoning.json</code> for this run directory.</p></div></details><details class='deep'><summary>Configuration dump</summary><div class='body'><p class='mono' style='color:var(--paper-dim);font-size:0.8em;margin-bottom:8px'>inferred from experiment_log.jsonl + metrics.json</p><pre>{
   &quot;tag&quot;: &quot;sg_only_fib_depth&quot;,
   &quot;model&quot;: &quot;NaturePrior&quot;,
   &quot;dataset&quot;: &quot;cifar100&quot;,

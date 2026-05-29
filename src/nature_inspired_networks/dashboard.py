@@ -948,14 +948,45 @@ def run_page_filename(run_dir_name: str, dataset: str | None = None) -> str:
 
 
 _EXP_FONT_LINK = (
+    # Academic-restrained palette: Source Serif 4 (Adobe's open serif designed
+    # for academic long-form reading — Frank Grießhammer / Adobe Design); IBM
+    # Plex Mono for technical text. No italic-as-emphasis display flourishes.
     "<link rel='preconnect' href='https://fonts.googleapis.com'>"
     "<link rel='preconnect' href='https://fonts.gstatic.com' crossorigin>"
     "<link href='https://fonts.googleapis.com/css2?"
-    "family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;0,6..72,800;"
-    "1,6..72,400;1,6..72,600&"
-    "family=IBM+Plex+Serif:wght@400;500;700&"
+    "family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600;8..60,700&"
     "family=IBM+Plex+Mono:wght@400;500;600&display=swap' rel='stylesheet'>"
 )
+
+
+def _md_to_html(text: str, *, inline_only: bool = False) -> str:
+    """Render a chunk of markdown text to safe HTML for inline display.
+
+    Uses the ``markdown`` library (3.10+) with conservative extensions:
+    ``tables``, ``fenced_code``, ``smarty``. Returns the empty string for
+    empty input. When ``inline_only=True``, strips the wrapping ``<p>`` so
+    the result fits inline with surrounding text. Markdown is trusted-input
+    here (it comes from repo .md files the agent has read), so we do not
+    pass through bleach.
+    """
+    if not text or not text.strip():
+        return ""
+    try:
+        import markdown as _md
+        html = _md.markdown(
+            text,
+            extensions=["tables", "fenced_code", "smarty"],
+            output_format="html5",
+        )
+    except Exception:
+        # Fallback: minimal escape + paragraph wrap so output is at least
+        # readable when the markdown library is missing.
+        from html import escape as _e
+        paragraphs = [p.strip() for p in text.split("\n\n") if p.strip()]
+        html = "".join(f"<p>{_e(p)}</p>" for p in paragraphs)
+    if inline_only and html.startswith("<p>") and html.endswith("</p>"):
+        html = html[3:-4]
+    return html
 
 # Brutalist Editorial Lab Notebook — colour + type system
 _BRUTALIST_VARS = """
@@ -981,20 +1012,38 @@ _BRUTALIST_VARS = """
 _EXP_PAGE_CSS = _BRUTALIST_VARS + """
  *{margin:0;padding:0;box-sizing:border-box;}
  html,body{background:var(--ink);}
- body{font-family:'IBM Plex Serif','Charter',Georgia,serif;color:var(--paper);
-      padding:32px 36px 80px;line-height:1.55;max-width:1180px;margin:0 auto;
-      font-size:16px;font-variant-numeric:tabular-nums;position:relative;}
+ body{font-family:'Source Serif 4','Charter','Source Serif Pro',Georgia,serif;
+      color:var(--paper);padding:32px 36px 80px;line-height:1.6;
+      max-width:1180px;margin:0 auto;font-size:16px;
+      font-variant-numeric:tabular-nums;position:relative;}
  a{color:var(--v-derivative);text-decoration:none;border-bottom:1px solid transparent;
    transition:border-color 160ms ease;}
  a:hover{border-bottom-color:var(--v-derivative);text-decoration:none;}
- h1{font-family:'Newsreader',serif;font-weight:600;font-style:italic;
-    font-size:42px;line-height:1.05;color:var(--paper);letter-spacing:-0.01em;
+ h1{font-family:'Source Serif 4',Georgia,serif;font-weight:600;
+    font-size:34px;line-height:1.15;color:var(--paper);letter-spacing:-0.005em;
     margin-bottom:6px;}
- h2{font-family:'Newsreader',serif;font-weight:600;font-style:italic;
-    font-size:22px;color:var(--paper);margin-bottom:14px;letter-spacing:-0.005em;}
+ h2{font-family:'Source Serif 4',Georgia,serif;font-weight:600;
+    font-size:20px;color:var(--paper);margin-bottom:14px;letter-spacing:-0.003em;}
  h3{font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:11px;
-    text-transform:uppercase;letter-spacing:0.18em;color:var(--paper-dim);
+    text-transform:uppercase;letter-spacing:0.16em;color:var(--paper-dim);
     margin:18px 0 8px 0;}
+ .md-body p{margin:8px 0 12px 0;}
+ .md-body p:first-child{margin-top:0;} .md-body p:last-child{margin-bottom:0;}
+ .md-body strong,.md-body b{color:var(--paper);font-weight:600;}
+ .md-body em,.md-body i{font-style:italic;}
+ .md-body code{font-family:'IBM Plex Mono',monospace;font-size:0.86em;
+    background:var(--panel2);padding:1px 5px;border-radius:3px;}
+ .md-body pre{font-family:'IBM Plex Mono',monospace;font-size:0.85em;
+    background:var(--panel2);padding:10px 12px;border-radius:5px;
+    border:1px solid var(--rule);overflow-x:auto;margin:10px 0;}
+ .md-body ul,.md-body ol{margin:8px 0 12px 22px;}
+ .md-body li{margin:3px 0;}
+ .md-body blockquote{border-left:3px solid var(--accent-dim);
+    padding:6px 14px;margin:10px 0;color:var(--paper-dim);font-style:italic;}
+ .md-body table{border-collapse:collapse;margin:10px 0;font-size:0.92em;}
+ .md-body th,.md-body td{border:1px solid var(--rule);padding:6px 10px;
+    text-align:left;}
+ .md-body th{background:var(--panel2);font-weight:600;}
  .mono{font-family:'IBM Plex Mono',monospace;font-size:0.85em;}
  .head-grid{display:grid;grid-template-columns:1fr auto;gap:24px;
             align-items:start;padding-bottom:18px;
@@ -1724,7 +1773,7 @@ def _render_verdict_section(repo_root: Path, tag: str) -> str:
         "<h2>Verdict <span class='mono' style='font-size:0.55em;"
         "letter-spacing:0.18em;color:var(--paper-dim);font-style:normal'>"
         "FINDINGS.md</span></h2>"
-        f"<div class='quote'>{_esc(blurb)}</div>"
+        f"<div class='quote md-body'>{_md_to_html(blurb)}</div>"
         f"<p style='margin-top:14px'><a href='{gh_url}'>↗ Full FINDINGS.md on GitHub</a></p></section>"
     )
 
@@ -1830,7 +1879,7 @@ def _render_audit_excerpt(hid: str | None, group: str,
     parts = []
     if badge:
         parts.append(f"<div style='margin-bottom:12px'>{badge}</div>")
-    parts.append(f"<div class='quote'>{_esc(body)}</div>")
+    parts.append(f"<div class='quote md-body'>{_md_to_html(body)}</div>")
     if audit.get("url"):
         local = audit.get("local", "")
         local_caption = (
@@ -1861,8 +1910,9 @@ def _render_scicritic_excerpt(md_path: Path | None) -> str:
     if block:
         # Render as preserved-markdown style block
         parts.append(
-            f"<pre style='border-left:2px solid var(--v-novel)'>"
-            f"{_esc(block)}</pre>"
+            f"<div class='md-body' style='border-left:2px solid var(--v-novel);"
+            f"padding:8px 14px;background:var(--panel2);border-radius:5px'>"
+            f"{_md_to_html(block)}</div>"
         )
     elif sci.get("raw"):
         parts.append(f"<div class='quote'>{_esc(sci['raw'])}</div>")

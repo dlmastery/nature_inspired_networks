@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang='en'><head><meta charset='utf-8'>
 <title>sg_only_constant_width · seed 0 · cifar10 — experiment page</title>
-<link rel='preconnect' href='https://fonts.googleapis.com'><link rel='preconnect' href='https://fonts.gstatic.com' crossorigin><link href='https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;0,6..72,800;1,6..72,400;1,6..72,600&family=IBM+Plex+Serif:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap' rel='stylesheet'>
+<link rel='preconnect' href='https://fonts.googleapis.com'><link rel='preconnect' href='https://fonts.gstatic.com' crossorigin><link href='https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600;8..60,700&family=IBM+Plex+Mono:wght@400;500;600&display=swap' rel='stylesheet'>
 <style>
  :root{
    --ink:#0a0a0d; --paper:#e6e1d6; --paper-dim:#a89e8c;
@@ -23,20 +23,38 @@
 
  *{margin:0;padding:0;box-sizing:border-box;}
  html,body{background:var(--ink);}
- body{font-family:'IBM Plex Serif','Charter',Georgia,serif;color:var(--paper);
-      padding:32px 36px 80px;line-height:1.55;max-width:1180px;margin:0 auto;
-      font-size:16px;font-variant-numeric:tabular-nums;position:relative;}
+ body{font-family:'Source Serif 4','Charter','Source Serif Pro',Georgia,serif;
+      color:var(--paper);padding:32px 36px 80px;line-height:1.6;
+      max-width:1180px;margin:0 auto;font-size:16px;
+      font-variant-numeric:tabular-nums;position:relative;}
  a{color:var(--v-derivative);text-decoration:none;border-bottom:1px solid transparent;
    transition:border-color 160ms ease;}
  a:hover{border-bottom-color:var(--v-derivative);text-decoration:none;}
- h1{font-family:'Newsreader',serif;font-weight:600;font-style:italic;
-    font-size:42px;line-height:1.05;color:var(--paper);letter-spacing:-0.01em;
+ h1{font-family:'Source Serif 4',Georgia,serif;font-weight:600;
+    font-size:34px;line-height:1.15;color:var(--paper);letter-spacing:-0.005em;
     margin-bottom:6px;}
- h2{font-family:'Newsreader',serif;font-weight:600;font-style:italic;
-    font-size:22px;color:var(--paper);margin-bottom:14px;letter-spacing:-0.005em;}
+ h2{font-family:'Source Serif 4',Georgia,serif;font-weight:600;
+    font-size:20px;color:var(--paper);margin-bottom:14px;letter-spacing:-0.003em;}
  h3{font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:11px;
-    text-transform:uppercase;letter-spacing:0.18em;color:var(--paper-dim);
+    text-transform:uppercase;letter-spacing:0.16em;color:var(--paper-dim);
     margin:18px 0 8px 0;}
+ .md-body p{margin:8px 0 12px 0;}
+ .md-body p:first-child{margin-top:0;} .md-body p:last-child{margin-bottom:0;}
+ .md-body strong,.md-body b{color:var(--paper);font-weight:600;}
+ .md-body em,.md-body i{font-style:italic;}
+ .md-body code{font-family:'IBM Plex Mono',monospace;font-size:0.86em;
+    background:var(--panel2);padding:1px 5px;border-radius:3px;}
+ .md-body pre{font-family:'IBM Plex Mono',monospace;font-size:0.85em;
+    background:var(--panel2);padding:10px 12px;border-radius:5px;
+    border:1px solid var(--rule);overflow-x:auto;margin:10px 0;}
+ .md-body ul,.md-body ol{margin:8px 0 12px 22px;}
+ .md-body li{margin:3px 0;}
+ .md-body blockquote{border-left:3px solid var(--accent-dim);
+    padding:6px 14px;margin:10px 0;color:var(--paper-dim);font-style:italic;}
+ .md-body table{border-collapse:collapse;margin:10px 0;font-size:0.92em;}
+ .md-body th,.md-body td{border:1px solid var(--rule);padding:6px 10px;
+    text-align:left;}
+ .md-body th{background:var(--panel2);font-weight:600;}
  .mono{font-family:'IBM Plex Mono',monospace;font-size:0.85em;}
  .head-grid{display:grid;grid-template-columns:1fr auto;gap:24px;
             align-items:start;padding-bottom:18px;
@@ -177,93 +195,83 @@
 </div>
 <div class='kn-strip' style='--i:1'><div class='kn-tile tint-neg'><div class='kn-val'>75.95%</div><div class='kn-lbl'>top-1</div></div><div class='kn-tile tint-neu'><div class='kn-val'>0.7629</div><div class='kn-lbl'>composite</div></div><div class='kn-tile tint-neg'><div class='kn-val'>−8.83pp</div><div class='kn-lbl'>Δ vs baseline</div></div><div class='kn-tile tint-neu'><div class='kn-val'>0.127M</div><div class='kn-lbl'>params</div></div><div class='kn-tile tint-neu'><div class='kn-val'>6.72ms</div><div class='kn-lbl'>latency b=1</div></div></div>
 <section class='card' style='--i:2'><h2>Hypothesis H80 — <i>H80 — ConstantWidthKernelConv (Reuleaux-masked isotropic convolution)</i></h2><div style='margin:2px 0 18px 0'><a href='https://github.com/dlmastery/nature_inspired_networks/blob/main/audits/G8_audit.md#h80-g8' style='text-decoration:none;border-bottom:none;margin-right:4px;display:inline-block'><span class='vbadge' style='display:inline-block;padding:3px 10px;border:1px solid #a89e8c;color:#a89e8c;font-weight:600;font-size:10px;font-family:"IBM Plex Mono",monospace;text-transform:uppercase;letter-spacing:0.16em;transition:transform 160ms ease,filter 160ms ease;background:transparent' title='N'><span style='opacity:0.65'>impl</span> &nbsp;N</span></a><span style='margin-right:4px;display:inline-block'><span class='vbadge' style='display:inline-block;padding:3px 10px;border:1px solid #58a6ff;color:#58a6ff;font-weight:600;font-size:10px;font-family:"IBM Plex Mono",monospace;text-transform:uppercase;letter-spacing:0.16em;transition:transform 160ms ease,filter 160ms ease;background:transparent' title='INCONCLUSIVE-NEEDS-DATA — empirically negative on upright CIFAR-10 (−8.8 pp), and the doc&#39;s rotation-robustness claim is still unmeasured; if the hex-mask baseline dominates on both axes, the verdict moves to DERIVATIVE+REJECTED.'><span style='opacity:0.65'>sci</span> &nbsp;DERIVATIVE+REJECTED</span></span></div><p style='font-family:Newsreader,serif;font-style:italic;font-size:1.08em;color:#e6e1d6;line-height:1.5;border-left:2px solid var(--accent);padding-left:14px;margin:6px 0 16px 0'>Masking a k×k convolution kernel with a constant-width (Reuleaux-triangle) soft mask, suppressing the corner taps, yields a more isotropic receptive field that holds CIFAR-10 top-1 within ±0.5 pp of a same-size square kernel at **equal trainable parameter count**, and improves robustness to input rotation (lower top-1 drop under ±15° test-time rotation) by ≥1 pp.</p><h3>Motivation</h3><p>A square k×k convolution kernel treats the four corner taps — which sit at distance `(k-1)/√2·... ` farther from the centre and only on the diagonal axes — with the same status as the axis-aligned neighbours. This bakes a subtle anisotropy into every conv layer: the effective receptive field is square, so diagonal structure is weighted more than a rotationally symmetric operator would. Classical signal processing prefers isotropic kernels (Gaussians, disks) precisely to avoid orientation bias, and this repo already exploits shaped-kernel masking for the hexagonal prior (`hex_kernel_mask`), which suppresses corner taps to emulate a honeycomb lattice. A Reuleaux triangle is the canonical *non-circular* curve of constant width: the intersection of three disks centred at the vertices of an equilateral triangle, each with radius equal to the side length. Masking the kernel to this support gives an isotropic-leaning receptive field (corners gone) that, unlike a plain disk, retains the constant-width geometric property. The hypothesis is that removing corner anisotropy at no extra parameter cost (masked taps are held at zero) is at worst neutral on upright CIFAR-10 and beneficial under rotation, where the square kernel&#39;s diagonal bias hurts most.</p><h3>Formal hypothesis</h3><p style='font-family:Newsreader,serif;font-style:italic;color:#e6e1d6'>Because a square kernel&#39;s corner taps inject a diagonal-axis anisotropy into the receptive field, **mechanism**-wise replacing the kernel support with a constant-width Reuleaux mask (corners → 0, centre → 1) removes that anisotropy *because* the masked support is closer to rotationally symmetric, so the layer&#39;s response varies less with input orientation; we therefore predict equal upright CIFAR-10 accuracy at equal trainable params and a measurably smaller top-1 drop under small test-time rotations than the square-kernel baseline.</p><details class='deep'><summary>Read the full design-doc digest</summary><div class='body'><h3>Mechanism (because…)</h3><p>`reuleaux_mask(k)` builds the intersection of three disks (radius = the inscribed equilateral triangle&#39;s side length, centred at the grid centre) and normalises the peak to 1.0. A soft variant uses a sigmoid of the signed distance to each disk boundary so boundary gradients are smooth; a hard `{0,1}` variant is available. `ConstantWidthConv2d` holds an `nn.Conv2d` (padding handled manually) and multiplies the mask into the weight at every forward pass, so masked taps stay at exactly zero and gradients flow only to in-support taps. Input `(B, C, H, W)` → output `(B, C_out, H, W)` at `stride=1, </p><h3>Numeric falsifier</h3><p>If, at 3-seed median, the Reuleaux-masked conv scores **more than 0.5 pp below** the same-size square-kernel baseline on upright CIFAR-10 (12 ep), **OR** if its top-1 drop under ±15° test-time rotation is **not smaller** (within noise) than the square kernel&#39;s drop, the isotropy benefit is absent and the hypothesis is **DISCARDED**. The mask is a fixed (non-learned) buffer in v0; a learnable-radius mask is the targeted follow-up.</p><h3>Predicted Δ</h3><p>| metric | Δ vs. square-kernel baseline | rationale | |---|---|---| | top-1 upright (12 ep) | [-0.5, +0.5] pp | corner taps carry little upright signal | | top-1 drop @ ±15° rot | [-2.0, -0.5] pp smaller | isotropic support | | trainable params | [0 %, 0 %] | mask is a buffer | | FLOPs | [-30 %, 0 %] | masked taps still convolved (dense), so ~0 |</p><p style='margin-top:14px'><a href='https://github.com/dlmastery/nature_inspired_networks/blob/main/hypotheses/g8_esoteric_extensions/H80_constant_width_kernel.md'>↗ Full design doc on GitHub</a> <span class='mono' style='color:var(--paper-dim);font-size:0.78em'>hypotheses/g8_esoteric_extensions/H80_constant_width_kernel.md</span></p></div></details></section>
-<section class='card' style='--i:3'><h2>Verdict <span class='mono' style='font-size:0.55em;letter-spacing:0.18em;color:var(--paper-dim);font-style:normal'>FINDINGS.md</span></h2><div class='quote'>| tag | hyp | top-1 | params | composite | verdict | |---|---|---|---|---|---| | `sg_only_sine_act` | H81 SIREN sin(ωx) | 80.62 % | 127 k | 0.8197 | neutral — lands mid-pack, beats every φ-channel variant; ω=1 near-identity start trains stably | | `sg_only_constant_width` | H80 Reuleaux | 75.95 % | 127 k | 0.7629 | mild negative — constant-width mask is too aggressive on 3×3 convs (drops ~4 of 9 taps), losing kernel capacity the isotropy gain doesn&#39;t recover at this scale |</div><p style='margin-top:14px'><a href='https://github.com/dlmastery/nature_inspired_networks/blob/main/FINDINGS.md'>↗ Full FINDINGS.md on GitHub</a></p></section>
+<section class='card' style='--i:3'><h2>Verdict <span class='mono' style='font-size:0.55em;letter-spacing:0.18em;color:var(--paper-dim);font-style:normal'>FINDINGS.md</span></h2><div class='quote md-body'><p>| tag | hyp | top-1 | params | composite | verdict | |&mdash;|&mdash;|&mdash;|&mdash;|&mdash;|&mdash;| | <code>sg_only_sine_act</code> | H81 SIREN sin(ωx) | 80.62 % | 127 k | 0.8197 | neutral — lands mid-pack, beats every φ-channel variant; ω=1 near-identity start trains stably | | <code>sg_only_constant_width</code> | H80 Reuleaux | 75.95 % | 127 k | 0.7629 | mild negative — constant-width mask is too aggressive on 3×3 convs (drops ~4 of 9 taps), losing kernel capacity the isotropy gain doesn&rsquo;t recover at this scale |</p></div><p style='margin-top:14px'><a href='https://github.com/dlmastery/nature_inspired_networks/blob/main/FINDINGS.md'>↗ Full FINDINGS.md on GitHub</a></p></section>
 <section class='card' style='--i:4'><h2>Composite-score breakdown</h2><div class='comp-stack'><div class='seg pos' style='width:89.81%' title='top-1 = 0.75950'>top-1 +0.7595</div><div class='seg params' style='width:5.30%' title='-0.05·log10(params_M)'>params +0.04478</div><div class='seg lat' style='width:4.89%' title='-0.05·log10(latency_ms)'>lat −0.04138</div></div><div style='display:flex;justify-content:space-between;font-family:IBM Plex Mono,monospace;font-size:11px;color:var(--paper-dim);margin-top:6px'><span>Σ recomputed: <b style='color:var(--paper)'>0.76290</b></span><span>reported: <b style='color:var(--paper)'>0.76290</b> &nbsp;·&nbsp; Δ +0.000000</span></div><div class='formula-chip' style='margin-top:14px'>composite ≔ <code>top1 - 0.05*log10(params_M) - 0.05*log10(latency_ms)</code></div></section>
 <section class='card' style='--i:5'><h2>Per-epoch training curves</h2><div class='charts'><div><svg viewBox='0 0 460 320' preserveAspectRatio='xMinYMin meet' width='100%' height='auto' xmlns='http://www.w3.org/2000/svg' style='background:#0a0a0d;border:1px solid #1c1c20;display:block;font-family:"IBM Plex Mono",monospace'><text x='46' y='18' fill='#e6e1d6' font-size='14' font-family='Newsreader,serif' font-style='italic' font-weight='600'>Loss</text><line x1='46' y1='292.0' x2='446' y2='292.0' stroke='#1c1c20' stroke-width='1'/><text x='40' y='295.0' fill='#a89e8c' font-size='9' text-anchor='end'>0.976</text><line x1='46' y1='226.5' x2='446' y2='226.5' stroke='#1c1c20' stroke-width='1'/><text x='40' y='229.5' fill='#a89e8c' font-size='9' text-anchor='end'>1.189</text><line x1='46' y1='161.0' x2='446' y2='161.0' stroke='#1c1c20' stroke-width='1'/><text x='40' y='164.0' fill='#a89e8c' font-size='9' text-anchor='end'>1.401</text><line x1='46' y1='95.5' x2='446' y2='95.5' stroke='#1c1c20' stroke-width='1'/><text x='40' y='98.5' fill='#a89e8c' font-size='9' text-anchor='end'>1.614</text><line x1='46' y1='30.0' x2='446' y2='30.0' stroke='#1c1c20' stroke-width='1'/><text x='40' y='33.0' fill='#a89e8c' font-size='9' text-anchor='end'>1.826</text><text x='46.0' y='310' fill='#a89e8c' font-size='9' text-anchor='middle'>0</text><text x='446.0' y='310' fill='#a89e8c' font-size='9' text-anchor='middle'>11</text><text x='246.0' y='310' fill='#a89e8c' font-size='10' font-family='Newsreader,serif' font-style='italic' text-anchor='middle'>epoch →</text><text x='14' y='161.0' fill='#a89e8c' font-size='10' font-family='Newsreader,serif' font-style='italic' text-anchor='middle' transform='rotate(-90 14 161.0)'>loss →</text><polyline points='46.0,44.0 82.4,138.7 118.7,179.8 155.1,203.4 191.5,221.3 227.8,233.2 264.2,245.5 300.5,256.4 336.9,263.8 373.3,270.8 409.6,275.6 446.0,278.0' fill='none' stroke='#f85149' stroke-width='1.8'/><circle cx='446.0' cy='278.0' r='2.6' fill='#f85149'/><rect x='52' y='35' width='10' height='10' fill='#f85149'/><text x='68' y='44' fill='#e6e1d6' font-size='10' font-family='IBM Plex Mono,monospace'>train loss</text></svg></div><div><svg viewBox='0 0 460 320' preserveAspectRatio='xMinYMin meet' width='100%' height='auto' xmlns='http://www.w3.org/2000/svg' style='background:#0a0a0d;border:1px solid #1c1c20;display:block;font-family:"IBM Plex Mono",monospace'><text x='46' y='18' fill='#e6e1d6' font-size='14' font-family='Newsreader,serif' font-style='italic' font-weight='600'>Accuracy</text><line x1='46' y1='292.0' x2='446' y2='292.0' stroke='#1c1c20' stroke-width='1'/><text x='40' y='295.0' fill='#a89e8c' font-size='9' text-anchor='end'>35.4%</text><line x1='46' y1='226.5' x2='446' y2='226.5' stroke='#1c1c20' stroke-width='1'/><text x='40' y='229.5' fill='#a89e8c' font-size='9' text-anchor='end'>52.0%</text><line x1='46' y1='161.0' x2='446' y2='161.0' stroke='#1c1c20' stroke-width='1'/><text x='40' y='164.0' fill='#a89e8c' font-size='9' text-anchor='end'>68.7%</text><line x1='46' y1='95.5' x2='446' y2='95.5' stroke='#1c1c20' stroke-width='1'/><text x='40' y='98.5' fill='#a89e8c' font-size='9' text-anchor='end'>85.4%</text><line x1='46' y1='30.0' x2='446' y2='30.0' stroke='#1c1c20' stroke-width='1'/><text x='40' y='33.0' fill='#a89e8c' font-size='9' text-anchor='end'>102.1%</text><text x='46.0' y='310' fill='#a89e8c' font-size='9' text-anchor='middle'>0</text><text x='446.0' y='310' fill='#a89e8c' font-size='9' text-anchor='middle'>11</text><text x='246.0' y='310' fill='#a89e8c' font-size='10' font-family='Newsreader,serif' font-style='italic' text-anchor='middle'>epoch →</text><text x='14' y='161.0' fill='#a89e8c' font-size='10' font-family='Newsreader,serif' font-style='italic' text-anchor='middle' transform='rotate(-90 14 161.0)'>accuracy →</text><polyline points='46.0,278.0 82.4,212.9 118.7,187.3 155.1,171.9 191.5,160.6 227.8,153.3 264.2,145.7 300.5,138.6 336.9,134.7 373.3,130.6 409.6,127.5 446.0,125.2' fill='none' stroke='#d29922' stroke-width='1.8'/><circle cx='446.0' cy='125.2' r='2.6' fill='#d29922'/><rect x='52' y='35' width='10' height='10' fill='#d29922'/><text x='68' y='44' fill='#e6e1d6' font-size='10' font-family='IBM Plex Mono,monospace'>train top-1</text><polyline points='46.0,244.9 82.4,218.9 118.7,254.0 155.1,183.6 191.5,184.6 227.8,164.3 264.2,152.9 300.5,147.9 336.9,140.1 373.3,135.5 409.6,132.8 446.0,132.6' fill='none' stroke='#58a6ff' stroke-width='1.8'/><circle cx='446.0' cy='132.6' r='2.6' fill='#58a6ff'/><rect x='52' y='51' width='10' height='10' fill='#58a6ff'/><text x='68' y='60' fill='#e6e1d6' font-size='10' font-family='IBM Plex Mono,monospace'>test top-1</text><polyline points='46.0,65.2 82.4,58.7 118.7,65.8 155.1,52.5 191.5,50.9 227.8,49.1 264.2,46.7 300.5,44.6 336.9,45.1 373.3,44.2 409.6,44.3 446.0,44.0' fill='none' stroke='#3fb950' stroke-width='1.8'/><circle cx='446.0' cy='44.0' r='2.6' fill='#3fb950'/><rect x='52' y='67' width='10' height='10' fill='#3fb950'/><text x='68' y='76' fill='#e6e1d6' font-size='10' font-family='IBM Plex Mono,monospace'>test top-5</text></svg></div></div></section>
-<section class='card' style='--i:6'><h2>Deep inspection</h2><p style='color:var(--paper-dim);font-size:0.9em;margin-bottom:6px'>Audit excerpts, reasoning blob, raw configuration, and full metrics JSON — expand sections of interest.</p><details class='deep'><summary>Research-scientist critique (addendum)</summary><div class='body'><div style='margin-bottom:12px'><span style='margin-right:4px;display:inline-block'><span class='vbadge' style='display:inline-block;padding:3px 10px;border:1px solid #58a6ff;color:#58a6ff;font-weight:600;font-size:10px;font-family:"IBM Plex Mono",monospace;text-transform:uppercase;letter-spacing:0.16em;transition:transform 160ms ease,filter 160ms ease;background:transparent' title='INCONCLUSIVE-NEEDS-DATA — empirically negative on upright CIFAR-10 (−8.8 pp), and the doc&#39;s rotation-robustness claim is still unmeasured; if the hex-mask baseline dominates on both axes, the verdict moves to DERIVATIVE+REJECTED.'><span style='opacity:0.65'>sci-critic</span> &nbsp;DERIVATIVE+REJECTED</span></span></div><pre style='border-left:2px solid var(--v-novel)'>*Reviewer: SciCritic-G8 (elite-research-scientist critic). Critiquing
-the IDEA, not the implementation (audit at `audits/G8_audit.md`).*
-
-### Prior plausibility (LOW/MED/HIGH + why)
-
-LOW. The isotropy-prior framing is real (Worrall, Garbin,
-Turmukhambetov, Brostow 2017 CVPR &#39;Harmonic Networks: Deep
-Translation and Rotation Equivariance&#39; (arXiv:1612.04642); Weiler,
-Hamprecht, Storath 2018 CVPR &#39;Learning Steerable Filters for
-Rotation Equivariant CNNs&#39; (arXiv:1711.07289)), but the Reuleaux
-triangle is a *peculiar* choice — it has C₃ symmetry, not full
+<section class='card' style='--i:6'><h2>Deep inspection</h2><p style='color:var(--paper-dim);font-size:0.9em;margin-bottom:6px'>Audit excerpts, reasoning blob, raw configuration, and full metrics JSON — expand sections of interest.</p><details class='deep'><summary>Research-scientist critique (addendum)</summary><div class='body'><div style='margin-bottom:12px'><span style='margin-right:4px;display:inline-block'><span class='vbadge' style='display:inline-block;padding:3px 10px;border:1px solid #58a6ff;color:#58a6ff;font-weight:600;font-size:10px;font-family:"IBM Plex Mono",monospace;text-transform:uppercase;letter-spacing:0.16em;transition:transform 160ms ease,filter 160ms ease;background:transparent' title='INCONCLUSIVE-NEEDS-DATA — empirically negative on upright CIFAR-10 (−8.8 pp), and the doc&#39;s rotation-robustness claim is still unmeasured; if the hex-mask baseline dominates on both axes, the verdict moves to DERIVATIVE+REJECTED.'><span style='opacity:0.65'>sci-critic</span> &nbsp;DERIVATIVE+REJECTED</span></span></div><div class='md-body' style='border-left:2px solid var(--v-novel);padding:8px 14px;background:var(--panel2);border-radius:5px'><p><em>Reviewer: SciCritic-G8 (elite-research-scientist critic). Critiquing
+the IDEA, not the implementation (audit at <code>audits/G8_audit.md</code>).</em></p>
+<h3>Prior plausibility (LOW/MED/HIGH + why)</h3>
+<p>LOW. The isotropy-prior framing is real (Worrall, Garbin,
+Turmukhambetov, Brostow 2017 CVPR &lsquo;Harmonic Networks: Deep
+Translation and Rotation Equivariance&rsquo; (arXiv:1612.04642); Weiler,
+Hamprecht, Storath 2018 CVPR &lsquo;Learning Steerable Filters for
+Rotation Equivariant CNNs&rsquo; (arXiv:1711.07289)), but the Reuleaux
+triangle is a <em>peculiar</em> choice — it has C₃ symmetry, not full
 rotational isotropy. A disk-masked kernel has continuous rotational
-symmetry; Reuleaux is *less* isotropic than a disk while removing
-fewer corner taps. Also, the empirical record in this repo&#39;s
+symmetry; Reuleaux is <em>less</em> isotropic than a disk while removing
+fewer corner taps. Also, the empirical record in this repo&rsquo;s
 existing audit shows H80 already attains 75.95 % vs. 84.78 %
-baseline (−8.8 pp) — a catastrophic confirmed negative.
-
-### Mechanism scrutiny — does the NEUTRAL recast match the cited real technique?
-
-PARTIALLY. Shaped-kernel masking is real (Hoogeboom, Peters, Cohen,
-Welling 2018 &#39;HexaConv&#39; (arXiv:1803.02108) — same masking technique
-for hex). But a Reuleaux triangle has *triangular* symmetry (C₃v),
-which is *more* anisotropic than a square (C₄v) along the rotation
+baseline (−8.8 pp) — a catastrophic confirmed negative.</p>
+<h3>Mechanism scrutiny — does the NEUTRAL recast match the cited real technique?</h3>
+<p>PARTIALLY. Shaped-kernel masking is real (Hoogeboom, Peters, Cohen,
+Welling 2018 &lsquo;HexaConv&rsquo; (arXiv:1803.02108) — same masking technique
+for hex). But a Reuleaux triangle has <em>triangular</em> symmetry (C₃v),
+which is <em>more</em> anisotropic than a square (C₄v) along the rotation
 axis — three-fold beats four-fold for orientation bias. The cited
-Worrall 2017 arXiv:1612.04642 motivates *circular* / steerable
+Worrall 2017 arXiv:1612.04642 motivates <em>circular</em> / steerable
 supports, not Reuleaux. The neutral recast is honest about being a
-&quot;shaped mask&quot; but misnames Reuleaux&#39;s symmetry as isotropic.
-
-### Does the esoteric origin contaminate the implementation or framing?
-
-YES. The doc opens with the Reuleaux triangle as a &quot;sacred
-constant-width form&quot;. The *constant-width* property is geometric
-(rolls smoothly between parallel lines) but has *no relevance* to
-convolution: a convolution doesn&#39;t roll, it convolves. The
+&ldquo;shaped mask&rdquo; but misnames Reuleaux&rsquo;s symmetry as isotropic.</p>
+<h3>Does the esoteric origin contaminate the implementation or framing?</h3>
+<p>YES. The doc opens with the Reuleaux triangle as a &ldquo;sacred
+constant-width form&rdquo;. The <em>constant-width</em> property is geometric
+(rolls smoothly between parallel lines) but has <em>no relevance</em> to
+convolution: a convolution doesn&rsquo;t roll, it convolves. The
 constant-width property is a red herring. The framing is selected
-for sacred-geometry resonance, not engineering need.
-
-### Confounds (≥2)
-
-1. **Capacity loss dominates.** For k=5, the Reuleaux mask covers
+for sacred-geometry resonance, not engineering need.</p>
+<h3>Confounds (≥2)</h3>
+<ol>
+<li><strong>Capacity loss dominates.</strong> For k=5, the Reuleaux mask covers
    ~10 of 25 cells, a 60 % reduction in effective kernel capacity
-   (the masked taps have zero contribution at *every* spatial
+   (the masked taps have zero contribution at <em>every</em> spatial
    position). The −8.8 pp empirical drop is almost certainly the
-   capacity loss, not isotropy benefit. The doc&#39;s §6 row &quot;params
-   [0%, 0%]&quot; is *trainable* params, but *effective* params drop by
-   ~60 %.
-2. **Hex baseline is the better comparand.** HexConv (Hoogeboom
+   capacity loss, not isotropy benefit. The doc&rsquo;s §6 row &ldquo;params
+   [0%, 0%]&rdquo; is <em>trainable</em> params, but <em>effective</em> params drop by
+   ~60 %.</li>
+<li><strong>Hex baseline is the better comparand.</strong> HexConv (Hoogeboom
    2018 arXiv:1803.02108) also masks corners but retains ~75 % of
    cells with a hexagonal (C₆v) support — strictly more isotropic
-   than Reuleaux&#39;s C₃v. The Reuleaux mask is dominated by hex on
-   both axes (isotropy *and* capacity).
-3. **No rotation-test reporting yet.** The falsifier requires a
+   than Reuleaux&rsquo;s C₃v. The Reuleaux mask is dominated by hex on
+   both axes (isotropy <em>and</em> capacity).</li>
+<li><strong>No rotation-test reporting yet.</strong> The falsifier requires a
    ±15° rotated-test eval, but the smoke row reports only upright
    accuracy; the isotropy claim is not measured by the
-   experiment.
-
-### Numerology / specificity check
-
-The Reuleaux triangle is one of *infinitely many* curves of
-constant width (Reuleaux polygons of any odd `n`, Reuleaux&#39;s
+   experiment.</li>
+</ol>
+<h3>Numerology / specificity check</h3>
+<p>The Reuleaux triangle is one of <em>infinitely many</em> curves of
+constant width (Reuleaux polygons of any odd <code>n</code>, Reuleaux&rsquo;s
 two-circle curve, the Meissner solids in 3-D, etc.). The
 specificity to the n=3 Reuleaux is not justified by any property of
-CIFAR-10 — it appears because the triangle is the &quot;sacred&quot; Reuleaux
-in popular geometry. A higher-`n` Reuleaux polygon (closer to a
-disk) would be more isotropic.
-
-### Literature precedent — was the neutral recast already known?
-
-YES. Disk/Gaussian/Sobel kernel-masking is decades old; hexagonal
+CIFAR-10 — it appears because the triangle is the &ldquo;sacred&rdquo; Reuleaux
+in popular geometry. A higher-<code>n</code> Reuleaux polygon (closer to a
+disk) would be more isotropic.</p>
+<h3>Literature precedent — was the neutral recast already known?</h3>
+<p>YES. Disk/Gaussian/Sobel kernel-masking is decades old; hexagonal
 masking is established (HexaConv arXiv:1803.02108). Steerable
 filters (Weiler 2018 arXiv:1711.07289) and harmonic networks
 (Worrall 2017 arXiv:1612.04642) achieve genuine rotation
 equivariance, not just isotropy. The Reuleaux-masked kernel is
-strictly weaker than each of these.
-
-### Expected effect size (90% CI a priori)
-
-CIFAR-10 12-ep top-1 vs. square baseline: [−10 pp, −4 pp] (the
-empirical record&#39;s −8.8 pp falls inside). Top-1 drop under ±15°
+strictly weaker than each of these.</p>
+<h3>Expected effect size (90% CI a priori)</h3>
+<p>CIFAR-10 12-ep top-1 vs. square baseline: [−10 pp, −4 pp] (the
+empirical record&rsquo;s −8.8 pp falls inside). Top-1 drop under ±15°
 rotation: smaller-than-square by [0 pp, −2 pp] (modest isotropy
-gain, dominated by capacity loss). The doc&#39;s predicted [-0.5, +</pre></div></details><details class='deep'><summary>Implementation-critic audit (audits/G8_audit.md)</summary><div class='body'><div style='margin-bottom:12px'><a href='https://github.com/dlmastery/nature_inspired_networks/blob/main/audits/G8_audit.md#h80-g8' style='text-decoration:none;border-bottom:none;margin-right:4px;display:inline-block'><span class='vbadge' style='display:inline-block;padding:3px 10px;border:1px solid #a89e8c;color:#a89e8c;font-weight:600;font-size:10px;font-family:"IBM Plex Mono",monospace;text-transform:uppercase;letter-spacing:0.16em;transition:transform 160ms ease,filter 160ms ease;background:transparent' title='N'><span style='opacity:0.65'>impl-critic</span> &nbsp;N</span></a></div><div class='quote'>- **Mechanism:** `reuleaux_mask(k)` = intersection of 3 disks at equilateral-triangle vertices, each disk radius = triangle side length `s = R·√3` with `R = (k−1)/2`. Soft mode = product of sigmoids of (s − dist) per disk; hard mode = boolean AND. Mask is normalised so peak = 1.0 and applied at every forward as `weight * mask` (so masked taps get zero gradient — gradient does flow to all non-masked taps).
-- **Math:** A Reuleaux triangle is *defined* as the intersection of three disks centred at the equilateral-triangle vertices with disk radius equal to the side length. Implementation matches the definition exactly. Centre value = 1 (inside all three disks). Corners &lt; 1 (suppressed). Disk radius `= s` (the side), not `s/2` or `R`, is correctly chosen.
-- **Tests** (`test_constant_width_kernel.py`, 6): corner values &lt; 1e-2, centre = 1.0, coverage strictly between 5 (tiny-disk floor) and k² (square), corner gradient ≪ centre gradient (mask is in the forward, not init), and param count equals plain `nn.Conv2d` (mask is a buffer). Mechanism-verifying.
-- **Verdict:** No defects.</div><p style='margin-top:12px'><a href='https://github.com/dlmastery/nature_inspired_networks/blob/main/audits/G8_audit.md#h80-g8'>↗ Full audit on GitHub</a> <span class='mono' style='color:var(--paper-dim);font-size:0.78em'>audits/G8_audit.md</span></p></div></details><details class='deep'><summary>Reasoning blob (reasoning.json)</summary><div class='body'><p class='empty'>No <code>reasoning.json</code> for this run directory.</p></div></details><details class='deep'><summary>Configuration dump</summary><div class='body'><p class='mono' style='color:var(--paper-dim);font-size:0.8em;margin-bottom:8px'>inferred from experiment_log.jsonl + metrics.json</p><pre>{
+gain, dominated by capacity loss). The doc&rsquo;s predicted [-0.5, +</p></div></div></details><details class='deep'><summary>Implementation-critic audit (audits/G8_audit.md)</summary><div class='body'><div style='margin-bottom:12px'><a href='https://github.com/dlmastery/nature_inspired_networks/blob/main/audits/G8_audit.md#h80-g8' style='text-decoration:none;border-bottom:none;margin-right:4px;display:inline-block'><span class='vbadge' style='display:inline-block;padding:3px 10px;border:1px solid #a89e8c;color:#a89e8c;font-weight:600;font-size:10px;font-family:"IBM Plex Mono",monospace;text-transform:uppercase;letter-spacing:0.16em;transition:transform 160ms ease,filter 160ms ease;background:transparent' title='N'><span style='opacity:0.65'>impl-critic</span> &nbsp;N</span></a></div><div class='quote md-body'><ul>
+<li><strong>Mechanism:</strong> <code>reuleaux_mask(k)</code> = intersection of 3 disks at equilateral-triangle vertices, each disk radius = triangle side length <code>s = R·√3</code> with <code>R = (k−1)/2</code>. Soft mode = product of sigmoids of (s − dist) per disk; hard mode = boolean AND. Mask is normalised so peak = 1.0 and applied at every forward as <code>weight * mask</code> (so masked taps get zero gradient — gradient does flow to all non-masked taps).</li>
+<li><strong>Math:</strong> A Reuleaux triangle is <em>defined</em> as the intersection of three disks centred at the equilateral-triangle vertices with disk radius equal to the side length. Implementation matches the definition exactly. Centre value = 1 (inside all three disks). Corners &lt; 1 (suppressed). Disk radius <code>= s</code> (the side), not <code>s/2</code> or <code>R</code>, is correctly chosen.</li>
+<li><strong>Tests</strong> (<code>test_constant_width_kernel.py</code>, 6): corner values &lt; 1e-2, centre = 1.0, coverage strictly between 5 (tiny-disk floor) and k² (square), corner gradient ≪ centre gradient (mask is in the forward, not init), and param count equals plain <code>nn.Conv2d</code> (mask is a buffer). Mechanism-verifying.</li>
+<li><strong>Verdict:</strong> No defects.</li>
+</ul></div><p style='margin-top:12px'><a href='https://github.com/dlmastery/nature_inspired_networks/blob/main/audits/G8_audit.md#h80-g8'>↗ Full audit on GitHub</a> <span class='mono' style='color:var(--paper-dim);font-size:0.78em'>audits/G8_audit.md</span></p></div></details><details class='deep'><summary>Reasoning blob (reasoning.json)</summary><div class='body'><p class='empty'>No <code>reasoning.json</code> for this run directory.</p></div></details><details class='deep'><summary>Configuration dump</summary><div class='body'><p class='mono' style='color:var(--paper-dim);font-size:0.8em;margin-bottom:8px'>inferred from experiment_log.jsonl + metrics.json</p><pre>{
   &quot;tag&quot;: &quot;sg_only_constant_width&quot;,
   &quot;model&quot;: &quot;NaturePrior&quot;,
   &quot;dataset&quot;: &quot;cifar10&quot;,
