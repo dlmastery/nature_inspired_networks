@@ -308,16 +308,28 @@ nature_inspired_networks/
 
 ---
 
-## 7. Sister projects
+## 7. Sister projects (cross-links, NOT dependencies)
 
-- [`dlmastery/autoresearchimage`](https://github.com/dlmastery/autoresearchimage) — protocol source-of-truth
+This repository is **self-contained**. The autoresearch protocol below
+(Rules 1–27) is fully specified here; nothing in this file requires
+reading another repo to implement. Sister repositories are listed only
+as related autoresearch projects on different domains — useful for
+cross-pollination but never as authoritative sources:
+
 - [`dlmastery/autoresearch`](https://github.com/dlmastery/autoresearch) — FX prediction
-- [`dlmastery/autoresearchtabular`](https://github.com/dlmastery/autoresearchtabular) — Higgs UCI
+- [`dlmastery/autoresearchimage`](https://github.com/dlmastery/autoresearchimage) — earlier image-classification autoresearch project that helped seed the protocol; this repo's rules supersede any divergence.
+- [`dlmastery/autoresearchtabular`](https://github.com/dlmastery/autoresearchtabular) — Higgs UCI tabular
 - [`dlmastery/autoresearchspy`](https://github.com/dlmastery/autoresearchspy) — SPY ETF
 - [`dlmastery/autoresearchindexstock`](https://github.com/dlmastery/autoresearchindexstock) — QQQ
 
-If you change a gate or composite formula here, also open an issue on
-`autoresearchimage` explaining why.
+Composite formula `top1 − 0.05·log10(params_M) − 0.05·log10(latency_ms)`
+is **defined here** (Rule 2) and SHA-256-fingerprinted as
+`d65565e9c7b12d14cbce30a801ecc6753aea3eb148074256bfcc051fa61d0893`.
+A new branch / repo is required to change it — no parent-repo dependency.
+
+The 17 reusable skills in `skills/` (catalogued in §11) are also
+self-contained and content-agnostic: any future autoresearch project
+can pick them up unchanged.
 
 ---
 
@@ -430,6 +442,49 @@ test suite — the code never delivered what the doc promised. Treat
 the Q&A as a binding contract: every Q&A test name not in `tests/`
 is a MAJOR audit finding.
 
+### Rule 26 — Windows thread-cap safety (crash prevention)
+The autoresearch hardware contract (§2) requires `num_workers: 0` for
+DataLoader on Windows (spawn-start workers wedge). After a 2026-05-28
+machine crash during a multi-hour multi-agent sweep, the same hardware
+contract is extended to ALSO set:
+```powershell
+$env:KMP_DUPLICATE_LIB_OK = "TRUE"
+$env:OMP_NUM_THREADS = 2
+$env:MKL_NUM_THREADS = 2
+```
+in front of every long-running sweep launch. Without the OMP/MKL caps,
+PyTorch + numpy + scipy each spin up `os.cpu_count()` threads, oversubscribing
+the CPU when 5+ agents + a GPU sweep + an auto-checkpoint loop run
+concurrently. The cap leaves enough cores for OS/IDE/Claude Code to
+continue and prevents the system-wide hang the May-28 crash exhibited.
+Rule 20's auto-checkpoint loop is then sufficient to lose ≤ 1 run on
+any future crash (validated empirically on 2026-05-28; 24 of 31 runs
+preserved by auto-checkpoint, the remaining 7 resumed cleanly via
+`--skip-existing`).
+
+### Rule 27 — Pages-link discipline (no repo-root .md hrefs in HTML)
+GitHub Pages publishes ONLY the `docs/` directory. Any link in the
+dashboard HTML to a repo-root file (`FINDINGS.md`, `EXPERIMENT_LOG.md`,
+`hypotheses/g*/H*.md`, `audits/G*_audit.md`, `PAPER.md`, etc.) using a
+relative path like `../FINDINGS.md` or `../../hypotheses/...` resolves
+to a Pages-root URL that returns **404**. The 2026-05-29 Playwright
+audit found 340+ such broken links across 199 generated HTML files.
+
+The fix codifies the discipline: every link from generated dashboard
+HTML to a non-`docs/` repo file MUST be the absolute GitHub-blob URL
+`https://github.com/dlmastery/nature_inspired_networks/blob/main/<path>`.
+Relative paths are reserved for files INSIDE `dashboard/` (e.g., per-
+experiment pages link to siblings via `experiments/<tag>.html` — that
+works because those files are mirrored under `docs/dashboard/`).
+
+Inline `fetch('../hypotheses/...')` JavaScript pattern is forbidden for
+the same reason; click handlers must `window.open` the GitHub-blob URL
+in a new tab rather than try to inline-render a Pages-blocked file.
+
+A Playwright link sweep (extract all `<a href>`, HEAD-test each suspect,
+report 404s) is the canonical verification — run after every renderer
+change.
+
 ### Cumulative checkpoint cadence (reinforcement of Rule 11)
 The auto-checkpoint loop discipline is **mandatory** during any
 multi-hour campaign. "I'll commit at the end of the turn" is a Rule-11
@@ -462,4 +517,6 @@ can pick them up unchanged. The current catalogue:
 - [`autoresearch-per-experiment-page`](skills/autoresearch-per-experiment-page/) — independent comprehensive dashboard page per run, group-sectioned aggregate, GitHub Pages mirror.
 - [`autoresearch-auto-checkpoint-loop`](skills/autoresearch-auto-checkpoint-loop/) — background git auto-commit loop for crash safety alongside long-running sweeps and agent teams.
 
-*Last updated: 2026-05-27. Rules 1–25 are normative invariants.*
+*Last updated: 2026-05-29. Rules 1–27 are normative invariants. CLAUDE.md
+is self-contained: no parent-repo dependency required to implement the
+protocol. The 17 skills in `skills/` are content-agnostic.*

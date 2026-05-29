@@ -2778,21 +2778,12 @@ function sortTable(tableId, n){
 }
 
 function openHypothesis(hid,fname){
-  var sp=document.getElementById('side-panel');
-  document.getElementById('side-panel-title').textContent=hid+' — '+fname;
-  document.getElementById('side-panel-body').textContent='Loading…';
-  fetch('../hypotheses/'+fname).then(function(r){
-    if(!r.ok) throw new Error('HTTP '+r.status);
-    return r.text();
-  }).then(function(t){
-    document.getElementById('side-panel-body').textContent=t;
-  }).catch(function(e){
-    document.getElementById('side-panel-body').textContent=
-      'Could not fetch hypotheses/'+fname+' ('+e.message+').\n'+
-      'When opened via file:// many browsers block fetch; serve via\n'+
-      '`python -m http.server` from the repo root and reload.';
-  });
-  sp.classList.add('open');
+  // Pages does not serve repo-root .md files (only docs/) and file://
+  // blocks fetch in most browsers — both made the previous inline-fetch
+  // side-panel uselessly broken. Just navigate to the GitHub-blob URL,
+  // which always resolves both as a published doc and in dev.
+  var url='https://github.com/dlmastery/nature_inspired_networks/blob/main/hypotheses/'+fname;
+  window.open(url,'_blank','noopener,noreferrer');
 }
 function closeSide(){
   var sp=document.getElementById('side-panel');
