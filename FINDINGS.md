@@ -232,6 +232,128 @@ seeds before earning the headline.
 
 ---
 
+## Phase 7 — Pre-fix vs post-fix comparison (24 of 31 tags, 2026-05-28)
+
+The audit + Fixer campaign (Rules 21, 22) re-ran every previously
+landed single-axis and combo tag against the corrected hypothesis
+modules. The pre-fix numbers come from commit `282cddb` ("Pre-fix
+combo ladder complete (7 rows, broken phi_budget + 1-step-saturating
+golden_momentum)"); the post-fix numbers are the current working
+tree under `experiments/cifar10/<tag>_seed0/metrics.json`. The 10
+Tier-A LOO / PAIR tags did NOT exist pre-fix — they were authored as
+the corrected ladder's importance-of-removal probes. Survival
+buckets: **STRENGTHENED** post − pre > +0.20 pp on top-1,
+**STABLE** within ±0.20 pp, **WEAKENED** post − pre < −0.20 pp,
+**EMERGED** new tag with post-fix > baseline 84.78 %,
+**NEW (negative)** new tag with post-fix < baseline. All numbers are
+CIFAR-10 top-1, 12-epoch, seed 0.
+
+| tag | hyp | pre-fix top1 | post-fix top1 | Δ (pp) | survives? |
+|---|---|---:|---:|---:|---|
+| `sg_only_phi_budget` | H09 | 85.54 | 85.56 | +0.02 | STABLE |
+| `sg_only_golden_bottleneck` | H10 | 69.25 | 68.79 | −0.46 | WEAKENED |
+| `sg_only_cymatic_init` | H29 | 77.44 | 77.64 | +0.20 | STABLE |
+| `sg_only_golden_spiral_init` | H30 | 80.42 | 80.57 | +0.15 | STABLE |
+| `sg_only_golden_adam` | H41 | 51.96 | 83.94 | **+31.98** | STRENGTHENED |
+| `sg_only_phi_dropout` | H44 | 82.80 | 83.03 | +0.23 | STRENGTHENED |
+| `sg_only_golden_momentum` | H48 | 83.52 | 83.65 | +0.13 | STABLE |
+| `combo2_pb_gm` | C2 | 86.14 | 85.62 | −0.52 | WEAKENED |
+| `combo3_pb_gm_pd` | C3 | 86.42 | 85.66 | −0.76 | WEAKENED |
+| `combo4_pb_gm_pd_pdw` | C4 | 85.80 | 85.44 | −0.36 | WEAKENED |
+| `combo5_pb_gm_pd_pdw_plr` | C5 | 81.59 | 79.78 | −1.81 | WEAKENED |
+| `combo6_pb_gm_pd_pdw_plr_fe` | C6 | 85.23 | 84.90 | −0.33 | WEAKENED |
+| `combo7_pb_gm_pd_pdw_plr_fe_sa` | C7 | 85.05 | 85.29 | +0.24 | STRENGTHENED |
+| `combo8_pb_gm_pd_pdw_plr_fe_sa_fp` | C8 | 84.08 | 84.96 | +0.88 | STRENGTHENED |
+| `loo_no_gm` | LOO−gm | N/A — new tag | 84.27 | — | NEW (negative) |
+| `loo_no_pd` | LOO−pd | N/A — new tag | 85.37 | — | EMERGED |
+| `loo_no_pdw` | LOO−pdw | N/A — new tag | 84.97 | — | EMERGED |
+| `loo_no_plr` | LOO−plr | N/A — new tag | 83.83 | — | NEW (negative) |
+| `loo_no_fe` | LOO−fe | N/A — new tag | 84.03 | — | NEW (negative) |
+| `loo_no_sa` | LOO−sa | N/A — new tag | 84.82 | — | EMERGED |
+| `loo_no_fp` | LOO−fp | N/A — new tag | 85.29 | — | EMERGED |
+| `pair_gm_pdw` | P(gm,pdw) | N/A — new tag | **85.85** | — | EMERGED |
+| `pair_gm_plr` | P(gm,plr) | N/A — new tag | 80.36 | — | NEW (negative) |
+| `pair_pd_pdw` | P(pd,pdw) | N/A — new tag | 85.24 | — | EMERGED |
+
+### Survival counts
+
+- **STRENGTHENED:** 4 (`golden_adam`, `phi_dropout`, `combo7`, `combo8`)
+- **STABLE:** 4 (`phi_budget`, `cymatic_init`, `golden_spiral_init`,
+  `golden_momentum`)
+- **WEAKENED:** 6 (`golden_bottleneck`, `combo2`, `combo3`, `combo4`,
+  `combo5`, `combo6`)
+- **EMERGED:** 6 (`pair_gm_pdw`, `loo_no_pd`, `loo_no_fp`,
+  `loo_no_pdw`, `loo_no_sa`, `pair_pd_pdw`)
+- **NEW (negative):** 4 (`loo_no_plr`, `loo_no_fe`, `loo_no_gm`,
+  `pair_gm_plr`)
+
+### Analysis
+
+**H09 phi_budget survives the corrected mechanism.** The single-axis
+post-fix number (85.56 %, +0.02 pp Δ) sits squarely on top of the
+pre-fix headline (85.54 %), confirming that the **mechanism fix did
+not erase the gain**. The Phase-5 verdict — phi_budget as the
+project's first defensible single-prior win, replicated on CIFAR-100
+across three seeds — remains intact. The corrected "1 : φ : φ²"
+per-stage allocation is reproducible, and the small param drop
+(283.6 k → 262.1 k) under the corrected width-rounding actually
+improves the param-efficient composite slightly.
+
+**H48 golden_momentum and H44 phi_dropout still help — but only
+inside the right combo.** golden_momentum's solo post-fix number
+moved from 83.52 → 83.65 (within noise), still −1.91 pp below the
+baseline; the fix saved its mechanism without rescuing the prior on
+its own. Stacked onto phi_budget, the combo2 row weakened slightly
+(86.14 → 85.62) because the pre-fix combo2 inherited an unsupported
+boost from the broken phi_budget initialisation. The **best stack in
+the entire post-fix sweep is `pair_gm_pdw` at 85.85 %** (phi_budget +
+golden_momentum + phi_dropout-weight) — beating every single prior
+including phi_budget alone by +0.29 pp and beating the corrected
+combo2 by +0.23 pp. phi_dropout solo moved STRENGTHENED (82.80 →
+83.03) and shows up in two of the four EMERGED LOO/pair rows.
+
+**Combo ladder post-fix: monotone-add is dead, the *axis* matters.**
+The pre-fix combo ladder showed monotone gain from C2 → C3 (86.14 →
+86.42) and a cliff at C5 (`+plr`, −4.83 pp). Post-fix the C2-to-C4
+plateau is gone (85.62, 85.66, 85.44) and the C5 cliff is even
+deeper post-fix (−5.88 pp from C4). C7 and C8 STRENGTHENED slightly,
+meaning that once `plr` has already collapsed accuracy, adding
+self-attention (`sa`) and feature-pyramid (`fp`) repairs some of the
+damage. The pattern: **`plr` (phi-LR-schedule) is the single most
+destructive axis** and a `fe` (fib-ensemble) on its own is also
+net-negative; `gm`, `pd`, `pdw`, `sa`, `fp` are all neutral-to-mildly
+positive in the right context.
+
+**Tier-A LOO/PAIR signal — which removal hurts the most?** Reading
+`combo8 = 84.96 %` and the seven LOO rows: removing `gm` drops to
+84.27 (−0.69 pp), removing `plr` drops to 83.83 (−1.13 pp),
+removing `fe` drops to 84.03 (−0.93 pp). Removing `pd`, `pdw`, `sa`,
+`fp` all sit at-or-above 84.82 (no harm to mild improvement, i.e.
+those four axes are net-zero inside combo8). **The most-damaging
+removal is `plr` (−1.13 pp), followed by `fe` (−0.93 pp) and `gm`
+(−0.69 pp).** Counterintuitively, although `plr` was the **most
+destructive axis** when *added* to the C4 stack, once the network
+has compensated for it through C7 + C8, **removing it costs the
+most** — the surrounding stack has reorganised around its presence.
+
+**Provisional Phase-8 winners.** Two tags clear both gates (post-fix
+top-1 > baseline 84.78 % AND best-of-class for their tier):
+
+1. **`pair_gm_pdw` — 85.85 %** (best single combo in the post-fix
+   sweep, +1.07 pp over baseline, beats every solo prior). Three
+   orthogonal axes: phi_budget (architecture) + golden_momentum
+   (optimiser) + phi_dropout-weight-decay (regulariser). Promote to
+   3-seed CIFAR-100 Phase-8.
+2. **`sg_only_phi_budget` — 85.56 %** (best single-prior post-fix,
+   already cleared Phase-5 on CIFAR-100). Continues as the
+   single-axis control for the 3-seed CIFAR-100 head-to-head.
+
+`combo3_pb_gm_pd` (85.66 %) is a candidate alternative if `pair_gm_pdw`
+fails the CIFAR-100 seed-noise gate; both share gm + a phi_dropout
+variant and differ only in the weight-decay vs dropout coupling.
+
+---
+
 ## Final ranking (composite descending, single seed) — original 11-row campaign
 
 | rank | tag | top-1 | params | latency ms | composite | Δ vs `sg_chan_fib` |
