@@ -47,8 +47,8 @@ class PhiReLU(nn.Module):
     """Per-channel learnable-threshold ReLU.
 
     The threshold ``tau`` is a learnable :class:`~torch.nn.Parameter`
-    of shape ``(num_channels,)`` initialised to ``init``
-    (default ``1/phi``). The forward pass broadcasts ``tau`` over the
+    of shape ``(num_channels,)`` initialised to ``tau_init``
+    (default ``0.0``). The forward pass broadcasts ``tau`` over the
     spatial / temporal axes based on the input rank:
 
     * 2-D input ``(B, C)``: ``tau`` broadcasts as ``(1, C)``.
@@ -57,16 +57,43 @@ class PhiReLU(nn.Module):
       ``(1, C, 1, 1)`` — the canonical conv-NCHW layout.
 
     The output is ``F.relu(x - tau)``; gradients flow through ``tau``.
+
+    Init policy (Paper-Gap-Audit-G2, 2026-05-28):
+    The original H19 implementation initialised ``tau`` at
+    ``1/phi ~= 0.618`` on the POST-BN signal. Empirically this cuts
+    ~62 % of activations through zero at init (only ~38 % of a
+    unit-norm Gaussian survives), starving downstream layers of
+    gradient. The default was therefore changed to ``tau_init = 0.0``
+    (standard ReLU behaviour at init; the threshold can still drift
+    upward through gradient descent). The phi-flavoured init is now an
+    explicit opt-in via ``phi_init=True`` for experimental
+    reproducibility with the pre-fix runs (sweep tag
+    ``sg_only_phi_relu_phiinit``).
+
+    The legacy ``init=`` kwarg is preserved as an alias that wins over
+    both ``tau_init`` and ``phi_init`` when provided.
     """
 
     def __init__(self, num_channels: int,
-                 init: float = PHI_RECIPROCAL) -> None:
+                 tau_init: float = 0.0,
+                 phi_init: bool = False,
+                 init: float | None = None) -> None:
         super().__init__()
         if num_channels < 1:
             raise ValueError(f"num_channels must be >= 1; got {num_channels}")
         self.num_channels = int(num_channels)
-        self.init = float(init)
-        self.tau = nn.Parameter(torch.full((num_channels,), float(init)))
+        self.phi_init = bool(phi_init)
+        # Resolve initial threshold value with a clear precedence:
+        # explicit ``init=`` legacy kwarg > ``phi_init=True`` opt-in >
+        # ``tau_init`` default.
+        if init is not None:
+            init_value = float(init)
+        elif phi_init:
+            init_value = float(PHI_RECIPROCAL)
+        else:
+            init_value = float(tau_init)
+        self.init = init_value
+        self.tau = nn.Parameter(torch.full((num_channels,), init_value))
 
     def _broadcast(self, x: torch.Tensor) -> torch.Tensor:
         if x.ndim == 2:
@@ -87,7 +114,10 @@ class PhiReLU(nn.Module):
         return F.relu(x - tau)
 
     def extra_repr(self) -> str:
-        return f"num_channels={self.num_channels}, init={self.init:.6f}"
+        return (
+            f"num_channels={self.num_channels}, init={self.init:.6f}, "
+            f"phi_init={self.phi_init}"
+        )
 
 
 class PhiAdaptiveReLU(nn.Module):

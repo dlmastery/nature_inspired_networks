@@ -18,15 +18,22 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 from nature_inspired_networks.blocks import NaturePriorFlags  # noqa: E402
 from nature_inspired_networks.stride import (  # noqa: E402
     DEFAULT_FIB_STRIDES,
+    EXTENDED_FIB_STRIDES_2_3_5,
     FibStrideNaturePriorNet,
+    LEGACY_FIB_STRIDES_1_2_3,
     fib_stride_schedule,
 )
 
 
-def test_default_strides_are_1_2_3():
-    """Canonical schedule: stage 0 keeps resolution; stages 1/2 alternate
-    Fib pair (2, 3)."""
-    assert DEFAULT_FIB_STRIDES == (1, 2, 3)
+def test_default_strides_are_2_2_2_after_paper_gap_fix():
+    """Paper-Gap-Audit-G2 (2026-05-28): the default schedule is the
+    canonical ResNet 2x-per-stage cascade ``(2, 2, 2)``. The pre-fix
+    schedule ``(1, 2, 3)`` is retained as ``LEGACY_FIB_STRIDES_1_2_3``
+    for opt-in Fibonacci sweeps but no longer the default."""
+    assert DEFAULT_FIB_STRIDES == (2, 2, 2)
+    # Legacy schedule still exported for backward compat / opt-in runs.
+    assert LEGACY_FIB_STRIDES_1_2_3 == (1, 2, 3)
+    assert EXTENDED_FIB_STRIDES_2_3_5 == (2, 3, 5)
 
 
 def test_fib_stride_schedule_canonical_3_stages():
@@ -87,14 +94,15 @@ def test_fib_stride_net_forward_shape_on_cifar():
 
 def test_fib_stride_net_predicted_cascade_matches_actual_shapes():
     """Regression: the spatial-size prediction must match the forward
-    cascade. Catches off-by-one bugs in stride-3 padding handling."""
+    cascade. After the paper-gap fix the default schedule is (2, 2, 2)
+    which gives the canonical ResNet cascade ``[32, 16, 8, 4]``."""
     torch.manual_seed(0)
     flags = NaturePriorFlags(False, False, False, False, False, False)
     net = FibStrideNaturePriorNet(num_classes=10, channel_mode="fib",
                                   flags=flags)
     cascade = net.predicted_spatial_cascade(32)
-    # 32 -> floor((32-1)/1)+1=32 -> floor((32-1)/2)+1=16 -> floor((16-1)/3)+1=6
-    assert cascade == [32, 32, 16, 6], cascade
+    # 32 -> floor((32+2-3)/2)+1=16 -> floor((16+2-3)/2)+1=8 -> floor((8+2-3)/2)+1=4
+    assert cascade == [32, 16, 8, 4], cascade
 
     # Trace stages manually to confirm
     x = torch.randn(1, 3, 32, 32)
@@ -102,11 +110,23 @@ def test_fib_stride_net_predicted_cascade_matches_actual_shapes():
     h = net.stem(h)
     assert h.shape[-1] == 32
     h = net.stages[0](h)
-    assert h.shape[-1] == 32, h.shape
-    h = net.stages[1](h)
     assert h.shape[-1] == 16, h.shape
+    h = net.stages[1](h)
+    assert h.shape[-1] == 8, h.shape
     h = net.stages[2](h)
-    assert h.shape[-1] == 6, h.shape
+    assert h.shape[-1] == 4, h.shape
+
+
+def test_fib_stride_net_predicted_cascade_legacy_1_2_3():
+    """Branch: passing the legacy schedule explicitly still reproduces
+    the pre-fix cascade ``[32, 32, 16, 6]`` so existing experiment
+    archives can be re-run for backward-compat comparison."""
+    torch.manual_seed(0)
+    flags = NaturePriorFlags(False, False, False, False, False, False)
+    net = FibStrideNaturePriorNet(num_classes=10, channel_mode="fib",
+                                  flags=flags, strides=(1, 2, 3))
+    cascade = net.predicted_spatial_cascade(32)
+    assert cascade == [32, 32, 16, 6], cascade
 
 
 def test_fib_stride_net_adaptive_pool_collapses_to_1x1():
@@ -145,6 +165,52 @@ def test_fib_stride_net_registered_with_build_model():
     assert isinstance(net, FibStrideNaturePriorNet)
     x = torch.randn(1, 3, 32, 32)
     assert net(x).shape == (1, 10)
+
+
+def test_h18_fib_stride_no_stage_drops_more_than_2x():
+    """Paper-Gap-Audit-G2 mechanism check: the default stride schedule
+    must NOT drop the spatial extent by more than a factor of 2 in any
+    single stage. The pre-fix default ``(1, 2, 3)`` violated this with
+    a 16->6 drop (~2.67x); the post-fix default ``(2, 2, 2)`` gives a
+    strict 2x cascade. Would FAIL on the pre-fix code, PASSES on the
+    post-fix code."""
+    torch.manual_seed(0)
+    flags = NaturePriorFlags(False, False, False, False, False, False)
+    net = FibStrideNaturePriorNet(num_classes=10, channel_mode="fib",
+                                  flags=flags)
+    cascade = net.predicted_spatial_cascade(32)
+    # Walk through consecutive stages and assert no >2x drop in spatial extent.
+    for prev, curr in zip(cascade[:-1], cascade[1:]):
+        if curr <= 0:
+            raise AssertionError(
+                f"stage produced non-positive spatial extent: {cascade}"
+            )
+        ratio = prev / curr
+        assert ratio <= 2.0 + 1e-6, (
+            f"stage drop ratio {ratio:.3f} exceeds 2x cap (cascade={cascade})"
+        )
+
+
+def test_h18_legacy_1_2_3_cascade_violates_2x_cap_regression_witness():
+    """Regression witness: the pre-fix schedule ``(1, 2, 3)`` is
+    KNOWN to violate the 2x cap (16->6 is ~2.67x). This test asserts
+    that explicit opt-in to the legacy schedule still produces the
+    too-aggressive cascade, so we have a regression witness for what
+    the paper-gap fix changed."""
+    torch.manual_seed(0)
+    flags = NaturePriorFlags(False, False, False, False, False, False)
+    net = FibStrideNaturePriorNet(num_classes=10, channel_mode="fib",
+                                  flags=flags, strides=(1, 2, 3))
+    cascade = net.predicted_spatial_cascade(32)
+    # 16 -> 6 is the violator stage
+    worst_ratio = max(
+        prev / curr for prev, curr in zip(cascade[:-1], cascade[1:])
+        if curr > 0
+    )
+    assert worst_ratio > 2.0, (
+        f"expected legacy schedule to violate 2x cap, got "
+        f"worst_ratio={worst_ratio:.3f} (cascade={cascade})"
+    )
 
 
 def test_fib_stride_net_baseline_uniform_strides_still_works():

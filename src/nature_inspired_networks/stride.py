@@ -32,11 +32,25 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 
-# Default alternating Fibonacci-pair stride schedule for a 3-stage
-# CIFAR-scale NaturePriorNet. Stage 0 is the first feature stage and
-# does not downsample (matches ResNet-20 stage1 stride=1). Subsequent
-# stages alternate between stride 2 and stride 3.
-DEFAULT_FIB_STRIDES: tuple[int, ...] = (1, 2, 3)
+# Default stride schedule for a 3-stage CIFAR-scale NaturePriorNet.
+#
+# Paper-Gap-Audit-G2 (2026-05-28): the original schedule ``(1, 2, 3)``
+# yielded a spatial cascade ``[32, 32, 16, 6]`` for 32x32 input — the
+# final 16->6 step drops the feature-map area by ~85 % in a single
+# stage, well beyond the canonical ResNet 2x-per-stage ratio. Empirical
+# CIFAR-10 hit was -9.61 pp vs the baseline.
+#
+# The default is therefore the canonical ResNet cascade ``(2, 2, 2)``
+# which produces ``[32, 16, 8, 4]`` (every stage halves the spatial
+# extent — the standard 2x cascade). The Fibonacci-flavoured schedule
+# ``(2, 3, 5)`` etc. is still available as an opt-in via the
+# ``strides=`` constructor argument so users who want to reproduce the
+# pre-fix Fib cascade can pass ``strides=(1, 2, 3)`` explicitly.
+DEFAULT_FIB_STRIDES: tuple[int, ...] = (2, 2, 2)
+
+# Legacy schedule preserved for backward-compat / opt-in Fib runs.
+LEGACY_FIB_STRIDES_1_2_3: tuple[int, ...] = (1, 2, 3)
+EXTENDED_FIB_STRIDES_2_3_5: tuple[int, ...] = (2, 3, 5)
 
 
 def fib_stride_schedule(n_stages: int,
@@ -78,11 +92,14 @@ class FibStrideNaturePriorNet(nn.Module):
     standard 3x3 kernel with ``padding=1`` so the output spatial size
     follows ``floor((H + 2 - 3) / 3) + 1 = floor((H - 1) / 3) + 1``.
 
-    For a 32x32 input and strides ``(1, 2, 3)``: 32 -> 32 -> 16 -> 6.
-    For strides ``(1, 2, 5)``: 32 -> 32 -> 16 -> 4. In every case the
-    final stage feeds :class:`~torch.nn.AdaptiveAvgPool2d(1)` so the
-    classifier head sees a fixed-shape feature regardless of the
-    downsampling cascade.
+    For a 32x32 input and the default strides ``(2, 2, 2)``: the
+    cascade is 32 -> 16 -> 8 -> 4 (canonical ResNet 2x-per-stage).
+    For the legacy Fib opt-in ``strides=(1, 2, 3)``: 32 -> 32 -> 16 -> 6
+    (the 16->6 stage drops ~85 % of spatial area in one step — kept
+    for backward-compat / Fibonacci sweeps but not the default after
+    the 2026-05-28 paper-gap fix). In every case the final stage feeds
+    :class:`~torch.nn.AdaptiveAvgPool2d(1)` so the classifier head
+    sees a fixed-shape feature regardless of the downsampling cascade.
     """
 
     def __init__(self, num_classes: int = 10, channel_mode: str = "fib",
