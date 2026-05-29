@@ -1,0 +1,2038 @@
+- generic [active] [ref=e1]:
+  - heading "NaturePriorBlock — autoresearch dashboard" [level=1] [ref=e2]
+  - generic [ref=e3]:
+    - text: 84-hypothesis dual-track audit on CIFAR-10 + CIFAR-100 · impl-critic + sci-critic + Fixer campaign · G1..G8 hypothesis ledger ·
+    - link "GitHub" [ref=e4] [cursor=pointer]:
+      - /url: https://github.com/dlmastery/nature_inspired_networks
+    - text: ·
+    - link "FINDINGS.md" [ref=e5] [cursor=pointer]:
+      - /url: https://github.com/dlmastery/nature_inspired_networks/blob/main/FINDINGS.md
+    - text: ·
+    - link "EXPERIMENT_LOG" [ref=e6] [cursor=pointer]:
+      - /url: https://github.com/dlmastery/nature_inspired_networks/blob/main/EXPERIMENT_LOG.md
+    - text: ·
+    - link "PAPER.md" [ref=e7] [cursor=pointer]:
+      - /url: https://github.com/dlmastery/nature_inspired_networks/blob/main/PAPER.md
+    - text: ·
+    - link "AUDIT_SUMMARY.md" [ref=e8] [cursor=pointer]:
+      - /url: https://github.com/dlmastery/nature_inspired_networks/blob/main/AUDIT_SUMMARY.md
+  - generic [ref=e9]: "Headline finding## ✅ PHASE-8 FINAL VERDICT (2026-05-29) — THREE replicated cross-dataset positives The audit + Fixer + post-fix re-run + 3-seed CIFAR-100 graduation cycle is complete. **Three independent hypotheses cleared the worst-leader-seed > best-baseline-seed Phase-5 gate** on CIFAR-100 (30 ep, 3 seeds): | tag | C100 median | min seed | baseline max | Δ vs baseline median | |---|---:|---:|---:|---:| | `pair_gm_pdw` (H09+H48+H44 orthogonal stack) | **0.5786** | 0.5761 | 0.5662 | **+1.34 pp** | | `slot_act_sine` (H81 SIREN, single prior) | **0.5784** | 0.5766 | 0.5662 | **+1.32 pp** | | `sg_only_phi_budge"
+  - generic [ref=e10]:
+    - text: composite ≔
+    - code [ref=e11]: composite = top1 - 0.05 * log10(params_M) - 0.05 * log10(latency_ms)
+    - text: SHA-256 · d65565e9c7b12d14cbce30a801ecc6753aea3eb148074256bfcc051fa61d0893
+  - generic [ref=e12]:
+    - generic [ref=e13]:
+      - generic [ref=e14]: Baseline ResNet-20 top-1
+      - generic [ref=e15]: 84.78%
+    - generic [ref=e16]:
+      - generic [ref=e17]: Full-hybrid top-1
+      - generic [ref=e18]: 73.24%
+    - generic [ref=e19]:
+      - generic [ref=e20]: Full-hybrid latency
+      - generic [ref=e21]: 20.02 ms
+    - generic [ref=e22]:
+      - generic [ref=e23]: Fractal Δ top-1
+      - generic [ref=e24]: +2.35 pp
+    - generic [ref=e25]:
+      - generic [ref=e26]: C4-group Δ top-1
+      - generic [ref=e27]: "-10.27 pp"
+  - generic [ref=e28]:
+    - generic [ref=e29]:
+      - 'heading "Pareto: accuracy vs. params / FLOPs / latency" [level=3] [ref=e30]'
+      - img [ref=e31]
+    - generic [ref=e32]:
+      - 'heading "Ablation matrix: each nature-inspired prior toggled independently" [level=3] [ref=e33]'
+      - img [ref=e34]
+    - generic [ref=e35]:
+      - heading "Training curves" [level=3] [ref=e36]
+      - img [ref=e37]
+    - generic [ref=e38]:
+      - heading "Persistent-homology Betti collapse" [level=3] [ref=e39]
+      - img [ref=e40]
+    - generic [ref=e41]:
+      - heading "Best per dataset (by composite)" [level=3] [ref=e42]
+      - list [ref=e43]:
+        - listitem [ref=e44]:
+          - text: "cifar10: top-1 85.85%, params 0.262M, latency 3.04 ms, composite 0.8634 —"
+          - code [ref=e45]: pair_gm_pdw
+          - text: seed=0
+        - listitem [ref=e46]:
+          - text: "cifar100: top-1 56.99%, params 0.278M, latency 3.99 ms, composite 0.5676 —"
+          - code [ref=e47]: sg_only_golden_momentum
+          - text: seed=0
+    - generic [ref=e48]:
+      - heading "Hypothesis ledger — status grid (G1..G8 × hypothesis index; click a cell to view the spec)" [level=3] [ref=e49]
+      - generic [ref=e50]: 84 hypotheses · 30 done · 51 impl · 2 queued · 1 deferred
+      - generic [ref=e51]:
+        - text: "Legend:"
+        - text: done
+        - text: impl
+        - text: partial
+        - text: running
+        - text: queued
+        - text: planned
+        - text: deferred
+        - text: failed
+        - text: superseded
+      - generic [ref=e61]:
+        - generic [ref=e62]:
+          - generic [ref=e63]: G1
+          - 'generic "H01 (status: done)" [ref=e64] [cursor=pointer]': "01"
+          - 'generic "H02 (status: done)" [ref=e65] [cursor=pointer]': "02"
+          - 'generic "H03 (status: done)" [ref=e66] [cursor=pointer]': "03"
+          - 'generic "H04 (status: done)" [ref=e67] [cursor=pointer]': "04"
+          - 'generic "H05 (status: done)" [ref=e68] [cursor=pointer]': "05"
+          - 'generic "H06 (status: done)" [ref=e69] [cursor=pointer]': "06"
+          - 'generic "H07 (status: done)" [ref=e70] [cursor=pointer]': "07"
+          - 'generic "H08 (status: impl)" [ref=e71] [cursor=pointer]': "08"
+          - 'generic "H09 (status: done)" [ref=e72] [cursor=pointer]': "09"
+          - 'generic "H10 (status: done)" [ref=e73] [cursor=pointer]': "10"
+        - generic [ref=e74]:
+          - generic [ref=e75]: G2
+          - 'generic "H11 (status: impl)" [ref=e76] [cursor=pointer]': "11"
+          - 'generic "H12 (status: done)" [ref=e77] [cursor=pointer]': "12"
+          - 'generic "H13 (status: done)" [ref=e78] [cursor=pointer]': "13"
+          - 'generic "H14 (status: impl)" [ref=e79] [cursor=pointer]': "14"
+          - 'generic "H15 (status: impl)" [ref=e80] [cursor=pointer]': "15"
+          - 'generic "H16 (status: impl)" [ref=e81] [cursor=pointer]': "16"
+          - 'generic "H17 (status: done)" [ref=e82] [cursor=pointer]': "17"
+          - 'generic "H18 (status: done)" [ref=e83] [cursor=pointer]': "18"
+          - 'generic "H19 (status: done)" [ref=e84] [cursor=pointer]': "19"
+          - 'generic "H20 (status: done)" [ref=e85] [cursor=pointer]': "20"
+        - generic [ref=e86]:
+          - generic [ref=e87]: G3
+          - 'generic "H21 (status: done)" [ref=e88] [cursor=pointer]': "21"
+          - 'generic "H22 (status: done)" [ref=e89] [cursor=pointer]': "22"
+          - 'generic "H23 (status: impl)" [ref=e90] [cursor=pointer]': "23"
+          - 'generic "H24 (status: done)" [ref=e91] [cursor=pointer]': "24"
+          - 'generic "H25 (status: impl)" [ref=e92] [cursor=pointer]': "25"
+          - 'generic "H26 (status: impl)" [ref=e93] [cursor=pointer]': "26"
+          - 'generic "H27 (status: impl)" [ref=e94] [cursor=pointer]': "27"
+          - 'generic "H28 (status: impl)" [ref=e95] [cursor=pointer]': "28"
+          - 'generic "H29 (status: impl)" [ref=e96] [cursor=pointer]': "29"
+          - 'generic "H30 (status: impl)" [ref=e97] [cursor=pointer]': "30"
+        - generic [ref=e98]:
+          - generic [ref=e99]: G4
+          - 'generic "H31 (status: done)" [ref=e100] [cursor=pointer]': "31"
+          - 'generic "H32 (status: impl)" [ref=e101] [cursor=pointer]': "32"
+          - 'generic "H33 (status: impl)" [ref=e102] [cursor=pointer]': "33"
+          - 'generic "H34 (status: done)" [ref=e103] [cursor=pointer]': "34"
+          - 'generic "H35 (status: done)" [ref=e104] [cursor=pointer]': "35"
+          - 'generic "H36 (status: impl)" [ref=e105] [cursor=pointer]': "36"
+          - 'generic "H37 (status: impl)" [ref=e106] [cursor=pointer]': "37"
+          - 'generic "H38 (status: impl)" [ref=e107] [cursor=pointer]': "38"
+          - 'generic "H39 (status: done)" [ref=e108] [cursor=pointer]': "39"
+          - 'generic "H40 (status: impl)" [ref=e109] [cursor=pointer]': "40"
+        - generic [ref=e110]:
+          - generic [ref=e111]: G5
+          - 'generic "H41 (status: done)" [ref=e112] [cursor=pointer]': "41"
+          - 'generic "H42 (status: done)" [ref=e113] [cursor=pointer]': "42"
+          - 'generic "H43 (status: done)" [ref=e114] [cursor=pointer]': "43"
+          - 'generic "H44 (status: done)" [ref=e115] [cursor=pointer]': "44"
+          - 'generic "H45 (status: impl)" [ref=e116] [cursor=pointer]': "45"
+          - 'generic "H46 (status: impl)" [ref=e117] [cursor=pointer]': "46"
+          - 'generic "H47 (status: done)" [ref=e118] [cursor=pointer]': "47"
+          - 'generic "H48 (status: done)" [ref=e119] [cursor=pointer]': "48"
+          - 'generic "H49 (status: impl)" [ref=e120] [cursor=pointer]': "49"
+          - 'generic "H50 (status: done)" [ref=e121] [cursor=pointer]': "50"
+        - generic [ref=e122]:
+          - generic [ref=e123]: G6
+          - 'generic "H51 (status: impl)" [ref=e124] [cursor=pointer]': "51"
+          - 'generic "H52 (status: impl)" [ref=e125] [cursor=pointer]': "52"
+          - 'generic "H53 (status: impl)" [ref=e126] [cursor=pointer]': "53"
+          - 'generic "H54 (status: impl)" [ref=e127] [cursor=pointer]': "54"
+          - 'generic "H55 (status: impl)" [ref=e128] [cursor=pointer]': "55"
+          - 'generic "H56 (status: impl)" [ref=e129] [cursor=pointer]': "56"
+          - 'generic "H57 (status: deferred)" [ref=e130] [cursor=pointer]': "57"
+          - 'generic "H58 (status: done)" [ref=e131] [cursor=pointer]': "58"
+          - 'generic "H59 (status: queued)" [ref=e132] [cursor=pointer]': "59"
+          - 'generic "H60 (status: queued)" [ref=e133] [cursor=pointer]': "60"
+        - generic [ref=e134]:
+          - generic [ref=e135]: G7
+          - 'generic "H61 (status: impl)" [ref=e136] [cursor=pointer]': "61"
+          - 'generic "H62 (status: impl)" [ref=e137] [cursor=pointer]': "62"
+          - 'generic "H63 (status: impl)" [ref=e138] [cursor=pointer]': "63"
+          - 'generic "H64 (status: impl)" [ref=e139] [cursor=pointer]': "64"
+          - 'generic "H65 (status: impl)" [ref=e140] [cursor=pointer]': "65"
+          - 'generic "H66 (status: impl)" [ref=e141] [cursor=pointer]': "66"
+          - 'generic "H67 (status: impl)" [ref=e142] [cursor=pointer]': "67"
+          - 'generic "H68 (status: impl)" [ref=e143] [cursor=pointer]': "68"
+          - 'generic "H69 (status: impl)" [ref=e144] [cursor=pointer]': "69"
+          - 'generic "H70 (status: impl)" [ref=e145] [cursor=pointer]': "70"
+          - 'generic "H71 (status: impl)" [ref=e146] [cursor=pointer]': "71"
+          - 'generic "H72 (status: impl)" [ref=e147] [cursor=pointer]': "72"
+          - 'generic "H73 (status: impl)" [ref=e148] [cursor=pointer]': "73"
+          - 'generic "H74 (status: impl)" [ref=e149] [cursor=pointer]': "74"
+          - 'generic "H75 (status: impl)" [ref=e150] [cursor=pointer]': "75"
+        - generic [ref=e151]:
+          - generic [ref=e152]: G8
+          - generic [ref=e153]: ·
+          - generic [ref=e154]: ·
+          - generic [ref=e155]: ·
+          - generic [ref=e156]: ·
+          - generic [ref=e157]: ·
+          - 'generic "H76 (status: impl)" [ref=e158] [cursor=pointer]': "76"
+          - 'generic "H77 (status: impl)" [ref=e159] [cursor=pointer]': "77"
+          - 'generic "H78 (status: impl)" [ref=e160] [cursor=pointer]': "78"
+          - 'generic "H79 (status: impl)" [ref=e161] [cursor=pointer]': "79"
+          - 'generic "H80 (status: impl)" [ref=e162] [cursor=pointer]': "80"
+          - 'generic "H81 (status: impl)" [ref=e163] [cursor=pointer]': "81"
+          - 'generic "H82 (status: impl)" [ref=e164] [cursor=pointer]': "82"
+          - 'generic "H83 (status: impl)" [ref=e165] [cursor=pointer]': "83"
+          - 'generic "H84 (status: impl)" [ref=e166] [cursor=pointer]': "84"
+  - heading "Runs by hypothesis group click any row to expand the experiment page" [level=2] [ref=e167]
+  - generic [ref=e168]:
+    - heading "Baselines (9 runs)" [level=2] [ref=e169]
+    - generic [ref=e170]: Stock ResNet-20 plus the all-priors-off NaturePriorNet scaffold — the controls every hypothesis is judged against.
+    - img [ref=e172]:
+      - generic [ref=e173]: Baselines · top-1 distribution (n=9)
+      - generic [ref=e174]: 22%
+      - generic [ref=e175]: 45%
+      - generic [ref=e176]: 67%
+      - generic [ref=e177]: 90%
+      - generic [ref=e178]: top-1 →
+      - generic [ref=e179]: cifar10 baseline 84.8%
+      - generic [ref=e180]: cifar100 baseline 56.5%
+      - generic "baseline_resnet20 · cifar10 · seed0 · top-1 84.78% · params 0.272M · composite 0.8458" [ref=e181]
+      - generic [ref=e182]: baseline_resnet20
+      - generic [ref=e183]: 84.78%
+      - generic "baseline_resnet20 · cifar10 · seed2 · top-1 83.46% · params 0.272M · composite 0.8331" [ref=e184]
+      - generic [ref=e185]: baseline_resnet20
+      - generic [ref=e186]: 83.46%
+      - generic "baseline_resnet20 · cifar10 · seed1 · top-1 83.39% · params 0.272M · composite 0.8240" [ref=e187]
+      - generic [ref=e188]: baseline_resnet20
+      - generic [ref=e189]: 83.39%
+      - generic "baseline_sg_vanilla · cifar10 · seed1 · top-1 82.95% · params 0.186M · composite 0.8299" [ref=e190]
+      - generic [ref=e191]: baseline_sg_vanilla
+      - generic [ref=e192]: 82.95%
+      - generic "baseline_sg_vanilla · cifar10 · seed2 · top-1 82.26% · params 0.186M · composite 0.8243" [ref=e193]
+      - generic [ref=e194]: baseline_sg_vanilla
+      - generic [ref=e195]: 82.26%
+      - generic "baseline_sg_vanilla · cifar10 · seed0 · top-1 82.16% · params 0.186M · composite 0.8258" [ref=e196]
+      - generic [ref=e197]: baseline_sg_vanilla
+      - generic [ref=e198]: 82.16%
+      - generic "baseline_resnet20 · cifar100 · seed2 · top-1 56.62% · params 0.278M · composite 0.5622" [ref=e199]
+      - generic [ref=e200]: baseline_resnet20
+      - generic [ref=e201]: 56.62%
+      - generic "baseline_resnet20 · cifar100 · seed1 · top-1 56.52% · params 0.278M · composite 0.5630" [ref=e202]
+      - generic [ref=e203]: baseline_resnet20
+      - generic [ref=e204]: 56.52%
+      - generic "baseline_resnet20 · cifar100 · seed0 · top-1 56.15% · params 0.278M · composite 0.5568" [ref=e205]
+      - generic [ref=e206]: baseline_resnet20
+      - generic [ref=e207]: 56.15%
+    - img [ref=e209]:
+      - generic [ref=e210]: Baselines · composite × params
+      - generic [ref=e211]: "0.534"
+      - generic [ref=e212]: "0.619"
+      - generic [ref=e213]: "0.704"
+      - generic [ref=e214]: "0.789"
+      - generic [ref=e215]: "0.875"
+      - generic [ref=e216]: params (M) →
+      - generic [ref=e217]: composite →
+      - generic "baseline · baseline_resnet20 · cifar10 · composite 0.8458" [ref=e218]
+      - generic [ref=e219]: baseline 84.8%
+      - generic "baseline · baseline_resnet20 · cifar10 · composite 0.8331" [ref=e220]
+      - generic [ref=e221]: baseline 83.5%
+      - generic "baseline · baseline_sg_vanilla · cifar10 · composite 0.8299" [ref=e222]
+      - generic [ref=e223]: baseline 83.0%
+      - generic "baseline · baseline_sg_vanilla · cifar10 · composite 0.8258" [ref=e224]
+      - generic [ref=e225]: baseline 82.2%
+      - generic "baseline · baseline_sg_vanilla · cifar10 · composite 0.8243" [ref=e226]
+      - generic [ref=e227]: baseline 82.3%
+      - generic "baseline · baseline_resnet20 · cifar10 · composite 0.8240" [ref=e228]
+      - generic [ref=e229]: baseline 83.4%
+      - generic "baseline · baseline_resnet20 · cifar100 · composite 0.5630" [ref=e230]
+      - generic [ref=e231]: baseline 56.5%
+      - generic "baseline · baseline_resnet20 · cifar100 · composite 0.5622" [ref=e232]
+      - generic [ref=e233]: baseline 56.6%
+      - generic "baseline · baseline_resnet20 · cifar100 · composite 0.5568" [ref=e234]
+      - generic [ref=e235]: baseline 56.1%
+    - table [ref=e236]:
+      - rowgroup [ref=e237]:
+        - row "Tag DS Seed Top-1 Composite Params Hyp Curve" [ref=e238]:
+          - columnheader "Tag" [ref=e239] [cursor=pointer]
+          - columnheader "DS" [ref=e240] [cursor=pointer]
+          - columnheader "Seed" [ref=e241] [cursor=pointer]
+          - columnheader "Top-1" [ref=e242] [cursor=pointer]
+          - columnheader "Composite" [ref=e243] [cursor=pointer]
+          - columnheader "Params" [ref=e244] [cursor=pointer]
+          - columnheader "Hyp" [ref=e245] [cursor=pointer]
+          - columnheader "Curve" [ref=e246] [cursor=pointer]
+      - rowgroup [ref=e247]:
+        - row "baseline_resnet20 cifar10 0 84.78% 0.8458 0.272M —" [ref=e248] [cursor=pointer]:
+          - cell "baseline_resnet20" [ref=e249]:
+            - link "baseline_resnet20" [ref=e250]:
+              - /url: experiments/cifar10__baseline_resnet20_seed0.html
+          - cell "cifar10" [ref=e251]
+          - cell "0" [ref=e252]
+          - cell "84.78%" [ref=e253]
+          - cell "0.8458" [ref=e254]
+          - cell "0.272M" [ref=e255]
+          - cell "—" [ref=e256]
+          - cell [ref=e257]:
+            - img [ref=e258]
+        - row "baseline_resnet20 cifar10 2 83.46% 0.8331 0.272M —" [ref=e261] [cursor=pointer]:
+          - cell "baseline_resnet20" [ref=e262]:
+            - link "baseline_resnet20" [ref=e263]:
+              - /url: experiments/cifar10__baseline_resnet20_seed2.html
+          - cell "cifar10" [ref=e264]
+          - cell "2" [ref=e265]
+          - cell "83.46%" [ref=e266]
+          - cell "0.8331" [ref=e267]
+          - cell "0.272M" [ref=e268]
+          - cell "—" [ref=e269]
+          - cell [ref=e270]:
+            - img [ref=e271]
+        - row "baseline_sg_vanilla cifar10 1 82.95% 0.8299 0.186M —" [ref=e274] [cursor=pointer]:
+          - cell "baseline_sg_vanilla" [ref=e275]:
+            - link "baseline_sg_vanilla" [ref=e276]:
+              - /url: experiments/cifar10__baseline_sg_vanilla_seed1.html
+          - cell "cifar10" [ref=e277]
+          - cell "1" [ref=e278]
+          - cell "82.95%" [ref=e279]
+          - cell "0.8299" [ref=e280]
+          - cell "0.186M" [ref=e281]
+          - cell "—" [ref=e282]
+          - cell [ref=e283]:
+            - img [ref=e284]
+        - row "baseline_sg_vanilla cifar10 0 82.16% 0.8258 0.186M —" [ref=e287] [cursor=pointer]:
+          - cell "baseline_sg_vanilla" [ref=e288]:
+            - link "baseline_sg_vanilla" [ref=e289]:
+              - /url: experiments/cifar10__baseline_sg_vanilla_seed0.html
+          - cell "cifar10" [ref=e290]
+          - cell "0" [ref=e291]
+          - cell "82.16%" [ref=e292]
+          - cell "0.8258" [ref=e293]
+          - cell "0.186M" [ref=e294]
+          - cell "—" [ref=e295]
+          - cell [ref=e296]:
+            - img [ref=e297]
+        - row "baseline_sg_vanilla cifar10 2 82.26% 0.8243 0.186M —" [ref=e300] [cursor=pointer]:
+          - cell "baseline_sg_vanilla" [ref=e301]:
+            - link "baseline_sg_vanilla" [ref=e302]:
+              - /url: experiments/cifar10__baseline_sg_vanilla_seed2.html
+          - cell "cifar10" [ref=e303]
+          - cell "2" [ref=e304]
+          - cell "82.26%" [ref=e305]
+          - cell "0.8243" [ref=e306]
+          - cell "0.186M" [ref=e307]
+          - cell "—" [ref=e308]
+          - cell [ref=e309]:
+            - img [ref=e310]
+        - row "baseline_resnet20 cifar10 1 83.39% 0.8240 0.272M —" [ref=e313] [cursor=pointer]:
+          - cell "baseline_resnet20" [ref=e314]:
+            - link "baseline_resnet20" [ref=e315]:
+              - /url: experiments/cifar10__baseline_resnet20_seed1.html
+          - cell "cifar10" [ref=e316]
+          - cell "1" [ref=e317]
+          - cell "83.39%" [ref=e318]
+          - cell "0.8240" [ref=e319]
+          - cell "0.272M" [ref=e320]
+          - cell "—" [ref=e321]
+          - cell [ref=e322]:
+            - img [ref=e323]
+        - row "baseline_resnet20 cifar100 1 56.52% 0.5630 0.278M —" [ref=e326] [cursor=pointer]:
+          - cell "baseline_resnet20" [ref=e327]:
+            - link "baseline_resnet20" [ref=e328]:
+              - /url: experiments/cifar100__baseline_resnet20_seed1.html
+          - cell "cifar100" [ref=e329]
+          - cell "1" [ref=e330]
+          - cell "56.52%" [ref=e331]
+          - cell "0.5630" [ref=e332]
+          - cell "0.278M" [ref=e333]
+          - cell "—" [ref=e334]
+          - cell [ref=e335]:
+            - img [ref=e336]
+        - row "baseline_resnet20 cifar100 2 56.62% 0.5622 0.278M —" [ref=e339] [cursor=pointer]:
+          - cell "baseline_resnet20" [ref=e340]:
+            - link "baseline_resnet20" [ref=e341]:
+              - /url: experiments/cifar100__baseline_resnet20_seed2.html
+          - cell "cifar100" [ref=e342]
+          - cell "2" [ref=e343]
+          - cell "56.62%" [ref=e344]
+          - cell "0.5622" [ref=e345]
+          - cell "0.278M" [ref=e346]
+          - cell "—" [ref=e347]
+          - cell [ref=e348]:
+            - img [ref=e349]
+        - row "baseline_resnet20 cifar100 0 56.15% 0.5568 0.278M —" [ref=e352] [cursor=pointer]:
+          - cell "baseline_resnet20" [ref=e353]:
+            - link "baseline_resnet20" [ref=e354]:
+              - /url: experiments/cifar100__baseline_resnet20_seed0.html
+          - cell "cifar100" [ref=e355]
+          - cell "0" [ref=e356]
+          - cell "56.15%" [ref=e357]
+          - cell "0.5568" [ref=e358]
+          - cell "0.278M" [ref=e359]
+          - cell "—" [ref=e360]
+          - cell [ref=e361]:
+            - img [ref=e362]
+  - generic [ref=e365]:
+    - heading "G1 — Scaling & Growth (45 runs)" [level=2] [ref=e366]
+    - generic [ref=e367]: φ / Fibonacci growth laws applied to depth, width, resolution, parameter budgets, and learning-rate schedulers (H01–H10).
+    - img [ref=e369]:
+      - generic [ref=e370]: G1 — Scaling & Growth · top-1 distribution (n=20)
+      - generic [ref=e371]: 23%
+      - generic [ref=e372]: 46%
+      - generic [ref=e373]: 68%
+      - generic [ref=e374]: 91%
+      - generic [ref=e375]: top-1 →
+      - generic [ref=e376]: cifar10 baseline 84.8%
+      - generic "pair_gm_pdw · cifar10 · seed0 · top-1 85.85% · params 0.262M · composite 0.8634" [ref=e377]
+      - generic [ref=e378]: pair_gm_pdw
+      - generic [ref=e379]: 85.85%
+      - generic "combo3_pb_gm_pd · cifar10 · seed0 · top-1 85.66% · params 0.262M · composite 0.8601" [ref=e380]
+      - generic [ref=e381]: combo3_pb_gm_pd
+      - generic [ref=e382]: 85.66%
+      - generic "combo2_pb_gm · cifar10 · seed0 · top-1 85.62% · params 0.262M · composite 0.8592" [ref=e383]
+      - generic [ref=e384]: combo2_pb_gm
+      - generic [ref=e385]: 85.62%
+      - generic "sg_only_phi_budget · cifar10 · seed0 · top-1 85.56% · params 0.262M · composite 0.8338" [ref=e386]
+      - generic [ref=e387]: sg_only_phi_budget
+      - generic [ref=e388]: 85.56%
+      - generic "sg_only_phi_budget · cifar10 · seed2 · top-1 85.51% · params 0.284M · composite 0.8550" [ref=e389]
+      - generic [ref=e390]: sg_only_phi_budget
+      - generic [ref=e391]: 85.51%
+      - generic "sg_only_phi_budget · cifar10 · seed1 · top-1 85.48% · params 0.284M · composite 0.8568" [ref=e392]
+      - generic [ref=e393]: sg_only_phi_budget
+      - generic [ref=e394]: 85.48%
+      - generic "combo4_pb_gm_pd_pdw · cifar10 · seed0 · top-1 85.44% · params 0.262M · composite 0.8558" [ref=e395]
+      - generic [ref=e396]: combo4_pb_gm_pd_pdw
+      - generic [ref=e397]: 85.44%
+      - generic "loo_no_pd · cifar10 · seed0 · top-1 85.37% · params 0.262M · composite 0.8494" [ref=e398]
+      - generic [ref=e399]: loo_no_pd
+      - generic [ref=e400]: 85.37%
+      - generic "loo_no_fp · cifar10 · seed0 · top-1 85.29% · params 0.262M · composite 0.8556" [ref=e401]
+      - generic [ref=e402]: loo_no_fp
+      - generic [ref=e403]: 85.29%
+      - generic "combo7_pb_gm_pd_pdw_plr_fe_sa · cifar10 · seed0 · top-1 85.29% · params 0.262M · composite 0.8536" [ref=e404]
+      - generic [ref=e405]: combo7_pb_gm_pd_pdw_plr_
+      - generic [ref=e406]: 85.29%
+      - generic "pair_pd_pdw · cifar10 · seed0 · top-1 85.24% · params 0.262M · composite 0.8562" [ref=e407]
+      - generic [ref=e408]: pair_pd_pdw
+      - generic [ref=e409]: 85.24%
+      - generic "loo_no_pdw · cifar10 · seed0 · top-1 84.97% · params 0.262M · composite 0.8456" [ref=e410]
+      - generic [ref=e411]: loo_no_pdw
+      - generic [ref=e412]: 84.97%
+      - generic "combo8_pb_gm_pd_pdw_plr_fe_sa_ · cifar10 · seed0 · top-1 84.96% · params 0.262M · composite 0.8451" [ref=e413]
+      - generic [ref=e414]: combo8_pb_gm_pd_pdw_plr_
+      - generic [ref=e415]: 84.96%
+      - generic "combo6_pb_gm_pd_pdw_plr_fe · cifar10 · seed0 · top-1 84.90% · params 0.262M · composite 0.8532" [ref=e416]
+      - generic [ref=e417]: combo6_pb_gm_pd_pdw_plr_
+      - generic [ref=e418]: 84.90%
+      - generic "loo_no_sa · cifar10 · seed0 · top-1 84.82% · params 0.262M · composite 0.8451" [ref=e419]
+      - generic [ref=e420]: loo_no_sa
+      - generic [ref=e421]: 84.82%
+      - generic "loo_no_gm · cifar10 · seed0 · top-1 84.27% · params 0.262M · composite 0.8382" [ref=e422]
+      - generic [ref=e423]: loo_no_gm
+      - generic [ref=e424]: 84.27%
+      - generic "loo_no_fe · cifar10 · seed0 · top-1 84.03% · params 0.262M · composite 0.8367" [ref=e425]
+      - generic [ref=e426]: loo_no_fe
+      - generic [ref=e427]: 84.03%
+      - generic "loo_no_plr · cifar10 · seed0 · top-1 83.83% · params 0.262M · composite 0.8341" [ref=e428]
+      - generic [ref=e429]: loo_no_plr
+      - generic [ref=e430]: 83.83%
+      - generic "sg_only_fractal · cifar10 · seed0 · top-1 82.46% · params 0.259M · composite 0.8104" [ref=e431]
+      - generic [ref=e432]: sg_only_fractal
+      - generic [ref=e433]: 82.46%
+      - generic "sg_only_fractal · cifar10 · seed2 · top-1 82.46% · params 0.259M · composite 0.8061" [ref=e434]
+      - generic [ref=e435]: sg_only_fractal
+      - generic [ref=e436]: 82.46%
+    - img [ref=e438]:
+      - generic [ref=e439]: G1 — Scaling & Growth · composite × params
+      - generic [ref=e440]: "0.458"
+      - generic [ref=e441]: "0.569"
+      - generic [ref=e442]: "0.680"
+      - generic [ref=e443]: "0.790"
+      - generic [ref=e444]: "0.901"
+      - generic [ref=e445]: 10^-1 M
+      - generic [ref=e446]: params (M) →
+      - generic [ref=e447]: composite →
+      - generic "pair_gm_pdw · cifar10 · seed0 · params 0.262M · composite 0.8634 · top-1 85.85%" [ref=e448]
+      - generic [ref=e449]: pair_gm_pdw
+      - generic "combo3_pb_gm_pd · cifar10 · seed0 · params 0.262M · composite 0.8601 · top-1 85.66%" [ref=e450]
+      - generic [ref=e451]: combo3_pb_gm_pd
+      - generic "combo2_pb_gm · cifar10 · seed0 · params 0.262M · composite 0.8592 · top-1 85.62%" [ref=e452]
+      - generic [ref=e453]: combo2_pb_gm
+      - generic "sg_only_phi_budget · cifar10 · seed1 · params 0.284M · composite 0.8568 · top-1 85.48%" [ref=e454]
+      - generic [ref=e455]: sg_only_phi_budget
+      - generic "pair_pd_pdw · cifar10 · seed0 · params 0.262M · composite 0.8562 · top-1 85.24%" [ref=e456]
+      - generic [ref=e457]: pair_pd_pdw
+      - generic "combo4_pb_gm_pd_pdw · cifar10 · seed0 · params 0.262M · composite 0.8558 · top-1 85.44%" [ref=e458]
+      - generic [ref=e459]: combo4_pb_gm_pd_pdw
+      - generic "loo_no_fp · cifar10 · seed0 · params 0.262M · composite 0.8556 · top-1 85.29%" [ref=e460]
+      - generic [ref=e461]: loo_no_fp
+      - generic "sg_only_phi_budget · cifar10 · seed2 · params 0.284M · composite 0.8550 · top-1 85.51%" [ref=e462]
+      - generic [ref=e463]: sg_only_phi_budget
+      - generic "combo7_pb_gm_pd_pdw_plr_fe_sa · cifar10 · seed0 · params 0.262M · composite 0.8536 · top-1 85.29%" [ref=e464]
+      - generic "combo6_pb_gm_pd_pdw_plr_fe · cifar10 · seed0 · params 0.262M · composite 0.8532 · top-1 84.90%" [ref=e465]
+      - generic "loo_no_pd · cifar10 · seed0 · params 0.262M · composite 0.8494 · top-1 85.37%" [ref=e466]
+      - generic [ref=e467]: loo_no_pd
+      - generic "loo_no_pdw · cifar10 · seed0 · params 0.262M · composite 0.8456 · top-1 84.97%" [ref=e468]
+      - generic [ref=e469]: loo_no_pdw
+      - generic "combo8_pb_gm_pd_pdw_plr_fe_sa_fp · cifar10 · seed0 · params 0.262M · composite 0.8451 · top-1 84.96%" [ref=e470]
+      - generic "loo_no_sa · cifar10 · seed0 · params 0.262M · composite 0.8451 · top-1 84.82%" [ref=e471]
+      - generic [ref=e472]: loo_no_sa
+      - generic "loo_no_gm · cifar10 · seed0 · params 0.262M · composite 0.8382 · top-1 84.27%" [ref=e473]
+      - generic [ref=e474]: loo_no_gm
+      - generic "loo_no_fe · cifar10 · seed0 · params 0.262M · composite 0.8367 · top-1 84.03%" [ref=e475]
+      - generic [ref=e476]: loo_no_fe
+      - generic "loo_no_plr · cifar10 · seed0 · params 0.262M · composite 0.8341 · top-1 83.83%" [ref=e477]
+      - generic [ref=e478]: loo_no_plr
+      - generic "sg_only_phi_budget · cifar10 · seed0 · params 0.262M · composite 0.8338 · top-1 85.56%" [ref=e479]
+      - generic [ref=e480]: sg_only_phi_budget
+      - generic "sg_only_fib_depth · cifar10 · seed0 · params 0.180M · composite 0.8261 · top-1 82.18%" [ref=e481]
+      - generic [ref=e482]: sg_only_fib_depth
+      - generic "pair_pd_plr · cifar10 · seed0 · params 0.262M · composite 0.8215 · top-1 81.31%" [ref=e483]
+      - generic [ref=e484]: pair_pd_plr
+      - generic "sg_chan_fib · cifar10 · seed1 · params 0.127M · composite 0.8186 · top-1 80.74%" [ref=e485]
+      - generic [ref=e486]: sg_chan_fib
+      - generic "sg_chan_fib · cifar10 · seed2 · params 0.127M · composite 0.8176 · top-1 81.21%" [ref=e487]
+      - generic [ref=e488]: sg_chan_fib
+      - generic "sg_chan_phi · cifar10 · seed1 · params 0.127M · composite 0.8158 · top-1 80.74%" [ref=e489]
+      - generic [ref=e490]: sg_chan_phi
+      - generic "sg_only_golden_resize · cifar10 · seed0 · params 0.127M · composite 0.8157 · top-1 80.67%" [ref=e491]
+      - generic [ref=e492]: sg_only_golden_resize
+      - generic "sg_chan_phi · cifar10 · seed0 · params 0.127M · composite 0.8152 · top-1 80.11%" [ref=e493]
+      - generic [ref=e494]: sg_chan_phi
+      - generic "sg_only_phi_compound · cifar10 · seed0 · params 0.127M · composite 0.8152 · top-1 80.42%" [ref=e495]
+      - generic [ref=e496]: sg_only_phi_compound
+      - generic "sg_only_phi_multiscale · cifar10 · seed0 · params 0.195M · composite 0.8151 · top-1 82.00%" [ref=e497]
+      - generic [ref=e498]: sg_only_phi_multiscale
+      - generic "sg_chan_fib · cifar10 · seed0 · params 0.127M · composite 0.8135 · top-1 80.11%" [ref=e499]
+      - generic [ref=e500]: sg_chan_fib
+      - generic "pair_pdw_plr · cifar10 · seed0 · params 0.262M · composite 0.8116 · top-1 81.55%" [ref=e501]
+      - generic [ref=e502]: pair_pdw_plr
+      - generic "sg_only_fractal · cifar10 · seed0 · params 0.259M · composite 0.8104 · top-1 82.46%" [ref=e503]
+      - generic [ref=e504]: sg_only_fractal
+      - generic "sg_only_fractal · cifar10 · seed2 · params 0.259M · composite 0.8061 · top-1 82.46%" [ref=e505]
+      - generic [ref=e506]: sg_only_fractal
+      - generic "pair_gm_plr · cifar10 · seed0 · params 0.262M · composite 0.8058 · top-1 80.36%" [ref=e507]
+      - generic [ref=e508]: pair_gm_plr
+      - generic "sg_only_phi_lr · cifar10 · seed0 · params 0.127M · composite 0.8005 · top-1 78.75%" [ref=e509]
+      - generic [ref=e510]: sg_only_phi_lr
+      - generic "combo5_pb_gm_pd_pdw_plr · cifar10 · seed0 · params 0.262M · composite 0.8000 · top-1 79.78%" [ref=e511]
+      - generic "sg_chan_phi · cifar10 · seed2 · params 0.127M · composite 0.7959 · top-1 81.21%" [ref=e512]
+      - generic [ref=e513]: sg_chan_phi
+      - generic "sg_only_fractal · cifar10 · seed1 · params 0.259M · composite 0.7871 · top-1 81.70%" [ref=e514]
+      - generic [ref=e515]: sg_only_fractal
+      - generic "sg_only_golden_bottleneck · cifar10 · seed0 · params 0.058M · composite 0.7018 · top-1 68.79%" [ref=e516]
+      - generic "pair_gm_pdw · cifar100 · seed0 · params 0.268M · composite 0.5544 · top-1 57.86%" [ref=e517]
+      - generic [ref=e518]: pair_gm_pdw
+      - generic "sg_only_phi_budget · cifar100 · seed1 · params 0.268M · composite 0.5540 · top-1 57.75%" [ref=e519]
+      - generic [ref=e520]: sg_only_phi_budget
+      - generic "pair_gm_pdw · cifar100 · seed1 · params 0.268M · composite 0.5532 · top-1 57.89%" [ref=e521]
+      - generic [ref=e522]: pair_gm_pdw
+      - generic "pair_gm_pdw · cifar100 · seed2 · params 0.268M · composite 0.5520 · top-1 57.61%" [ref=e523]
+      - generic [ref=e524]: pair_gm_pdw
+      - generic "sg_only_phi_budget · cifar100 · seed0 · params 0.268M · composite 0.5489 · top-1 57.41%" [ref=e525]
+      - generic [ref=e526]: sg_only_phi_budget
+      - generic "sg_only_phi_budget · cifar100 · seed2 · params 0.268M · composite 0.5443 · top-1 56.87%" [ref=e527]
+      - generic [ref=e528]: sg_only_phi_budget
+      - generic "sg_only_fib_depth · cifar100 · seed0 · params 0.184M · composite 0.5187 · top-1 51.78%" [ref=e529]
+      - generic [ref=e530]: sg_only_fib_depth
+      - generic "sg_only_fractal · cifar100 · seed0 · params 0.263M · composite 0.4881 · top-1 50.72%" [ref=e531]
+      - generic [ref=e532]: sg_only_fractal
+    - table [ref=e533]:
+      - rowgroup [ref=e534]:
+        - row "Tag DS Seed Top-1 Composite Params Hyp Curve" [ref=e535]:
+          - columnheader "Tag" [ref=e536] [cursor=pointer]
+          - columnheader "DS" [ref=e537] [cursor=pointer]
+          - columnheader "Seed" [ref=e538] [cursor=pointer]
+          - columnheader "Top-1" [ref=e539] [cursor=pointer]
+          - columnheader "Composite" [ref=e540] [cursor=pointer]
+          - columnheader "Params" [ref=e541] [cursor=pointer]
+          - columnheader "Hyp" [ref=e542] [cursor=pointer]
+          - columnheader "Curve" [ref=e543] [cursor=pointer]
+      - rowgroup [ref=e544]:
+        - row "pair_gm_pdw cifar10 0 85.85% 0.8634 0.262M H09" [ref=e545] [cursor=pointer]:
+          - cell "pair_gm_pdw" [ref=e546]:
+            - link "pair_gm_pdw" [ref=e547]:
+              - /url: experiments/cifar10__pair_gm_pdw_seed0.html
+          - cell "cifar10" [ref=e548]
+          - cell "0" [ref=e549]
+          - cell "85.85%" [ref=e550]
+          - cell "0.8634" [ref=e551]
+          - cell "0.262M" [ref=e552]
+          - cell "H09" [ref=e553]
+          - cell [ref=e554]:
+            - img [ref=e555]
+        - row "combo3_pb_gm_pd cifar10 0 85.66% 0.8601 0.262M H09" [ref=e558] [cursor=pointer]:
+          - cell "combo3_pb_gm_pd" [ref=e559]:
+            - link "combo3_pb_gm_pd" [ref=e560]:
+              - /url: experiments/cifar10__combo3_pb_gm_pd_seed0.html
+          - cell "cifar10" [ref=e561]
+          - cell "0" [ref=e562]
+          - cell "85.66%" [ref=e563]
+          - cell "0.8601" [ref=e564]
+          - cell "0.262M" [ref=e565]
+          - cell "H09" [ref=e566]
+          - cell [ref=e567]:
+            - img [ref=e568]
+        - row "combo2_pb_gm cifar10 0 85.62% 0.8592 0.262M H09" [ref=e571] [cursor=pointer]:
+          - cell "combo2_pb_gm" [ref=e572]:
+            - link "combo2_pb_gm" [ref=e573]:
+              - /url: experiments/cifar10__combo2_pb_gm_seed0.html
+          - cell "cifar10" [ref=e574]
+          - cell "0" [ref=e575]
+          - cell "85.62%" [ref=e576]
+          - cell "0.8592" [ref=e577]
+          - cell "0.262M" [ref=e578]
+          - cell "H09" [ref=e579]
+          - cell [ref=e580]:
+            - img [ref=e581]
+        - row "sg_only_phi_budget cifar10 1 85.48% 0.8568 0.284M H09" [ref=e584] [cursor=pointer]:
+          - cell "sg_only_phi_budget" [ref=e585]:
+            - link "sg_only_phi_budget" [ref=e586]:
+              - /url: experiments/cifar10__sg_only_phi_budget_seed1.html
+          - cell "cifar10" [ref=e587]
+          - cell "1" [ref=e588]
+          - cell "85.48%" [ref=e589]
+          - cell "0.8568" [ref=e590]
+          - cell "0.284M" [ref=e591]
+          - cell "H09" [ref=e592]
+          - cell [ref=e593]:
+            - img [ref=e594]
+        - row "pair_pd_pdw cifar10 0 85.24% 0.8562 0.262M H09" [ref=e597] [cursor=pointer]:
+          - cell "pair_pd_pdw" [ref=e598]:
+            - link "pair_pd_pdw" [ref=e599]:
+              - /url: experiments/cifar10__pair_pd_pdw_seed0.html
+          - cell "cifar10" [ref=e600]
+          - cell "0" [ref=e601]
+          - cell "85.24%" [ref=e602]
+          - cell "0.8562" [ref=e603]
+          - cell "0.262M" [ref=e604]
+          - cell "H09" [ref=e605]
+          - cell [ref=e606]:
+            - img [ref=e607]
+        - row "combo4_pb_gm_pd_pdw cifar10 0 85.44% 0.8558 0.262M H09" [ref=e610] [cursor=pointer]:
+          - cell "combo4_pb_gm_pd_pdw" [ref=e611]:
+            - link "combo4_pb_gm_pd_pdw" [ref=e612]:
+              - /url: experiments/cifar10__combo4_pb_gm_pd_pdw_seed0.html
+          - cell "cifar10" [ref=e613]
+          - cell "0" [ref=e614]
+          - cell "85.44%" [ref=e615]
+          - cell "0.8558" [ref=e616]
+          - cell "0.262M" [ref=e617]
+          - cell "H09" [ref=e618]
+          - cell [ref=e619]:
+            - img [ref=e620]
+        - row "loo_no_fp cifar10 0 85.29% 0.8556 0.262M H09" [ref=e623] [cursor=pointer]:
+          - cell "loo_no_fp" [ref=e624]:
+            - link "loo_no_fp" [ref=e625]:
+              - /url: experiments/cifar10__loo_no_fp_seed0.html
+          - cell "cifar10" [ref=e626]
+          - cell "0" [ref=e627]
+          - cell "85.29%" [ref=e628]
+          - cell "0.8556" [ref=e629]
+          - cell "0.262M" [ref=e630]
+          - cell "H09" [ref=e631]
+          - cell [ref=e632]:
+            - img [ref=e633]
+        - row "sg_only_phi_budget cifar10 2 85.51% 0.8550 0.284M H09" [ref=e636] [cursor=pointer]:
+          - cell "sg_only_phi_budget" [ref=e637]:
+            - link "sg_only_phi_budget" [ref=e638]:
+              - /url: experiments/cifar10__sg_only_phi_budget_seed2.html
+          - cell "cifar10" [ref=e639]
+          - cell "2" [ref=e640]
+          - cell "85.51%" [ref=e641]
+          - cell "0.8550" [ref=e642]
+          - cell "0.284M" [ref=e643]
+          - cell "H09" [ref=e644]
+          - cell [ref=e645]:
+            - img [ref=e646]
+        - row "combo7_pb_gm_pd_pdw_plr_fe_sa cifar10 0 85.29% 0.8536 0.262M H09" [ref=e649] [cursor=pointer]:
+          - cell "combo7_pb_gm_pd_pdw_plr_fe_sa" [ref=e650]:
+            - link "combo7_pb_gm_pd_pdw_plr_fe_sa" [ref=e651]:
+              - /url: experiments/cifar10__combo7_pb_gm_pd_pdw_plr_fe_sa_seed0.html
+          - cell "cifar10" [ref=e652]
+          - cell "0" [ref=e653]
+          - cell "85.29%" [ref=e654]
+          - cell "0.8536" [ref=e655]
+          - cell "0.262M" [ref=e656]
+          - cell "H09" [ref=e657]
+          - cell [ref=e658]:
+            - img [ref=e659]
+        - row "combo6_pb_gm_pd_pdw_plr_fe cifar10 0 84.90% 0.8532 0.262M H09" [ref=e662] [cursor=pointer]:
+          - cell "combo6_pb_gm_pd_pdw_plr_fe" [ref=e663]:
+            - link "combo6_pb_gm_pd_pdw_plr_fe" [ref=e664]:
+              - /url: experiments/cifar10__combo6_pb_gm_pd_pdw_plr_fe_seed0.html
+          - cell "cifar10" [ref=e665]
+          - cell "0" [ref=e666]
+          - cell "84.90%" [ref=e667]
+          - cell "0.8532" [ref=e668]
+          - cell "0.262M" [ref=e669]
+          - cell "H09" [ref=e670]
+          - cell [ref=e671]:
+            - img [ref=e672]
+        - row "loo_no_pd cifar10 0 85.37% 0.8494 0.262M H09" [ref=e675] [cursor=pointer]:
+          - cell "loo_no_pd" [ref=e676]:
+            - link "loo_no_pd" [ref=e677]:
+              - /url: experiments/cifar10__loo_no_pd_seed0.html
+          - cell "cifar10" [ref=e678]
+          - cell "0" [ref=e679]
+          - cell "85.37%" [ref=e680]
+          - cell "0.8494" [ref=e681]
+          - cell "0.262M" [ref=e682]
+          - cell "H09" [ref=e683]
+          - cell [ref=e684]:
+            - img [ref=e685]
+        - row "loo_no_pdw cifar10 0 84.97% 0.8456 0.262M H09" [ref=e688] [cursor=pointer]:
+          - cell "loo_no_pdw" [ref=e689]:
+            - link "loo_no_pdw" [ref=e690]:
+              - /url: experiments/cifar10__loo_no_pdw_seed0.html
+          - cell "cifar10" [ref=e691]
+          - cell "0" [ref=e692]
+          - cell "84.97%" [ref=e693]
+          - cell "0.8456" [ref=e694]
+          - cell "0.262M" [ref=e695]
+          - cell "H09" [ref=e696]
+          - cell [ref=e697]:
+            - img [ref=e698]
+        - row "combo8_pb_gm_pd_pdw_plr_fe_sa_fp cifar10 0 84.96% 0.8451 0.262M H09" [ref=e701] [cursor=pointer]:
+          - cell "combo8_pb_gm_pd_pdw_plr_fe_sa_fp" [ref=e702]:
+            - link "combo8_pb_gm_pd_pdw_plr_fe_sa_fp" [ref=e703]:
+              - /url: experiments/cifar10__combo8_pb_gm_pd_pdw_plr_fe_sa_fp_seed0.html
+          - cell "cifar10" [ref=e704]
+          - cell "0" [ref=e705]
+          - cell "84.96%" [ref=e706]
+          - cell "0.8451" [ref=e707]
+          - cell "0.262M" [ref=e708]
+          - cell "H09" [ref=e709]
+          - cell [ref=e710]:
+            - img [ref=e711]
+        - row "loo_no_sa cifar10 0 84.82% 0.8451 0.262M H09" [ref=e714] [cursor=pointer]:
+          - cell "loo_no_sa" [ref=e715]:
+            - link "loo_no_sa" [ref=e716]:
+              - /url: experiments/cifar10__loo_no_sa_seed0.html
+          - cell "cifar10" [ref=e717]
+          - cell "0" [ref=e718]
+          - cell "84.82%" [ref=e719]
+          - cell "0.8451" [ref=e720]
+          - cell "0.262M" [ref=e721]
+          - cell "H09" [ref=e722]
+          - cell [ref=e723]:
+            - img [ref=e724]
+        - row "loo_no_gm cifar10 0 84.27% 0.8382 0.262M H09" [ref=e727] [cursor=pointer]:
+          - cell "loo_no_gm" [ref=e728]:
+            - link "loo_no_gm" [ref=e729]:
+              - /url: experiments/cifar10__loo_no_gm_seed0.html
+          - cell "cifar10" [ref=e730]
+          - cell "0" [ref=e731]
+          - cell "84.27%" [ref=e732]
+          - cell "0.8382" [ref=e733]
+          - cell "0.262M" [ref=e734]
+          - cell "H09" [ref=e735]
+          - cell [ref=e736]:
+            - img [ref=e737]
+        - row "loo_no_fe cifar10 0 84.03% 0.8367 0.262M H09" [ref=e740] [cursor=pointer]:
+          - cell "loo_no_fe" [ref=e741]:
+            - link "loo_no_fe" [ref=e742]:
+              - /url: experiments/cifar10__loo_no_fe_seed0.html
+          - cell "cifar10" [ref=e743]
+          - cell "0" [ref=e744]
+          - cell "84.03%" [ref=e745]
+          - cell "0.8367" [ref=e746]
+          - cell "0.262M" [ref=e747]
+          - cell "H09" [ref=e748]
+          - cell [ref=e749]:
+            - img [ref=e750]
+        - row "loo_no_plr cifar10 0 83.83% 0.8341 0.262M H09" [ref=e753] [cursor=pointer]:
+          - cell "loo_no_plr" [ref=e754]:
+            - link "loo_no_plr" [ref=e755]:
+              - /url: experiments/cifar10__loo_no_plr_seed0.html
+          - cell "cifar10" [ref=e756]
+          - cell "0" [ref=e757]
+          - cell "83.83%" [ref=e758]
+          - cell "0.8341" [ref=e759]
+          - cell "0.262M" [ref=e760]
+          - cell "H09" [ref=e761]
+          - cell [ref=e762]:
+            - img [ref=e763]
+        - row "sg_only_phi_budget cifar10 0 85.56% 0.8338 0.262M H09" [ref=e766] [cursor=pointer]:
+          - cell "sg_only_phi_budget" [ref=e767]:
+            - link "sg_only_phi_budget" [ref=e768]:
+              - /url: experiments/cifar10__sg_only_phi_budget_seed0.html
+          - cell "cifar10" [ref=e769]
+          - cell "0" [ref=e770]
+          - cell "85.56%" [ref=e771]
+          - cell "0.8338" [ref=e772]
+          - cell "0.262M" [ref=e773]
+          - cell "H09" [ref=e774]
+          - cell [ref=e775]:
+            - img [ref=e776]
+        - row "sg_only_fib_depth cifar10 0 82.18% 0.8261 0.180M H02" [ref=e779] [cursor=pointer]:
+          - cell "sg_only_fib_depth" [ref=e780]:
+            - link "sg_only_fib_depth" [ref=e781]:
+              - /url: experiments/cifar10__sg_only_fib_depth_seed0.html
+          - cell "cifar10" [ref=e782]
+          - cell "0" [ref=e783]
+          - cell "82.18%" [ref=e784]
+          - cell "0.8261" [ref=e785]
+          - cell "0.180M" [ref=e786]
+          - cell "H02" [ref=e787]
+          - cell [ref=e788]:
+            - img [ref=e789]
+        - row "pair_pd_plr cifar10 0 81.31% 0.8215 0.262M H09" [ref=e792] [cursor=pointer]:
+          - cell "pair_pd_plr" [ref=e793]:
+            - link "pair_pd_plr" [ref=e794]:
+              - /url: experiments/cifar10__pair_pd_plr_seed0.html
+          - cell "cifar10" [ref=e795]
+          - cell "0" [ref=e796]
+          - cell "81.31%" [ref=e797]
+          - cell "0.8215" [ref=e798]
+          - cell "0.262M" [ref=e799]
+          - cell "H09" [ref=e800]
+          - cell [ref=e801]:
+            - img [ref=e802]
+        - row "sg_chan_fib cifar10 1 80.74% 0.8186 0.127M H04" [ref=e805] [cursor=pointer]:
+          - cell "sg_chan_fib" [ref=e806]:
+            - link "sg_chan_fib" [ref=e807]:
+              - /url: experiments/cifar10__sg_chan_fib_seed1.html
+          - cell "cifar10" [ref=e808]
+          - cell "1" [ref=e809]
+          - cell "80.74%" [ref=e810]
+          - cell "0.8186" [ref=e811]
+          - cell "0.127M" [ref=e812]
+          - cell "H04" [ref=e813]
+          - cell [ref=e814]:
+            - img [ref=e815]
+        - row "sg_chan_fib cifar10 2 81.21% 0.8176 0.127M H04" [ref=e818] [cursor=pointer]:
+          - cell "sg_chan_fib" [ref=e819]:
+            - link "sg_chan_fib" [ref=e820]:
+              - /url: experiments/cifar10__sg_chan_fib_seed2.html
+          - cell "cifar10" [ref=e821]
+          - cell "2" [ref=e822]
+          - cell "81.21%" [ref=e823]
+          - cell "0.8176" [ref=e824]
+          - cell "0.127M" [ref=e825]
+          - cell "H04" [ref=e826]
+          - cell [ref=e827]:
+            - img [ref=e828]
+        - row "sg_chan_phi cifar10 1 80.74% 0.8158 0.127M H04" [ref=e831] [cursor=pointer]:
+          - cell "sg_chan_phi" [ref=e832]:
+            - link "sg_chan_phi" [ref=e833]:
+              - /url: experiments/cifar10__sg_chan_phi_seed1.html
+          - cell "cifar10" [ref=e834]
+          - cell "1" [ref=e835]
+          - cell "80.74%" [ref=e836]
+          - cell "0.8158" [ref=e837]
+          - cell "0.127M" [ref=e838]
+          - cell "H04" [ref=e839]
+          - cell [ref=e840]:
+            - img [ref=e841]
+        - row "sg_only_golden_resize cifar10 0 80.67% 0.8157 0.127M H03" [ref=e844] [cursor=pointer]:
+          - cell "sg_only_golden_resize" [ref=e845]:
+            - link "sg_only_golden_resize" [ref=e846]:
+              - /url: experiments/cifar10__sg_only_golden_resize_seed0.html
+          - cell "cifar10" [ref=e847]
+          - cell "0" [ref=e848]
+          - cell "80.67%" [ref=e849]
+          - cell "0.8157" [ref=e850]
+          - cell "0.127M" [ref=e851]
+          - cell "H03" [ref=e852]
+          - cell [ref=e853]:
+            - img [ref=e854]
+        - row "sg_chan_phi cifar10 0 80.11% 0.8152 0.127M H04" [ref=e857] [cursor=pointer]:
+          - cell "sg_chan_phi" [ref=e858]:
+            - link "sg_chan_phi" [ref=e859]:
+              - /url: experiments/cifar10__sg_chan_phi_seed0.html
+          - cell "cifar10" [ref=e860]
+          - cell "0" [ref=e861]
+          - cell "80.11%" [ref=e862]
+          - cell "0.8152" [ref=e863]
+          - cell "0.127M" [ref=e864]
+          - cell "H04" [ref=e865]
+          - cell [ref=e866]:
+            - img [ref=e867]
+        - row "sg_only_phi_compound cifar10 0 80.42% 0.8152 0.127M H01" [ref=e870] [cursor=pointer]:
+          - cell "sg_only_phi_compound" [ref=e871]:
+            - link "sg_only_phi_compound" [ref=e872]:
+              - /url: experiments/cifar10__sg_only_phi_compound_seed0.html
+          - cell "cifar10" [ref=e873]
+          - cell "0" [ref=e874]
+          - cell "80.42%" [ref=e875]
+          - cell "0.8152" [ref=e876]
+          - cell "0.127M" [ref=e877]
+          - cell "H01" [ref=e878]
+          - cell [ref=e879]:
+            - img [ref=e880]
+        - row "sg_only_phi_multiscale cifar10 0 82.00% 0.8151 0.195M H07" [ref=e883] [cursor=pointer]:
+          - cell "sg_only_phi_multiscale" [ref=e884]:
+            - link "sg_only_phi_multiscale" [ref=e885]:
+              - /url: experiments/cifar10__sg_only_phi_multiscale_seed0.html
+          - cell "cifar10" [ref=e886]
+          - cell "0" [ref=e887]
+          - cell "82.00%" [ref=e888]
+          - cell "0.8151" [ref=e889]
+          - cell "0.195M" [ref=e890]
+          - cell "H07" [ref=e891]
+          - cell [ref=e892]:
+            - img [ref=e893]
+        - row "sg_chan_fib cifar10 0 80.11% 0.8135 0.127M H04" [ref=e896] [cursor=pointer]:
+          - cell "sg_chan_fib" [ref=e897]:
+            - link "sg_chan_fib" [ref=e898]:
+              - /url: experiments/cifar10__sg_chan_fib_seed0.html
+          - cell "cifar10" [ref=e899]
+          - cell "0" [ref=e900]
+          - cell "80.11%" [ref=e901]
+          - cell "0.8135" [ref=e902]
+          - cell "0.127M" [ref=e903]
+          - cell "H04" [ref=e904]
+          - cell [ref=e905]:
+            - img [ref=e906]
+        - row "pair_pdw_plr cifar10 0 81.55% 0.8116 0.262M H09" [ref=e909] [cursor=pointer]:
+          - cell "pair_pdw_plr" [ref=e910]:
+            - link "pair_pdw_plr" [ref=e911]:
+              - /url: experiments/cifar10__pair_pdw_plr_seed0.html
+          - cell "cifar10" [ref=e912]
+          - cell "0" [ref=e913]
+          - cell "81.55%" [ref=e914]
+          - cell "0.8116" [ref=e915]
+          - cell "0.262M" [ref=e916]
+          - cell "H09" [ref=e917]
+          - cell [ref=e918]:
+            - img [ref=e919]
+        - row "sg_only_fractal cifar10 0 82.46% 0.8104 0.259M H05" [ref=e922] [cursor=pointer]:
+          - cell "sg_only_fractal" [ref=e923]:
+            - link "sg_only_fractal" [ref=e924]:
+              - /url: experiments/cifar10__sg_only_fractal_seed0.html
+          - cell "cifar10" [ref=e925]
+          - cell "0" [ref=e926]
+          - cell "82.46%" [ref=e927]
+          - cell "0.8104" [ref=e928]
+          - cell "0.259M" [ref=e929]
+          - cell "H05" [ref=e930]
+          - cell [ref=e931]:
+            - img [ref=e932]
+        - row "sg_only_fractal cifar10 2 82.46% 0.8061 0.259M H05" [ref=e935] [cursor=pointer]:
+          - cell "sg_only_fractal" [ref=e936]:
+            - link "sg_only_fractal" [ref=e937]:
+              - /url: experiments/cifar10__sg_only_fractal_seed2.html
+          - cell "cifar10" [ref=e938]
+          - cell "2" [ref=e939]
+          - cell "82.46%" [ref=e940]
+          - cell "0.8061" [ref=e941]
+          - cell "0.259M" [ref=e942]
+          - cell "H05" [ref=e943]
+          - cell [ref=e944]:
+            - img [ref=e945]
+        - row "pair_gm_plr cifar10 0 80.36% 0.8058 0.262M H09" [ref=e948] [cursor=pointer]:
+          - cell "pair_gm_plr" [ref=e949]:
+            - link "pair_gm_plr" [ref=e950]:
+              - /url: experiments/cifar10__pair_gm_plr_seed0.html
+          - cell "cifar10" [ref=e951]
+          - cell "0" [ref=e952]
+          - cell "80.36%" [ref=e953]
+          - cell "0.8058" [ref=e954]
+          - cell "0.262M" [ref=e955]
+          - cell "H09" [ref=e956]
+          - cell [ref=e957]:
+            - img [ref=e958]
+        - row "sg_only_phi_lr cifar10 0 78.75% 0.8005 0.127M H10" [ref=e961] [cursor=pointer]:
+          - cell "sg_only_phi_lr" [ref=e962]:
+            - link "sg_only_phi_lr" [ref=e963]:
+              - /url: experiments/cifar10__sg_only_phi_lr_seed0.html
+          - cell "cifar10" [ref=e964]
+          - cell "0" [ref=e965]
+          - cell "78.75%" [ref=e966]
+          - cell "0.8005" [ref=e967]
+          - cell "0.127M" [ref=e968]
+          - cell "H10" [ref=e969]
+          - cell [ref=e970]:
+            - img [ref=e971]
+        - row "combo5_pb_gm_pd_pdw_plr cifar10 0 79.78% 0.8000 0.262M H09" [ref=e974] [cursor=pointer]:
+          - cell "combo5_pb_gm_pd_pdw_plr" [ref=e975]:
+            - link "combo5_pb_gm_pd_pdw_plr" [ref=e976]:
+              - /url: experiments/cifar10__combo5_pb_gm_pd_pdw_plr_seed0.html
+          - cell "cifar10" [ref=e977]
+          - cell "0" [ref=e978]
+          - cell "79.78%" [ref=e979]
+          - cell "0.8000" [ref=e980]
+          - cell "0.262M" [ref=e981]
+          - cell "H09" [ref=e982]
+          - cell [ref=e983]:
+            - img [ref=e984]
+        - row "sg_chan_phi cifar10 2 81.21% 0.7959 0.127M H04" [ref=e987] [cursor=pointer]:
+          - cell "sg_chan_phi" [ref=e988]:
+            - link "sg_chan_phi" [ref=e989]:
+              - /url: experiments/cifar10__sg_chan_phi_seed2.html
+          - cell "cifar10" [ref=e990]
+          - cell "2" [ref=e991]
+          - cell "81.21%" [ref=e992]
+          - cell "0.7959" [ref=e993]
+          - cell "0.127M" [ref=e994]
+          - cell "H04" [ref=e995]
+          - cell [ref=e996]:
+            - img [ref=e997]
+        - row "sg_only_fractal cifar10 1 81.70% 0.7871 0.259M H05" [ref=e1000] [cursor=pointer]:
+          - cell "sg_only_fractal" [ref=e1001]:
+            - link "sg_only_fractal" [ref=e1002]:
+              - /url: experiments/cifar10__sg_only_fractal_seed1.html
+          - cell "cifar10" [ref=e1003]
+          - cell "1" [ref=e1004]
+          - cell "81.70%" [ref=e1005]
+          - cell "0.7871" [ref=e1006]
+          - cell "0.259M" [ref=e1007]
+          - cell "H05" [ref=e1008]
+          - cell [ref=e1009]:
+            - img [ref=e1010]
+        - row "sg_only_golden_bottleneck cifar10 0 68.79% 0.7018 0.058M H06" [ref=e1013] [cursor=pointer]:
+          - cell "sg_only_golden_bottleneck" [ref=e1014]:
+            - link "sg_only_golden_bottleneck" [ref=e1015]:
+              - /url: experiments/cifar10__sg_only_golden_bottleneck_seed0.html
+          - cell "cifar10" [ref=e1016]
+          - cell "0" [ref=e1017]
+          - cell "68.79%" [ref=e1018]
+          - cell "0.7018" [ref=e1019]
+          - cell "0.058M" [ref=e1020]
+          - cell "H06" [ref=e1021]
+          - cell [ref=e1022]:
+            - img [ref=e1023]
+        - row "pair_gm_pdw cifar100 0 57.86% 0.5544 0.268M H09" [ref=e1026] [cursor=pointer]:
+          - cell "pair_gm_pdw" [ref=e1027]:
+            - link "pair_gm_pdw" [ref=e1028]:
+              - /url: experiments/cifar100__pair_gm_pdw_seed0.html
+          - cell "cifar100" [ref=e1029]
+          - cell "0" [ref=e1030]
+          - cell "57.86%" [ref=e1031]
+          - cell "0.5544" [ref=e1032]
+          - cell "0.268M" [ref=e1033]
+          - cell "H09" [ref=e1034]
+          - cell [ref=e1035]:
+            - img [ref=e1036]
+        - row "sg_only_phi_budget cifar100 1 57.75% 0.5540 0.268M H09" [ref=e1039] [cursor=pointer]:
+          - cell "sg_only_phi_budget" [ref=e1040]:
+            - link "sg_only_phi_budget" [ref=e1041]:
+              - /url: experiments/cifar100__sg_only_phi_budget_seed1.html
+          - cell "cifar100" [ref=e1042]
+          - cell "1" [ref=e1043]
+          - cell "57.75%" [ref=e1044]
+          - cell "0.5540" [ref=e1045]
+          - cell "0.268M" [ref=e1046]
+          - cell "H09" [ref=e1047]
+          - cell [ref=e1048]:
+            - img [ref=e1049]
+        - row "pair_gm_pdw cifar100 1 57.89% 0.5532 0.268M H09" [ref=e1052] [cursor=pointer]:
+          - cell "pair_gm_pdw" [ref=e1053]:
+            - link "pair_gm_pdw" [ref=e1054]:
+              - /url: experiments/cifar100__pair_gm_pdw_seed1.html
+          - cell "cifar100" [ref=e1055]
+          - cell "1" [ref=e1056]
+          - cell "57.89%" [ref=e1057]
+          - cell "0.5532" [ref=e1058]
+          - cell "0.268M" [ref=e1059]
+          - cell "H09" [ref=e1060]
+          - cell [ref=e1061]:
+            - img [ref=e1062]
+        - row "pair_gm_pdw cifar100 2 57.61% 0.5520 0.268M H09" [ref=e1065] [cursor=pointer]:
+          - cell "pair_gm_pdw" [ref=e1066]:
+            - link "pair_gm_pdw" [ref=e1067]:
+              - /url: experiments/cifar100__pair_gm_pdw_seed2.html
+          - cell "cifar100" [ref=e1068]
+          - cell "2" [ref=e1069]
+          - cell "57.61%" [ref=e1070]
+          - cell "0.5520" [ref=e1071]
+          - cell "0.268M" [ref=e1072]
+          - cell "H09" [ref=e1073]
+          - cell [ref=e1074]:
+            - img [ref=e1075]
+        - row "sg_only_phi_budget cifar100 0 57.41% 0.5489 0.268M H09" [ref=e1078] [cursor=pointer]:
+          - cell "sg_only_phi_budget" [ref=e1079]:
+            - link "sg_only_phi_budget" [ref=e1080]:
+              - /url: experiments/cifar100__sg_only_phi_budget_seed0.html
+          - cell "cifar100" [ref=e1081]
+          - cell "0" [ref=e1082]
+          - cell "57.41%" [ref=e1083]
+          - cell "0.5489" [ref=e1084]
+          - cell "0.268M" [ref=e1085]
+          - cell "H09" [ref=e1086]
+          - cell [ref=e1087]:
+            - img [ref=e1088]
+        - row "sg_only_phi_budget cifar100 2 56.87% 0.5443 0.268M H09" [ref=e1091] [cursor=pointer]:
+          - cell "sg_only_phi_budget" [ref=e1092]:
+            - link "sg_only_phi_budget" [ref=e1093]:
+              - /url: experiments/cifar100__sg_only_phi_budget_seed2.html
+          - cell "cifar100" [ref=e1094]
+          - cell "2" [ref=e1095]
+          - cell "56.87%" [ref=e1096]
+          - cell "0.5443" [ref=e1097]
+          - cell "0.268M" [ref=e1098]
+          - cell "H09" [ref=e1099]
+          - cell [ref=e1100]:
+            - img [ref=e1101]
+        - row "sg_only_fib_depth cifar100 0 51.78% 0.5187 0.184M H02" [ref=e1104] [cursor=pointer]:
+          - cell "sg_only_fib_depth" [ref=e1105]:
+            - link "sg_only_fib_depth" [ref=e1106]:
+              - /url: experiments/cifar100__sg_only_fib_depth_seed0.html
+          - cell "cifar100" [ref=e1107]
+          - cell "0" [ref=e1108]
+          - cell "51.78%" [ref=e1109]
+          - cell "0.5187" [ref=e1110]
+          - cell "0.184M" [ref=e1111]
+          - cell "H02" [ref=e1112]
+          - cell [ref=e1113]:
+            - img [ref=e1114]
+        - row "sg_only_fractal cifar100 0 50.72% 0.4881 0.263M H05" [ref=e1117] [cursor=pointer]:
+          - cell "sg_only_fractal" [ref=e1118]:
+            - link "sg_only_fractal" [ref=e1119]:
+              - /url: experiments/cifar100__sg_only_fractal_seed0.html
+          - cell "cifar100" [ref=e1120]
+          - cell "0" [ref=e1121]
+          - cell "50.72%" [ref=e1122]
+          - cell "0.4881" [ref=e1123]
+          - cell "0.263M" [ref=e1124]
+          - cell "H05" [ref=e1125]
+          - cell [ref=e1126]:
+            - img [ref=e1127]
+  - generic [ref=e1130]:
+    - heading "G2 — Layer / Channel / Neuron (8 runs)" [level=2] [ref=e1131]
+    - generic [ref=e1132]: Fibonacci-sized MLPs, channel counts, neuron connectivity, skip scaling, head diversity, activation thresholds, ensembles (H11–H20).
+    - img [ref=e1134]:
+      - generic [ref=e1135]: G2 — Layer / Channel / Neuron · top-1 distribution (n=8)
+      - generic [ref=e1136]: 22%
+      - generic [ref=e1137]: 45%
+      - generic [ref=e1138]: 67%
+      - generic [ref=e1139]: 90%
+      - generic [ref=e1140]: top-1 →
+      - generic [ref=e1141]: cifar10 baseline 84.8%
+      - generic "sg_only_golden_skip · cifar10 · seed0 · top-1 81.63% · params 0.272M · composite 0.8014" [ref=e1142]
+      - generic [ref=e1143]: sg_only_golden_skip
+      - generic [ref=e1144]: 81.63%
+      - generic "sg_only_fib_ensemble · cifar10 · seed0 · top-1 80.11% · params 0.127M · composite 0.8132" [ref=e1145]
+      - generic [ref=e1146]: sg_only_fib_ensemble
+      - generic [ref=e1147]: 80.11%
+      - generic "sg_only_golden_modulate · cifar10 · seed0 · top-1 79.81% · params 0.127M · composite 0.8042" [ref=e1148]
+      - generic [ref=e1149]: sg_only_golden_modulate
+      - generic [ref=e1150]: 79.81%
+      - generic "sg_only_golden_modulate · cifar10 · seed1 · top-1 78.32% · params 0.127M · composite 0.7606" [ref=e1151]
+      - generic [ref=e1152]: sg_only_golden_modulate
+      - generic [ref=e1153]: 78.32%
+      - generic "sg_only_golden_modulate · cifar10 · seed2 · top-1 77.92% · params 0.127M · composite 0.7571" [ref=e1154]
+      - generic [ref=e1155]: sg_only_golden_modulate
+      - generic [ref=e1156]: 77.92%
+      - generic "sg_only_phi_sparse · cifar10 · seed0 · top-1 73.33% · params 0.259M · composite 0.6953" [ref=e1157]
+      - generic [ref=e1158]: sg_only_phi_sparse
+      - generic [ref=e1159]: 73.33%
+      - generic "sg_only_fib_stride · cifar10 · seed0 · top-1 72.55% · params 0.259M · composite 0.6872" [ref=e1160]
+      - generic [ref=e1161]: sg_only_fib_stride
+      - generic [ref=e1162]: 72.55%
+      - generic "sg_only_phi_relu · cifar10 · seed0 · top-1 71.07% · params 0.259M · composite 0.6733" [ref=e1163]
+      - generic [ref=e1164]: sg_only_phi_relu
+      - generic [ref=e1165]: 71.07%
+    - img [ref=e1167]:
+      - generic [ref=e1168]: G2 — Layer / Channel / Neuron · composite × params
+      - generic [ref=e1169]: "0.662"
+      - generic [ref=e1170]: "0.703"
+      - generic [ref=e1171]: "0.745"
+      - generic [ref=e1172]: "0.786"
+      - generic [ref=e1173]: "0.827"
+      - generic [ref=e1174]: params (M) →
+      - generic [ref=e1175]: composite →
+      - generic "sg_only_fib_ensemble · cifar10 · seed0 · params 0.127M · composite 0.8132 · top-1 80.11%" [ref=e1176]
+      - generic [ref=e1177]: sg_only_fib_ensemble
+      - generic "sg_only_golden_modulate · cifar10 · seed0 · params 0.127M · composite 0.8042 · top-1 79.81%" [ref=e1178]
+      - generic "sg_only_golden_skip · cifar10 · seed0 · params 0.272M · composite 0.8014 · top-1 81.63%" [ref=e1179]
+      - generic [ref=e1180]: sg_only_golden_skip
+      - generic "sg_only_golden_modulate · cifar10 · seed1 · params 0.127M · composite 0.7606 · top-1 78.32%" [ref=e1181]
+      - generic "sg_only_golden_modulate · cifar10 · seed2 · params 0.127M · composite 0.7571 · top-1 77.92%" [ref=e1182]
+      - generic "sg_only_phi_sparse · cifar10 · seed0 · params 0.259M · composite 0.6953 · top-1 73.33%" [ref=e1183]
+      - generic [ref=e1184]: sg_only_phi_sparse
+      - generic "sg_only_fib_stride · cifar10 · seed0 · params 0.259M · composite 0.6872 · top-1 72.55%" [ref=e1185]
+      - generic [ref=e1186]: sg_only_fib_stride
+      - generic "sg_only_phi_relu · cifar10 · seed0 · params 0.259M · composite 0.6733 · top-1 71.07%" [ref=e1187]
+      - generic [ref=e1188]: sg_only_phi_relu
+    - table [ref=e1189]:
+      - rowgroup [ref=e1190]:
+        - row "Tag DS Seed Top-1 Composite Params Hyp Curve" [ref=e1191]:
+          - columnheader "Tag" [ref=e1192] [cursor=pointer]
+          - columnheader "DS" [ref=e1193] [cursor=pointer]
+          - columnheader "Seed" [ref=e1194] [cursor=pointer]
+          - columnheader "Top-1" [ref=e1195] [cursor=pointer]
+          - columnheader "Composite" [ref=e1196] [cursor=pointer]
+          - columnheader "Params" [ref=e1197] [cursor=pointer]
+          - columnheader "Hyp" [ref=e1198] [cursor=pointer]
+          - columnheader "Curve" [ref=e1199] [cursor=pointer]
+      - rowgroup [ref=e1200]:
+        - row "sg_only_fib_ensemble cifar10 0 80.11% 0.8132 0.127M H20" [ref=e1201] [cursor=pointer]:
+          - cell "sg_only_fib_ensemble" [ref=e1202]:
+            - link "sg_only_fib_ensemble" [ref=e1203]:
+              - /url: experiments/cifar10__sg_only_fib_ensemble_seed0.html
+          - cell "cifar10" [ref=e1204]
+          - cell "0" [ref=e1205]
+          - cell "80.11%" [ref=e1206]
+          - cell "0.8132" [ref=e1207]
+          - cell "0.127M" [ref=e1208]
+          - cell "H20" [ref=e1209]
+          - cell [ref=e1210]:
+            - img [ref=e1211]
+        - row "sg_only_golden_modulate cifar10 0 79.81% 0.8042 0.127M H17" [ref=e1214] [cursor=pointer]:
+          - cell "sg_only_golden_modulate" [ref=e1215]:
+            - link "sg_only_golden_modulate" [ref=e1216]:
+              - /url: experiments/cifar10__sg_only_golden_modulate_seed0.html
+          - cell "cifar10" [ref=e1217]
+          - cell "0" [ref=e1218]
+          - cell "79.81%" [ref=e1219]
+          - cell "0.8042" [ref=e1220]
+          - cell "0.127M" [ref=e1221]
+          - cell "H17" [ref=e1222]
+          - cell [ref=e1223]:
+            - img [ref=e1224]
+        - row "sg_only_golden_skip cifar10 0 81.63% 0.8014 0.272M H17" [ref=e1227] [cursor=pointer]:
+          - cell "sg_only_golden_skip" [ref=e1228]:
+            - link "sg_only_golden_skip" [ref=e1229]:
+              - /url: experiments/cifar10__sg_only_golden_skip_seed0.html
+          - cell "cifar10" [ref=e1230]
+          - cell "0" [ref=e1231]
+          - cell "81.63%" [ref=e1232]
+          - cell "0.8014" [ref=e1233]
+          - cell "0.272M" [ref=e1234]
+          - cell "H17" [ref=e1235]
+          - cell [ref=e1236]:
+            - img [ref=e1237]
+        - row "sg_only_golden_modulate cifar10 1 78.32% 0.7606 0.127M H17" [ref=e1240] [cursor=pointer]:
+          - cell "sg_only_golden_modulate" [ref=e1241]:
+            - link "sg_only_golden_modulate" [ref=e1242]:
+              - /url: experiments/cifar10__sg_only_golden_modulate_seed1.html
+          - cell "cifar10" [ref=e1243]
+          - cell "1" [ref=e1244]
+          - cell "78.32%" [ref=e1245]
+          - cell "0.7606" [ref=e1246]
+          - cell "0.127M" [ref=e1247]
+          - cell "H17" [ref=e1248]
+          - cell [ref=e1249]:
+            - img [ref=e1250]
+        - row "sg_only_golden_modulate cifar10 2 77.92% 0.7571 0.127M H17" [ref=e1253] [cursor=pointer]:
+          - cell "sg_only_golden_modulate" [ref=e1254]:
+            - link "sg_only_golden_modulate" [ref=e1255]:
+              - /url: experiments/cifar10__sg_only_golden_modulate_seed2.html
+          - cell "cifar10" [ref=e1256]
+          - cell "2" [ref=e1257]
+          - cell "77.92%" [ref=e1258]
+          - cell "0.7571" [ref=e1259]
+          - cell "0.127M" [ref=e1260]
+          - cell "H17" [ref=e1261]
+          - cell [ref=e1262]:
+            - img [ref=e1263]
+        - row "sg_only_phi_sparse cifar10 0 73.33% 0.6953 0.259M H13" [ref=e1266] [cursor=pointer]:
+          - cell "sg_only_phi_sparse" [ref=e1267]:
+            - link "sg_only_phi_sparse" [ref=e1268]:
+              - /url: experiments/cifar10__sg_only_phi_sparse_seed0.html
+          - cell "cifar10" [ref=e1269]
+          - cell "0" [ref=e1270]
+          - cell "73.33%" [ref=e1271]
+          - cell "0.6953" [ref=e1272]
+          - cell "0.259M" [ref=e1273]
+          - cell "H13" [ref=e1274]
+          - cell [ref=e1275]:
+            - img [ref=e1276]
+        - row "sg_only_fib_stride cifar10 0 72.55% 0.6872 0.259M H18" [ref=e1279] [cursor=pointer]:
+          - cell "sg_only_fib_stride" [ref=e1280]:
+            - link "sg_only_fib_stride" [ref=e1281]:
+              - /url: experiments/cifar10__sg_only_fib_stride_seed0.html
+          - cell "cifar10" [ref=e1282]
+          - cell "0" [ref=e1283]
+          - cell "72.55%" [ref=e1284]
+          - cell "0.6872" [ref=e1285]
+          - cell "0.259M" [ref=e1286]
+          - cell "H18" [ref=e1287]
+          - cell [ref=e1288]:
+            - img [ref=e1289]
+        - row "sg_only_phi_relu cifar10 0 71.07% 0.6733 0.259M H19" [ref=e1292] [cursor=pointer]:
+          - cell "sg_only_phi_relu" [ref=e1293]:
+            - link "sg_only_phi_relu" [ref=e1294]:
+              - /url: experiments/cifar10__sg_only_phi_relu_seed0.html
+          - cell "cifar10" [ref=e1295]
+          - cell "0" [ref=e1296]
+          - cell "71.07%" [ref=e1297]
+          - cell "0.6733" [ref=e1298]
+          - cell "0.259M" [ref=e1299]
+          - cell "H19" [ref=e1300]
+          - cell [ref=e1301]:
+            - img [ref=e1302]
+  - generic [ref=e1305]:
+    - heading "G3 — Topologies & Graphs (6 runs)" [level=2] [ref=e1306]
+    - generic [ref=e1307]: Hexagonal lattices, toroidal closures, Platonic / icosahedral / dodecahedral equivariance, fractal toroidal, cymatic-hex resonance (H21–H30).
+    - img [ref=e1309]:
+      - generic [ref=e1310]: G3 — Topologies & Graphs · top-1 distribution (n=6)
+      - generic [ref=e1311]: 22%
+      - generic [ref=e1312]: 45%
+      - generic [ref=e1313]: 67%
+      - generic [ref=e1314]: 90%
+      - generic [ref=e1315]: top-1 →
+      - generic [ref=e1316]: cifar10 baseline 84.8%
+      - generic "sg_only_hex · cifar10 · seed1 · top-1 79.93% · params 0.127M · composite 0.7695" [ref=e1317]
+      - generic [ref=e1318]: sg_only_hex
+      - generic [ref=e1319]: 79.93%
+      - generic "sg_only_hex · cifar10 · seed0 · top-1 79.32% · params 0.127M · composite 0.7941" [ref=e1320]
+      - generic [ref=e1321]: sg_only_hex
+      - generic [ref=e1322]: 79.32%
+      - generic "sg_only_hex · cifar10 · seed2 · top-1 79.29% · params 0.127M · composite 0.7715" [ref=e1323]
+      - generic [ref=e1324]: sg_only_hex
+      - generic [ref=e1325]: 79.29%
+      - generic "sg_only_toroidal · cifar10 · seed1 · top-1 78.65% · params 0.127M · composite 0.7849" [ref=e1326]
+      - generic [ref=e1327]: sg_only_toroidal
+      - generic [ref=e1328]: 78.65%
+      - generic "sg_only_toroidal · cifar10 · seed0 · top-1 78.05% · params 0.127M · composite 0.7768" [ref=e1329]
+      - generic [ref=e1330]: sg_only_toroidal
+      - generic [ref=e1331]: 78.05%
+      - generic "sg_only_toroidal · cifar10 · seed2 · top-1 77.43% · params 0.127M · composite 0.7746" [ref=e1332]
+      - generic [ref=e1333]: sg_only_toroidal
+      - generic [ref=e1334]: 77.43%
+    - img [ref=e1336]:
+      - generic [ref=e1337]: G3 — Topologies & Graphs · composite × params
+      - generic [ref=e1338]: "0.768"
+      - generic [ref=e1339]: "0.775"
+      - generic [ref=e1340]: "0.782"
+      - generic [ref=e1341]: "0.789"
+      - generic [ref=e1342]: "0.797"
+      - generic [ref=e1343]: params (M) →
+      - generic [ref=e1344]: composite →
+      - generic "sg_only_hex · cifar10 · seed0 · params 0.127M · composite 0.7941 · top-1 79.32%" [ref=e1345]
+      - generic [ref=e1346]: sg_only_hex
+      - generic "sg_only_toroidal · cifar10 · seed1 · params 0.127M · composite 0.7849 · top-1 78.65%" [ref=e1347]
+      - generic [ref=e1348]: sg_only_toroidal
+      - generic "sg_only_toroidal · cifar10 · seed0 · params 0.127M · composite 0.7768 · top-1 78.05%" [ref=e1349]
+      - generic [ref=e1350]: sg_only_toroidal
+      - generic "sg_only_toroidal · cifar10 · seed2 · params 0.127M · composite 0.7746 · top-1 77.43%" [ref=e1351]
+      - generic [ref=e1352]: sg_only_toroidal
+      - generic "sg_only_hex · cifar10 · seed2 · params 0.127M · composite 0.7715 · top-1 79.29%" [ref=e1353]
+      - generic [ref=e1354]: sg_only_hex
+      - generic "sg_only_hex · cifar10 · seed1 · params 0.127M · composite 0.7695 · top-1 79.93%" [ref=e1355]
+      - generic [ref=e1356]: sg_only_hex
+    - table [ref=e1357]:
+      - rowgroup [ref=e1358]:
+        - row "Tag DS Seed Top-1 Composite Params Hyp Curve" [ref=e1359]:
+          - columnheader "Tag" [ref=e1360] [cursor=pointer]
+          - columnheader "DS" [ref=e1361] [cursor=pointer]
+          - columnheader "Seed" [ref=e1362] [cursor=pointer]
+          - columnheader "Top-1" [ref=e1363] [cursor=pointer]
+          - columnheader "Composite" [ref=e1364] [cursor=pointer]
+          - columnheader "Params" [ref=e1365] [cursor=pointer]
+          - columnheader "Hyp" [ref=e1366] [cursor=pointer]
+          - columnheader "Curve" [ref=e1367] [cursor=pointer]
+      - rowgroup [ref=e1368]:
+        - row "sg_only_hex cifar10 0 79.32% 0.7941 0.127M H21" [ref=e1369] [cursor=pointer]:
+          - cell "sg_only_hex" [ref=e1370]:
+            - link "sg_only_hex" [ref=e1371]:
+              - /url: experiments/cifar10__sg_only_hex_seed0.html
+          - cell "cifar10" [ref=e1372]
+          - cell "0" [ref=e1373]
+          - cell "79.32%" [ref=e1374]
+          - cell "0.7941" [ref=e1375]
+          - cell "0.127M" [ref=e1376]
+          - cell "H21" [ref=e1377]
+          - cell [ref=e1378]:
+            - img [ref=e1379]
+        - row "sg_only_toroidal cifar10 1 78.65% 0.7849 0.127M H22" [ref=e1382] [cursor=pointer]:
+          - cell "sg_only_toroidal" [ref=e1383]:
+            - link "sg_only_toroidal" [ref=e1384]:
+              - /url: experiments/cifar10__sg_only_toroidal_seed1.html
+          - cell "cifar10" [ref=e1385]
+          - cell "1" [ref=e1386]
+          - cell "78.65%" [ref=e1387]
+          - cell "0.7849" [ref=e1388]
+          - cell "0.127M" [ref=e1389]
+          - cell "H22" [ref=e1390]
+          - cell [ref=e1391]:
+            - img [ref=e1392]
+        - row "sg_only_toroidal cifar10 0 78.05% 0.7768 0.127M H22" [ref=e1395] [cursor=pointer]:
+          - cell "sg_only_toroidal" [ref=e1396]:
+            - link "sg_only_toroidal" [ref=e1397]:
+              - /url: experiments/cifar10__sg_only_toroidal_seed0.html
+          - cell "cifar10" [ref=e1398]
+          - cell "0" [ref=e1399]
+          - cell "78.05%" [ref=e1400]
+          - cell "0.7768" [ref=e1401]
+          - cell "0.127M" [ref=e1402]
+          - cell "H22" [ref=e1403]
+          - cell [ref=e1404]:
+            - img [ref=e1405]
+        - row "sg_only_toroidal cifar10 2 77.43% 0.7746 0.127M H22" [ref=e1408] [cursor=pointer]:
+          - cell "sg_only_toroidal" [ref=e1409]:
+            - link "sg_only_toroidal" [ref=e1410]:
+              - /url: experiments/cifar10__sg_only_toroidal_seed2.html
+          - cell "cifar10" [ref=e1411]
+          - cell "2" [ref=e1412]
+          - cell "77.43%" [ref=e1413]
+          - cell "0.7746" [ref=e1414]
+          - cell "0.127M" [ref=e1415]
+          - cell "H22" [ref=e1416]
+          - cell [ref=e1417]:
+            - img [ref=e1418]
+        - row "sg_only_hex cifar10 2 79.29% 0.7715 0.127M H21" [ref=e1421] [cursor=pointer]:
+          - cell "sg_only_hex" [ref=e1422]:
+            - link "sg_only_hex" [ref=e1423]:
+              - /url: experiments/cifar10__sg_only_hex_seed2.html
+          - cell "cifar10" [ref=e1424]
+          - cell "2" [ref=e1425]
+          - cell "79.29%" [ref=e1426]
+          - cell "0.7715" [ref=e1427]
+          - cell "0.127M" [ref=e1428]
+          - cell "H21" [ref=e1429]
+          - cell [ref=e1430]:
+            - img [ref=e1431]
+        - row "sg_only_hex cifar10 1 79.93% 0.7695 0.127M H21" [ref=e1434] [cursor=pointer]:
+          - cell "sg_only_hex" [ref=e1435]:
+            - link "sg_only_hex" [ref=e1436]:
+              - /url: experiments/cifar10__sg_only_hex_seed1.html
+          - cell "cifar10" [ref=e1437]
+          - cell "1" [ref=e1438]
+          - cell "79.93%" [ref=e1439]
+          - cell "0.7695" [ref=e1440]
+          - cell "0.127M" [ref=e1441]
+          - cell "H21" [ref=e1442]
+          - cell [ref=e1443]:
+            - img [ref=e1444]
+  - generic [ref=e1447]:
+    - heading "G4 — Kernels / Attention / Filters (8 runs)" [level=2] [ref=e1448]
+    - generic [ref=e1449]: Golden-spiral kernels, Fibonacci dilation, vesica-piscis filters, golden-angle rotary, cymatic wavelets, harmonic activations (H31–H40).
+    - img [ref=e1451]:
+      - generic [ref=e1452]: G4 — Kernels / Attention / Filters · top-1 distribution (n=8)
+      - generic [ref=e1453]: 23%
+      - generic [ref=e1454]: 45%
+      - generic [ref=e1455]: 68%
+      - generic [ref=e1456]: 91%
+      - generic [ref=e1457]: top-1 →
+      - generic [ref=e1458]: cifar10 baseline 84.8%
+      - generic "slot_init_cymatic · cifar10 · seed0 · top-1 85.40% · params 0.262M · composite 0.8254" [ref=e1459]
+      - generic [ref=e1460]: slot_init_cymatic
+      - generic [ref=e1461]: 85.40%
+      - generic "slot_init_spiral · cifar10 · seed0 · top-1 85.40% · params 0.262M · composite 0.8248" [ref=e1462]
+      - generic [ref=e1463]: slot_init_spiral
+      - generic [ref=e1464]: 85.40%
+      - generic "slot_act_phi · cifar10 · seed0 · top-1 85.37% · params 0.262M · composite 0.8278" [ref=e1465]
+      - generic [ref=e1466]: slot_act_phi
+      - generic [ref=e1467]: 85.37%
+      - generic "sg_only_golden_spiral_init · cifar10 · seed0 · top-1 80.57% · params 0.127M · composite 0.7947" [ref=e1468]
+      - generic [ref=e1469]: sg_only_golden_spiral_in
+      - generic [ref=e1470]: 80.57%
+      - generic "sg_only_phi_activation · cifar10 · seed0 · top-1 79.95% · params 0.127M · composite 0.8092" [ref=e1471]
+      - generic [ref=e1472]: sg_only_phi_activation
+      - generic [ref=e1473]: 79.95%
+      - generic "sg_only_cymatic_init · cifar10 · seed0 · top-1 77.64% · params 0.127M · composite 0.7746" [ref=e1474]
+      - generic [ref=e1475]: sg_only_cymatic_init
+      - generic [ref=e1476]: 77.64%
+      - generic "sg_only_cymatic_init · cifar10 · seed2 · top-1 76.34% · params 0.127M · composite 0.7746" [ref=e1477]
+      - generic [ref=e1478]: sg_only_cymatic_init
+      - generic [ref=e1479]: 76.34%
+      - generic "sg_only_cymatic_init · cifar10 · seed1 · top-1 75.80% · params 0.127M · composite 0.7689" [ref=e1480]
+      - generic [ref=e1481]: sg_only_cymatic_init
+      - generic [ref=e1482]: 75.80%
+    - img [ref=e1484]:
+      - generic [ref=e1485]: G4 — Kernels / Attention / Filters · composite × params
+      - generic [ref=e1486]: "0.764"
+      - generic [ref=e1487]: "0.782"
+      - generic [ref=e1488]: "0.799"
+      - generic [ref=e1489]: "0.816"
+      - generic [ref=e1490]: "0.834"
+      - generic [ref=e1491]: params (M) →
+      - generic [ref=e1492]: composite →
+      - generic "slot_act_phi · cifar10 · seed0 · params 0.262M · composite 0.8278 · top-1 85.37%" [ref=e1493]
+      - generic [ref=e1494]: slot_act_phi
+      - generic "slot_init_cymatic · cifar10 · seed0 · params 0.262M · composite 0.8254 · top-1 85.40%" [ref=e1495]
+      - generic [ref=e1496]: slot_init_cymatic
+      - generic "slot_init_spiral · cifar10 · seed0 · params 0.262M · composite 0.8248 · top-1 85.40%" [ref=e1497]
+      - generic [ref=e1498]: slot_init_spiral
+      - generic "sg_only_phi_activation · cifar10 · seed0 · params 0.127M · composite 0.8092 · top-1 79.95%" [ref=e1499]
+      - generic [ref=e1500]: sg_only_phi_activation
+      - generic "sg_only_golden_spiral_init · cifar10 · seed0 · params 0.127M · composite 0.7947 · top-1 80.57%" [ref=e1501]
+      - generic "sg_only_cymatic_init · cifar10 · seed2 · params 0.127M · composite 0.7746 · top-1 76.34%" [ref=e1502]
+      - generic [ref=e1503]: sg_only_cymatic_init
+      - generic "sg_only_cymatic_init · cifar10 · seed0 · params 0.127M · composite 0.7746 · top-1 77.64%" [ref=e1504]
+      - generic [ref=e1505]: sg_only_cymatic_init
+      - generic "sg_only_cymatic_init · cifar10 · seed1 · params 0.127M · composite 0.7689 · top-1 75.80%" [ref=e1506]
+      - generic [ref=e1507]: sg_only_cymatic_init
+    - table [ref=e1508]:
+      - rowgroup [ref=e1509]:
+        - row "Tag DS Seed Top-1 Composite Params Hyp Curve" [ref=e1510]:
+          - columnheader "Tag" [ref=e1511] [cursor=pointer]
+          - columnheader "DS" [ref=e1512] [cursor=pointer]
+          - columnheader "Seed" [ref=e1513] [cursor=pointer]
+          - columnheader "Top-1" [ref=e1514] [cursor=pointer]
+          - columnheader "Composite" [ref=e1515] [cursor=pointer]
+          - columnheader "Params" [ref=e1516] [cursor=pointer]
+          - columnheader "Hyp" [ref=e1517] [cursor=pointer]
+          - columnheader "Curve" [ref=e1518] [cursor=pointer]
+      - rowgroup [ref=e1519]:
+        - row "slot_act_phi cifar10 0 85.37% 0.8278 0.262M H39" [ref=e1520] [cursor=pointer]:
+          - cell "slot_act_phi" [ref=e1521]:
+            - link "slot_act_phi" [ref=e1522]:
+              - /url: experiments/cifar10__slot_act_phi_seed0.html
+          - cell "cifar10" [ref=e1523]
+          - cell "0" [ref=e1524]
+          - cell "85.37%" [ref=e1525]
+          - cell "0.8278" [ref=e1526]
+          - cell "0.262M" [ref=e1527]
+          - cell "H39" [ref=e1528]
+          - cell [ref=e1529]:
+            - img [ref=e1530]
+        - row "slot_init_cymatic cifar10 0 85.40% 0.8254 0.262M H35" [ref=e1533] [cursor=pointer]:
+          - cell "slot_init_cymatic" [ref=e1534]:
+            - link "slot_init_cymatic" [ref=e1535]:
+              - /url: experiments/cifar10__slot_init_cymatic_seed0.html
+          - cell "cifar10" [ref=e1536]
+          - cell "0" [ref=e1537]
+          - cell "85.40%" [ref=e1538]
+          - cell "0.8254" [ref=e1539]
+          - cell "0.262M" [ref=e1540]
+          - cell "H35" [ref=e1541]
+          - cell [ref=e1542]:
+            - img [ref=e1543]
+        - row "slot_init_spiral cifar10 0 85.40% 0.8248 0.262M H31" [ref=e1546] [cursor=pointer]:
+          - cell "slot_init_spiral" [ref=e1547]:
+            - link "slot_init_spiral" [ref=e1548]:
+              - /url: experiments/cifar10__slot_init_spiral_seed0.html
+          - cell "cifar10" [ref=e1549]
+          - cell "0" [ref=e1550]
+          - cell "85.40%" [ref=e1551]
+          - cell "0.8248" [ref=e1552]
+          - cell "0.262M" [ref=e1553]
+          - cell "H31" [ref=e1554]
+          - cell [ref=e1555]:
+            - img [ref=e1556]
+        - row "sg_only_phi_activation cifar10 0 79.95% 0.8092 0.127M H39" [ref=e1559] [cursor=pointer]:
+          - cell "sg_only_phi_activation" [ref=e1560]:
+            - link "sg_only_phi_activation" [ref=e1561]:
+              - /url: experiments/cifar10__sg_only_phi_activation_seed0.html
+          - cell "cifar10" [ref=e1562]
+          - cell "0" [ref=e1563]
+          - cell "79.95%" [ref=e1564]
+          - cell "0.8092" [ref=e1565]
+          - cell "0.127M" [ref=e1566]
+          - cell "H39" [ref=e1567]
+          - cell [ref=e1568]:
+            - img [ref=e1569]
+        - row "sg_only_golden_spiral_init cifar10 0 80.57% 0.7947 0.127M H31" [ref=e1572] [cursor=pointer]:
+          - cell "sg_only_golden_spiral_init" [ref=e1573]:
+            - link "sg_only_golden_spiral_init" [ref=e1574]:
+              - /url: experiments/cifar10__sg_only_golden_spiral_init_seed0.html
+          - cell "cifar10" [ref=e1575]
+          - cell "0" [ref=e1576]
+          - cell "80.57%" [ref=e1577]
+          - cell "0.7947" [ref=e1578]
+          - cell "0.127M" [ref=e1579]
+          - cell "H31" [ref=e1580]
+          - cell [ref=e1581]:
+            - img [ref=e1582]
+        - row "sg_only_cymatic_init cifar10 2 76.34% 0.7746 0.127M H35" [ref=e1585] [cursor=pointer]:
+          - cell "sg_only_cymatic_init" [ref=e1586]:
+            - link "sg_only_cymatic_init" [ref=e1587]:
+              - /url: experiments/cifar10__sg_only_cymatic_init_seed2.html
+          - cell "cifar10" [ref=e1588]
+          - cell "2" [ref=e1589]
+          - cell "76.34%" [ref=e1590]
+          - cell "0.7746" [ref=e1591]
+          - cell "0.127M" [ref=e1592]
+          - cell "H35" [ref=e1593]
+          - cell [ref=e1594]:
+            - img [ref=e1595]
+        - row "sg_only_cymatic_init cifar10 0 77.64% 0.7746 0.127M H35" [ref=e1598] [cursor=pointer]:
+          - cell "sg_only_cymatic_init" [ref=e1599]:
+            - link "sg_only_cymatic_init" [ref=e1600]:
+              - /url: experiments/cifar10__sg_only_cymatic_init_seed0.html
+          - cell "cifar10" [ref=e1601]
+          - cell "0" [ref=e1602]
+          - cell "77.64%" [ref=e1603]
+          - cell "0.7746" [ref=e1604]
+          - cell "0.127M" [ref=e1605]
+          - cell "H35" [ref=e1606]
+          - cell [ref=e1607]:
+            - img [ref=e1608]
+        - row "sg_only_cymatic_init cifar10 1 75.80% 0.7689 0.127M H35" [ref=e1611] [cursor=pointer]:
+          - cell "sg_only_cymatic_init" [ref=e1612]:
+            - link "sg_only_cymatic_init" [ref=e1613]:
+              - /url: experiments/cifar10__sg_only_cymatic_init_seed1.html
+          - cell "cifar10" [ref=e1614]
+          - cell "1" [ref=e1615]
+          - cell "75.80%" [ref=e1616]
+          - cell "0.7689" [ref=e1617]
+          - cell "0.127M" [ref=e1618]
+          - cell "H35" [ref=e1619]
+          - cell [ref=e1620]:
+            - img [ref=e1621]
+  - generic [ref=e1624]:
+    - heading "G5 — Optimisation / Init / Regularisation / NAS (12 runs)" [level=2] [ref=e1625]
+    - generic [ref=e1626]: Golden-ratio AdamW, φ-weight init, Fibonacci pruning, φ-dropout, golden-momentum schedulers, full-hybrid stacks (H41–H50).
+    - img [ref=e1628]:
+      - generic [ref=e1629]: G5 — Optimisation / Init / Regularisation / NAS · top-1 distribution (n=12)
+      - generic [ref=e1630]: 22%
+      - generic [ref=e1631]: 45%
+      - generic [ref=e1632]: 67%
+      - generic [ref=e1633]: 90%
+      - generic [ref=e1634]: top-1 →
+      - generic [ref=e1635]: cifar10 baseline 84.8%
+      - generic [ref=e1636]: cifar100 baseline 56.5%
+      - generic "sg_only_golden_adam · cifar10 · seed0 · top-1 83.94% · params 0.272M · composite 0.8334" [ref=e1637]
+      - generic [ref=e1638]: sg_only_golden_adam
+      - generic [ref=e1639]: 83.94%
+      - generic "sg_only_golden_momentum · cifar10 · seed0 · top-1 83.65% · params 0.272M · composite 0.8334" [ref=e1640]
+      - generic [ref=e1641]: sg_only_golden_momentum
+      - generic [ref=e1642]: 83.65%
+      - generic "slot_init_phi · cifar10 · seed0 · top-1 83.46% · params 0.262M · composite 0.8060" [ref=e1643]
+      - generic [ref=e1644]: slot_init_phi
+      - generic [ref=e1645]: 83.46%
+      - generic "sg_only_phi_dropout · cifar10 · seed0 · top-1 83.03% · params 0.272M · composite 0.8253" [ref=e1646]
+      - generic [ref=e1647]: sg_only_phi_dropout
+      - generic [ref=e1648]: 83.03%
+      - generic "sg_only_fib_prune · cifar10 · seed0 · top-1 81.15% · params 0.272M · composite 0.8004" [ref=e1649]
+      - generic [ref=e1650]: sg_only_fib_prune
+      - generic [ref=e1651]: 81.15%
+      - generic "sg_only_phi_decay · cifar10 · seed0 · top-1 79.81% · params 0.127M · composite 0.8119" [ref=e1652]
+      - generic [ref=e1653]: sg_only_phi_decay
+      - generic [ref=e1654]: 79.81%
+      - generic "sg_only_phi_init · cifar10 · seed0 · top-1 76.56% · params 0.127M · composite 0.7766" [ref=e1655]
+      - generic [ref=e1656]: sg_only_phi_init
+      - generic [ref=e1657]: 76.56%
+      - generic "sg_full_fib · cifar10 · seed0 · top-1 73.24% · params 0.259M · composite 0.6966" [ref=e1658]
+      - generic [ref=e1659]: sg_full_fib
+      - generic [ref=e1660]: 73.24%
+      - generic "sg_full_fib_avg · cifar10 · seed0 · top-1 66.86% · params 0.259M · composite 0.6330" [ref=e1661]
+      - generic [ref=e1662]: sg_full_fib_avg
+      - generic [ref=e1663]: 66.86%
+      - generic "sg_only_golden_momentum · cifar100 · seed0 · top-1 56.99% · params 0.278M · composite 0.5676" [ref=e1664]
+      - generic [ref=e1665]: sg_only_golden_momentum
+      - generic [ref=e1666]: 56.99%
+      - generic "sg_only_golden_momentum · cifar100 · seed1 · top-1 56.76% · params 0.278M · composite 0.5646" [ref=e1667]
+      - generic [ref=e1668]: sg_only_golden_momentum
+      - generic [ref=e1669]: 56.76%
+      - generic "sg_only_golden_momentum · cifar100 · seed2 · top-1 56.43% · params 0.278M · composite 0.5576" [ref=e1670]
+      - generic [ref=e1671]: sg_only_golden_momentum
+      - generic [ref=e1672]: 56.43%
+    - img [ref=e1674]:
+      - generic [ref=e1675]: G5 — Optimisation / Init / Regularisation / NAS · composite × params
+      - generic [ref=e1676]: "0.536"
+      - generic [ref=e1677]: "0.617"
+      - generic [ref=e1678]: "0.698"
+      - generic [ref=e1679]: "0.780"
+      - generic [ref=e1680]: "0.861"
+      - generic [ref=e1681]: params (M) →
+      - generic [ref=e1682]: composite →
+      - generic "sg_only_golden_adam · cifar10 · seed0 · params 0.272M · composite 0.8334 · top-1 83.94%" [ref=e1683]
+      - generic [ref=e1684]: sg_only_golden_adam
+      - generic "sg_only_golden_momentum · cifar10 · seed0 · params 0.272M · composite 0.8334 · top-1 83.65%" [ref=e1685]
+      - generic "sg_only_phi_dropout · cifar10 · seed0 · params 0.272M · composite 0.8253 · top-1 83.03%" [ref=e1686]
+      - generic [ref=e1687]: sg_only_phi_dropout
+      - generic "sg_only_phi_decay · cifar10 · seed0 · params 0.127M · composite 0.8119 · top-1 79.81%" [ref=e1688]
+      - generic [ref=e1689]: sg_only_phi_decay
+      - generic "slot_init_phi · cifar10 · seed0 · params 0.262M · composite 0.8060 · top-1 83.46%" [ref=e1690]
+      - generic [ref=e1691]: slot_init_phi
+      - generic "sg_only_fib_prune · cifar10 · seed0 · params 0.272M · composite 0.8004 · top-1 81.15%" [ref=e1692]
+      - generic [ref=e1693]: sg_only_fib_prune
+      - generic "sg_only_phi_init · cifar10 · seed0 · params 0.127M · composite 0.7766 · top-1 76.56%" [ref=e1694]
+      - generic [ref=e1695]: sg_only_phi_init
+      - generic "sg_full_fib · cifar10 · seed0 · params 0.259M · composite 0.6966 · top-1 73.24%" [ref=e1696]
+      - generic [ref=e1697]: sg_full_fib
+      - generic "sg_full_fib_avg · cifar10 · seed0 · params 0.259M · composite 0.6330 · top-1 66.86%" [ref=e1698]
+      - generic [ref=e1699]: sg_full_fib_avg
+      - generic "sg_only_golden_momentum · cifar100 · seed0 · params 0.278M · composite 0.5676 · top-1 56.99%" [ref=e1700]
+      - generic "sg_only_golden_momentum · cifar100 · seed1 · params 0.278M · composite 0.5646 · top-1 56.76%" [ref=e1701]
+      - generic "sg_only_golden_momentum · cifar100 · seed2 · params 0.278M · composite 0.5576 · top-1 56.43%" [ref=e1702]
+    - table [ref=e1703]:
+      - rowgroup [ref=e1704]:
+        - row "Tag DS Seed Top-1 Composite Params Hyp Curve" [ref=e1705]:
+          - columnheader "Tag" [ref=e1706] [cursor=pointer]
+          - columnheader "DS" [ref=e1707] [cursor=pointer]
+          - columnheader "Seed" [ref=e1708] [cursor=pointer]
+          - columnheader "Top-1" [ref=e1709] [cursor=pointer]
+          - columnheader "Composite" [ref=e1710] [cursor=pointer]
+          - columnheader "Params" [ref=e1711] [cursor=pointer]
+          - columnheader "Hyp" [ref=e1712] [cursor=pointer]
+          - columnheader "Curve" [ref=e1713] [cursor=pointer]
+      - rowgroup [ref=e1714]:
+        - row "sg_only_golden_adam cifar10 0 83.94% 0.8334 0.272M H41" [ref=e1715] [cursor=pointer]:
+          - cell "sg_only_golden_adam" [ref=e1716]:
+            - link "sg_only_golden_adam" [ref=e1717]:
+              - /url: experiments/cifar10__sg_only_golden_adam_seed0.html
+          - cell "cifar10" [ref=e1718]
+          - cell "0" [ref=e1719]
+          - cell "83.94%" [ref=e1720]
+          - cell "0.8334" [ref=e1721]
+          - cell "0.272M" [ref=e1722]
+          - cell "H41" [ref=e1723]
+          - cell [ref=e1724]:
+            - img [ref=e1725]
+        - row "sg_only_golden_momentum cifar10 0 83.65% 0.8334 0.272M H48" [ref=e1728] [cursor=pointer]:
+          - cell "sg_only_golden_momentum" [ref=e1729]:
+            - link "sg_only_golden_momentum" [ref=e1730]:
+              - /url: experiments/cifar10__sg_only_golden_momentum_seed0.html
+          - cell "cifar10" [ref=e1731]
+          - cell "0" [ref=e1732]
+          - cell "83.65%" [ref=e1733]
+          - cell "0.8334" [ref=e1734]
+          - cell "0.272M" [ref=e1735]
+          - cell "H48" [ref=e1736]
+          - cell [ref=e1737]:
+            - img [ref=e1738]
+        - row "sg_only_phi_dropout cifar10 0 83.03% 0.8253 0.272M H47" [ref=e1741] [cursor=pointer]:
+          - cell "sg_only_phi_dropout" [ref=e1742]:
+            - link "sg_only_phi_dropout" [ref=e1743]:
+              - /url: experiments/cifar10__sg_only_phi_dropout_seed0.html
+          - cell "cifar10" [ref=e1744]
+          - cell "0" [ref=e1745]
+          - cell "83.03%" [ref=e1746]
+          - cell "0.8253" [ref=e1747]
+          - cell "0.272M" [ref=e1748]
+          - cell "H47" [ref=e1749]
+          - cell [ref=e1750]:
+            - img [ref=e1751]
+        - row "sg_only_phi_decay cifar10 0 79.81% 0.8119 0.127M H44" [ref=e1754] [cursor=pointer]:
+          - cell "sg_only_phi_decay" [ref=e1755]:
+            - link "sg_only_phi_decay" [ref=e1756]:
+              - /url: experiments/cifar10__sg_only_phi_decay_seed0.html
+          - cell "cifar10" [ref=e1757]
+          - cell "0" [ref=e1758]
+          - cell "79.81%" [ref=e1759]
+          - cell "0.8119" [ref=e1760]
+          - cell "0.127M" [ref=e1761]
+          - cell "H44" [ref=e1762]
+          - cell [ref=e1763]:
+            - img [ref=e1764]
+        - row "slot_init_phi cifar10 0 83.46% 0.8060 0.262M H42" [ref=e1767] [cursor=pointer]:
+          - cell "slot_init_phi" [ref=e1768]:
+            - link "slot_init_phi" [ref=e1769]:
+              - /url: experiments/cifar10__slot_init_phi_seed0.html
+          - cell "cifar10" [ref=e1770]
+          - cell "0" [ref=e1771]
+          - cell "83.46%" [ref=e1772]
+          - cell "0.8060" [ref=e1773]
+          - cell "0.262M" [ref=e1774]
+          - cell "H42" [ref=e1775]
+          - cell [ref=e1776]:
+            - img [ref=e1777]
+        - row "sg_only_fib_prune cifar10 0 81.15% 0.8004 0.272M H43" [ref=e1780] [cursor=pointer]:
+          - cell "sg_only_fib_prune" [ref=e1781]:
+            - link "sg_only_fib_prune" [ref=e1782]:
+              - /url: experiments/cifar10__sg_only_fib_prune_seed0.html
+          - cell "cifar10" [ref=e1783]
+          - cell "0" [ref=e1784]
+          - cell "81.15%" [ref=e1785]
+          - cell "0.8004" [ref=e1786]
+          - cell "0.272M" [ref=e1787]
+          - cell "H43" [ref=e1788]
+          - cell [ref=e1789]:
+            - img [ref=e1790]
+        - row "sg_only_phi_init cifar10 0 76.56% 0.7766 0.127M H42" [ref=e1793] [cursor=pointer]:
+          - cell "sg_only_phi_init" [ref=e1794]:
+            - link "sg_only_phi_init" [ref=e1795]:
+              - /url: experiments/cifar10__sg_only_phi_init_seed0.html
+          - cell "cifar10" [ref=e1796]
+          - cell "0" [ref=e1797]
+          - cell "76.56%" [ref=e1798]
+          - cell "0.7766" [ref=e1799]
+          - cell "0.127M" [ref=e1800]
+          - cell "H42" [ref=e1801]
+          - cell [ref=e1802]:
+            - img [ref=e1803]
+        - row "sg_full_fib cifar10 0 73.24% 0.6966 0.259M H50" [ref=e1806] [cursor=pointer]:
+          - cell "sg_full_fib" [ref=e1807]:
+            - link "sg_full_fib" [ref=e1808]:
+              - /url: experiments/cifar10__sg_full_fib_seed0.html
+          - cell "cifar10" [ref=e1809]
+          - cell "0" [ref=e1810]
+          - cell "73.24%" [ref=e1811]
+          - cell "0.6966" [ref=e1812]
+          - cell "0.259M" [ref=e1813]
+          - cell "H50" [ref=e1814]
+          - cell [ref=e1815]:
+            - img [ref=e1816]
+        - row "sg_full_fib_avg cifar10 0 66.86% 0.6330 0.259M H50" [ref=e1819] [cursor=pointer]:
+          - cell "sg_full_fib_avg" [ref=e1820]:
+            - link "sg_full_fib_avg" [ref=e1821]:
+              - /url: experiments/cifar10__sg_full_fib_avg_seed0.html
+          - cell "cifar10" [ref=e1822]
+          - cell "0" [ref=e1823]
+          - cell "66.86%" [ref=e1824]
+          - cell "0.6330" [ref=e1825]
+          - cell "0.259M" [ref=e1826]
+          - cell "H50" [ref=e1827]
+          - cell [ref=e1828]:
+            - img [ref=e1829]
+        - row "sg_only_golden_momentum cifar100 0 56.99% 0.5676 0.278M H48" [ref=e1832] [cursor=pointer]:
+          - cell "sg_only_golden_momentum" [ref=e1833]:
+            - link "sg_only_golden_momentum" [ref=e1834]:
+              - /url: experiments/cifar100__sg_only_golden_momentum_seed0.html
+          - cell "cifar100" [ref=e1835]
+          - cell "0" [ref=e1836]
+          - cell "56.99%" [ref=e1837]
+          - cell "0.5676" [ref=e1838]
+          - cell "0.278M" [ref=e1839]
+          - cell "H48" [ref=e1840]
+          - cell [ref=e1841]:
+            - img [ref=e1842]
+        - row "sg_only_golden_momentum cifar100 1 56.76% 0.5646 0.278M H48" [ref=e1845] [cursor=pointer]:
+          - cell "sg_only_golden_momentum" [ref=e1846]:
+            - link "sg_only_golden_momentum" [ref=e1847]:
+              - /url: experiments/cifar100__sg_only_golden_momentum_seed1.html
+          - cell "cifar100" [ref=e1848]
+          - cell "1" [ref=e1849]
+          - cell "56.76%" [ref=e1850]
+          - cell "0.5646" [ref=e1851]
+          - cell "0.278M" [ref=e1852]
+          - cell "H48" [ref=e1853]
+          - cell [ref=e1854]:
+            - img [ref=e1855]
+        - row "sg_only_golden_momentum cifar100 2 56.43% 0.5576 0.278M H48" [ref=e1858] [cursor=pointer]:
+          - cell "sg_only_golden_momentum" [ref=e1859]:
+            - link "sg_only_golden_momentum" [ref=e1860]:
+              - /url: experiments/cifar100__sg_only_golden_momentum_seed2.html
+          - cell "cifar100" [ref=e1861]
+          - cell "2" [ref=e1862]
+          - cell "56.43%" [ref=e1863]
+          - cell "0.5576" [ref=e1864]
+          - cell "0.278M" [ref=e1865]
+          - cell "H48" [ref=e1866]
+          - cell [ref=e1867]:
+            - img [ref=e1868]
+  - generic [ref=e1871]:
+    - heading "G6 — Topological & Bridging (4 runs)" [level=2] [ref=e1872]
+    - generic [ref=e1873]: Persistent-homology losses, drop-path anytime nets, icosa-unfold bridges, C4-group avg-pool, trained-feature Betti probes (H51–H60).
+    - img [ref=e1875]:
+      - generic [ref=e1876]: G6 — Topological & Bridging · top-1 distribution (n=4)
+      - generic [ref=e1877]: 22%
+      - generic [ref=e1878]: 45%
+      - generic [ref=e1879]: 67%
+      - generic [ref=e1880]: 90%
+      - generic [ref=e1881]: top-1 →
+      - generic [ref=e1882]: cifar10 baseline 84.8%
+      - generic "sg_only_group · cifar10 · seed2 · top-1 70.33% · params 0.127M · composite 0.6786" [ref=e1883]
+      - generic [ref=e1884]: sg_only_group
+      - generic [ref=e1885]: 70.33%
+      - generic "sg_only_group · cifar10 · seed1 · top-1 69.93% · params 0.127M · composite 0.6897" [ref=e1886]
+      - generic [ref=e1887]: sg_only_group
+      - generic [ref=e1888]: 69.93%
+      - generic "sg_only_group · cifar10 · seed0 · top-1 69.84% · params 0.127M · composite 0.6937" [ref=e1889]
+      - generic [ref=e1890]: sg_only_group
+      - generic [ref=e1891]: 69.84%
+      - generic "sg_only_group_avg · cifar10 · seed0 · top-1 65.38% · params 0.127M · composite 0.6513" [ref=e1892]
+      - generic [ref=e1893]: sg_only_group_avg
+      - generic [ref=e1894]: 65.38%
+    - img [ref=e1896]:
+      - generic [ref=e1897]: G6 — Topological & Bridging · composite × params
+      - generic [ref=e1898]: "0.648"
+      - generic [ref=e1899]: "0.660"
+      - generic [ref=e1900]: "0.673"
+      - generic [ref=e1901]: "0.685"
+      - generic [ref=e1902]: "0.698"
+      - generic [ref=e1903]: params (M) →
+      - generic [ref=e1904]: composite →
+      - generic "sg_only_group · cifar10 · seed0 · params 0.127M · composite 0.6937 · top-1 69.84%" [ref=e1905]
+      - generic [ref=e1906]: sg_only_group
+      - generic "sg_only_group · cifar10 · seed1 · params 0.127M · composite 0.6897 · top-1 69.93%" [ref=e1907]
+      - generic [ref=e1908]: sg_only_group
+      - generic "sg_only_group · cifar10 · seed2 · params 0.127M · composite 0.6786 · top-1 70.33%" [ref=e1909]
+      - generic [ref=e1910]: sg_only_group
+      - generic "sg_only_group_avg · cifar10 · seed0 · params 0.127M · composite 0.6513 · top-1 65.38%" [ref=e1911]
+      - generic [ref=e1912]: sg_only_group_avg
+    - table [ref=e1913]:
+      - rowgroup [ref=e1914]:
+        - row "Tag DS Seed Top-1 Composite Params Hyp Curve" [ref=e1915]:
+          - columnheader "Tag" [ref=e1916] [cursor=pointer]
+          - columnheader "DS" [ref=e1917] [cursor=pointer]
+          - columnheader "Seed" [ref=e1918] [cursor=pointer]
+          - columnheader "Top-1" [ref=e1919] [cursor=pointer]
+          - columnheader "Composite" [ref=e1920] [cursor=pointer]
+          - columnheader "Params" [ref=e1921] [cursor=pointer]
+          - columnheader "Hyp" [ref=e1922] [cursor=pointer]
+          - columnheader "Curve" [ref=e1923] [cursor=pointer]
+      - rowgroup [ref=e1924]:
+        - row "sg_only_group cifar10 0 69.84% 0.6937 0.127M H58" [ref=e1925] [cursor=pointer]:
+          - cell "sg_only_group" [ref=e1926]:
+            - link "sg_only_group" [ref=e1927]:
+              - /url: experiments/cifar10__sg_only_group_seed0.html
+          - cell "cifar10" [ref=e1928]
+          - cell "0" [ref=e1929]
+          - cell "69.84%" [ref=e1930]
+          - cell "0.6937" [ref=e1931]
+          - cell "0.127M" [ref=e1932]
+          - cell "H58" [ref=e1933]
+          - cell [ref=e1934]:
+            - img [ref=e1935]
+        - row "sg_only_group cifar10 1 69.93% 0.6897 0.127M H58" [ref=e1938] [cursor=pointer]:
+          - cell "sg_only_group" [ref=e1939]:
+            - link "sg_only_group" [ref=e1940]:
+              - /url: experiments/cifar10__sg_only_group_seed1.html
+          - cell "cifar10" [ref=e1941]
+          - cell "1" [ref=e1942]
+          - cell "69.93%" [ref=e1943]
+          - cell "0.6897" [ref=e1944]
+          - cell "0.127M" [ref=e1945]
+          - cell "H58" [ref=e1946]
+          - cell [ref=e1947]:
+            - img [ref=e1948]
+        - row "sg_only_group cifar10 2 70.33% 0.6786 0.127M H58" [ref=e1951] [cursor=pointer]:
+          - cell "sg_only_group" [ref=e1952]:
+            - link "sg_only_group" [ref=e1953]:
+              - /url: experiments/cifar10__sg_only_group_seed2.html
+          - cell "cifar10" [ref=e1954]
+          - cell "2" [ref=e1955]
+          - cell "70.33%" [ref=e1956]
+          - cell "0.6786" [ref=e1957]
+          - cell "0.127M" [ref=e1958]
+          - cell "H58" [ref=e1959]
+          - cell [ref=e1960]:
+            - img [ref=e1961]
+        - row "sg_only_group_avg cifar10 0 65.38% 0.6513 0.127M H58" [ref=e1964] [cursor=pointer]:
+          - cell "sg_only_group_avg" [ref=e1965]:
+            - link "sg_only_group_avg" [ref=e1966]:
+              - /url: experiments/cifar10__sg_only_group_avg_seed0.html
+          - cell "cifar10" [ref=e1967]
+          - cell "0" [ref=e1968]
+          - cell "65.38%" [ref=e1969]
+          - cell "0.6513" [ref=e1970]
+          - cell "0.127M" [ref=e1971]
+          - cell "H58" [ref=e1972]
+          - cell [ref=e1973]:
+            - img [ref=e1974]
+  - generic [ref=e1977]:
+    - heading "G7 — Cross-Paradigm Hybrids (0 runs)" [level=2] [ref=e1978]
+    - generic [ref=e1979]: Liquid / JEPA / KAN / Transformer / GNN cross-paradigm hybrids (H61–H75). No CIFAR sweep rows yet — placeholder section.
+    - generic [ref=e1980]: No sweep rows yet in this group.
+  - generic [ref=e1981]:
+    - heading "G8 — Esoteric Extensions (6 runs)" [level=2] [ref=e1982]
+    - generic [ref=e1983]: Reuleaux constant-width kernels, SIREN sinusoidal activations, tetrahedral dual paths, radial-12 attention, spectral Hopfield (H76–H84).
+    - img [ref=e1985]:
+      - generic [ref=e1986]: G8 — Esoteric Extensions · top-1 distribution (n=6)
+      - generic [ref=e1987]: 23%
+      - generic [ref=e1988]: 45%
+      - generic [ref=e1989]: 68%
+      - generic [ref=e1990]: 91%
+      - generic [ref=e1991]: top-1 →
+      - generic [ref=e1992]: cifar10 baseline 84.8%
+      - generic [ref=e1993]: cifar100 baseline 56.5%
+      - generic "slot_act_sine · cifar10 · seed0 · top-1 85.56% · params 0.262M · composite 0.8618" [ref=e1994]
+      - generic [ref=e1995]: slot_act_sine
+      - generic [ref=e1996]: 85.56%
+      - generic "sg_only_sine_act · cifar10 · seed0 · top-1 80.62% · params 0.127M · composite 0.8197" [ref=e1997]
+      - generic [ref=e1998]: sg_only_sine_act
+      - generic [ref=e1999]: 80.62%
+      - generic "sg_only_constant_width · cifar10 · seed0 · top-1 75.95% · params 0.127M · composite 0.7629" [ref=e2000]
+      - generic [ref=e2001]: sg_only_constant_width
+      - generic [ref=e2002]: 75.95%
+      - generic "slot_act_sine · cifar100 · seed0 · top-1 57.96% · params 0.268M · composite 0.5545" [ref=e2003]
+      - generic [ref=e2004]: slot_act_sine
+      - generic [ref=e2005]: 57.96%
+      - generic "slot_act_sine · cifar100 · seed1 · top-1 57.84% · params 0.268M · composite 0.5537" [ref=e2006]
+      - generic [ref=e2007]: slot_act_sine
+      - generic [ref=e2008]: 57.84%
+      - generic "slot_act_sine · cifar100 · seed2 · top-1 57.66% · params 0.268M · composite 0.5511" [ref=e2009]
+      - generic [ref=e2010]: slot_act_sine
+      - generic [ref=e2011]: 57.66%
+    - img [ref=e2013]:
+      - generic [ref=e2014]: G8 — Esoteric Extensions · composite × params
+      - generic [ref=e2015]: "0.526"
+      - generic [ref=e2016]: "0.618"
+      - generic [ref=e2017]: "0.710"
+      - generic [ref=e2018]: "0.801"
+      - generic [ref=e2019]: "0.893"
+      - generic [ref=e2020]: params (M) →
+      - generic [ref=e2021]: composite →
+      - generic "slot_act_sine · cifar10 · seed0 · params 0.262M · composite 0.8618 · top-1 85.56%" [ref=e2022]
+      - generic [ref=e2023]: slot_act_sine
+      - generic "sg_only_sine_act · cifar10 · seed0 · params 0.127M · composite 0.8197 · top-1 80.62%" [ref=e2024]
+      - generic [ref=e2025]: sg_only_sine_act
+      - generic "sg_only_constant_width · cifar10 · seed0 · params 0.127M · composite 0.7629 · top-1 75.95%" [ref=e2026]
+      - generic [ref=e2027]: sg_only_constant_width
+      - generic "slot_act_sine · cifar100 · seed0 · params 0.268M · composite 0.5545 · top-1 57.96%" [ref=e2028]
+      - generic [ref=e2029]: slot_act_sine
+      - generic "slot_act_sine · cifar100 · seed1 · params 0.268M · composite 0.5537 · top-1 57.84%" [ref=e2030]
+      - generic [ref=e2031]: slot_act_sine
+      - generic "slot_act_sine · cifar100 · seed2 · params 0.268M · composite 0.5511 · top-1 57.66%" [ref=e2032]
+      - generic [ref=e2033]: slot_act_sine
+    - table [ref=e2034]:
+      - rowgroup [ref=e2035]:
+        - row "Tag DS Seed Top-1 Composite Params Hyp Curve" [ref=e2036]:
+          - columnheader "Tag" [ref=e2037] [cursor=pointer]
+          - columnheader "DS" [ref=e2038] [cursor=pointer]
+          - columnheader "Seed" [ref=e2039] [cursor=pointer]
+          - columnheader "Top-1" [ref=e2040] [cursor=pointer]
+          - columnheader "Composite" [ref=e2041] [cursor=pointer]
+          - columnheader "Params" [ref=e2042] [cursor=pointer]
+          - columnheader "Hyp" [ref=e2043] [cursor=pointer]
+          - columnheader "Curve" [ref=e2044] [cursor=pointer]
+      - rowgroup [ref=e2045]:
+        - row "slot_act_sine cifar10 0 85.56% 0.8618 0.262M H81" [ref=e2046] [cursor=pointer]:
+          - cell "slot_act_sine" [ref=e2047]:
+            - link "slot_act_sine" [ref=e2048]:
+              - /url: experiments/cifar10__slot_act_sine_seed0.html
+          - cell "cifar10" [ref=e2049]
+          - cell "0" [ref=e2050]
+          - cell "85.56%" [ref=e2051]
+          - cell "0.8618" [ref=e2052]
+          - cell "0.262M" [ref=e2053]
+          - cell "H81" [ref=e2054]
+          - cell [ref=e2055]:
+            - img [ref=e2056]
+        - row "sg_only_sine_act cifar10 0 80.62% 0.8197 0.127M H81" [ref=e2059] [cursor=pointer]:
+          - cell "sg_only_sine_act" [ref=e2060]:
+            - link "sg_only_sine_act" [ref=e2061]:
+              - /url: experiments/cifar10__sg_only_sine_act_seed0.html
+          - cell "cifar10" [ref=e2062]
+          - cell "0" [ref=e2063]
+          - cell "80.62%" [ref=e2064]
+          - cell "0.8197" [ref=e2065]
+          - cell "0.127M" [ref=e2066]
+          - cell "H81" [ref=e2067]
+          - cell [ref=e2068]:
+            - img [ref=e2069]
+        - row "sg_only_constant_width cifar10 0 75.95% 0.7629 0.127M H80" [ref=e2072] [cursor=pointer]:
+          - cell "sg_only_constant_width" [ref=e2073]:
+            - link "sg_only_constant_width" [ref=e2074]:
+              - /url: experiments/cifar10__sg_only_constant_width_seed0.html
+          - cell "cifar10" [ref=e2075]
+          - cell "0" [ref=e2076]
+          - cell "75.95%" [ref=e2077]
+          - cell "0.7629" [ref=e2078]
+          - cell "0.127M" [ref=e2079]
+          - cell "H80" [ref=e2080]
+          - cell [ref=e2081]:
+            - img [ref=e2082]
+        - row "slot_act_sine cifar100 0 57.96% 0.5545 0.268M H81" [ref=e2085] [cursor=pointer]:
+          - cell "slot_act_sine" [ref=e2086]:
+            - link "slot_act_sine" [ref=e2087]:
+              - /url: experiments/cifar100__slot_act_sine_seed0.html
+          - cell "cifar100" [ref=e2088]
+          - cell "0" [ref=e2089]
+          - cell "57.96%" [ref=e2090]
+          - cell "0.5545" [ref=e2091]
+          - cell "0.268M" [ref=e2092]
+          - cell "H81" [ref=e2093]
+          - cell [ref=e2094]:
+            - img [ref=e2095]
+        - row "slot_act_sine cifar100 1 57.84% 0.5537 0.268M H81" [ref=e2098] [cursor=pointer]:
+          - cell "slot_act_sine" [ref=e2099]:
+            - link "slot_act_sine" [ref=e2100]:
+              - /url: experiments/cifar100__slot_act_sine_seed1.html
+          - cell "cifar100" [ref=e2101]
+          - cell "1" [ref=e2102]
+          - cell "57.84%" [ref=e2103]
+          - cell "0.5537" [ref=e2104]
+          - cell "0.268M" [ref=e2105]
+          - cell "H81" [ref=e2106]
+          - cell [ref=e2107]:
+            - img [ref=e2108]
+        - row "slot_act_sine cifar100 2 57.66% 0.5511 0.268M H81" [ref=e2111] [cursor=pointer]:
+          - cell "slot_act_sine" [ref=e2112]:
+            - link "slot_act_sine" [ref=e2113]:
+              - /url: experiments/cifar100__slot_act_sine_seed2.html
+          - cell "cifar100" [ref=e2114]
+          - cell "2" [ref=e2115]
+          - cell "57.66%" [ref=e2116]
+          - cell "0.5511" [ref=e2117]
+          - cell "0.268M" [ref=e2118]
+          - cell "H81" [ref=e2119]
+          - cell [ref=e2120]:
+            - img [ref=e2121]
+  - generic [ref=e2124]:
+    - heading "Uncategorised (0 runs)" [level=2] [ref=e2125]
+    - generic [ref=e2126]: Tags whose hypothesis mapping is not yet wired into TAG_TO_HYP — please update dashboard.py.
+    - generic [ref=e2127]: No sweep rows yet in this group.
+  - generic [ref=e2128]:
+    - text: Generated by
+    - code [ref=e2129]: nature_inspired_networks.dashboard.render_dashboard
+    - text: · Brutalist Editorial Lab Notebook v3 · Newsreader / IBM Plex Serif / IBM Plex Mono · all SVG + CSS inline; no external CDN besides Google Fonts · leaderboard sectioned by hypothesis group; each row navigates to its own per-experiment page.
+  - generic [ref=e2130]:
+    - button "close · Esc" [ref=e2131] [cursor=pointer]
+    - heading "Hypothesis spec" [level=3] [ref=e2132]
+    - generic [ref=e2133]: —

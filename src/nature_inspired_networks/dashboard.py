@@ -628,6 +628,154 @@ def parse_scicritic_verdict(md_path: Path | None) -> dict[str, str]:
     return out
 
 
+# ---------------------------------------------------------------------------
+# Phase-8 winners (Rule 28 — n=3 evaluation tier)
+#
+# The three hypotheses that cleared the worst-leader-seed > best-baseline-seed
+# Phase-5 gate on CIFAR-100 (3 seeds × 30 epochs). All other rows are
+# n=1-seed SCREENING by default.
+# ---------------------------------------------------------------------------
+PHASE8_EVALUATION_TAGS: dict[str, set[str]] = {
+    "cifar100": {"pair_gm_pdw", "slot_act_sine", "sg_only_phi_budget"},
+}
+
+
+def _seed_count_for_tag(results_dir: Path, tag: str, dataset: str) -> int:
+    """Return the number of seed run-dirs on disk for (tag, dataset)."""
+    if not tag or not dataset:
+        return 0
+    ds_dir = Path(results_dir) / dataset
+    if not ds_dir.exists():
+        return 0
+    count = 0
+    for sib in ds_dir.iterdir():
+        if not sib.is_dir():
+            continue
+        if not sib.name.startswith(f"{tag}_seed"):
+            continue
+        if (sib / "metrics.json").exists():
+            count += 1
+    return count
+
+
+def _evaluation_tier(tag: str, dataset: str, seed_count: int) -> str:
+    """Return ``"EVALUATION"`` for Phase-8 winners with n>=3, else ``"SCREENING"``.
+
+    The Phase-5 gate (best-baseline-seed < worst-leader-seed) is verified
+    in FINDINGS.md for the three CIFAR-100 winners listed in
+    ``PHASE8_EVALUATION_TAGS`` — so for any other (tag, dataset) we
+    classify as SCREENING regardless of seed_count.
+    """
+    if seed_count < 3:
+        return "SCREENING"
+    eval_tags = PHASE8_EVALUATION_TAGS.get(dataset, set())
+    if tag in eval_tags:
+        return "EVALUATION"
+    return "SCREENING"
+
+
+def _build_stamp(repo_root: Path) -> dict[str, str]:
+    """Return ``{sha, sha_short, iso_date, url}`` for the HEAD commit."""
+    out = {"sha": "", "sha_short": "", "iso_date": "", "url": ""}
+    try:
+        r = subprocess.run(
+            ["git", "rev-parse", "HEAD"],
+            cwd=str(repo_root), capture_output=True, text=True, timeout=5,
+        )
+        sha = r.stdout.strip()
+        out["sha"] = sha
+        out["sha_short"] = sha[:7] if sha else ""
+        r2 = subprocess.run(
+            ["git", "log", "-1", "--format=%cI"],
+            cwd=str(repo_root), capture_output=True, text=True, timeout=5,
+        )
+        out["iso_date"] = r2.stdout.strip()
+        if sha:
+            out["url"] = (
+                f"https://github.com/dlmastery/nature_inspired_networks/"
+                f"commit/{sha}"
+            )
+    except Exception:
+        pass
+    return out
+
+
+# ---------------------------------------------------------------------------
+# Multi-hypothesis pill expansion for combo / loo / pair / slot ladders
+# ---------------------------------------------------------------------------
+#
+# A run tag like ``combo3_pb_gm_pd`` stacks three priors on top of the
+# H09 phi_budget base. The aggregate-dashboard / per-experiment-page
+# H-pill display previously showed only the leading H ID. Each suffix
+# token maps to its hypothesis ID:
+_COMBO_TOKEN_TO_HYP: dict[str, str] = {
+    "pb": "H09",   # phi_budget base
+    "gm": "H48",   # golden_momentum
+    "pd": "H47",   # phi_dropout
+    "pdw": "H44",  # phi_decay (weight decay)
+    "plr": "H10",  # phi_lr
+    "fe": "H20",   # fib_ensemble
+    "sa": "H81",   # sine_act / SIREN
+    "fp": "H43",   # fib_prune
+}
+
+
+def hypotheses_for_tag(tag: str) -> list[str]:
+    """Return ALL hypothesis IDs contributing to a tag (combo / loo / pair / slot).
+
+    - For combo/loo/pair/slot tags: parses the underscore-separated tokens
+      after the prefix and maps each to its H-ID via ``_COMBO_TOKEN_TO_HYP``.
+      Combo always includes the H09 base.
+    - For everything else: returns the single TAG_TO_HYP[tag] HID (or []).
+    """
+    if not tag:
+        return []
+    # Combo: combo<N>_<tok1>_<tok2>_... — always includes phi_budget base
+    if tag.startswith("combo"):
+        m = re.match(r"combo\d+_(.+)", tag)
+        if m:
+            toks = m.group(1).split("_")
+            ids: list[str] = ["H09"]  # phi_budget base
+            for t in toks:
+                hid = _COMBO_TOKEN_TO_HYP.get(t)
+                if hid and hid not in ids:
+                    ids.append(hid)
+            return ids
+    # LOO: loo_no_<tok> — base combo8 minus one prior (still on phi_budget base)
+    if tag.startswith("loo_no_"):
+        tok = tag[len("loo_no_"):]
+        ids = ["H09"]
+        # combo8 base = pb + gm + pd + pdw + plr + fe + sa + fp; LOO removes one
+        for t in ("gm", "pd", "pdw", "plr", "fe", "sa", "fp"):
+            if t == tok:
+                continue
+            hid = _COMBO_TOKEN_TO_HYP.get(t)
+            if hid and hid not in ids:
+                ids.append(hid)
+        return ids
+    # PAIR: pair_<tok1>_<tok2> — phi_budget base + two priors
+    if tag.startswith("pair_"):
+        toks = tag[len("pair_"):].split("_")
+        ids = ["H09"]
+        for t in toks:
+            hid = _COMBO_TOKEN_TO_HYP.get(t)
+            if hid and hid not in ids:
+                ids.append(hid)
+        return ids
+    # SLOT: slot_<axis>_<value> — one prior swapped onto phi_budget base.
+    # The TAG_TO_HYP map already records the swapped-in hypothesis, so
+    # we add the H09 base in front.
+    if tag.startswith("slot_"):
+        hid_pair = TAG_TO_HYP.get(tag)
+        if hid_pair and hid_pair[0]:
+            return ["H09", hid_pair[0]]
+        return ["H09"]
+    hid_pair = TAG_TO_HYP.get(tag)
+    if hid_pair and hid_pair[0]:
+        return [hid_pair[0]]
+    return []
+
+
 def _git_short_sha(repo_root: Path, target: Path | None) -> str:
     """Return the short SHA of the last commit touching ``target``.
 
@@ -959,7 +1107,45 @@ _EXP_FONT_LINK = (
 )
 
 
-def _md_to_html(text: str, *, inline_only: bool = False) -> str:
+def _strip_blockquote_markers(text: str) -> str:
+    """Strip leading ``>`` blockquote markers (one or more, possibly nested).
+
+    The FINDINGS / impl-critic / sci-critic excerpts embedded in the
+    dashboard are quoted FROM their source .md files using the
+    project's "we're embedding this section" convention (leading ``> ``
+    per line). The ``markdown`` library treats those leading markers as
+    blockquotes containing the inner GFM table, but its parser does NOT
+    recognise GFM tables nested inside a blockquote — so the pipes
+    survive into the HTML output as literal ``|`` characters.
+
+    The right fix is to strip the leading blockquote markers BEFORE
+    handing the body to the markdown parser; the caller re-wraps the
+    rendered HTML in a styled ``<div class='findings-quote md-body'>``
+    so the visual blockquote affordance is retained.
+
+    This handles arbitrary nesting depth (e.g., ``> > | tag | ...``):
+    we strip ALL leading ``>`` markers at the start of each line.
+    """
+    lines: list[str] = []
+    for line in text.splitlines():
+        # Strip arbitrarily many leading "> " sequences (allowing spaces
+        # between them), then a single trailing space if present.
+        s = line
+        while True:
+            t = s.lstrip()
+            if t.startswith("> "):
+                s = t[2:]
+                continue
+            if t.startswith(">"):
+                s = t[1:]
+                continue
+            break
+        lines.append(s)
+    return "\n".join(lines)
+
+
+def _md_to_html(text: str, *, inline_only: bool = False,
+                strip_blockquote: bool = True) -> str:
     """Render a chunk of markdown text to safe HTML for inline display.
 
     Uses the ``markdown`` library (3.10+) with conservative extensions:
@@ -968,9 +1154,17 @@ def _md_to_html(text: str, *, inline_only: bool = False) -> str:
     the result fits inline with surrounding text. Markdown is trusted-input
     here (it comes from repo .md files the agent has read), so we do not
     pass through bleach.
+
+    When ``strip_blockquote=True`` (default), leading ``>`` markdown
+    blockquote markers are removed before parsing — this lets embedded
+    GFM tables inside an excerpted blockquote render properly (the
+    ``markdown`` library's blockquote nesting does not recurse into the
+    tables extension).
     """
     if not text or not text.strip():
         return ""
+    if strip_blockquote:
+        text = _strip_blockquote_markers(text)
     try:
         import markdown as _md
         html = _md.markdown(
@@ -1920,8 +2114,15 @@ def _render_scicritic_excerpt(md_path: Path | None) -> str:
 
 
 def _render_key_numbers_strip(metrics: dict,
-                              baseline_top1: float | None) -> str:
-    """Brutalist tile bar of key headline numbers (top of page)."""
+                              baseline_top1: float | None,
+                              tier: str = "SCREENING",
+                              seed_count: int = 1) -> str:
+    """Brutalist tile bar of key headline numbers (top of page).
+
+    The Δ vs baseline tile is labelled with the Rule-28 seed-count
+    framing — "(n=1, screening)" or "(n=3, evaluation)" — so a reader
+    knows whether the claim is screening-tier or evaluation-tier.
+    """
     def f(k):
         v = metrics.get(k)
         try:
@@ -1944,7 +2145,11 @@ def _render_key_numbers_strip(metrics: dict,
         delta = (top1 - baseline_top1) * 100
         sign = "+" if delta >= 0 else "−"
         tint = "tint-pos" if delta >= 0 else "tint-neg"
-        tiles.append((f"{sign}{abs(delta):.2f}pp", "Δ vs baseline", tint))
+        tier_label = tier.lower()
+        delta_lbl = (
+            f"Δ vs baseline (n={seed_count}, {tier_label})"
+        )
+        tiles.append((f"{sign}{abs(delta):.2f}pp", delta_lbl, tint))
     if params is not None:
         tiles.append((f"{params/1e6:.3f}M", "params", "tint-neu"))
     if lat is not None:

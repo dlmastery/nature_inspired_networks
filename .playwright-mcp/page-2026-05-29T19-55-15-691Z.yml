@@ -1,0 +1,208 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - generic [ref=e3]:
+      - generic [ref=e4]: pair_gm_pdw
+      - generic [ref=e5]:
+        - generic [ref=e6]: H09
+        - generic [ref=e7]: G1 — Scaling & Growth
+        - generic [ref=e8]: cifar100
+        - generic [ref=e9]: seed 0
+        - text: · run dir pair_gm_pdw_seed0
+    - generic [ref=e10]:
+      - link "← back to dashboard" [ref=e11] [cursor=pointer]:
+        - /url: ../dashboard.html
+      - generic [ref=e12]:
+        - link "impl MAJOR" [ref=e13] [cursor=pointer]:
+          - /url: https://github.com/dlmastery/nature_inspired_networks/blob/main/audits/G1_audit.md#h09-g1
+          - 'generic "- `phi_budget_allocations(B, n)` correctly computes shares = `(phi - 1) * phi**k / (phi**n - 1)` (phi_scaling.py:263–264). For B=1_000_000, n=4 the output is `[105_573, 170_820, 276_393, 447_214]`, and pairwise ratios are `1 : 1.618 : 2.618 : 4.236` (verified — within 5e-6 of phi**k). The allocation step is correct. - `phi_budget_widths(B, n, kernel=3, blocks_per_stage=2)` derives per-stage channe" [ref=e14]': impl MAJOR
+        - 'generic "**DERIVATIVE+TESTABLE** (provisionally) — The empirical result is real, but it is *almost certainly* explained by stage-3 shrinkage acting as implicit regularisation at small epoch budgets (mechanism #1) and FLOPs-redistribution to early stages (mechanism #3), not by φ. The hypothesis as currently stated should be **re-framed as \"test whether per-stage ratio in [1.5, 2.0] generally beats doubling at small epoch budge" [ref=e16]': sci DERIVATIVE+TESTABLE
+  - generic [ref=e17]:
+    - generic [ref=e18]:
+      - generic [ref=e19]: 57.86%
+      - generic [ref=e20]: top-1
+    - generic [ref=e21]:
+      - generic [ref=e22]: "0.5544"
+      - generic [ref=e23]: composite
+    - generic [ref=e24]:
+      - generic [ref=e25]: +1.34pp
+      - generic [ref=e26]: Δ vs baseline
+    - generic [ref=e27]:
+      - generic [ref=e28]: 0.268M
+      - generic [ref=e29]: params
+    - generic [ref=e30]:
+      - generic [ref=e31]: 11.40ms
+      - generic [ref=e32]: latency b=1
+  - generic [ref=e33]:
+    - 'heading "Hypothesis H09 — H09 — Golden Proportion Parameter Budget (1 : phi : phi**2 across stages)" [level=2] [ref=e34]'
+    - generic [ref=e35]:
+      - link "impl MAJOR" [ref=e36] [cursor=pointer]:
+        - /url: https://github.com/dlmastery/nature_inspired_networks/blob/main/audits/G1_audit.md#h09-g1
+        - 'generic "- `phi_budget_allocations(B, n)` correctly computes shares = `(phi - 1) * phi**k / (phi**n - 1)` (phi_scaling.py:263–264). For B=1_000_000, n=4 the output is `[105_573, 170_820, 276_393, 447_214]`, and pairwise ratios are `1 : 1.618 : 2.618 : 4.236` (verified — within 5e-6 of phi**k). The allocation step is correct. - `phi_budget_widths(B, n, kernel=3, blocks_per_stage=2)` derives per-stage channe" [ref=e37]': impl MAJOR
+      - 'generic "**DERIVATIVE+TESTABLE** (provisionally) — The empirical result is real, but it is *almost certainly* explained by stage-3 shrinkage acting as implicit regularisation at small epoch budgets (mechanism #1) and FLOPs-redistribution to early stages (mechanism #3), not by φ. The hypothesis as currently stated should be **re-framed as \"test whether per-stage ratio in [1.5, 2.0] generally beats doubling at small epoch budge" [ref=e39]': sci DERIVATIVE+TESTABLE
+    - paragraph [ref=e40]: "Allocating a fixed total parameter budget B across network stages in the ratio 1 : phi : phi**2 : phi**3 yields a Pareto point dominating uniform or geometric-2 allocation at iso-FLOPs."
+    - heading "Motivation" [level=3] [ref=e41]
+    - paragraph [ref=e42]: "When a fixed resource budget must be split across a hierarchy of processing stages, the optimal allocation depends on how the marginal returns of each stage compare. For deep networks, deeper stages process more abstract features that have higher information content per parameter (because they integrate larger receptive fields). The phi recurrence phi**(k+1) = phi**k + phi**(k-1) means that allocating budget in proportion to phi**k automatically gives each stage exactly the sum of what the two prior stages received, mirroring the biological resource-inheritance rule (mollusc shells, ammonite chambers, plant internodes). The total budget is then B = sum_{k=0}^{K} phi**k = (phi**(K+1) - 1) / (phi - 1), which gives a closed-form allocator: stage k receives B * (phi - 1) * phi**k / (phi**(K+1) - 1). This is fundamentally different from the linear, geometric-2, or EfficientNet-style allocations and provides a parameter-efficient hierarchy where each stage's expressive capacity is mathematically locked to the sum of the previous two stages."
+    - heading "Formal hypothesis" [level=3] [ref=e43]
+    - paragraph [ref=e44]: "Because golden-proportion parameter budget allocation (1 : phi : phi**2 : phi**3) per stage assigns each stage's capacity to be the sum of the two prior stages, the mechanism by which it should dominate uniform or geometric-2 allocation at fixed total budget B is that the hierarchical information-integration cost grows as phi**k (matching biological resource inheritance) per Tan and Le 2019. We expect a Pareto point on CIFAR-100 at +0.3 to +0.8 pp top-1 at iso-FLOPs vs uniform allocation."
+    - group [ref=e45]:
+      - generic "▸ Read the full design-doc digest" [ref=e46] [cursor=pointer]
+  - generic [ref=e47]:
+    - heading "Verdict FINDINGS.md" [level=2] [ref=e48]
+    - generic [ref=e49]: "> ## ✅ PHASE-8 FINAL VERDICT (2026-05-29) — THREE replicated cross-dataset positives > > The audit + Fixer + post-fix re-run + 3-seed CIFAR-100 graduation cycle > is complete. **Three independent hypotheses cleared the worst-leader-seed > > best-baseline-seed Phase-5 gate** on CIFAR-100 (30 ep, 3 seeds): > > | tag | C100 median | min seed | baseline max | Δ vs baseline median | > |---|---:|---:|---:|---:| > | `pair_gm_pdw` (H09+H48+H44 orthogonal stack) | **0.5786** | 0.5761 | 0.5662 | **+1.34 pp** | > | `slot_act_sine` (H81 SIREN, single prior) | **0.5784** | 0.5766 | 0.5662 | **+1.32 pp** | > | `sg_only_phi_budget` (H09, post-fix 1:1.623:2.629) | **0.5741** | 0.5687 | 0.5662 | **+0.89 pp** | > | `baseline_resnet20` (rail) | 0.5652 | — | — | — | > > All three lead floors are strictly above the baseline ceiling → > **leads are outside seed noise**. The post-fix H09 median (57.41 %) is > ~0.6 pp LOWER than the pre-fix broken-architecture median (58.05 %), > which is exactly what an honest audit predicts — the broken realised > ratio happened to land a fortuitously-high seed-0 number. The corrected > mechanism gives a more modest but statistically robust lead. > > **The dual-track au"
+    - paragraph [ref=e50]:
+      - link "↗ Full FINDINGS.md on GitHub" [ref=e51] [cursor=pointer]:
+        - /url: https://github.com/dlmastery/nature_inspired_networks/blob/main/FINDINGS.md
+  - generic [ref=e52]:
+    - heading "Composite-score breakdown" [level=2] [ref=e53]
+    - generic [ref=e54]:
+      - generic "top-1 = 0.57860" [ref=e55]: top-1 +0.5786
+      - generic "-0.05·log10(params_M)" [ref=e56]: params +0.02862
+      - generic "-0.05·log10(latency_ms)" [ref=e57]: lat −0.05284
+    - generic [ref=e58]:
+      - generic [ref=e59]: "Σ recomputed: 0.55438"
+      - generic [ref=e60]: "reported: 0.55438 · Δ +0.000000"
+    - generic [ref=e61]:
+      - text: composite ≔
+      - code [ref=e62]: top1 - 0.05*log10(params_M) - 0.05*log10(latency_ms)
+  - generic [ref=e63]:
+    - heading "Per-epoch training curves" [level=2] [ref=e64]
+    - generic [ref=e65]:
+      - img [ref=e67]:
+        - generic [ref=e68]: Loss
+        - generic [ref=e69]: "1.817"
+        - generic [ref=e70]: "2.404"
+        - generic [ref=e71]: "2.991"
+        - generic [ref=e72]: "3.578"
+        - generic [ref=e73]: "4.165"
+        - generic [ref=e74]: "0"
+        - generic [ref=e75]: "29"
+        - generic [ref=e76]: epoch →
+        - generic [ref=e77]: loss →
+        - generic [ref=e81]: train loss
+      - img [ref=e83]:
+        - generic [ref=e84]: Accuracy
+        - generic [ref=e85]: 5.7%
+        - generic [ref=e86]: 26.9%
+        - generic [ref=e87]: 48.0%
+        - generic [ref=e88]: 69.1%
+        - generic [ref=e89]: 90.2%
+        - generic [ref=e90]: "0"
+        - generic [ref=e91]: "29"
+        - generic [ref=e92]: epoch →
+        - generic [ref=e93]: accuracy →
+        - generic [ref=e97]: train top-1
+        - generic [ref=e101]: test top-1
+        - generic [ref=e105]: test top-5
+  - generic [ref=e106]:
+    - heading "Deep inspection" [level=2] [ref=e107]
+    - paragraph [ref=e108]: Audit excerpts, reasoning blob, raw configuration, and full metrics JSON — expand sections of interest.
+    - group [ref=e109]:
+      - generic "▸ Research-scientist critique (addendum)" [ref=e110] [cursor=pointer]
+    - group [ref=e111]:
+      - generic "▸ Implementation-critic audit (audits/G1_audit.md)" [ref=e112] [cursor=pointer]
+    - group [ref=e113]:
+      - generic "▸ Reasoning blob (reasoning.json)" [ref=e114] [cursor=pointer]
+    - group [ref=e115]:
+      - generic "▸ Configuration dump" [ref=e116] [cursor=pointer]
+    - group [ref=e117]:
+      - generic "▸ Full metrics JSON" [ref=e118] [cursor=pointer]
+  - generic [ref=e119]:
+    - heading "Metrics — quick reference" [level=2] [ref=e120]
+    - table [ref=e121]:
+      - rowgroup [ref=e122]:
+        - row "Dataset cifar100" [ref=e123]:
+          - cell "Dataset" [ref=e124]
+          - cell "cifar100" [ref=e125]
+        - row "Seed 0" [ref=e126]:
+          - cell "Seed" [ref=e127]
+          - cell "0" [ref=e128]
+        - row "Epochs 30" [ref=e129]:
+          - cell "Epochs" [ref=e130]
+          - cell "30" [ref=e131]
+        - row "Top-1 accuracy 57.86%" [ref=e132]:
+          - cell "Top-1 accuracy" [ref=e133]
+          - cell "57.86%" [ref=e134]
+        - row "Top-5 accuracy 85.64%" [ref=e135]:
+          - cell "Top-5 accuracy" [ref=e136]
+          - cell "85.64%" [ref=e137]
+        - row "Train top-1 65.12%" [ref=e138]:
+          - cell "Train top-1" [ref=e139]
+          - cell "65.12%" [ref=e140]
+        - row "Generalisation gap (train − test) 7.26%" [ref=e141]:
+          - cell "Generalisation gap (train − test)" [ref=e142]
+          - cell "7.26%" [ref=e143]
+        - row "Parameters 267,658 (0.268 M)" [ref=e144]:
+          - cell "Parameters" [ref=e145]
+          - cell "267,658 (0.268 M)" [ref=e146]
+        - row "FLOPs 80.8 M MACs" [ref=e147]:
+          - cell "FLOPs" [ref=e148]
+          - cell "80.8 M MACs" [ref=e149]
+        - row "Latency (batch=1) 11.397 ms" [ref=e150]:
+          - cell "Latency (batch=1)" [ref=e151]
+          - cell "11.397 ms" [ref=e152]
+        - row "Rot-eq error 0.394386" [ref=e153]:
+          - cell "Rot-eq error" [ref=e154]
+          - cell "0.394386" [ref=e155]
+        - row "Epochs-to-target -1" [ref=e156]:
+          - cell "Epochs-to-target" [ref=e157]
+          - cell "-1" [ref=e158]
+        - row "Train wall-clock 2804.4 s" [ref=e159]:
+          - cell "Train wall-clock" [ref=e160]
+          - cell "2804.4 s" [ref=e161]
+        - row "Composite score 0.554381" [ref=e162]:
+          - cell "Composite score" [ref=e163]
+          - cell "0.554381" [ref=e164]
+        - row "Composite fingerprint (SHA-256) d65565e9c7b12d14cbce30a801ecc6753aea3eb148074256bfcc051fa61d0893" [ref=e165]:
+          - cell "Composite fingerprint (SHA-256)" [ref=e166]
+          - cell "d65565e9c7b12d14cbce30a801ecc6753aea3eb148074256bfcc051fa61d0893" [ref=e167]
+  - generic [ref=e168]:
+    - heading "Cross-references" [level=2] [ref=e169]
+    - generic [ref=e170]:
+      - link "↪ other seed pair_gm_pdw cifar100 · seed 1" [ref=e171] [cursor=pointer]:
+        - /url: ../experiments/cifar100__pair_gm_pdw_seed1.html
+        - generic [ref=e172]: ↪ other seed
+        - generic [ref=e173]: pair_gm_pdw
+        - generic [ref=e174]: cifar100 · seed 1
+      - link "↪ other seed pair_gm_pdw cifar100 · seed 2" [ref=e175] [cursor=pointer]:
+        - /url: ../experiments/cifar100__pair_gm_pdw_seed2.html
+        - generic [ref=e176]: ↪ other seed
+        - generic [ref=e177]: pair_gm_pdw
+        - generic [ref=e178]: cifar100 · seed 2
+      - link "↪ same tag, other dataset pair_gm_pdw cifar10 · seed 0" [ref=e179] [cursor=pointer]:
+        - /url: ../experiments/cifar10__pair_gm_pdw_seed0.html
+        - generic [ref=e180]: ↪ same tag, other dataset
+        - generic [ref=e181]: pair_gm_pdw
+        - generic [ref=e182]: cifar10 · seed 0
+      - link "↪ nearest in G1 sg_only_phi_budget 57.75% · Δ-comp −0.0004" [ref=e183] [cursor=pointer]:
+        - /url: ../experiments/cifar100__sg_only_phi_budget_seed1.html
+        - generic [ref=e184]: ↪ nearest in G1
+        - generic [ref=e185]: sg_only_phi_budget
+        - generic [ref=e186]: 57.75% · Δ-comp −0.0004
+      - link "↪ nearest in G1 sg_only_phi_budget 57.41% · Δ-comp −0.0055" [ref=e187] [cursor=pointer]:
+        - /url: ../experiments/cifar100__sg_only_phi_budget_seed0.html
+        - generic [ref=e188]: ↪ nearest in G1
+        - generic [ref=e189]: sg_only_phi_budget
+        - generic [ref=e190]: 57.41% · Δ-comp −0.0055
+      - link "↪ nearest in G1 sg_only_phi_budget 56.87% · Δ-comp −0.0101" [ref=e191] [cursor=pointer]:
+        - /url: ../experiments/cifar100__sg_only_phi_budget_seed2.html
+        - generic [ref=e192]: ↪ nearest in G1
+        - generic [ref=e193]: sg_only_phi_budget
+        - generic [ref=e194]: 56.87% · Δ-comp −0.0101
+  - generic [ref=e195]:
+    - text: composite formula SHA-256
+    - code [ref=e196]: d65565e9c7b12d14cbce30a801ecc6753aea3eb148074256bfcc051fa61d0893
+    - text: epochs run
+    - code [ref=e197]: "30"
+    - text: · train wall-clock
+    - code [ref=e198]: 2804.4 s
+    - text: · gen-gap (train − test)
+    - code [ref=e199]: 7.26 pp
+    - text: "· metrics.json git commit:"
+    - link "e4f286f" [ref=e200] [cursor=pointer]:
+      - /url: https://github.com/dlmastery/nature_inspired_networks/commit/e4f286f
+      - code [ref=e201]: e4f286f
+    - text: run directory
+    - code [ref=e202]: pair_gm_pdw_seed0
+    - text: Generated by
+    - code [ref=e203]: nature_inspired_networks.dashboard.render_experiment_page
+    - text: · self-contained inline SVG, no external assets · brutalist editorial lab notebook v3
