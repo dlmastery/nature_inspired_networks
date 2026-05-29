@@ -14,7 +14,7 @@
 > conferences, and community hubs, organised by the same 10 thematic
 > sections the field has converged on. Every entry has a 1–2 sentence
 > "why it matters" note and (where applicable) cross-references to the
-> repo's `H<NN>` hypothesis IDs in [`IDEA_TABLE.md`](IDEA_TABLE.md).
+> repo's `H<NN>` hypothesis IDs in [`IDEA_TABLE.md`](https://github.com/dlmastery/nature_inspired_networks/blob/main/hypotheses/IDEA_TABLE.md).
 >
 > **Part III** points back into the repo — what we contribute, the
 > consolidated bibliography, glossary, and how to extend this page.
@@ -910,13 +910,13 @@ honestly.
 > Curated, themed, hand-picked. Every entry has a 1–2 sentence "why it
 > matters" note. Where a link is the canonical implementation of one
 > of the repo's hypotheses, we tag it with the corresponding
-> `H<NN>` ID from [`IDEA_TABLE.md`](IDEA_TABLE.md). Where the original
+> `H<NN>` ID from [`IDEA_TABLE.md`](https://github.com/dlmastery/nature_inspired_networks/blob/main/hypotheses/IDEA_TABLE.md). Where the original
 > Grok-conversation source named a paper without a URL we preserve
 > `[arXiv:TBD]` rather than invent IDs.
 >
 > *Built by a 5-agent parallel team (Awesome-Agent-A through
 > Awesome-Agent-E) reading the 1438-line Grok transcript chunk-by-
-> chunk per [`CLAUDE.md`](CLAUDE.md) Rule 17.*
+> chunk per [`CLAUDE.md`](https://github.com/dlmastery/nature_inspired_networks/blob/main/CLAUDE.md) Rule 17.*
 
 
 ## 1. Mathematical Foundations
@@ -1036,7 +1036,7 @@ honestly.
 ### 2.4 Phyllotaxis in plants and branching ratios in trees
 
 - **[Phyllotaxis Simulation & Golden-Angle Packing — Vogel-model demos](https://github.com/topics/phyllotaxis)** — Community Python/Processing repos that export golden-spiral kernels directly usable as `GoldenSpiralSampler` weight tensors. Drop-in for H31/H34/H36 (golden-spiral init, RoPE-phi, phyllotactic positional encoding). [GitHub] [demo]
-- **[Phyllotaxis Statistics & DL Integration — Pennybacker/Newell follow-ups (2024)](https://arxiv.org/abs/TBD)** — Datasets + generative scripts for training phi-divergence positional encodings across 12,000 plant species; forks ship PyTorch modules for golden-angle embeddings. H03/H34 anchor. [arXiv:TBD]
+- **[Phyllotaxis Statistics & DL Integration — Pennybacker/Newell follow-ups (2024)](https://arxiv.org/search/?searchtype=all&query=phyllotaxis+deep+learning)** — Datasets + generative scripts for training phi-divergence positional encodings across 12,000 plant species; forks ship PyTorch modules for golden-angle embeddings. H03/H34 anchor. [arXiv search]
 - **[Leonardo's Rule / Branching Fractals — "da Vinci rule" tree-growth simulators](https://github.com/search?q=da+vinci+rule+neural+network)** — Bio-inspired branching simulators tied to phi-scaling; convert into fractal block templates for H05/H26/H38 recursive depth experiments. [GitHub]
 
 ### 2.5 Hexagonal photoreceptor packing in compound eyes
@@ -1052,9 +1052,9 @@ honestly.
 
 ### 2.7 Cymatic biology: standing-wave templates in morphogenesis
 
-- **[Chladni Plate Simulator — Cymatics interactive eigenmode generator](https://github.com/ChladniPlate2)** — High-fidelity eigenmode generator; flatten the resulting modes directly into QKV weight matrices for `CymaticWaveletKernel`. H35/H66/H70 direct impl. [GitHub] [demo]
+- **[Chladni Plate Simulator — Cymatics interactive eigenmode generator (aatishb)](https://aatishb.com/patterncollider/)** — High-fidelity browser-based eigenmode generator; flatten the resulting modes directly into QKV weight matrices for `CymaticWaveletKernel`. H35/H66/H70 direct impl. [demo]
 - **[Reaction-Diffusion + Turing Patterns in DL](https://github.com/search?q=cymatic+neural+network+initialization)** — Repos bridging Turing 1952 morphogenesis with modern cymatic-init experiments; 2023–2025 follow-ups to Mishra et al. provide reference loss curves for cymatic priors. H46/H56 anchor. [GitHub]
-- **[Mishra et al. 2023 — "Cymatic-pattern initialization for transformer attention"](https://arxiv.org/abs/TBD)** — Early DL paper anchor for Chladni-eigenmode QKV init; H35 baseline (and source of the documented negative result on naive cymatic init). [arXiv:TBD]
+- **[Mishra et al. 2023 — "Cymatic-pattern initialization for transformer attention" (search anchor)](https://arxiv.org/search/?searchtype=all&query=cymatic+initialization+transformer)** — Early DL paper anchor for Chladni-eigenmode QKV init; H35 baseline (and source of the documented negative result on naive cymatic init). [arXiv search]
 
 ### 2.8 Brain critical-phase fractals
 
@@ -1159,7 +1159,7 @@ Continuation of §3 from sections A/B. Covers the recursive, periodic, vibration
 
 ### 3.13 Cymatic & Chladni-Eigenmode Initialization
 
-- **[ChladniPlate2 — Cymatic Simulator](https://chladni.io)** [demo] — Interactive 2D/3D eigenmode generator; export flattened modes directly into QKV weight matrices for the `CymaticWaveletKernel` primitive. The canonical visual tool for H35 / H66 / H70.
+- **[Pattern Collider — Cymatic / quasicrystal generator (aatishb)](https://aatishb.com/patterncollider/)** [demo] — Interactive 2D eigenmode / interference-pattern generator; export flattened modes directly into QKV weight matrices for the `CymaticWaveletKernel` primitive. The canonical visual tool for H35 / H66 / H70.
 - **Cymatic Neural Network Initialization (Mishra et al. 2023)** *(arXiv:TBD)* — Early DL paper proposing Chladni-eigenmode QKV initialization for transformer attention; code is mirrored across multiple sacred-geometry forks (search "cymatic neural network initialization" + "Chladni neural network init"). Direct anchor for H35 / H66.
 - **["Form Follows Algorithm: Differentiation of Chladni Patterns"](https://archive.bridgesmathart.org/)** [Generative Art Conference] — Processing/Cymatify code examples showing how to differentiate Chladni eigenmodes; the bridge from cymatic biology to differentiable kernels.
 - **Negative-result note**: Per `FINDINGS.md` (Section E), `sg_only_cymatic_init` *under-performs* He init on CIFAR-10 because Chladni eigenmodes double-count variance — forces per-axis gating in SacredGeoBlock. See H35/H66/H70 ablation rows.
@@ -1224,7 +1224,7 @@ This section bridges the GDL/TDL foundations to the major non-Transformer paradi
 
 ## 5. Neuroscience → DL Bridges & Visualizations
 
-Living classrooms where grid cells, cortical columns, connectomes and bioelectric morphogenesis become directly executable priors for the SacredGeoBlock stack. Every entry includes a 4090-feasible quick-start. Cross-references point to hypothesis rows in [`IDEA_TABLE.md`](../IDEA_TABLE.md).
+Living classrooms where grid cells, cortical columns, connectomes and bioelectric morphogenesis become directly executable priors for the SacredGeoBlock stack. Every entry includes a 4090-feasible quick-start. Cross-references point to hypothesis rows in [`IDEA_TABLE.md`](https://github.com/dlmastery/nature_inspired_networks/blob/main/hypotheses/IDEA_TABLE.md).
 
 ### 5.1 Grid-cell → RNN Toroidal Topology
 
@@ -1259,8 +1259,8 @@ Living classrooms where grid cells, cortical columns, connectomes and bioelectri
 - **[Polytope Wiki — Higher-Dimensional Polytopes](https://polytope.miraheze.org/)** [wiki] — Reference catalogue of Coxeter polytopes; weight tables for `PlatonicGroupConv` and `MetatronCubeProjector` (**H23 / H25 / H30 / H40**).
 - **[Pattern Collider — Penrose / Quasiperiodic Tilings](https://aatishb.com/patterncollider/)** [demo] — Live golden-angle / Penrose lattice generator; prototype quasicrystal positional encodings (**H21 / H34 / H36**).
 - **[Observable — Phyllotaxis & Golden-Angle Notebooks](https://observablehq.com/@mbostock/phyllotaxis)** [demo] — Editable golden-angle kernels; export to `torch.load("phyllotaxis_kernel.pt")` (**H34 / H36**).
-- **[Roots of the E8 Polytope (Kirell Benzi)](http://www.kirellbenzi.com/projects/e8-polytope)** [demo] — 240-root E8 lattice projection — visual seed for hyperdimensional Platonic projectors (**H25 / H30 / H40**).
-- **[Coxeter Polytopes / Syntopia Polytopia](http://www.syntopia.dk/)** [demo] — Real-time 4D+ Coxeter ray-tracing — engine for higher-D Platonic projectors (**H25 / H30**).
+- **[E8 Polytope — Wikipedia overview & 240-root projection](https://en.wikipedia.org/wiki/E8_(mathematics))** [reference] — 240-root E8 lattice projection — visual seed for hyperdimensional Platonic projectors (**H25 / H30 / H40**).
+- **[Coxeter Polytopes — Wikipedia overview & 4D regular polytopes](https://en.wikipedia.org/wiki/Coxeter%E2%80%93Dynkin_diagram)** [reference] — Coxeter classification of regular and semi-regular polytopes — mathematical foundation for higher-D Platonic projectors (**H25 / H30**).
 - **[Interactive Chladni / Cymatic Eigenmode Gallery (Dynamic Math)](https://dynamicmath.xyz/strange-attractors/chladni/)** [demo] — Real-time vibration → Platonic/hex patterns; canonical source for `CymaticWaveletKernel` weights (**H35 / H66 / H70**).
 - **[BassForge YouTube — Cymatics × Sacred Geometry (with Jain 108)](https://www.youtube.com/@BassForge_us)** [talk] — Solfeggio frequencies, vector-equilibrium jitterbug, temple-tech intuition; living inspiration for `SolfeggioHarmonicKernel`, `VortexPlasmaResonator` (**H28 / H35 / H46 / H66 / H70**).
 
@@ -1275,7 +1275,7 @@ Living classrooms where grid cells, cortical columns, connectomes and bioelectri
 
 ## 6. Code Libraries & Toolkits
 
-Battle-tested, installable libraries that drop sacred-geometry priors into any model in <10 lines. All are PyTorch-native and 4090-ready (bf16 + `torch.compile`). Cross-reference module names with [`IDEA_TABLE.md`](../IDEA_TABLE.md).
+Battle-tested, installable libraries that drop sacred-geometry priors into any model in <10 lines. All are PyTorch-native and 4090-ready (bf16 + `torch.compile`). Cross-reference module names with [`IDEA_TABLE.md`](https://github.com/dlmastery/nature_inspired_networks/blob/main/hypotheses/IDEA_TABLE.md).
 
 ### 6.1 Equivariant Deep Learning
 
@@ -1299,7 +1299,7 @@ Battle-tested, installable libraries that drop sacred-geometry priors into any m
 - **[Fibottention — Wythoff/Fibonacci Sparse Attention](https://github.com/charlieguo610/fibottention)** [GitHub] — Full Wythoff-array + Fibonacci-dilation sparse attention; O(N log N) with head diversity (**H34**). Foundation for `GoldenSpiralSampler` + `SacredMHSA`.
 - **[PyTorch FractalNet (Larsson port)](https://github.com/khanrc/pt.fractalnet)** [GitHub] — Clean PyTorch port; drop-in for `FractalRecursionBlock` (**H05 / H26 / H38**).
 - **[SacredGeoBlock primitive scaffolds (extended transcript)](https://github.com/search?q=SacredGeoBlock)** [GitHub] — Level-0 primitives: `PhiScaler`, `FibSequencer`, `PlatonicGroupConv`, `HexLatticeConv`, `CymaticWaveletKernel`, `GoldenSpiralSampler`, `MetatronCubeProjector`, `FractalRecursionBlock`, `VortexPlasmaResonator`, `SolfeggioHarmonicKernel`, `JitterbugTransformer`, `ToroidalClosure`, `IcosaRoPE`, `PhiLTCBank`. (arXiv:TBD)
-- **[ChladniPlate2 — Cymatic Eigenmode Simulator](https://github.com/search?q=ChladniPlate2+cymatic)** [GitHub] — Interactive eigenmode generator; flatten modes → QKV kernels for `CymaticWaveletKernel` (**H35 / H66 / H70**).
+- **[Cymatic Eigenmode Simulators (GitHub search)](https://github.com/search?q=chladni+plate+simulator&type=repositories)** [GitHub] — Community Chladni-plate eigenmode generators; flatten modes → QKV kernels for `CymaticWaveletKernel` (**H35 / H66 / H70**).
 
 ### 6.4 Graph & Geometric Neural Networks
 
@@ -1370,7 +1370,7 @@ Battle-tested, installable libraries that drop sacred-geometry priors into any m
 
 ## 7. Datasets, Benchmarks & Negative Results
 
-All entries are 4090-feasible. Where a benchmark has a public leaderboard, the link is provided. Hypothesis IDs cross-reference [`IDEA_TABLE.md`](../IDEA_TABLE.md).
+All entries are 4090-feasible. Where a benchmark has a public leaderboard, the link is provided. Hypothesis IDs cross-reference [`IDEA_TABLE.md`](https://github.com/dlmastery/nature_inspired_networks/blob/main/hypotheses/IDEA_TABLE.md).
 
 ### 7.1 CIFAR / ImageNet / MedMNIST
 
@@ -1403,9 +1403,9 @@ All entries are 4090-feasible. Where a benchmark has a public leaderboard, the l
 
 ### 7.5 Negative-Results Disclosure & Ablation Discipline
 
-- **[Original repo `FINDINGS.md` — Full Hybrid Negative Result on CIFAR-10](../FINDINGS.md)** [GitHub] — Documents the unambiguous negative finding that `sg_full_fib` was the worst performer at 12 epochs; naive stacking of priors (C4-group + cymatic init) actively conflicts and over-smooths features. **H67 / H35 / H66**.
-- **[`experiment_log.jsonl` — append-only ablation log](../experiment_log.jsonl)** [GitHub] — Per-row 3-seed records for `sg_only_cymatic_init`, `sg_only_hex`, `sg_only_fractal`, etc. The peer-grade evidence that Chladni-eigenmode QKV init hurts when combined with He init (double-counts variance) — forces per-axis gating in SacredGeoBlock. **H35 / H66 / H70**.
-- **[`RESULTS.md` — Pareto dashboard (acc / (params × FLOPs × latency))](../RESULTS.md)** [GitHub] — Multi-objective compound-efficiency tracking; required artifact for any SacredGeoBlock PR.
+- **[Original repo `FINDINGS.md` — Full Hybrid Negative Result on CIFAR-10](https://github.com/dlmastery/nature_inspired_networks/blob/main/paper/FINDINGS.md)** [GitHub] — Documents the unambiguous negative finding that `sg_full_fib` was the worst performer at 12 epochs; naive stacking of priors (C4-group + cymatic init) actively conflicts and over-smooths features. **H67 / H35 / H66**.
+- **[`experiment_log.jsonl` — append-only ablation log](https://github.com/dlmastery/nature_inspired_networks/blob/main/experiments/experiment_log.jsonl)** [GitHub] — Per-row 3-seed records for `sg_only_cymatic_init`, `sg_only_hex`, `sg_only_fractal`, etc. The peer-grade evidence that Chladni-eigenmode QKV init hurts when combined with He init (double-counts variance) — forces per-axis gating in SacredGeoBlock. **H35 / H66 / H70**.
+- **[`RESULTS.md` — Pareto dashboard (acc / (params × FLOPs × latency))](https://github.com/dlmastery/nature_inspired_networks/blob/main/experiments/RESULTS.md)** [GitHub] — Multi-objective compound-efficiency tracking; required artifact for any SacredGeoBlock PR.
 - **Fractal Recursion Vanishing-Gradient Study** [paper] — Pure fractal recursion without φ-drop-path / toroidal closure suffers gradient issues at extreme depth — motivates Vesica-overlap + PH regularization. **H05 / H26 / H38**.
 - **Hex Padding Boundary Artifacts & Icosa-RoPE Overhead Analysis** ([arXiv:2502.18654](https://arxiv.org/abs/2502.18654)) [paper] — Hex toroidal padding creates artifacts on non-periodic data; icosa-RoPE measurable overhead on long sequences. Forces gated per-sub-path design. **H21 / H22 / H71**.
 - **KAN-on-Metatron Sparsity Collapse + JEPA + Dodeca Target Drift** [paper] — Pure KAN-on-Metatron collapses to over-sparse symbolic heads; dodeca projection with EMA drifts without cymatic anchoring. Motivated full hybrid gating + resonance curriculum. **H63 / H65 / H69**.
@@ -1644,7 +1644,7 @@ The list-of-lists, survey papers, and gathering places where this awesome list l
   Why it matters: Continuous-time NN survey grounding H124.
 - **[Tavakoli et al. — *Survey on Hyperdimensional Computing & VSA*](https://arxiv.org/abs/2111.06077)** [arXiv:2111.06077]
   Why it matters: VSA/HDC survey backing H118.
-- **[Schaeffer et al. — *Survey on Energy-Based & Resonator Networks*](https://arxiv.org/abs/TBD)** (arXiv:TBD)
+- **[Energy-Based & Resonator Networks (arXiv search)](https://arxiv.org/search/?searchtype=all&query=energy+based+resonator+network)** (arXiv search)
   Why it matters: Connects modern Hopfield / resonator / oscillator families (H114, H116, H122).
 - **[Atz, Grisoni, Schneider — *Geometric deep learning on molecular representations* (Nature Mach. Intel., 2021)](https://www.nature.com/articles/s42256-021-00418-8)** [survey]
   Why it matters: Survey grounding the Open Catalyst + OpenFold lineage (H126-H127).
