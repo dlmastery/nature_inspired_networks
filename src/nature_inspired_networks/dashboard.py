@@ -761,7 +761,7 @@ def _esc(s: object) -> str:
 
 def _line_chart_svg(series: list[tuple[str, list[float], list[float], str]],
                     title: str, y_label: str,
-                    w: int = 460, h: int = 240,
+                    w: int = 460, h: int = 320,
                     y_as_pct: bool = False) -> str:
     series = [s for s in series if s[1] and s[2] and len(s[1]) == len(s[2])]
     if not series:
@@ -787,10 +787,13 @@ def _line_chart_svg(series: list[tuple[str, list[float], list[float], str]],
         return mt + ph * (1 - (y - ymin) / (ymax - ymin))
 
     parts: list[str] = [
-        f"<svg width='{w}' height='{h}' viewBox='0 0 {w} {h}' "
+        f"<svg viewBox='0 0 {w} {h}' preserveAspectRatio='xMinYMin meet' "
+        f"width='100%' height='auto' "
         f"xmlns='http://www.w3.org/2000/svg' "
-        f"style='background:#0d1117;border:1px solid #30363d;border-radius:6px'>",
-        f"<text x='{ml}' y='16' fill='#c9d1d9' font-size='12' "
+        f"style='background:#0a0a0d;border:1px solid #1c1c20;display:block;"
+        f"font-family:\"IBM Plex Mono\",monospace'>",
+        f"<text x='{ml}' y='18' fill='#e6e1d6' font-size='14' "
+        f"font-family='Newsreader,serif' font-style='italic' "
         f"font-weight='600'>{_esc(title)}</text>",
     ]
     for i in range(5):
@@ -798,29 +801,31 @@ def _line_chart_svg(series: list[tuple[str, list[float], list[float], str]],
         yy = sy(yv)
         parts.append(
             f"<line x1='{ml}' y1='{yy:.1f}' x2='{ml + pw}' y2='{yy:.1f}' "
-            f"stroke='#21262d' stroke-width='1'/>"
+            f"stroke='#1c1c20' stroke-width='1'/>"
         )
         lbl = f"{yv * 100:.1f}%" if y_as_pct else f"{yv:.3f}"
         parts.append(
-            f"<text x='{ml - 6}' y='{yy + 3:.1f}' fill='#8b949e' font-size='9' "
+            f"<text x='{ml - 6}' y='{yy + 3:.1f}' fill='#a89e8c' font-size='9' "
             f"text-anchor='end'>{lbl}</text>"
         )
     parts.append(
-        f"<text x='{sx(xmin):.1f}' y='{h - 8}' fill='#8b949e' font-size='9' "
+        f"<text x='{sx(xmin):.1f}' y='{h - 10}' fill='#a89e8c' font-size='9' "
         f"text-anchor='middle'>{int(xmin)}</text>"
     )
     parts.append(
-        f"<text x='{sx(xmax):.1f}' y='{h - 8}' fill='#8b949e' font-size='9' "
+        f"<text x='{sx(xmax):.1f}' y='{h - 10}' fill='#a89e8c' font-size='9' "
         f"text-anchor='middle'>{int(xmax)}</text>"
     )
     parts.append(
-        f"<text x='{ml + pw / 2:.1f}' y='{h - 8}' fill='#8b949e' font-size='9' "
-        f"text-anchor='middle'>epoch</text>"
+        f"<text x='{ml + pw / 2:.1f}' y='{h - 10}' fill='#a89e8c' "
+        f"font-size='10' font-family='Newsreader,serif' font-style='italic' "
+        f"text-anchor='middle'>epoch →</text>"
     )
     parts.append(
-        f"<text x='12' y='{mt + ph / 2:.1f}' fill='#8b949e' font-size='9' "
-        f"text-anchor='middle' transform='rotate(-90 12 {mt + ph / 2:.1f})'>"
-        f"{_esc(y_label)}</text>"
+        f"<text x='14' y='{mt + ph / 2:.1f}' fill='#a89e8c' font-size='10' "
+        f"font-family='Newsreader,serif' font-style='italic' "
+        f"text-anchor='middle' transform='rotate(-90 14 {mt + ph / 2:.1f})'>"
+        f"{_esc(y_label)} →</text>"
     )
     legend_x = ml + 6
     for li, (label, xs, ys, color) in enumerate(series):
@@ -830,15 +835,18 @@ def _line_chart_svg(series: list[tuple[str, list[float], list[float], str]],
             f"stroke-width='1.8'/>"
         )
         lx, ly = sx(xs[-1]), sy(ys[-1])
-        parts.append(f"<circle cx='{lx:.1f}' cy='{ly:.1f}' r='2.6' fill='{color}'/>")
-        ly_txt = mt + 12 + li * 14
         parts.append(
-            f"<rect x='{legend_x}' y='{ly_txt - 8}' width='10' height='10' "
-            f"fill='{color}' rx='2'/>"
+            f"<circle cx='{lx:.1f}' cy='{ly:.1f}' r='2.6' fill='{color}'/>"
+        )
+        ly_txt = mt + 14 + li * 16
+        parts.append(
+            f"<rect x='{legend_x}' y='{ly_txt - 9}' width='10' height='10' "
+            f"fill='{color}'/>"
         )
         parts.append(
-            f"<text x='{legend_x + 15}' y='{ly_txt}' fill='#c9d1d9' "
-            f"font-size='10'>{_esc(label)}</text>"
+            f"<text x='{legend_x + 16}' y='{ly_txt}' fill='#e6e1d6' "
+            f"font-size='10' font-family='IBM Plex Mono,monospace'>"
+            f"{_esc(label)}</text>"
         )
     parts.append("</svg>")
     return "".join(parts)
@@ -860,58 +868,180 @@ def run_page_filename(run_dir_name: str, dataset: str | None = None) -> str:
     return f"{run_dir_name}.html"
 
 
-_EXP_PAGE_CSS = """
+_EXP_FONT_LINK = (
+    "<link rel='preconnect' href='https://fonts.googleapis.com'>"
+    "<link rel='preconnect' href='https://fonts.gstatic.com' crossorigin>"
+    "<link href='https://fonts.googleapis.com/css2?"
+    "family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;0,6..72,800;"
+    "1,6..72,400;1,6..72,600&"
+    "family=IBM+Plex+Serif:wght@400;500;700&"
+    "family=IBM+Plex+Mono:wght@400;500;600&display=swap' rel='stylesheet'>"
+)
+
+# Brutalist Editorial Lab Notebook — colour + type system
+_BRUTALIST_VARS = """
+ :root{
+   --ink:#0a0a0d; --paper:#e6e1d6; --paper-dim:#a89e8c;
+   --rule:#1c1c20; --rule-bright:#2a2a30;
+   --panel:#111114; --panel2:#16161a;
+   --accent:#bb8c4d; --accent-dim:#7a5e36;
+   --v-pass:#3fb950; --v-minor:#d29922; --v-major:#f0883e; --v-broken:#f85149;
+   --v-novel:#a371f7; --v-derivative:#58a6ff; --v-numerology:#8b949e;
+   --v-falsified:#db6d28; --v-infra:#8b949e;
+ }
+ .grain{position:fixed;inset:0;pointer-events:none;z-index:2;opacity:0.035;
+   background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");}
+ @keyframes reveal{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+ section,.card,.kn-strip,.hero,.findings-row,details.deep{
+   animation:reveal 360ms cubic-bezier(.2,.7,.2,1) both;
+   animation-delay:calc(var(--i, 0) * 60ms);
+ }
+ html{scroll-behavior:smooth;}
+"""
+
+_EXP_PAGE_CSS = _BRUTALIST_VARS + """
  *{margin:0;padding:0;box-sizing:border-box;}
- body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:#0d1117;
-      color:#c9d1d9;padding:24px 28px;line-height:1.55;max-width:1180px;margin:0 auto;}
- a{color:#58a6ff;text-decoration:none;} a:hover{text-decoration:underline;}
- h1{color:#58a6ff;font-size:1.6em;margin-bottom:4px;}
- h2{color:#58a6ff;font-size:1.05em;margin-bottom:12px;font-weight:600;
-    letter-spacing:0.3px;}
- .sub{color:#8b949e;font-size:0.95em;margin-bottom:18px;}
- .pill{display:inline-block;background:#21262d;border:1px solid #30363d;
-       border-radius:10px;padding:2px 10px;font-size:0.78em;color:#c9d1d9;
-       font-family:Consolas,monospace;margin-right:6px;}
- .pill.hyp{background:#1f3a5f;border-color:#58a6ff;color:#cfe6ff;}
- .pill.grp{background:#2c1e3a;border-color:#a371f7;color:#dbc9f7;}
- .back{display:inline-block;margin-bottom:14px;font-size:0.9em;}
- .card{background:#161b22;border:1px solid #30363d;border-radius:8px;
-       padding:18px 22px;margin-bottom:18px;}
- .card h2{color:#58a6ff;font-size:1.05em;margin-bottom:12px;font-weight:600;}
- .card h3{color:#c9d1d9;font-size:0.92em;margin:14px 0 6px 0;font-weight:600;
-          text-transform:uppercase;letter-spacing:0.5px;}
- .card p{margin-bottom:10px;font-size:0.92em;}
- .card ul{margin-left:22px;font-size:0.9em;}
- table{width:100%;border-collapse:collapse;font-size:0.86em;}
- th{background:#0d1117;color:#8b949e;text-align:left;padding:7px 10px;
-    border-bottom:2px solid #30363d;font-size:0.74em;text-transform:uppercase;
-    letter-spacing:0.4px;}
- td{padding:7px 10px;border-bottom:1px solid #21262d;}
- td.k{color:#8b949e;width:42%;}
- td.v{color:#c9d1d9;font-family:Consolas,monospace;}
- .formula-chip{background:#0d1117;border:1px solid #30363d;border-radius:6px;
-               padding:10px 12px;font-family:Consolas,monospace;font-size:0.82em;
-               margin-bottom:12px;color:#c9d1d9;word-break:break-all;}
- .breakdown td.term{font-family:Consolas,monospace;}
- .pos{color:#3fb950;} .neg{color:#f85149;} .mut{color:#8b949e;}
- .charts{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
- @media(max-width:980px){.charts{grid-template-columns:1fr;}}
- .meta{font-size:0.78em;color:#484f58;margin-top:18px;line-height:1.6;}
- code{background:#0d1117;padding:1px 5px;border-radius:3px;font-size:0.92em;
-      font-family:Consolas,monospace;}
- pre{background:#0d1117;border:1px solid #30363d;border-radius:6px;
-     padding:12px;overflow-x:auto;font-family:Consolas,monospace;
-     font-size:0.84em;color:#c9d1d9;white-space:pre-wrap;line-height:1.5;}
- .reason-section{margin-bottom:14px;}
- .reason-section .lbl{color:#3fb950;font-size:0.72em;text-transform:uppercase;
-                      letter-spacing:0.6px;margin-bottom:4px;font-weight:600;}
- .reason-section .body{font-size:0.9em;color:#c9d1d9;white-space:pre-wrap;}
- .quote{border-left:3px solid #d29922;padding:8px 14px;background:#0d1117;
-        border-radius:0 6px 6px 0;font-size:0.9em;color:#c9d1d9;
-        margin:8px 0;}
- .verdict-label{color:#d29922;font-weight:600;}
- .empty{color:#8b949e;font-style:italic;font-size:0.88em;}
- .xrefs li{margin:4px 0;font-size:0.9em;font-family:Consolas,monospace;}
+ html,body{background:var(--ink);}
+ body{font-family:'IBM Plex Serif','Charter',Georgia,serif;color:var(--paper);
+      padding:32px 36px 80px;line-height:1.55;max-width:1180px;margin:0 auto;
+      font-size:16px;font-variant-numeric:tabular-nums;position:relative;}
+ a{color:var(--v-derivative);text-decoration:none;border-bottom:1px solid transparent;
+   transition:border-color 160ms ease;}
+ a:hover{border-bottom-color:var(--v-derivative);text-decoration:none;}
+ h1{font-family:'Newsreader',serif;font-weight:600;font-style:italic;
+    font-size:42px;line-height:1.05;color:var(--paper);letter-spacing:-0.01em;
+    margin-bottom:6px;}
+ h2{font-family:'Newsreader',serif;font-weight:600;font-style:italic;
+    font-size:22px;color:var(--paper);margin-bottom:14px;letter-spacing:-0.005em;}
+ h3{font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:11px;
+    text-transform:uppercase;letter-spacing:0.18em;color:var(--paper-dim);
+    margin:18px 0 8px 0;}
+ .mono{font-family:'IBM Plex Mono',monospace;font-size:0.85em;}
+ .head-grid{display:grid;grid-template-columns:1fr auto;gap:24px;
+            align-items:start;padding-bottom:18px;
+            border-bottom:1px solid var(--rule);margin-bottom:24px;}
+ .head-left .tag-display{font-family:'Newsreader',serif;font-style:italic;
+    font-size:54px;font-weight:600;line-height:1;color:var(--paper);
+    letter-spacing:-0.015em;word-break:break-word;}
+ .head-left .sub{font-family:'IBM Plex Mono',monospace;font-size:11px;
+    text-transform:uppercase;letter-spacing:0.18em;color:var(--paper-dim);
+    margin-top:10px;}
+ .head-right{display:flex;flex-direction:column;align-items:flex-end;gap:8px;
+             min-width:240px;}
+ .head-right .back{font-family:'IBM Plex Mono',monospace;font-size:11px;
+    text-transform:uppercase;letter-spacing:0.18em;color:var(--paper-dim);}
+ .pill{display:inline-block;background:transparent;border:1px solid var(--rule-bright);
+       border-radius:1px;padding:3px 10px;font-size:0.72em;color:var(--paper-dim);
+       font-family:'IBM Plex Mono',monospace;margin:0 4px 4px 0;
+       text-transform:uppercase;letter-spacing:0.12em;}
+ .pill.hyp{border-color:var(--v-derivative);color:var(--v-derivative);}
+ .pill.grp{border-color:var(--v-novel);color:var(--v-novel);}
+ .pill.ds{border-color:var(--accent-dim);color:var(--accent);}
+ .verdict-row{display:flex;flex-wrap:wrap;gap:4px;justify-content:flex-end;}
+ .card{background:var(--panel);border:1px solid var(--rule);
+       padding:24px 28px;margin-bottom:24px;position:relative;}
+ .card::before{content:"";position:absolute;top:0;left:0;width:48px;
+               height:1px;background:var(--accent);}
+ .card p{margin-bottom:12px;font-size:0.96em;line-height:1.6;}
+ .card ul{margin:6px 0 12px 22px;font-size:0.95em;line-height:1.6;}
+ .card ul li{margin-bottom:4px;}
+ details.deep{margin:14px 0;border-top:1px solid var(--rule);
+              padding-top:14px;}
+ details.deep > summary{cursor:pointer;list-style:none;
+    font-family:'IBM Plex Mono',monospace;font-size:11px;text-transform:uppercase;
+    letter-spacing:0.18em;color:var(--paper-dim);display:flex;align-items:center;
+    gap:10px;padding:6px 0;transition:color 160ms ease;}
+ details.deep > summary:hover{color:var(--accent);}
+ details.deep > summary::-webkit-details-marker{display:none;}
+ details.deep > summary::before{content:"▸";display:inline-block;
+    transition:transform 200ms ease;color:var(--accent);font-size:14px;}
+ details.deep[open] > summary::before{transform:rotate(90deg);}
+ details.deep > .body{padding:14px 0 6px 24px;font-size:0.95em;
+    border-left:1px solid var(--rule);margin-left:5px;margin-top:6px;
+    animation:reveal 280ms ease;}
+ table{width:100%;border-collapse:collapse;font-size:0.88em;
+       font-variant-numeric:tabular-nums;}
+ th{background:transparent;color:var(--paper-dim);text-align:left;
+    padding:8px 12px;border-bottom:1px solid var(--rule-bright);
+    font-size:10px;text-transform:uppercase;letter-spacing:0.18em;
+    font-family:'IBM Plex Mono',monospace;font-weight:500;}
+ td{padding:9px 12px;border-bottom:1px solid var(--rule);}
+ td.k{color:var(--paper-dim);width:42%;font-family:'IBM Plex Serif',serif;}
+ td.v{color:var(--paper);font-family:'IBM Plex Mono',monospace;}
+ .formula-chip{background:var(--ink);border:1px solid var(--rule);
+               padding:14px 16px;font-family:'IBM Plex Mono',monospace;
+               font-size:0.82em;margin-bottom:14px;color:var(--paper);
+               word-break:break-all;border-left:2px solid var(--accent);}
+ .breakdown td.term{font-family:'IBM Plex Mono',monospace;}
+ .pos{color:var(--v-pass);} .neg{color:var(--v-broken);} .mut{color:var(--paper-dim);}
+ .charts{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+ @media(max-width:980px){.charts{grid-template-columns:1fr;}
+   .head-grid{grid-template-columns:1fr;} .head-right{align-items:flex-start;}
+   .verdict-row{justify-content:flex-start;}}
+ .meta{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--paper-dim);
+       margin-top:28px;padding-top:18px;border-top:1px solid var(--rule);
+       line-height:1.9;letter-spacing:0.04em;}
+ .meta code{background:var(--ink);padding:1px 5px;color:var(--paper);
+            border:1px solid var(--rule);}
+ code{background:var(--ink);padding:1px 5px;font-size:0.92em;
+      font-family:'IBM Plex Mono',monospace;border:1px solid var(--rule);}
+ pre{background:var(--ink);border:1px solid var(--rule);
+     padding:14px 16px;overflow-x:auto;font-family:'IBM Plex Mono',monospace;
+     font-size:0.82em;color:var(--paper);white-space:pre-wrap;line-height:1.6;
+     border-left:2px solid var(--accent-dim);}
+ .reason-section{margin-bottom:16px;}
+ .reason-section .lbl{color:var(--accent);font-family:'IBM Plex Mono',monospace;
+                      font-size:10px;text-transform:uppercase;
+                      letter-spacing:0.18em;margin-bottom:6px;font-weight:600;}
+ .reason-section .body{font-size:0.95em;color:var(--paper);
+                       white-space:pre-wrap;line-height:1.6;}
+ .quote{border-left:2px solid var(--accent);padding:10px 18px;
+        background:var(--ink);font-size:0.95em;color:var(--paper);
+        margin:10px 0;font-style:italic;font-family:'Newsreader',serif;
+        font-weight:400;line-height:1.55;}
+ .verdict-label{color:var(--accent);font-weight:600;}
+ .empty{color:var(--paper-dim);font-style:italic;font-size:0.9em;}
+ .xrefs-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+             gap:10px;margin-top:6px;}
+ .xref-card{display:block;background:var(--ink);border:1px solid var(--rule);
+            padding:12px 14px;text-decoration:none;
+            transition:border-color 160ms ease,transform 160ms ease;}
+ .xref-card:hover{border-color:var(--accent);transform:translateY(-1px);
+                  text-decoration:none;}
+ .xref-card .xref-lbl{font-family:'IBM Plex Mono',monospace;font-size:9px;
+    text-transform:uppercase;letter-spacing:0.18em;color:var(--paper-dim);
+    margin-bottom:6px;}
+ .xref-card .xref-tag{font-family:'IBM Plex Mono',monospace;font-size:0.88em;
+    color:var(--paper);font-weight:500;}
+ .xref-card .xref-meta{font-family:'IBM Plex Mono',monospace;font-size:0.78em;
+    color:var(--paper-dim);margin-top:4px;}
+ /* Key numbers strip — the "tile bar" near top */
+ .kn-strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
+           gap:1px;background:var(--rule);border:1px solid var(--rule);
+           margin-bottom:24px;}
+ .kn-tile{background:var(--panel);padding:18px 18px 16px 18px;
+          position:relative;overflow:hidden;}
+ .kn-tile .kn-val{font-family:'Newsreader',serif;font-style:italic;
+                  font-size:30px;font-weight:600;line-height:1.05;
+                  color:var(--paper);letter-spacing:-0.01em;}
+ .kn-tile .kn-lbl{font-family:'IBM Plex Mono',monospace;font-size:9.5px;
+                  text-transform:uppercase;letter-spacing:0.18em;
+                  color:var(--paper-dim);margin-top:6px;}
+ .kn-tile.tint-pos{box-shadow:inset 3px 0 0 var(--v-pass);}
+ .kn-tile.tint-neg{box-shadow:inset 3px 0 0 var(--v-broken);}
+ .kn-tile.tint-neu{box-shadow:inset 3px 0 0 var(--accent-dim);}
+ /* Composite stacked bar */
+ .comp-stack{display:flex;height:34px;border:1px solid var(--rule);
+             margin:14px 0 8px 0;font-family:'IBM Plex Mono',monospace;
+             font-size:9.5px;}
+ .comp-stack .seg{display:flex;align-items:center;justify-content:center;
+                  color:var(--ink);font-weight:600;
+                  border-right:1px solid var(--ink);padding:0 6px;
+                  white-space:nowrap;overflow:hidden;}
+ .comp-stack .seg:last-child{border-right:none;}
+ .comp-stack .seg.pos{background:var(--v-pass);}
+ .comp-stack .seg.params{background:var(--accent);}
+ .comp-stack .seg.lat{background:var(--v-derivative);}
 """
 
 
@@ -947,18 +1077,18 @@ def _load_experiment_log_row(experiment_log: Path,
         return None
 
 
-# Two-tone palette for hypothesis verdict badges.
+# Brutalist verdict palette — hairline border, transparent fill, ink-coloured fg.
 _VERDICT_COLORS = {
-    "PASS":      ("#3fb950", "#0d2818"),
-    "MINOR":     ("#d29922", "#2c220a"),
-    "MAJOR":     ("#f0883e", "#3a1f0c"),
-    "BROKEN":    ("#f85149", "#3a0e0e"),
-    "NOVEL":     ("#3fb950", "#0d2818"),
-    "DERIVATIVE": ("#58a6ff", "#0f1d33"),
-    "NUMEROLOGY": ("#f85149", "#3a0e0e"),
-    "FALSIFIED":  ("#f85149", "#3a0e0e"),
-    "UNFALSIFIABLE": ("#a371f7", "#1c142e"),
-    "INFRASTRUCTURE": ("#8b949e", "#21262d"),
+    "PASS":      "#3fb950",
+    "MINOR":     "#d29922",
+    "MAJOR":     "#f0883e",
+    "BROKEN":    "#f85149",
+    "NOVEL":     "#a371f7",
+    "DERIVATIVE": "#58a6ff",
+    "NUMEROLOGY": "#8b949e",
+    "FALSIFIED":  "#db6d28",
+    "UNFALSIFIABLE": "#a371f7",
+    "INFRASTRUCTURE": "#8b949e",
 }
 
 
@@ -967,25 +1097,275 @@ def _verdict_badge(label: str, verdict: str, url: str = "",
     if not verdict:
         return ""
     base = verdict.split("+")[0].strip()
-    fg, bg = _VERDICT_COLORS.get(base, ("#c9d1d9", "#21262d"))
+    fg = _VERDICT_COLORS.get(base, "#a89e8c")
     title = _esc(tooltip) if tooltip else _esc(verdict)
     inner = (
-        f"<span style='display:inline-block;padding:2px 10px;border-radius:10px;"
-        f"background:{bg};border:1px solid {fg};color:{fg};font-weight:600;"
-        f"font-size:0.78em;font-family:Consolas,monospace' "
-        f"title='{title}'>{_esc(label)}: {_esc(verdict)}</span>"
+        f"<span class='vbadge' style='display:inline-block;padding:3px 10px;"
+        f"border:1px solid {fg};color:{fg};font-weight:600;"
+        f"font-size:10px;font-family:\"IBM Plex Mono\",monospace;"
+        f"text-transform:uppercase;letter-spacing:0.16em;"
+        f"transition:transform 160ms ease,filter 160ms ease;background:transparent' "
+        f"title='{title}'>"
+        f"<span style='opacity:0.65'>{_esc(label)}</span> &nbsp;{_esc(verdict)}"
+        "</span>"
     )
     if url:
         return (
-            f"<a href='{_esc(url)}' style='text-decoration:none;"
-            f"margin-right:6px'>{inner}</a>"
+            f"<a href='{_esc(url)}' style='text-decoration:none;border-bottom:none;"
+            f"margin-right:4px;display:inline-block'>{inner}</a>"
         )
-    return f"<span style='margin-right:6px'>{inner}</span>"
+    return f"<span style='margin-right:4px;display:inline-block'>{inner}</span>"
+
+
+# Tiny hover-scale style for vbadge (injected once via .vbadge:hover)
+_VBADGE_HOVER_CSS = (
+    " .vbadge:hover{transform:scale(1.05);filter:brightness(1.15);} "
+)
+
+
+# ---------------------------------------------------------------------------
+# Audit excerpt — per-hypothesis findings block from audits/G<X>_audit.md
+# ---------------------------------------------------------------------------
+
+def parse_audit_findings_block(repo_root: Path, hid: str,
+                               group: str) -> str:
+    """Return the FULL findings block for ``hid`` from ``audits/G<X>_audit.md``.
+
+    This is the verbatim audit body between ``### Hxx`` headings — longer
+    than the 1-sentence summary in ``parse_audit_verdict``.
+    """
+    if not hid or not group or not group.startswith("G"):
+        return ""
+    audit_md = repo_root / "audits" / f"{group}_audit.md"
+    if not audit_md.exists():
+        return ""
+    try:
+        text = audit_md.read_text(encoding="utf-8", errors="ignore")
+    except Exception:
+        return ""
+    m = re.search(
+        rf"^###\s+{re.escape(hid)}\b.*?\n(.+?)(?=^###\s+H\d{{2}}\b|\Z)",
+        text, re.DOTALL | re.MULTILINE,
+    )
+    if not m:
+        return ""
+    block = m.group(1).strip()
+    # Trim ridiculously long blocks
+    return block[:4000]
+
+
+def parse_scicritic_block(md_path: Path | None) -> str:
+    """Return the verbatim 'Addendum: Research-Scientist Critique' body."""
+    if md_path is None or not md_path.exists():
+        return ""
+    try:
+        text = md_path.read_text(encoding="utf-8", errors="ignore")
+    except Exception:
+        return ""
+    m = re.search(
+        r"##\s+Addendum:\s*Research-Scientist.*?\n(.+?)(?=\n##\s+(?!#)|\Z)",
+        text, re.DOTALL | re.IGNORECASE,
+    )
+    if not m:
+        return ""
+    return m.group(1).strip()[:4000]
 
 
 # ---------------------------------------------------------------------------
 # Per-group SVG visualisation for the aggregate dashboard
 # ---------------------------------------------------------------------------
+
+def _verdict_color_for_tag(tag: str, repo_root: Path | None) -> str:
+    """Get the canonical verdict colour for a tag (impl-critic verdict)."""
+    if repo_root is None:
+        return "#58a6ff"
+    hid, group = TAG_TO_HYP.get(tag, (None, "Uncategorized"))
+    if not hid:
+        return "#a89e8c"  # baseline = paper-dim
+    try:
+        v = parse_audit_verdict(repo_root, hid, group)
+        base = (v.get("verdict") or "").split("+")[0].strip()
+        return _VERDICT_COLORS.get(base, "#58a6ff")
+    except Exception:
+        return "#58a6ff"
+
+
+def _group_scatter_svg(rows: list[pd.Series], group_letter: str,
+                       chart_id: str, repo_root: Path | None,
+                       width: int = 960, height: int = 280) -> str:
+    """Composite-vs-params scatter for a hypothesis group.
+
+    X axis: params (log scale, M), Y axis: composite. Dot colour = impl-critic
+    verdict. Baseline highlighted with a hollow ring. Returns "" if <3 rows.
+    """
+    pts: list[dict] = []
+    base_pts: list[dict] = []
+    for r in rows:
+        try:
+            params_m = float(r.get("params", 0) or 0) / 1e6
+            comp = float(r.get("composite", 0) or 0)
+        except Exception:
+            continue
+        if params_m <= 0:
+            continue
+        tag = str(r.get("tag", ""))
+        col = _verdict_color_for_tag(tag, repo_root)
+        d = {
+            "tag": tag, "params_m": params_m, "comp": comp,
+            "top1": float(r.get("top1", 0) or 0),
+            "seed": r.get("seed", ""),
+            "dataset": str(r.get("dataset", "")),
+            "color": col,
+        }
+        if tag.startswith("baseline_"):
+            base_pts.append(d)
+        else:
+            pts.append(d)
+    all_pts = pts + base_pts
+    if len(all_pts) < 3:
+        return ""
+    import math
+    ml, mr, mt, mb = 64, 28, 36, 44
+    pw, ph = width - ml - mr, height - mt - mb
+    xs = [math.log10(p["params_m"]) for p in all_pts]
+    ys = [p["comp"] for p in all_pts]
+    xmin, xmax = min(xs), max(xs)
+    ymin, ymax = min(ys), max(ys)
+    if xmax == xmin:
+        xmax = xmin + 0.5
+    if ymax == ymin:
+        ymax = ymin + 0.05
+    xspan = xmax - xmin
+    yspan = ymax - ymin
+    xmin -= xspan * 0.08
+    xmax += xspan * 0.18
+    ymin -= yspan * 0.08
+    ymax += yspan * 0.10
+
+    def sx(lx: float) -> float:
+        return ml + pw * (lx - xmin) / (xmax - xmin)
+
+    def sy(y: float) -> float:
+        return mt + ph * (1 - (y - ymin) / (ymax - ymin))
+
+    parts: list[str] = [
+        f"<svg viewBox='0 0 {width} {height}' preserveAspectRatio='xMinYMin meet' "
+        f"xmlns='http://www.w3.org/2000/svg' style='width:100%;height:auto;"
+        f"background:#0a0a0d;border:1px solid #1c1c20;display:block;"
+        f"margin:8px 0;font-family:\"IBM Plex Mono\",monospace' "
+        f"id='{chart_id}'>",
+        # title (Newsreader italic via tspan attrs)
+        f"<text x='{ml}' y='22' fill='#e6e1d6' font-size='14' "
+        f"font-family='Newsreader,serif' font-style='italic' "
+        f"font-weight='600'>{_esc(group_letter)} · composite × params</text>",
+    ]
+    # Gridlines (5 horizontal)
+    for i in range(5):
+        yv = ymin + (ymax - ymin) * i / 4
+        yy = sy(yv)
+        parts.append(
+            f"<line x1='{ml}' y1='{yy:.1f}' x2='{ml + pw}' y2='{yy:.1f}' "
+            f"stroke='#1c1c20' stroke-width='1'/>"
+        )
+        parts.append(
+            f"<text x='{ml - 6}' y='{yy + 3:.1f}' fill='#a89e8c' "
+            f"font-size='9' text-anchor='end'>{yv:.3f}</text>"
+        )
+    # X ticks (log10 powers)
+    for lx in range(int(math.floor(xmin)), int(math.ceil(xmax)) + 1):
+        if lx < xmin or lx > xmax:
+            continue
+        xx = sx(lx)
+        parts.append(
+            f"<line x1='{xx:.1f}' y1='{mt}' x2='{xx:.1f}' "
+            f"y2='{mt + ph}' stroke='#1c1c20' stroke-width='1' "
+            f"stroke-dasharray='2,3'/>"
+        )
+        parts.append(
+            f"<text x='{xx:.1f}' y='{mt + ph + 14}' fill='#a89e8c' "
+            f"font-size='9' text-anchor='middle'>10^{lx} M</text>"
+        )
+    # Axis labels (Newsreader italic)
+    parts.append(
+        f"<text x='{ml + pw - 4}' y='{mt + ph + 30}' fill='#a89e8c' "
+        f"font-size='10' font-family='Newsreader,serif' font-style='italic' "
+        f"text-anchor='end'>params (M) →</text>"
+    )
+    parts.append(
+        f"<text x='12' y='{mt + ph / 2:.1f}' fill='#a89e8c' "
+        f"font-size='10' font-family='Newsreader,serif' font-style='italic' "
+        f"text-anchor='middle' "
+        f"transform='rotate(-90 12 {mt + ph / 2:.1f})'>composite →</text>"
+    )
+    # Plot non-baseline dots
+    for p in pts:
+        cx = sx(math.log10(p["params_m"]))
+        cy = sy(p["comp"])
+        col = p["color"]
+        parts.append(
+            f"<circle cx='{cx:.1f}' cy='{cy:.1f}' r='4.5' fill='{col}' "
+            f"fill-opacity='0.85' stroke='#0a0a0d' stroke-width='1'>"
+            f"<title>{_esc(p['tag'])} · {p['dataset']} · seed{p['seed']} · "
+            f"params {p['params_m']:.3f}M · composite {p['comp']:.4f} · "
+            f"top-1 {p['top1']*100:.2f}%</title></circle>"
+        )
+        # Label (only when short)
+        if len(p["tag"]) <= 22:
+            parts.append(
+                f"<text x='{cx + 7:.1f}' y='{cy + 3:.1f}' fill='#e6e1d6' "
+                f"font-size='8.5' font-family='IBM Plex Mono,monospace'>"
+                f"{_esc(p['tag'][:22])}</text>"
+            )
+    # Baseline = hollow ring
+    for p in base_pts:
+        cx = sx(math.log10(p["params_m"]))
+        cy = sy(p["comp"])
+        parts.append(
+            f"<circle cx='{cx:.1f}' cy='{cy:.1f}' r='7' fill='none' "
+            f"stroke='#bb8c4d' stroke-width='2'>"
+            f"<title>baseline · {_esc(p['tag'])} · {p['dataset']} · "
+            f"composite {p['comp']:.4f}</title></circle>"
+        )
+        parts.append(
+            f"<text x='{cx + 10:.1f}' y='{cy + 3:.1f}' fill='#bb8c4d' "
+            f"font-size='9' font-family='IBM Plex Mono,monospace' "
+            f"font-weight='600'>baseline {p['top1']*100:.1f}%</text>"
+        )
+    parts.append("</svg>")
+    return "".join(parts)
+
+
+def _tag_sparkline_svg(history: list[dict] | None,
+                       w: int = 100, h: int = 22) -> str:
+    """Tiny per-row sparkline of test_top1 vs epoch for the leaderboard."""
+    if not history:
+        return "<span style='color:#484f58'>—</span>"
+    pts = [(r.get("epoch"), r.get("test_top1")) for r in history
+           if r.get("test_top1") is not None]
+    if len(pts) < 2:
+        return "<span style='color:#484f58'>—</span>"
+    xs = [p[0] for p in pts]
+    ys = [p[1] for p in pts]
+    xmin, xmax = min(xs), max(xs)
+    ymin, ymax = min(ys), max(ys)
+    if xmax == xmin:
+        xmax = xmin + 1
+    if ymax == ymin:
+        ymax = ymin + 1e-6
+    pad = 2
+    def sx(x): return pad + (w - 2 * pad) * (x - xmin) / (xmax - xmin)
+    def sy(y): return h - pad - (h - 2 * pad) * (y - ymin) / (ymax - ymin)
+    pts_str = " ".join(f"{sx(x):.1f},{sy(y):.1f}" for x, y in pts)
+    last_x, last_y = sx(xs[-1]), sy(ys[-1])
+    return (
+        f"<svg width='{w}' height='{h}' viewBox='0 0 {w} {h}' "
+        f"xmlns='http://www.w3.org/2000/svg' style='vertical-align:middle'>"
+        f"<polyline points='{pts_str}' fill='none' stroke='#bb8c4d' "
+        f"stroke-width='1.4'/>"
+        f"<circle cx='{last_x:.1f}' cy='{last_y:.1f}' r='1.8' "
+        f"fill='#e6e1d6'/></svg>"
+    )
+
 
 def _group_visualisation_svg(rows: list[pd.Series], group_letter: str,
                              chart_id: str, width: int = 960,
@@ -1038,12 +1418,16 @@ def _group_visualisation_svg(rows: list[pd.Series], group_letter: str,
     parts: list[str] = [
         f"<svg viewBox='0 0 {width} {h}' preserveAspectRatio='xMinYMin meet' "
         f"xmlns='http://www.w3.org/2000/svg' "
-        f"style='width:100%;height:auto;background:#0d1117;border:1px solid "
-        f"#30363d;border-radius:6px;display:block;margin-bottom:8px' "
+        f"style='width:100%;height:auto;background:#0a0a0d;border:1px solid "
+        f"#1c1c20;display:block;margin-bottom:8px;"
+        f"font-family:\"IBM Plex Mono\",monospace' "
         f"id='{chart_id}'>",
-        f"<text x='{ml}' y='18' fill='#c9d1d9' font-size='12' "
-        f"font-weight='600'>Top-1 by tag · {_esc(group_letter)} "
-        f"(n={len(bars)})</text>",
+        f"<text x='{ml}' y='20' fill='#e6e1d6' font-size='14' "
+        f"font-family='Newsreader,serif' font-style='italic' "
+        f"font-weight='600'>{_esc(group_letter)} · top-1 distribution "
+        f"<tspan fill='#a89e8c' font-size='11' "
+        f"font-family='IBM Plex Mono,monospace' font-style='normal'>"
+        f"(n={len(bars)})</tspan></text>",
     ]
     # Grid + x-axis ticks at 25 %, 50 %, 75 % of xmax
     for frac in (0.25, 0.5, 0.75, 1.0):
@@ -1051,58 +1435,66 @@ def _group_visualisation_svg(rows: list[pd.Series], group_letter: str,
         xx = sx(xv)
         parts.append(
             f"<line x1='{xx:.1f}' y1='{mt}' x2='{xx:.1f}' "
-            f"y2='{mt + ph}' stroke='#21262d' stroke-width='1'/>"
+            f"y2='{mt + ph}' stroke='#1c1c20' stroke-width='1'/>"
         )
         parts.append(
-            f"<text x='{xx:.1f}' y='{mt + ph + 14}' fill='#8b949e' "
+            f"<text x='{xx:.1f}' y='{mt + ph + 14}' fill='#a89e8c' "
             f"font-size='9' text-anchor='middle'>{xv*100:.0f}%</text>"
         )
-    # Baseline reference line(s)
-    bl_colors = {"cifar10": "#d29922", "cifar100": "#f0883e"}
-    legend_x = ml
+    parts.append(
+        f"<text x='{ml + pw - 4}' y='{mt + ph + 26}' fill='#a89e8c' "
+        f"font-size='10' font-family='Newsreader,serif' font-style='italic' "
+        f"text-anchor='end'>top-1 →</text>"
+    )
+    # Baseline reference line(s) — accent gold
+    bl_colors = {"cifar10": "#bb8c4d", "cifar100": "#db6d28"}
     for ds in sorted(datasets_in_group):
         if ds not in BASELINE_TOP1:
             continue
         bx = sx(BASELINE_TOP1[ds])
-        col = bl_colors.get(ds, "#d29922")
+        col = bl_colors.get(ds, "#bb8c4d")
         parts.append(
             f"<line x1='{bx:.1f}' y1='{mt - 4}' x2='{bx:.1f}' "
-            f"y2='{mt + ph + 4}' stroke='{col}' stroke-width='1.6' "
-            f"stroke-dasharray='4,3' opacity='0.85'/>"
+            f"y2='{mt + ph + 4}' stroke='{col}' stroke-width='1.4' "
+            f"stroke-dasharray='4,3' opacity='0.95'/>"
         )
         parts.append(
             f"<text x='{bx + 4:.1f}' y='{mt - 4}' fill='{col}' "
-            f"font-size='9'>{_esc(ds)} baseline {BASELINE_TOP1[ds]*100:.1f}%</text>"
+            f"font-size='9' font-family='IBM Plex Mono,monospace'>"
+            f"{_esc(ds)} baseline {BASELINE_TOP1[ds]*100:.1f}%</text>"
         )
-    # Bars + labels
-    palette = {
-        "cifar10": "#58a6ff",
-        "cifar100": "#a371f7",
-    }
+    # Bars + labels — colour by impl-critic verdict
+    # Cache repo_root from globals; here we receive only rows, so look up via tag
+    # We pass repo_root via globals as _ROOT_FOR_SVG below.
     for i, b in enumerate(bars):
         y = mt + i * (bh + gap)
         bx0 = ml
         bx1 = sx(b["top1"])
-        col = palette.get(b["dataset"], "#58a6ff")
+        col = _verdict_color_for_tag(b["tag"], _ROOT_FOR_SVG.get("root"))
         ds_tag = f"{b['tag']} · {b['dataset']} · seed{b['seed']}"
         parts.append(
             f"<rect x='{bx0:.1f}' y='{y}' width='{bx1 - bx0:.1f}' "
-            f"height='{bh}' fill='{col}' opacity='0.85' rx='2'>"
+            f"height='{bh}' fill='{col}' opacity='0.85'>"
             f"<title>{_esc(ds_tag)} · top-1 {b['top1']*100:.2f}% · "
             f"params {b['params']/1e6:.3f}M · composite {b['composite']:.4f}</title>"
             f"</rect>"
         )
         parts.append(
-            f"<text x='{ml - 6}' y='{y + bh - 3}' fill='#c9d1d9' "
+            f"<text x='{ml - 6}' y='{y + bh - 3}' fill='#e6e1d6' "
             f"font-size='10' text-anchor='end' "
-            f"font-family='Consolas,monospace'>{_esc(b['tag'][:24])}</text>"
+            f"font-family='IBM Plex Mono,monospace'>{_esc(b['tag'][:24])}</text>"
         )
         parts.append(
-            f"<text x='{bx1 + 4:.1f}' y='{y + bh - 3}' fill='#8b949e' "
-            f"font-size='9'>{b['top1']*100:.2f}%</text>"
+            f"<text x='{bx1 + 4:.1f}' y='{y + bh - 3}' fill='#a89e8c' "
+            f"font-size='9' font-family='IBM Plex Mono,monospace'>"
+            f"{b['top1']*100:.2f}%</text>"
         )
     parts.append("</svg>")
     return "".join(parts)
+
+
+# Module-level slot for passing repo_root to SVG builders called via maps.
+_ROOT_FOR_SVG: dict[str, Path | None] = {"root": None}
 
 
 def _nearest_in_group(df: pd.DataFrame, group_letter: str, this_tag: str,
@@ -1138,46 +1530,46 @@ def _nearest_in_group(df: pd.DataFrame, group_letter: str, this_tag: str,
 
 
 def _render_hypothesis_section(hid: str | None, group: str,
-                               repo_root: Path) -> str:
-    """Build the inline hypothesis digest block for a per-experiment page."""
+                               repo_root: Path,
+                               sci_badge_html: str = "",
+                               impl_badge_html: str = "") -> str:
+    """Hypothesis digest with always-visible summary + expandable full digest."""
     if not hid:
         return (
-            "<div class='card'><h2>Hypothesis</h2>"
+            "<section class='card' style='--i:2'><h2>Hypothesis</h2>"
             "<p class='empty'>No matching hypothesis document — this row "
-            "is a baseline reference.</p></div>"
+            "is a baseline reference run.</p></section>"
         )
     md = find_hypothesis_path(repo_root, hid)
     if md is None:
         return (
-            f"<div class='card'><h2>Hypothesis {_esc(hid)}</h2>"
+            f"<section class='card' style='--i:2'>"
+            f"<h2>Hypothesis {_esc(hid)}</h2>"
             f"<p class='empty'>(hypothesis doc not located on disk for "
-            f"{_esc(hid)})</p></div>"
+            f"{_esc(hid)})</p></section>"
         )
     digest = parse_hypothesis_doc(md)
     rel = md.relative_to(repo_root).as_posix()
     gh_url = f"https://github.com/dlmastery/nature_inspired_networks/blob/main/{rel}"
-    sci = parse_scicritic_verdict(md)
     parts: list[str] = [
-        f"<div class='card'><h2>Hypothesis {_esc(hid)} — {_esc(digest['title'] or hid)}</h2>"
+        f"<section class='card' style='--i:2'>"
+        f"<h2>Hypothesis {_esc(hid)} — <i>{_esc(digest['title'] or hid)}</i></h2>"
     ]
-    # Prominent GitHub design-doc CTA up front + sci-critic badge inline
-    cta_bits = [
-        f"<a href='{_esc(gh_url)}' style='display:inline-block;background:"
-        f"#1f6feb;color:#fff;padding:6px 14px;border-radius:6px;font-weight:600;"
-        f"font-size:0.86em;border:1px solid #58a6ff;text-decoration:none;"
-        f"margin-right:8px'>&#128196; Hypothesis design doc &rarr;</a>"
-    ]
-    if sci["verdict"]:
-        cta_bits.append(_verdict_badge(
-            "sci-critic", sci["verdict"], url=gh_url, tooltip=sci["raw"],
-        ))
-    parts.append(
-        f"<div style='margin:4px 0 14px 0'>{''.join(cta_bits)}</div>"
-    )
+    badges = []
+    if impl_badge_html:
+        badges.append(impl_badge_html)
+    if sci_badge_html:
+        badges.append(sci_badge_html)
+    if badges:
+        parts.append(
+            f"<div style='margin:2px 0 18px 0'>{''.join(badges)}</div>"
+        )
     if digest["oneline"]:
         parts.append(
-            f"<p><b style='color:#d29922'>One-line claim:</b> "
-            f"<i>{_esc(digest['oneline'])}</i></p>"
+            f"<p style='font-family:Newsreader,serif;font-style:italic;"
+            f"font-size:1.08em;color:#e6e1d6;line-height:1.5;border-left:"
+            f"2px solid var(--accent);padding-left:14px;margin:6px 0 16px 0'>"
+            f"{_esc(digest['oneline'])}</p>"
         )
     if digest["motivation"]:
         parts.append(
@@ -1185,31 +1577,49 @@ def _render_hypothesis_section(hid: str | None, group: str,
         )
     if digest["formal"]:
         parts.append(
-            f"<h3>Formal hypothesis</h3><p>{_esc(digest['formal'])}</p>"
+            f"<h3>Formal hypothesis</h3>"
+            f"<p style='font-family:Newsreader,serif;font-style:italic;"
+            f"color:#e6e1d6'>{_esc(digest['formal'])}</p>"
         )
+    # Expandable deep-dive with mechanism / falsifier / predicted / citation
+    deep_bits: list[str] = []
     if digest["mechanism"]:
-        parts.append(
-            f"<h3>Mechanism (because…)</h3><p>{_esc(digest['mechanism'])}</p>"
+        deep_bits.append(
+            f"<h3>Mechanism (because…)</h3>"
+            f"<p>{_esc(digest['mechanism'])}</p>"
         )
     if digest["falsifier"]:
-        parts.append(
+        deep_bits.append(
             f"<h3>Numeric falsifier</h3><p>{_esc(digest['falsifier'])}</p>"
         )
     if digest["predicted"]:
-        parts.append(
+        deep_bits.append(
             f"<h3>Predicted Δ</h3><p>{_esc(digest['predicted'])}</p>"
         )
     if digest["citation"]:
-        parts.append(
-            f"<h3>Primary citation</h3><p style='font-family:Consolas,"
-            f"monospace;font-size:0.85em'>{_esc(digest['citation'])}</p>"
+        deep_bits.append(
+            f"<h3>Primary citation</h3>"
+            f"<p class='mono'>{_esc(digest['citation'])}</p>"
         )
-    parts.append(
-        f"<p style='margin-top:14px'>"
-        f"<a href='{_esc(gh_url)}'>Full design doc on GitHub →</a> · "
-        f"<a href='../../{_esc(rel)}'>local: {_esc(rel)}</a></p>"
-    )
-    parts.append("</div>")
+    if deep_bits:
+        parts.append(
+            "<details class='deep'><summary>Read the full design-doc digest"
+            "</summary><div class='body'>"
+            + "".join(deep_bits)
+            + f"<p style='margin-top:14px'>"
+            f"<a href='{_esc(gh_url)}'>↗ Full design doc on GitHub</a> "
+            f"&nbsp;·&nbsp; <a href='../../{_esc(rel)}'>"
+            f"local: <span class='mono'>{_esc(rel)}</span></a></p>"
+            "</div></details>"
+        )
+    else:
+        parts.append(
+            f"<p style='margin-top:14px'>"
+            f"<a href='{_esc(gh_url)}'>↗ Full design doc on GitHub</a> "
+            f"&nbsp;·&nbsp; <a href='../../{_esc(rel)}'>"
+            f"local: <span class='mono'>{_esc(rel)}</span></a></p>"
+        )
+    parts.append("</section>")
     return "".join(parts)
 
 
@@ -1222,37 +1632,39 @@ def _render_verdict_section(repo_root: Path, tag: str) -> str:
     )
     if not blurb:
         return (
-            "<div class='card'><h2>Verdict (FINDINGS.md)</h2>"
+            "<section class='card' style='--i:3'>"
+            "<h2>Verdict <span class='mono' style='font-size:0.55em;"
+            "letter-spacing:0.18em;color:var(--paper-dim);font-style:normal'>"
+            "FINDINGS.md</span></h2>"
             "<p class='empty'>No paragraph in FINDINGS.md mentions this tag "
             "yet.</p>"
-            f"<p><a href='{gh_url}'>Browse FINDINGS.md →</a></p></div>"
+            f"<p><a href='{gh_url}'>↗ Browse FINDINGS.md</a></p></section>"
         )
     return (
-        "<div class='card'><h2>Verdict (FINDINGS.md)</h2>"
+        "<section class='card' style='--i:3'>"
+        "<h2>Verdict <span class='mono' style='font-size:0.55em;"
+        "letter-spacing:0.18em;color:var(--paper-dim);font-style:normal'>"
+        "FINDINGS.md</span></h2>"
         f"<div class='quote'>{_esc(blurb)}</div>"
-        f"<p style='margin-top:10px'><a href='{gh_url}'>Full FINDINGS.md →</a> · "
-        f"<a href='../../FINDINGS.md'>local: FINDINGS.md</a></p></div>"
+        f"<p style='margin-top:14px'><a href='{gh_url}'>↗ Full FINDINGS.md</a>"
+        f" &nbsp;·&nbsp; <a href='../../FINDINGS.md'>"
+        f"local: <span class='mono'>FINDINGS.md</span></a></p></section>"
     )
 
 
 def _render_reasoning_section(reasoning_path: Path | None) -> str:
     if reasoning_path is None or not reasoning_path.exists():
         return (
-            "<div class='card'><h2>Reasoning blob</h2>"
             "<p class='empty'>No <code>reasoning.json</code> for this run "
-            "directory.</p></div>"
+            "directory.</p>"
         )
     try:
         data = json.loads(reasoning_path.read_text(encoding="utf-8"))
     except Exception as exc:
-        return (
-            "<div class='card'><h2>Reasoning blob</h2>"
-            f"<p class='empty'>Failed to parse: {_esc(exc)}.</p></div>"
-        )
+        return f"<p class='empty'>Failed to parse: {_esc(exc)}.</p>"
     if isinstance(data, list):
-        # Could be a list of entries; take the first.
         data = data[0] if data else {}
-    parts = ["<div class='card'><h2>Reasoning blob</h2>"]
+    parts: list[str] = []
     fields = [
         ("diagnosis", "Diagnosis"),
         ("citations", "Citations"),
@@ -1270,9 +1682,11 @@ def _render_reasoning_section(reasoning_path: Path | None) -> str:
         else:
             body = f"<div class='body'>{_esc(v)}</div>"
         parts.append(
-            f"<div class='reason-section'><div class='lbl'>{label}</div>{body}</div>"
+            f"<div class='reason-section'>"
+            f"<div class='lbl'>{label}</div>{body}</div>"
         )
-    parts.append("</div>")
+    if not parts:
+        return "<p class='empty'>reasoning.json is empty.</p>"
     return "".join(parts)
 
 
@@ -1285,8 +1699,7 @@ def _render_configuration_section(run_dir: Path, metrics: dict,
         except Exception:
             text = "(failed to read config.yaml)"
         return (
-            "<div class='card'><h2>Configuration</h2>"
-            f"<pre>{_esc(text)}</pre></div>"
+            f"<pre>{_esc(text)}</pre>"
         )
     # Fallback 1: enrich with the matching experiments/experiment_log.jsonl row.
     log_row: dict | None = None
@@ -1311,42 +1724,240 @@ def _render_configuration_section(run_dir: Path, metrics: dict,
             inferred[k] = v
     if not inferred:
         return (
-            "<div class='card'><h2>Configuration</h2>"
             "<p class='empty'>No <code>config.yaml</code> in run directory "
             "and neither <code>metrics.json</code> nor "
             "<code>experiment_log.jsonl</code> carries recoverable config "
-            "overrides.</p></div>"
+            "overrides.</p>"
         )
     src = "experiment_log.jsonl + metrics.json" if log_row else "metrics.json"
     return (
-        f"<div class='card'><h2>Configuration (inferred from {src})</h2>"
-        f"<pre>{_esc(json.dumps(inferred, indent=2))}</pre></div>"
+        f"<p class='mono' style='color:var(--paper-dim);font-size:0.8em;"
+        f"margin-bottom:8px'>inferred from {src}</p>"
+        f"<pre>{_esc(json.dumps(inferred, indent=2))}</pre>"
     )
 
 
-def _render_audit_verdict_section(hid: str | None, group: str,
-                                  repo_root: Path) -> str:
-    """Implementation-critic verdict card (parsed from audits/G<X>_audit.md)."""
+def _render_audit_excerpt(hid: str | None, group: str,
+                          repo_root: Path) -> str:
+    """Return the full audit excerpt body (for an accordion)."""
     if not hid:
         return ""
     audit = parse_audit_verdict(repo_root, hid, group)
-    if not audit["verdict"]:
+    block = parse_audit_findings_block(repo_root, hid, group)
+    if not audit["verdict"] and not block:
         return ""
-    badge = _verdict_badge("impl-critic", audit["verdict"],
-                           url=audit["url"], tooltip=audit["summary"])
-    body = audit["summary"] or "(see full audit on GitHub)"
-    local_link = (
-        f"<a href='../../{_esc(audit['local'])}'>"
-        f"local: {_esc(audit['local'])}</a>"
-    ) if audit["local"] else ""
+    badge = _verdict_badge("impl-critic", audit.get("verdict", ""),
+                           url=audit.get("url", ""),
+                           tooltip=audit.get("summary", ""))
+    body = block or audit.get("summary") or "(see full audit on GitHub)"
+    parts = []
+    if badge:
+        parts.append(f"<div style='margin-bottom:12px'>{badge}</div>")
+    parts.append(f"<div class='quote'>{_esc(body)}</div>")
+    if audit.get("url"):
+        local = audit.get("local", "")
+        local_link = (
+            f" &nbsp;·&nbsp; <a href='../../{_esc(local)}'>"
+            f"local: <span class='mono'>{_esc(local)}</span></a>"
+        ) if local else ""
+        parts.append(
+            f"<p style='margin-top:12px'>"
+            f"<a href='{_esc(audit['url'])}'>↗ Full audit on GitHub</a>"
+            f"{local_link}</p>"
+        )
+    return "".join(parts)
+
+
+def _render_scicritic_excerpt(md_path: Path | None) -> str:
+    """Return the full sci-critic addendum body (for an accordion)."""
+    if md_path is None:
+        return ""
+    sci = parse_scicritic_verdict(md_path)
+    block = parse_scicritic_block(md_path)
+    if not sci["verdict"] and not block:
+        return ""
+    badge = _verdict_badge("sci-critic", sci.get("verdict", ""),
+                           tooltip=sci.get("raw", ""))
+    parts: list[str] = []
+    if badge:
+        parts.append(f"<div style='margin-bottom:12px'>{badge}</div>")
+    if block:
+        # Render as preserved-markdown style block
+        parts.append(
+            f"<pre style='border-left:2px solid var(--v-novel)'>"
+            f"{_esc(block)}</pre>"
+        )
+    elif sci.get("raw"):
+        parts.append(f"<div class='quote'>{_esc(sci['raw'])}</div>")
+    return "".join(parts)
+
+
+def _render_key_numbers_strip(metrics: dict,
+                              baseline_top1: float | None) -> str:
+    """Brutalist tile bar of key headline numbers (top of page)."""
+    def f(k):
+        v = metrics.get(k)
+        try:
+            return float(v) if v is not None else None
+        except Exception:
+            return None
+    top1 = f("top1")
+    comp = f("composite")
+    params = f("params")
+    lat = f("latency_ms")
+    tiles: list[tuple[str, str, str]] = []
+    if top1 is not None:
+        tint = "tint-neu"
+        if baseline_top1 is not None:
+            tint = "tint-pos" if top1 >= baseline_top1 else "tint-neg"
+        tiles.append((f"{top1*100:.2f}%", "top-1", tint))
+    if comp is not None:
+        tiles.append((f"{comp:.4f}", "composite", "tint-neu"))
+    if top1 is not None and baseline_top1 is not None:
+        delta = (top1 - baseline_top1) * 100
+        sign = "+" if delta >= 0 else "−"
+        tint = "tint-pos" if delta >= 0 else "tint-neg"
+        tiles.append((f"{sign}{abs(delta):.2f}pp", "Δ vs baseline", tint))
+    if params is not None:
+        tiles.append((f"{params/1e6:.3f}M", "params", "tint-neu"))
+    if lat is not None:
+        tiles.append((f"{lat:.2f}ms", "latency b=1", "tint-neu"))
+    if not tiles:
+        return ""
+    cells = "".join(
+        f"<div class='kn-tile {tint}'>"
+        f"<div class='kn-val'>{_esc(v)}</div>"
+        f"<div class='kn-lbl'>{_esc(l)}</div></div>"
+        for v, l, tint in tiles
+    )
+    return f"<div class='kn-strip' style='--i:1'>{cells}</div>"
+
+
+def _render_composite_stacked_bar(metrics: dict, formula: str) -> str:
+    """Horizontal stacked bar of composite terms with formula chip below."""
+    import math
+    try:
+        top1 = float(metrics["top1"])
+        params_m = float(metrics["params"]) / 1e6
+        lat = float(metrics["latency_ms"])
+        t_params = -0.05 * math.log10(params_m) if params_m > 0 else 0.0
+        t_lat = -0.05 * math.log10(lat) if lat > 0 else 0.0
+        total = top1 + t_params + t_lat
+        reported = float(metrics.get("composite", total))
+    except Exception:
+        return (
+            f"<div class='formula-chip'>composite ≔ "
+            f"<code>{_esc(formula)}</code></div>"
+            "<p class='empty'>Insufficient fields to render the composite "
+            "stacked bar.</p>"
+        )
+    # Compute fractional widths from absolute values
+    abs_sum = abs(top1) + abs(t_params) + abs(t_lat)
+    if abs_sum <= 0:
+        abs_sum = 1.0
+    w_top = abs(top1) / abs_sum * 100
+    w_pp = abs(t_params) / abs_sum * 100
+    w_pl = abs(t_lat) / abs_sum * 100
+    sign_p = "+" if t_params >= 0 else "−"
+    sign_l = "+" if t_lat >= 0 else "−"
+    bar = (
+        f"<div class='comp-stack'>"
+        f"<div class='seg pos' style='width:{w_top:.2f}%' "
+        f"title='top-1 = {top1:.5f}'>top-1 +{top1:.4f}</div>"
+        f"<div class='seg params' style='width:{w_pp:.2f}%' "
+        f"title='-0.05·log10(params_M)'>params {sign_p}{abs(t_params):.5f}</div>"
+        f"<div class='seg lat' style='width:{w_pl:.2f}%' "
+        f"title='-0.05·log10(latency_ms)'>lat {sign_l}{abs(t_lat):.5f}</div>"
+        f"</div>"
+    )
+    overlay = (
+        f"<div style='display:flex;justify-content:space-between;"
+        f"font-family:IBM Plex Mono,monospace;font-size:11px;"
+        f"color:var(--paper-dim);margin-top:6px'>"
+        f"<span>Σ recomputed: <b style='color:var(--paper)'>{total:.5f}</b>"
+        f"</span>"
+        f"<span>reported: <b style='color:var(--paper)'>{reported:.5f}</b>"
+        f" &nbsp;·&nbsp; Δ {(reported-total):+.6f}</span></div>"
+    )
+    chip = (
+        f"<div class='formula-chip' style='margin-top:14px'>composite ≔ "
+        f"<code>{_esc(formula)}</code></div>"
+    )
+    return bar + overlay + chip
+
+
+def _render_cross_refs_grid(run_dir_name: str, tag: str, dataset: str,
+                            results_dir: Path,
+                            df: pd.DataFrame | None = None,
+                            group_letter: str | None = None,
+                            composite: float | None = None) -> str:
+    """Grid of xref cards (other seeds / datasets / nearest-in-group)."""
+    cards: list[str] = []
+    same_ds_dir = results_dir / dataset
+    if same_ds_dir.exists():
+        for sib in sorted(same_ds_dir.iterdir()):
+            if (not sib.is_dir() or not sib.name.startswith(f"{tag}_seed")
+                    or sib.name == run_dir_name):
+                continue
+            href = (
+                f"../experiments/"
+                f"{run_page_filename(sib.name, dataset=dataset)}"
+            )
+            seed = sib.name.rsplit("_seed", 1)[-1]
+            cards.append(
+                f"<a class='xref-card' href='{_esc(href)}'>"
+                f"<div class='xref-lbl'>↪ other seed</div>"
+                f"<div class='xref-tag'>{_esc(tag)}</div>"
+                f"<div class='xref-meta'>{_esc(dataset)} · seed {_esc(seed)}</div>"
+                "</a>"
+            )
+    for ds_dir in sorted(results_dir.iterdir()):
+        if not ds_dir.is_dir() or ds_dir.name == dataset:
+            continue
+        for sib in sorted(ds_dir.iterdir()):
+            if not sib.is_dir() or not sib.name.startswith(f"{tag}_seed"):
+                continue
+            href = (
+                f"../experiments/"
+                f"{run_page_filename(sib.name, dataset=ds_dir.name)}"
+            )
+            seed = sib.name.rsplit("_seed", 1)[-1]
+            cards.append(
+                f"<a class='xref-card' href='{_esc(href)}'>"
+                f"<div class='xref-lbl'>↪ same tag, other dataset</div>"
+                f"<div class='xref-tag'>{_esc(tag)}</div>"
+                f"<div class='xref-meta'>{_esc(ds_dir.name)} · seed "
+                f"{_esc(seed)}</div></a>"
+            )
+    if (df is not None and group_letter is not None
+            and composite is not None and not df.empty):
+        neighbours = _nearest_in_group(
+            df, group_letter, tag, dataset, composite, k=3,
+        )
+        for n in neighbours:
+            run_name = n["run_dir"].split("/")[-1]
+            href = (
+                f"../experiments/"
+                f"{run_page_filename(run_name, dataset=n['dataset'])}"
+            )
+            delta = n["composite"] - composite
+            sign = "+" if delta >= 0 else "−"
+            cards.append(
+                f"<a class='xref-card' href='{_esc(href)}'>"
+                f"<div class='xref-lbl'>↪ nearest in {_esc(group_letter)}"
+                f"</div>"
+                f"<div class='xref-tag'>{_esc(n['tag'])}</div>"
+                f"<div class='xref-meta'>{n['top1']*100:.2f}% · "
+                f"Δ-comp {sign}{abs(delta):.4f}</div></a>"
+            )
+    if not cards:
+        return (
+            "<section class='card' style='--i:8'><h2>Cross-references</h2>"
+            "<p class='empty'>No companion runs found.</p></section>"
+        )
     return (
-        f"<div class='card'><h2>Implementation-critic verdict "
-        f"(audits/{group}_audit.md)</h2>"
-        f"<div style='margin-bottom:10px'>{badge}</div>"
-        f"<div class='quote'>{_esc(body)}</div>"
-        f"<p style='margin-top:10px'>"
-        f"<a href='{_esc(audit['url'])}'>Full audit on GitHub &rarr;</a>"
-        f"{' &middot; ' + local_link if local_link else ''}</p></div>"
+        "<section class='card' style='--i:8'><h2>Cross-references</h2>"
+        f"<div class='xrefs-grid'>{''.join(cards)}</div></section>"
     )
 
 
@@ -1468,15 +2079,16 @@ def _render_footer(metrics: dict, run_dir: Path,
         run_path_rel = run_dir.name
     return (
         "<div class='meta'>"
-        f"composite formula SHA-256: <code>{_esc(fp)}</code> &nbsp;·&nbsp; "
-        f"epochs run: <b>{_esc(epochs)}</b> &nbsp;·&nbsp; "
-        f"train wall-clock: <b>{train_s_disp}</b> &nbsp;·&nbsp; "
-        f"generalisation gap (train − test top-1): <b>{gen_gap_disp}</b>"
-        f"{sha_html}"
-        f"<br>run directory: <code>{_esc(run_path_rel)}</code>"
-        "<br>Generated by "
-        "<code>nature_inspired_networks.dashboard.render_experiment_page</code>"
-        " · self-contained inline SVG; no external assets."
+        f"composite formula SHA-256 &nbsp; <code>{_esc(fp)}</code><br>"
+        f"epochs run &nbsp; <code>{_esc(epochs)}</code> "
+        f"&nbsp;·&nbsp; train wall-clock &nbsp; <code>{train_s_disp}</code> "
+        f"&nbsp;·&nbsp; gen-gap (train − test) &nbsp; <code>{gen_gap_disp}</code>"
+        f"{sha_html}<br>"
+        f"run directory &nbsp; <code>{_esc(run_path_rel)}</code><br>"
+        "Generated by "
+        "<code>nature_inspired_networks.dashboard.render_experiment_page</code> "
+        "&middot; self-contained inline SVG, no external assets "
+        "&middot; brutalist editorial lab notebook v3"
         "</div>"
     )
 
@@ -1659,35 +2271,57 @@ def render_experiment_page(metrics: dict, history: list[dict] | None,
             "per-epoch curves available.</div>"
         )
 
-    # ---- hypothesis / verdict / reasoning / config / cross-refs --------
-    hyp_html = _render_hypothesis_section(hid, group, repo_root)
+    # ---- gather audit + sci verdict badges for the header --------------
     md_path = find_hypothesis_path(repo_root, hid) if hid else None
+    sci = parse_scicritic_verdict(md_path) if md_path else {
+        "verdict": "", "raw": ""
+    }
+    audit_v = (parse_audit_verdict(repo_root, hid, group)
+               if hid else {"verdict": "", "summary": "", "url": ""})
+    impl_badge = _verdict_badge(
+        "impl", audit_v.get("verdict", ""),
+        url=audit_v.get("url", ""),
+        tooltip=audit_v.get("summary", ""),
+    ) if audit_v.get("verdict") else ""
+    sci_badge = _verdict_badge(
+        "sci", sci.get("verdict", ""),
+        tooltip=sci.get("raw", ""),
+    ) if sci.get("verdict") else ""
+
+    # ---- hypothesis section (always visible) ---------------------------
+    hyp_html = _render_hypothesis_section(
+        hid, group, repo_root,
+        sci_badge_html=sci_badge, impl_badge_html=impl_badge,
+    )
     if hid is not None and md_path is not None:
         flags["hypothesis"] = True
-        if parse_scicritic_verdict(md_path)["verdict"]:
+        if sci.get("verdict"):
             flags["scicritic"] = True
 
-    # Implementation-critic verdict from audits/G<X>_audit.md
-    audit_html = _render_audit_verdict_section(hid, group, repo_root)
-    if audit_html:
+    # ---- audit excerpt (for accordion) ---------------------------------
+    audit_excerpt = _render_audit_excerpt(hid, group, repo_root)
+    if audit_excerpt:
         flags["audit"] = True
 
+    # ---- sci-critic excerpt (for accordion) ----------------------------
+    sci_excerpt = _render_scicritic_excerpt(md_path)
+
+    # ---- FINDINGS verdict (always visible card) ------------------------
     verdict_html = _render_verdict_section(repo_root, tag)
     if parse_findings_for_tag(repo_root / "FINDINGS.md", tag):
         flags["verdict"] = True
 
+    # ---- reasoning + config (accordion bodies) -------------------------
     reasoning_path = run_dir / "reasoning.json"
-    reasoning_html = _render_reasoning_section(
+    reasoning_body = _render_reasoning_section(
         reasoning_path if reasoning_path.exists() else None
     )
     flags["reasoning"] = reasoning_path.exists()
 
-    config_html = _render_configuration_section(
+    config_body = _render_configuration_section(
         run_dir, metrics, results_dir=results_dir,
     )
-    # "config" flag counts ANY successfully rendered config block — exact
-    # config.yaml OR an experiment_log.jsonl row OR sufficient metrics fields.
-    if (run_dir / "config.yaml").exists() or "Configuration (inferred" in config_html:
+    if (run_dir / "config.yaml").exists() or "inferred from" in config_body:
         flags["config"] = True
 
     # Composite for nearest-neighbour distance ranking
@@ -1695,59 +2329,123 @@ def render_experiment_page(metrics: dict, history: list[dict] | None,
         comp = float(metrics.get("composite"))
     except Exception:
         comp = None
-    xrefs_html = _render_cross_refs(
+    xrefs_html = _render_cross_refs_grid(
         run_dir_name, tag, dataset, results_dir,
         df=runs_df, group_letter=group, composite=comp,
     )
-    if "<li>" in xrefs_html:
+    if "xref-card" in xrefs_html:
         flags["cross_refs"] = True
+
+    # ---- key numbers strip (per-experiment quick read) -----------------
+    baseline_top1 = BASELINE_TOP1.get(dataset)
+    key_strip = _render_key_numbers_strip(metrics, baseline_top1)
+
+    # ---- composite stacked bar -----------------------------------------
+    composite_stack = _render_composite_stacked_bar(metrics, formula)
 
     footer_html = _render_footer(metrics, run_dir, repo_root=repo_root)
 
-    # ---- header pills --------------------------------------------------
+    # ---- pretty-print metrics JSON for accordion -----------------------
+    try:
+        metrics_pretty = json.dumps(metrics, indent=2, ensure_ascii=False)
+    except Exception:
+        metrics_pretty = str(metrics)
+
+    # ---- header pills + verdicts ---------------------------------------
     hyp_pill = (
         f"<span class='pill hyp'>{_esc(hid)}</span>"
         if hid else "<span class='pill'>baseline</span>"
     )
-    grp_pill = f"<span class='pill grp'>{_esc(grp_header)}</span>"
-    ds_pill = f"<span class='pill'>{_esc(dataset)}</span>"
+    grp_pill = (
+        f"<span class='pill grp'>{_esc(grp_header)}</span>"
+        if group != "Uncategorized" else ""
+    )
+    ds_pill = f"<span class='pill ds'>{_esc(dataset)}</span>"
     seed_pill = f"<span class='pill'>seed {_esc(seed)}</span>"
 
-    # Hypothesis-doc GitHub link for the header strip
-    hyp_url = ""
-    if hid:
-        mdp = find_hypothesis_path(repo_root, hid)
-        if mdp is not None:
-            rel = mdp.relative_to(repo_root).as_posix()
-            hyp_url = (
-                "https://github.com/dlmastery/nature_inspired_networks/blob/"
-                f"main/{rel}"
-            )
-    hyp_link_html = (
-        f"&nbsp;·&nbsp; <a href='{_esc(hyp_url)}' "
-        f"style='color:#58a6ff;font-weight:600'>"
-        f"&#128196; Hypothesis design doc &rarr;</a>"
-        if hyp_url else ""
+    # ---- accordions ----------------------------------------------------
+    accordions: list[str] = []
+    if sci_excerpt:
+        accordions.append(
+            "<details class='deep'><summary>Research-scientist critique "
+            "(addendum)</summary><div class='body'>"
+            + sci_excerpt
+            + "</div></details>"
+        )
+    if audit_excerpt:
+        accordions.append(
+            "<details class='deep'><summary>Implementation-critic audit "
+            f"(audits/{_esc(group)}_audit.md)</summary>"
+            f"<div class='body'>{audit_excerpt}</div></details>"
+        )
+    accordions.append(
+        "<details class='deep'><summary>Reasoning blob "
+        "(reasoning.json)</summary>"
+        f"<div class='body'>{reasoning_body}</div></details>"
+    )
+    accordions.append(
+        "<details class='deep'><summary>Configuration dump</summary>"
+        f"<div class='body'>{config_body}</div></details>"
+    )
+    accordions.append(
+        "<details class='deep'><summary>Full metrics JSON</summary>"
+        f"<div class='body'><pre>{_esc(metrics_pretty)}</pre></div></details>"
+    )
+
+    deep_card = (
+        "<section class='card' style='--i:6'>"
+        "<h2>Deep inspection</h2>"
+        "<p style='color:var(--paper-dim);font-size:0.9em;margin-bottom:6px'>"
+        "Audit excerpts, reasoning blob, raw configuration, and full metrics "
+        "JSON — expand sections of interest.</p>"
+        + "".join(accordions)
+        + "</section>"
     )
 
     page = (
         "<!doctype html>\n"
         "<html lang='en'><head><meta charset='utf-8'>\n"
         f"<title>{_esc(title)} — experiment page</title>\n"
-        f"<style>{_EXP_PAGE_CSS}</style></head><body>\n"
-        "<a class='back' href='../dashboard.html'>&larr; back to dashboard</a>\n"
-        f"<h1>{_esc(tag)}</h1>\n"
-        f"<div class='sub'>{hyp_pill}{grp_pill}{ds_pill}{seed_pill}"
-        f" &nbsp;·&nbsp; run directory <code>{_esc(run_dir_name)}</code>"
-        f"{hyp_link_html}</div>\n"
+        f"{_EXP_FONT_LINK}\n"
+        f"<style>{_EXP_PAGE_CSS}{_VBADGE_HOVER_CSS}</style></head><body>\n"
+        "<div class='grain'></div>\n"
+        # Asymmetric 3-column header
+        "<div class='head-grid' style='--i:0'>\n"
+        "  <div class='head-left'>\n"
+        f"    <div class='tag-display'>{_esc(tag)}</div>\n"
+        f"    <div class='sub'>{hyp_pill}{grp_pill}{ds_pill}{seed_pill}"
+        f"&nbsp;·&nbsp; run dir <span class='mono' style='color:var(--paper)'>"
+        f"{_esc(run_dir_name)}</span></div>\n"
+        "  </div>\n"
+        "  <div class='head-right'>\n"
+        "    <a class='back' href='../dashboard.html'>← back to dashboard</a>\n"
+        f"    <div class='verdict-row'>{impl_badge}{sci_badge}</div>\n"
+        "  </div>\n"
+        "</div>\n"
+        # Always-visible key-numbers strip
+        f"{key_strip}\n"
+        # Hypothesis (always-visible summary + expandable digest)
         f"{hyp_html}\n"
-        f"{audit_html}\n"
+        # FINDINGS verdict card
         f"{verdict_html}\n"
-        f"{reasoning_html}\n"
-        f"{config_html}\n"
-        f"<div class='card'><h2>Metrics</h2>{metrics_table}</div>\n"
-        f"<div class='card'><h2>Composite-score breakdown</h2>{breakdown_html}</div>\n"
-        f"<div class='card'><h2>Per-epoch training curves</h2>{charts_html}</div>\n"
+        # Composite breakdown — stacked bar
+        "<section class='card' style='--i:4'>"
+        "<h2>Composite-score breakdown</h2>"
+        f"{composite_stack}"
+        "</section>\n"
+        # Training curves card
+        "<section class='card' style='--i:5'>"
+        "<h2>Per-epoch training curves</h2>"
+        f"{charts_html}"
+        "</section>\n"
+        # Deep-inspection accordions
+        f"{deep_card}\n"
+        # Quick-glance metrics table
+        "<section class='card' style='--i:7'>"
+        "<h2>Metrics — quick reference</h2>"
+        f"{metrics_table}"
+        "</section>\n"
+        # Cross references grid
         f"{xrefs_html}\n"
         f"{footer_html}\n"
         "</body></html>\n"
@@ -1770,6 +2468,7 @@ def render_all_experiment_pages(results_dir: str | Path,
     od = Path(out_dir)
     od.mkdir(parents=True, exist_ok=True)
     root = Path(repo_root) if repo_root else rp.parent
+    _ROOT_FOR_SVG["root"] = root
     written: list[str] = []
     coverage = {
         "hypothesis": 0, "verdict": 0, "reasoning": 0, "config": 0,
@@ -1817,105 +2516,162 @@ HTML_HEAD = """<!doctype html>
 <html lang='en'><head><meta charset='utf-8'>
 <meta http-equiv='Cache-Control' content='no-cache, no-store, must-revalidate'>
 <title>nature_inspired_networks — autoresearch dashboard</title>
+""" + _EXP_FONT_LINK + """
 <style>
+""" + _BRUTALIST_VARS + """
  *{margin:0;padding:0;box-sizing:border-box;}
- body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:#0d1117;
-      color:#c9d1d9;padding:20px;line-height:1.45;}
- a{color:#58a6ff;text-decoration:none;} a:hover{text-decoration:underline;}
- h1{color:#58a6ff;margin-bottom:4px;font-size:1.7em;font-weight:700;}
- h2{color:#58a6ff;font-size:1.15em;margin:30px 0 6px 0;font-weight:600;
-    letter-spacing:0.3px;}
- h3{color:#c9d1d9;font-size:0.95em;margin-bottom:10px;font-weight:600;}
- .sub{color:#8b949e;margin-bottom:14px;font-size:0.92em;}
- .group-desc{color:#8b949e;font-size:0.88em;margin:2px 0 10px 0;
-             max-width:980px;line-height:1.55;}
- .ribbon{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));
-         gap:10px;margin:10px 0 14px 0;}
- .kpi{background:#161b22;border:1px solid #30363d;border-radius:8px;padding:12px 14px;}
- .kpi .label{color:#8b949e;font-size:0.7em;text-transform:uppercase;
-             letter-spacing:0.6px;}
- .kpi .value{font-size:1.55em;font-weight:700;margin-top:3px;color:#c9d1d9;}
- .kpi.positive .value{color:#3fb950;}
- .kpi.negative .value{color:#f85149;}
- .kpi.neutral  .value{color:#58a6ff;}
- .formula-chip{display:inline-block;background:#161b22;border:1px solid #30363d;
-               border-radius:6px;padding:6px 10px;margin:4px 0 12px 0;
-               font-family:Consolas,monospace;font-size:0.78em;color:#c9d1d9;}
- .formula-chip .fp{color:#8b949e;}
- .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:8px;}
- .card{background:#161b22;border:1px solid #30363d;border-radius:8px;padding:14px;}
- .card img{max-width:100%;height:auto;border-radius:4px;
-           background:#fff;padding:4px;}
+ html,body{background:var(--ink);}
+ body{font-family:'IBM Plex Serif','Charter',Georgia,serif;color:var(--paper);
+      padding:32px 36px 80px;line-height:1.55;max-width:1340px;margin:0 auto;
+      font-size:16px;font-variant-numeric:tabular-nums;position:relative;}
+ a{color:var(--v-derivative);text-decoration:none;
+   border-bottom:1px solid transparent;transition:border-color 160ms ease;}
+ a:hover{border-bottom-color:var(--v-derivative);text-decoration:none;}
+ h1{font-family:'Newsreader',serif;font-weight:600;font-style:italic;
+    font-size:54px;line-height:1.02;color:var(--paper);
+    letter-spacing:-0.015em;margin-bottom:8px;}
+ h2{font-family:'Newsreader',serif;font-weight:600;font-style:italic;
+    font-size:24px;color:var(--paper);margin:36px 0 10px 0;
+    letter-spacing:-0.005em;}
+ h3{font-family:'IBM Plex Mono',monospace;font-size:11px;
+    text-transform:uppercase;letter-spacing:0.18em;color:var(--paper-dim);
+    margin:14px 0 8px 0;font-weight:600;}
+ .sub{font-family:'IBM Plex Mono',monospace;color:var(--paper-dim);
+      margin-bottom:18px;font-size:11px;text-transform:uppercase;
+      letter-spacing:0.18em;}
+ .group-desc{color:var(--paper-dim);font-size:0.93em;margin:4px 0 14px 0;
+             max-width:980px;line-height:1.6;font-style:italic;
+             font-family:'Newsreader',serif;}
+ .ribbon{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+         gap:1px;background:var(--rule);border:1px solid var(--rule);
+         margin:14px 0 24px 0;}
+ .kpi{background:var(--panel);padding:14px 16px;}
+ .kpi .label{color:var(--paper-dim);font-size:9.5px;
+             font-family:'IBM Plex Mono',monospace;
+             text-transform:uppercase;letter-spacing:0.18em;}
+ .kpi .value{font-family:'Newsreader',serif;font-style:italic;font-size:28px;
+             font-weight:600;margin-top:4px;color:var(--paper);
+             letter-spacing:-0.01em;}
+ .kpi.positive{box-shadow:inset 3px 0 0 var(--v-pass);}
+ .kpi.negative{box-shadow:inset 3px 0 0 var(--v-broken);}
+ .kpi.neutral{box-shadow:inset 3px 0 0 var(--accent-dim);}
+ .formula-chip{display:inline-block;background:var(--panel);
+               border:1px solid var(--rule);border-left:2px solid var(--accent);
+               padding:8px 14px;margin:4px 0 18px 0;
+               font-family:'IBM Plex Mono',monospace;font-size:11px;
+               color:var(--paper);letter-spacing:0.04em;}
+ .formula-chip .fp{color:var(--paper-dim);font-size:10px;}
+ .grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:8px;}
+ .card{background:var(--panel);border:1px solid var(--rule);
+       padding:18px 20px;position:relative;}
+ .card::before{content:"";position:absolute;top:0;left:0;width:48px;
+               height:1px;background:var(--accent);}
+ .card img{max-width:100%;height:auto;background:#fff;padding:4px;
+           border:1px solid var(--rule);}
  .panel-2col{grid-column:1 / 3;}
- table.runs{width:100%;border-collapse:collapse;font-size:0.83em;
-            background:#161b22;border:1px solid #30363d;border-radius:8px;
-            overflow:hidden;}
- table.runs th{background:#0d1117;color:#8b949e;text-align:right;padding:8px 10px;
-    border-bottom:2px solid #30363d;font-weight:600;text-transform:uppercase;
-    font-size:0.72em;letter-spacing:0.4px;cursor:pointer;}
+ table.runs{width:100%;border-collapse:collapse;font-size:0.82em;
+            background:var(--panel);border:1px solid var(--rule);}
+ table.runs th{background:transparent;color:var(--paper-dim);text-align:right;
+    padding:9px 12px;border-bottom:1px solid var(--rule-bright);
+    font-weight:500;text-transform:uppercase;font-size:10px;
+    letter-spacing:0.18em;cursor:pointer;
+    font-family:'IBM Plex Mono',monospace;}
  table.runs th:first-child{text-align:left;}
- table.runs td{padding:7px 10px;border-bottom:1px solid #21262d;text-align:right;
-    color:#c9d1d9;}
+ table.runs td{padding:8px 12px;border-bottom:1px solid var(--rule);
+    text-align:right;color:var(--paper);
+    font-family:'IBM Plex Mono',monospace;font-size:0.96em;}
  table.runs td:first-child{text-align:left;}
- table.runs tr.row-link{cursor:pointer;}
- table.runs tr.row-link:hover{background:#1c2128;}
- table.runs tr.best-row{background:#0d2818;border-left:4px solid #00d26a;}
+ table.runs tr.row-link{cursor:pointer;transition:background 160ms ease;}
+ table.runs tr.row-link:hover{background:rgba(187,140,77,0.06);}
+ table.runs tr.best-row{box-shadow:inset 3px 0 0 var(--accent);
+                        background:rgba(187,140,77,0.045);}
  table.runs tr.best-row td{font-weight:600;}
- .tag-pill{display:inline-block;background:#21262d;border:1px solid #30363d;
-           border-radius:10px;padding:1px 8px;font-size:0.75em;color:#c9d1d9;
-           font-family:Consolas,monospace;}
- .chip{display:inline-block;background:#21262d;border:1px solid #30363d;
-       border-radius:14px;padding:3px 11px;margin:2px 4px 2px 0;
-       font-size:0.78em;color:#c9d1d9;}
- .meta{font-size:0.78em;color:#484f58;margin-top:18px;}
- .status-done{background:#3fb950;}
- .status-running{background:#d29922;animation:pulse 1.5s infinite;}
- .status-queued{background:#1f6feb;}
+ .tag-pill{display:inline-block;background:transparent;
+           border:1px solid var(--rule-bright);
+           padding:2px 9px;font-size:11px;color:var(--paper);
+           font-family:'IBM Plex Mono',monospace;letter-spacing:0.06em;}
+ .meta{font-family:'IBM Plex Mono',monospace;font-size:10px;
+       color:var(--paper-dim);margin-top:28px;padding-top:18px;
+       border-top:1px solid var(--rule);line-height:1.9;
+       letter-spacing:0.04em;}
+ .meta code{background:var(--ink);padding:1px 5px;color:var(--paper);
+            border:1px solid var(--rule);}
+ .status-done{background:var(--v-pass);}
+ .status-running{background:var(--v-minor);animation:pulse 1.5s infinite;}
+ .status-queued{background:var(--v-derivative);}
  .status-planned{background:#484f58;}
- .status-failed{background:#f85149;}
+ .status-failed{background:var(--v-broken);}
  .status-superseded{background:#6e7681;}
  @keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.45;}}
- .group-section{margin-top:26px;background:#161b22;border:1px solid #30363d;
-                border-radius:10px;padding:14px 18px;}
- .group-section h2{margin-top:0;color:#58a6ff;font-size:1.1em;}
- .group-empty{color:#8b949e;font-style:italic;font-size:0.88em;
-              padding:6px 0;}
- .group-chart{margin:8px 0 10px 0;}
+ @keyframes reveal{from{opacity:0;transform:translateY(8px);}
+                   to{opacity:1;transform:translateY(0);}}
+ section,.card,.ribbon,.group-section,.formula-chip,.headline-ribbon{
+   animation:reveal 360ms cubic-bezier(.2,.7,.2,1) both;
+   animation-delay:calc(var(--i, 0) * 60ms);}
+ html{scroll-behavior:smooth;}
+ .group-section{margin-top:32px;background:var(--panel);
+                border:1px solid var(--rule);padding:22px 26px;position:relative;}
+ .group-section::before{content:"";position:absolute;top:0;left:0;width:64px;
+                        height:1px;background:var(--accent);}
+ .group-section h2{margin-top:0;color:var(--paper);font-size:24px;}
+ .group-empty{color:var(--paper-dim);font-style:italic;font-size:0.93em;
+              padding:8px 0;font-family:'Newsreader',serif;}
+ .group-chart{margin:14px 0;}
  table.runs.compact{font-size:0.78em;}
- table.runs.compact th{padding:5px 7px;font-size:0.66em;}
- table.runs.compact td{padding:4px 7px;}
- .hyp-link{color:#58a6ff;font-family:Consolas,monospace;font-size:0.78em;
-           white-space:nowrap;}
+ table.runs.compact th{padding:6px 9px;font-size:9px;}
+ table.runs.compact td{padding:5px 9px;}
+ .hyp-link{color:var(--v-derivative);font-family:'IBM Plex Mono',monospace;
+           font-size:11px;white-space:nowrap;letter-spacing:0.06em;}
+ .headline-ribbon{background:var(--panel);border:1px solid var(--rule);
+                  border-left:2px solid var(--accent);
+                  padding:16px 22px;margin:14px 0 18px 0;
+                  font-size:0.96em;color:var(--paper);
+                  font-family:'Newsreader',serif;font-style:italic;line-height:1.55;}
+ .headline-ribbon b{font-family:'IBM Plex Mono',monospace;font-style:normal;
+                    font-weight:600;color:var(--accent);font-size:10px;
+                    text-transform:uppercase;letter-spacing:0.18em;
+                    margin-right:8px;}
  /* side panel (hypothesis quick-open) */
- #side-panel{position:fixed;top:0;right:-560px;width:540px;height:100vh;
-             background:#0d1117;border-left:1px solid #30363d;
+ #side-panel{position:fixed;top:0;right:-580px;width:560px;height:100vh;
+             background:var(--ink);border-left:1px solid var(--rule);
              box-shadow:-4px 0 24px rgba(0,0,0,0.6);
-             padding:20px 22px;overflow-y:auto;transition:right 0.25s ease;
+             padding:24px 26px;overflow-y:auto;transition:right 0.25s ease;
              z-index:50;}
  #side-panel.open{right:0;}
- #side-panel h3{color:#58a6ff;font-size:1.05em;margin-bottom:10px;}
- #side-panel pre{background:#161b22;border:1px solid #30363d;border-radius:6px;
-                 padding:12px;white-space:pre-wrap;color:#c9d1d9;font-size:0.82em;
-                 font-family:Consolas,monospace;line-height:1.5;}
- .close-btn{background:#21262d;border:1px solid #30363d;color:#8b949e;
-            padding:4px 12px;border-radius:4px;cursor:pointer;font-size:0.82em;
-            float:right;}
- .close-btn:hover{background:#30363d;color:#c9d1d9;}
- .legend-row{margin:8px 0 12px 0;font-size:0.78em;color:#8b949e;}
- .legend-row .swatch{display:inline-block;width:12px;height:12px;border-radius:2px;
+ #side-panel h3{color:var(--paper);font-size:18px;margin-bottom:12px;
+                font-family:'Newsreader',serif;font-style:italic;
+                font-weight:600;letter-spacing:normal;}
+ #side-panel pre{background:var(--panel);border:1px solid var(--rule);
+                 padding:14px 16px;white-space:pre-wrap;color:var(--paper);
+                 font-size:11px;font-family:'IBM Plex Mono',monospace;
+                 line-height:1.6;border-left:2px solid var(--accent-dim);}
+ .close-btn{background:transparent;border:1px solid var(--rule-bright);
+            color:var(--paper-dim);padding:5px 14px;cursor:pointer;
+            font-family:'IBM Plex Mono',monospace;font-size:10px;
+            text-transform:uppercase;letter-spacing:0.18em;float:right;}
+ .close-btn:hover{border-color:var(--accent);color:var(--accent);}
+ .legend-row{margin:10px 0 14px 0;font-size:0.78em;color:var(--paper-dim);
+             font-family:'IBM Plex Mono',monospace;letter-spacing:0.08em;}
+ .legend-row .swatch{display:inline-block;width:12px;height:12px;
                      vertical-align:middle;margin:0 4px 0 10px;}
  .hyp-grid-row{display:flex;align-items:center;margin-bottom:4px;
-               font-family:Consolas,monospace;font-size:0.78em;}
- .hyp-grid-row .gid{width:34px;color:#8b949e;}
- .hyp-grid-row .cell{width:26px;height:22px;margin-right:3px;border-radius:3px;
+               font-family:'IBM Plex Mono',monospace;font-size:0.78em;}
+ .hyp-grid-row .gid{width:34px;color:var(--paper-dim);}
+ .hyp-grid-row .cell{width:26px;height:22px;margin-right:3px;
                      display:inline-flex;align-items:center;justify-content:center;
-                     font-size:0.7em;color:#fff;cursor:pointer;
-                     border:1px solid #21262d;}
- .hyp-grid-row .cell:hover{outline:2px solid #58a6ff;}
- .hyp-grid-row .cell.empty{background:#21262d;color:#484f58;cursor:default;
+                     font-size:0.7em;color:#0a0a0d;cursor:pointer;
+                     border:1px solid var(--rule);font-weight:600;}
+ .hyp-grid-row .cell:hover{outline:1px solid var(--accent);}
+ .hyp-grid-row .cell.empty{background:var(--rule);color:#484f58;cursor:default;
                             border-color:transparent;}
+ code{background:var(--ink);padding:1px 5px;font-family:'IBM Plex Mono',monospace;
+      border:1px solid var(--rule);font-size:0.9em;}
+ .grain{position:fixed;inset:0;pointer-events:none;z-index:2;opacity:0.035;
+   background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");}
+ .vbadge:hover{transform:scale(1.05);filter:brightness(1.15);}
 </style>
 </head><body>
+<div class='grain'></div>
 """
 
 
@@ -1953,8 +2709,10 @@ function openHypothesis(hid,fname){
   });
   sp.classList.add('open');
 }
-function closeSide(){document.getElementById('side-panel').classList.remove('open');}
-
+function closeSide(){
+  var sp=document.getElementById('side-panel');
+  if(sp){sp.classList.remove('open');}
+}
 document.addEventListener('keydown',function(e){
   if(e.key==='Escape'){closeSide();}
 });
@@ -2105,15 +2863,22 @@ def _format_cell(k: str, v) -> tuple[str, str]:
 def _group_section_html(group_letter: str,
                         rows: list[pd.Series],
                         best_idx: set,
-                        table_id: str) -> str:
-    """Render one ``<section>`` for a hypothesis-group block."""
+                        table_id: str,
+                        history_map: dict[str, list[dict]] | None = None,
+                        repo_root: Path | None = None) -> str:
+    """Render one ``<section>`` for a hypothesis-group block.
+
+    Now renders 2 diagrams per group (top-1 bars + composite-vs-params
+    scatter) and adds a per-row sparkline column when history is available.
+    """
     header, desc = GROUP_HEADERS.get(group_letter, (group_letter, ""))
     n = len(rows)
     parts = [
-        f"<section class='group-section'>",
-        f"<h2>{_esc(header)} <span style='color:#8b949e;"
-        f"font-weight:400;font-size:0.78em'>({n} run{'s' if n != 1 else ''})"
-        f"</span></h2>",
+        f"<section class='group-section' style='--i:{hash(group_letter) % 8}'>",
+        f"<h2>{_esc(header)} <span style='color:var(--paper-dim);"
+        f"font-weight:400;font-size:0.78em;font-style:normal;"
+        f"font-family:IBM Plex Mono,monospace'>"
+        f"({n} run{'s' if n != 1 else ''})</span></h2>",
         f"<div class='group-desc'>{_esc(desc)}</div>",
     ]
     if not rows:
@@ -2122,13 +2887,18 @@ def _group_section_html(group_letter: str,
         )
         parts.append("</section>")
         return "".join(parts)
-    # Compact per-group SVG visualisation BEFORE the table.
+    # Diagram 1: top-1 horizontal bar chart
     chart = _group_visualisation_svg(
-        rows, group_letter,
-        chart_id=f"svg-{table_id}",
+        rows, header, chart_id=f"svg-{table_id}",
     )
     if chart:
         parts.append("<div class='group-chart'>" + chart + "</div>")
+    # Diagram 2: composite-vs-params scatter (only if ≥3 rows)
+    scatter = _group_scatter_svg(
+        rows, header, chart_id=f"svg-scatter-{table_id}", repo_root=repo_root,
+    )
+    if scatter:
+        parts.append("<div class='group-chart'>" + scatter + "</div>")
     parts.append(
         f"<table class='runs compact' id='{table_id}' data-dir='asc'>"
         "<thead><tr>"
@@ -2138,6 +2908,8 @@ def _group_section_html(group_letter: str,
             f"<th onclick=\"sortTable('{table_id}', {i})\">{label}</th>"
         )
     parts.append("<th>Hyp</th>")
+    if history_map is not None:
+        parts.append("<th>Curve</th>")
     parts.append("</tr></thead><tbody>")
 
     for r in rows:
@@ -2188,6 +2960,12 @@ def _group_section_html(group_letter: str,
         else:
             parts.append(
                 "<td style='text-align:left'><span class='mut'>—</span></td>"
+            )
+        # Per-tag sparkline cell (test_top1 vs epoch)
+        if history_map is not None:
+            spark = _tag_sparkline_svg(history_map.get(run_dir_name))
+            parts.append(
+                f"<td style='text-align:left;padding:2px 6px'>{spark}</td>"
             )
         parts.append("</tr>")
     parts.append("</tbody></table>")
@@ -2244,22 +3022,30 @@ def render_dashboard(results_dir: str | Path,
         df["__group"] = pd.Series(dtype=str)
         best_idx = set()
 
+    # Make repo_root available to per-group SVG colour-by-verdict lookup
+    _ROOT_FOR_SVG["root"] = root
+
+    # Preload per-tag history for inline sparklines on every leaderboard row
+    history_map: dict[str, list[dict]] = {}
+    for hj in p.glob("**/history.json"):
+        try:
+            history_map[hj.parent.name] = json.loads(hj.read_text(encoding="utf-8"))
+        except Exception:
+            continue
+
     html = [HTML_HEAD]
     html.append(f"<h1>{title}</h1>")
     html.append(
-        f"<div class='sub'>{subtitle} · "
+        f"<div class='sub'>{subtitle} &nbsp;·&nbsp; "
         f"<a href='https://github.com/dlmastery/nature_inspired_networks'>"
-        f"GitHub</a> · "
-        f"<a href='../FINDINGS.md'>FINDINGS.md</a> · "
+        f"GitHub</a> &nbsp;·&nbsp; "
+        f"<a href='../FINDINGS.md'>FINDINGS.md</a> &nbsp;·&nbsp; "
         f"<a href='../EXPERIMENT_LOG.md'>EXPERIMENT_LOG</a></div>"
     )
     if findings_blurb:
         html.append(
-            "<div style='background:#161b22;border-left:4px solid #d29922;"
-            "border:1px solid #30363d;border-radius:6px;padding:12px 16px;"
-            "margin:6px 0 10px 0;font-size:0.92em;color:#c9d1d9'>"
-            f"<b style='color:#d29922'>Headline finding · </b>"
-            f"{findings_blurb}</div>"
+            "<div class='headline-ribbon' style='--i:1'>"
+            f"<b>Headline finding</b>{findings_blurb}</div>"
         )
     html.append(_composite_formula_chip(df))
     html.append(_ribbon_html(findings_metrics))
@@ -2300,9 +3086,11 @@ def render_dashboard(results_dir: str | Path,
     # Runs sections by hypothesis group (NO modal anywhere)
     # ------------------------------------------------------------------
     html.append(
-        "<h2 style='margin-top:34px'>Runs by hypothesis group "
-        "<span style='color:#8b949e;font-weight:400;font-size:0.78em'>"
-        "— click any row for the full per-experiment page</span></h2>"
+        "<h2 style='margin-top:48px'>Runs by hypothesis group "
+        "<span style='color:var(--paper-dim);font-weight:400;font-size:13px;"
+        "font-family:IBM Plex Mono,monospace;font-style:normal;"
+        "letter-spacing:0.14em;text-transform:uppercase'>"
+        "&nbsp;click any row to expand the experiment page</span></h2>"
     )
 
     rows_by_group: dict[str, list[pd.Series]] = {g: [] for g in GROUP_ORDER}
@@ -2321,15 +3109,19 @@ def render_dashboard(results_dir: str | Path,
             _group_section_html(
                 g, rows, best_idx,
                 table_id=f"runs-{g.lower()}",
+                history_map=history_map,
+                repo_root=root,
             )
         )
 
     html.append(
         "<div class='meta'>Generated by "
-        "<code>nature_inspired_networks.dashboard.render_dashboard</code> · "
-        "dark theme adapted from dlmastery/autoresearchspy/docs/spy_dashboard · "
-        "all CSS+JS inline; no external CDN; PNG plots kept as PNG; "
-        "leaderboard organised by hypothesis group; rows link to per-experiment pages.</div>"
+        "<code>nature_inspired_networks.dashboard.render_dashboard</code> "
+        "&middot; Brutalist Editorial Lab Notebook v3 "
+        "&middot; Newsreader / IBM Plex Serif / IBM Plex Mono "
+        "&middot; all SVG + CSS inline; no external CDN besides Google Fonts "
+        "&middot; leaderboard sectioned by hypothesis group; each row navigates "
+        "to its own per-experiment page.</div>"
     )
 
     # Side panel (kept — hypothesis-cell quick-open; NOT a modal)

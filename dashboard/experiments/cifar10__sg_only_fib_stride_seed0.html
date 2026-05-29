@@ -1,67 +1,210 @@
 <!doctype html>
 <html lang='en'><head><meta charset='utf-8'>
 <title>sg_only_fib_stride · seed 0 · cifar10 — experiment page</title>
+<link rel='preconnect' href='https://fonts.googleapis.com'><link rel='preconnect' href='https://fonts.gstatic.com' crossorigin><link href='https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;0,6..72,800;1,6..72,400;1,6..72,600&family=IBM+Plex+Serif:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap' rel='stylesheet'>
 <style>
- *{margin:0;padding:0;box-sizing:border-box;}
- body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:#0d1117;
-      color:#c9d1d9;padding:24px 28px;line-height:1.55;max-width:1180px;margin:0 auto;}
- a{color:#58a6ff;text-decoration:none;} a:hover{text-decoration:underline;}
- h1{color:#58a6ff;font-size:1.6em;margin-bottom:4px;}
- h2{color:#58a6ff;font-size:1.05em;margin-bottom:12px;font-weight:600;
-    letter-spacing:0.3px;}
- .sub{color:#8b949e;font-size:0.95em;margin-bottom:18px;}
- .pill{display:inline-block;background:#21262d;border:1px solid #30363d;
-       border-radius:10px;padding:2px 10px;font-size:0.78em;color:#c9d1d9;
-       font-family:Consolas,monospace;margin-right:6px;}
- .pill.hyp{background:#1f3a5f;border-color:#58a6ff;color:#cfe6ff;}
- .pill.grp{background:#2c1e3a;border-color:#a371f7;color:#dbc9f7;}
- .back{display:inline-block;margin-bottom:14px;font-size:0.9em;}
- .card{background:#161b22;border:1px solid #30363d;border-radius:8px;
-       padding:18px 22px;margin-bottom:18px;}
- .card h2{color:#58a6ff;font-size:1.05em;margin-bottom:12px;font-weight:600;}
- .card h3{color:#c9d1d9;font-size:0.92em;margin:14px 0 6px 0;font-weight:600;
-          text-transform:uppercase;letter-spacing:0.5px;}
- .card p{margin-bottom:10px;font-size:0.92em;}
- .card ul{margin-left:22px;font-size:0.9em;}
- table{width:100%;border-collapse:collapse;font-size:0.86em;}
- th{background:#0d1117;color:#8b949e;text-align:left;padding:7px 10px;
-    border-bottom:2px solid #30363d;font-size:0.74em;text-transform:uppercase;
-    letter-spacing:0.4px;}
- td{padding:7px 10px;border-bottom:1px solid #21262d;}
- td.k{color:#8b949e;width:42%;}
- td.v{color:#c9d1d9;font-family:Consolas,monospace;}
- .formula-chip{background:#0d1117;border:1px solid #30363d;border-radius:6px;
-               padding:10px 12px;font-family:Consolas,monospace;font-size:0.82em;
-               margin-bottom:12px;color:#c9d1d9;word-break:break-all;}
- .breakdown td.term{font-family:Consolas,monospace;}
- .pos{color:#3fb950;} .neg{color:#f85149;} .mut{color:#8b949e;}
- .charts{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
- @media(max-width:980px){.charts{grid-template-columns:1fr;}}
- .meta{font-size:0.78em;color:#484f58;margin-top:18px;line-height:1.6;}
- code{background:#0d1117;padding:1px 5px;border-radius:3px;font-size:0.92em;
-      font-family:Consolas,monospace;}
- pre{background:#0d1117;border:1px solid #30363d;border-radius:6px;
-     padding:12px;overflow-x:auto;font-family:Consolas,monospace;
-     font-size:0.84em;color:#c9d1d9;white-space:pre-wrap;line-height:1.5;}
- .reason-section{margin-bottom:14px;}
- .reason-section .lbl{color:#3fb950;font-size:0.72em;text-transform:uppercase;
-                      letter-spacing:0.6px;margin-bottom:4px;font-weight:600;}
- .reason-section .body{font-size:0.9em;color:#c9d1d9;white-space:pre-wrap;}
- .quote{border-left:3px solid #d29922;padding:8px 14px;background:#0d1117;
-        border-radius:0 6px 6px 0;font-size:0.9em;color:#c9d1d9;
-        margin:8px 0;}
- .verdict-label{color:#d29922;font-weight:600;}
- .empty{color:#8b949e;font-style:italic;font-size:0.88em;}
- .xrefs li{margin:4px 0;font-size:0.9em;font-family:Consolas,monospace;}
-</style></head><body>
-<a class='back' href='../dashboard.html'>&larr; back to dashboard</a>
-<h1>sg_only_fib_stride</h1>
-<div class='sub'><span class='pill hyp'>H18</span><span class='pill grp'>G2 — Layer / Channel / Neuron</span><span class='pill'>cifar10</span><span class='pill'>seed 0</span> &nbsp;·&nbsp; run directory <code>sg_only_fib_stride_seed0</code>&nbsp;·&nbsp; <a href='https://github.com/dlmastery/nature_inspired_networks/blob/main/hypotheses/g2_layer_channel_neuron/H18_fib_stage_transition.md' style='color:#58a6ff;font-weight:600'>&#128196; Hypothesis design doc &rarr;</a></div>
-<div class='card'><h2>Hypothesis H18 — H18 — Fib-Stage Transition (downsampling factors alternate Fib: stride 2, 3, 2, 3)</h2><div style='margin:4px 0 14px 0'><a href='https://github.com/dlmastery/nature_inspired_networks/blob/main/hypotheses/g2_layer_channel_neuron/H18_fib_stage_transition.md' style='display:inline-block;background:#1f6feb;color:#fff;padding:6px 14px;border-radius:6px;font-weight:600;font-size:0.86em;border:1px solid #58a6ff;text-decoration:none;margin-right:8px'>&#128196; Hypothesis design doc &rarr;</a><a href='https://github.com/dlmastery/nature_inspired_networks/blob/main/hypotheses/g2_layer_channel_neuron/H18_fib_stage_transition.md' style='text-decoration:none;margin-right:6px'><span style='display:inline-block;padding:2px 10px;border-radius:10px;background:#0f1d33;border:1px solid #58a6ff;color:#58a6ff;font-weight:600;font-size:0.78em;font-family:Consolas,monospace' title='DERIVATIVE+TESTABLE — not pure numerology because stride is a well-defined architectural axis and the {2,3,2,3} configuration is concretely testable, but the φ-rationale is decorative; the experiment will likely show &quot;any non-uniform stride works as well as Fib.&quot;'>sci-critic: DERIVATIVE+TESTABLE</span></a></div><p><b style='color:#d29922'>One-line claim:</b> <i>A 4-stage backbone with alternating stride {2, 3, 2, 3} (Fib pair) yields a finer downsampling cascade than the standard {2, 2, 2, 2}, lifting CIFAR-100 top-1 by 0.3-0.8 pp.</i></p><h3>Motivation</h3><p>Standard CNNs downsample by stride 2 at each stage, halving the spatial resolution four times to produce a final feature map at 1/16 of the input resolution. This power-of-two cascade is computationally convenient but produces a coarse step from one stage to the next. Biological visual systems (the retinal -&gt; LGN -&gt; V1 -&gt; V2 -&gt; V4 cascade) use intermediate downsampling ratios closer to 2.5x at each step, achieving a finer scale-space coverage. The Fibonacci pair 2, 3 satisfies the recurrence 2 + 3 = 5 and produces alternating downsampling ratios that average phi (geometric mean of 2 and 3 is sqrt(6) = 2.449, close to phi**2 = 2.618). The hypothesis is that {2, 3, 2, 3} downsampling preserves more spatial information at intermediate scales than uniform {2, 2, 2, 2} and produces better features for medium-resolution classification tasks.</p><h3>Formal hypothesis</h3><p>Because Fibonacci-stride downsampling ({2, 3, 2, 3} produces resolution cascade 1, 1/2, 1/6, 1/12, 1/36 instead of 1, 1/2, 1/4, 1/8, 1/16), the mechanism by which it should improve CIFAR-100 top-1 is matching the retinal-cortical scale-space cascade more closely than power-of-two downsampling. Per LeCun et al 1998 LeNet (originally used non-uniform strides) we expect a 0.3-0.8 pp top-1 lift at iso-FLOPs.</p><h3>Mechanism (because…)</h3><p>For CIFAR-100 input (B, 3, 32, 32), 4-stage backbone with c0 = 32:</p><h3>Numeric falsifier</h3><p>If a {2, 3, 2, 3}-stride 4-stage backbone does NOT match or exceed the {2, 2, 2, 2}-stride baseline within +/- 0.3 pp top-1 on CIFAR-100 at 3-seed median, AND has no other compensating advantage (FLOPs, params, latency), the hypothesis is FALSIFIED.</p><h3>Predicted Δ</h3><p>| metric | Delta vs baseline | rationale | |---|---|---| | composite | [-0.005, +0.015] | accuracy vs FLOPs trade-off | | top-1 (CIFAR-100, CNN) | [+0.3, +0.8] pp | finer cascade | | perplexity (WikiText-103 LLM) | [+0.5, +1.0] | pooling-info-loss | | params | [-2, +2] pct | unchanged | | FLOPs | [+15, +30] pct | stride-3 dwell | | GPU latency (batch=1) | [+10, +25] pct | proportional | | rotation-equivariance err | [-0.005, +0.005] | not affected | | KV cache @ 32k (LLM, with pool) | [-50, -30] pct | hierarchical compression | | Betti collapse rate | [+0.02, +0.05] | finer cascade |</p><p style='margin-top:14px'><a href='https://github.com/dlmastery/nature_inspired_networks/blob/main/hypotheses/g2_layer_channel_neuron/H18_fib_stage_transition.md'>Full design doc on GitHub →</a> · <a href='../../hypotheses/g2_layer_channel_neuron/H18_fib_stage_transition.md'>local: hypotheses/g2_layer_channel_neuron/H18_fib_stage_transition.md</a></p></div>
+ :root{
+   --ink:#0a0a0d; --paper:#e6e1d6; --paper-dim:#a89e8c;
+   --rule:#1c1c20; --rule-bright:#2a2a30;
+   --panel:#111114; --panel2:#16161a;
+   --accent:#bb8c4d; --accent-dim:#7a5e36;
+   --v-pass:#3fb950; --v-minor:#d29922; --v-major:#f0883e; --v-broken:#f85149;
+   --v-novel:#a371f7; --v-derivative:#58a6ff; --v-numerology:#8b949e;
+   --v-falsified:#db6d28; --v-infra:#8b949e;
+ }
+ .grain{position:fixed;inset:0;pointer-events:none;z-index:2;opacity:0.035;
+   background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");}
+ @keyframes reveal{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+ section,.card,.kn-strip,.hero,.findings-row,details.deep{
+   animation:reveal 360ms cubic-bezier(.2,.7,.2,1) both;
+   animation-delay:calc(var(--i, 0) * 60ms);
+ }
+ html{scroll-behavior:smooth;}
 
-<div class='card'><h2>Verdict (FINDINGS.md)</h2><div class='quote'>`golden_adam` (51.96, above), `group_avg` (65.38), `golden_bottleneck` (69.25, but at **0.21× params** — efficiency outlier worth a second look), `phi_relu` (71.07), `fib_stride` (72.55), `phi_sparse` (73.33), `phi_init` (76.56). The φ-init and sparse-connectivity priors actively hurt at this scale.</div><p style='margin-top:10px'><a href='https://github.com/dlmastery/nature_inspired_networks/blob/main/FINDINGS.md'>Full FINDINGS.md →</a> · <a href='../../FINDINGS.md'>local: FINDINGS.md</a></p></div>
-<div class='card'><h2>Reasoning blob</h2><p class='empty'>No <code>reasoning.json</code> for this run directory.</p></div>
-<div class='card'><h2>Configuration (inferred from experiment_log.jsonl + metrics.json)</h2><pre>{
+ *{margin:0;padding:0;box-sizing:border-box;}
+ html,body{background:var(--ink);}
+ body{font-family:'IBM Plex Serif','Charter',Georgia,serif;color:var(--paper);
+      padding:32px 36px 80px;line-height:1.55;max-width:1180px;margin:0 auto;
+      font-size:16px;font-variant-numeric:tabular-nums;position:relative;}
+ a{color:var(--v-derivative);text-decoration:none;border-bottom:1px solid transparent;
+   transition:border-color 160ms ease;}
+ a:hover{border-bottom-color:var(--v-derivative);text-decoration:none;}
+ h1{font-family:'Newsreader',serif;font-weight:600;font-style:italic;
+    font-size:42px;line-height:1.05;color:var(--paper);letter-spacing:-0.01em;
+    margin-bottom:6px;}
+ h2{font-family:'Newsreader',serif;font-weight:600;font-style:italic;
+    font-size:22px;color:var(--paper);margin-bottom:14px;letter-spacing:-0.005em;}
+ h3{font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:11px;
+    text-transform:uppercase;letter-spacing:0.18em;color:var(--paper-dim);
+    margin:18px 0 8px 0;}
+ .mono{font-family:'IBM Plex Mono',monospace;font-size:0.85em;}
+ .head-grid{display:grid;grid-template-columns:1fr auto;gap:24px;
+            align-items:start;padding-bottom:18px;
+            border-bottom:1px solid var(--rule);margin-bottom:24px;}
+ .head-left .tag-display{font-family:'Newsreader',serif;font-style:italic;
+    font-size:54px;font-weight:600;line-height:1;color:var(--paper);
+    letter-spacing:-0.015em;word-break:break-word;}
+ .head-left .sub{font-family:'IBM Plex Mono',monospace;font-size:11px;
+    text-transform:uppercase;letter-spacing:0.18em;color:var(--paper-dim);
+    margin-top:10px;}
+ .head-right{display:flex;flex-direction:column;align-items:flex-end;gap:8px;
+             min-width:240px;}
+ .head-right .back{font-family:'IBM Plex Mono',monospace;font-size:11px;
+    text-transform:uppercase;letter-spacing:0.18em;color:var(--paper-dim);}
+ .pill{display:inline-block;background:transparent;border:1px solid var(--rule-bright);
+       border-radius:1px;padding:3px 10px;font-size:0.72em;color:var(--paper-dim);
+       font-family:'IBM Plex Mono',monospace;margin:0 4px 4px 0;
+       text-transform:uppercase;letter-spacing:0.12em;}
+ .pill.hyp{border-color:var(--v-derivative);color:var(--v-derivative);}
+ .pill.grp{border-color:var(--v-novel);color:var(--v-novel);}
+ .pill.ds{border-color:var(--accent-dim);color:var(--accent);}
+ .verdict-row{display:flex;flex-wrap:wrap;gap:4px;justify-content:flex-end;}
+ .card{background:var(--panel);border:1px solid var(--rule);
+       padding:24px 28px;margin-bottom:24px;position:relative;}
+ .card::before{content:"";position:absolute;top:0;left:0;width:48px;
+               height:1px;background:var(--accent);}
+ .card p{margin-bottom:12px;font-size:0.96em;line-height:1.6;}
+ .card ul{margin:6px 0 12px 22px;font-size:0.95em;line-height:1.6;}
+ .card ul li{margin-bottom:4px;}
+ details.deep{margin:14px 0;border-top:1px solid var(--rule);
+              padding-top:14px;}
+ details.deep > summary{cursor:pointer;list-style:none;
+    font-family:'IBM Plex Mono',monospace;font-size:11px;text-transform:uppercase;
+    letter-spacing:0.18em;color:var(--paper-dim);display:flex;align-items:center;
+    gap:10px;padding:6px 0;transition:color 160ms ease;}
+ details.deep > summary:hover{color:var(--accent);}
+ details.deep > summary::-webkit-details-marker{display:none;}
+ details.deep > summary::before{content:"▸";display:inline-block;
+    transition:transform 200ms ease;color:var(--accent);font-size:14px;}
+ details.deep[open] > summary::before{transform:rotate(90deg);}
+ details.deep > .body{padding:14px 0 6px 24px;font-size:0.95em;
+    border-left:1px solid var(--rule);margin-left:5px;margin-top:6px;
+    animation:reveal 280ms ease;}
+ table{width:100%;border-collapse:collapse;font-size:0.88em;
+       font-variant-numeric:tabular-nums;}
+ th{background:transparent;color:var(--paper-dim);text-align:left;
+    padding:8px 12px;border-bottom:1px solid var(--rule-bright);
+    font-size:10px;text-transform:uppercase;letter-spacing:0.18em;
+    font-family:'IBM Plex Mono',monospace;font-weight:500;}
+ td{padding:9px 12px;border-bottom:1px solid var(--rule);}
+ td.k{color:var(--paper-dim);width:42%;font-family:'IBM Plex Serif',serif;}
+ td.v{color:var(--paper);font-family:'IBM Plex Mono',monospace;}
+ .formula-chip{background:var(--ink);border:1px solid var(--rule);
+               padding:14px 16px;font-family:'IBM Plex Mono',monospace;
+               font-size:0.82em;margin-bottom:14px;color:var(--paper);
+               word-break:break-all;border-left:2px solid var(--accent);}
+ .breakdown td.term{font-family:'IBM Plex Mono',monospace;}
+ .pos{color:var(--v-pass);} .neg{color:var(--v-broken);} .mut{color:var(--paper-dim);}
+ .charts{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+ @media(max-width:980px){.charts{grid-template-columns:1fr;}
+   .head-grid{grid-template-columns:1fr;} .head-right{align-items:flex-start;}
+   .verdict-row{justify-content:flex-start;}}
+ .meta{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--paper-dim);
+       margin-top:28px;padding-top:18px;border-top:1px solid var(--rule);
+       line-height:1.9;letter-spacing:0.04em;}
+ .meta code{background:var(--ink);padding:1px 5px;color:var(--paper);
+            border:1px solid var(--rule);}
+ code{background:var(--ink);padding:1px 5px;font-size:0.92em;
+      font-family:'IBM Plex Mono',monospace;border:1px solid var(--rule);}
+ pre{background:var(--ink);border:1px solid var(--rule);
+     padding:14px 16px;overflow-x:auto;font-family:'IBM Plex Mono',monospace;
+     font-size:0.82em;color:var(--paper);white-space:pre-wrap;line-height:1.6;
+     border-left:2px solid var(--accent-dim);}
+ .reason-section{margin-bottom:16px;}
+ .reason-section .lbl{color:var(--accent);font-family:'IBM Plex Mono',monospace;
+                      font-size:10px;text-transform:uppercase;
+                      letter-spacing:0.18em;margin-bottom:6px;font-weight:600;}
+ .reason-section .body{font-size:0.95em;color:var(--paper);
+                       white-space:pre-wrap;line-height:1.6;}
+ .quote{border-left:2px solid var(--accent);padding:10px 18px;
+        background:var(--ink);font-size:0.95em;color:var(--paper);
+        margin:10px 0;font-style:italic;font-family:'Newsreader',serif;
+        font-weight:400;line-height:1.55;}
+ .verdict-label{color:var(--accent);font-weight:600;}
+ .empty{color:var(--paper-dim);font-style:italic;font-size:0.9em;}
+ .xrefs-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+             gap:10px;margin-top:6px;}
+ .xref-card{display:block;background:var(--ink);border:1px solid var(--rule);
+            padding:12px 14px;text-decoration:none;
+            transition:border-color 160ms ease,transform 160ms ease;}
+ .xref-card:hover{border-color:var(--accent);transform:translateY(-1px);
+                  text-decoration:none;}
+ .xref-card .xref-lbl{font-family:'IBM Plex Mono',monospace;font-size:9px;
+    text-transform:uppercase;letter-spacing:0.18em;color:var(--paper-dim);
+    margin-bottom:6px;}
+ .xref-card .xref-tag{font-family:'IBM Plex Mono',monospace;font-size:0.88em;
+    color:var(--paper);font-weight:500;}
+ .xref-card .xref-meta{font-family:'IBM Plex Mono',monospace;font-size:0.78em;
+    color:var(--paper-dim);margin-top:4px;}
+ /* Key numbers strip — the "tile bar" near top */
+ .kn-strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
+           gap:1px;background:var(--rule);border:1px solid var(--rule);
+           margin-bottom:24px;}
+ .kn-tile{background:var(--panel);padding:18px 18px 16px 18px;
+          position:relative;overflow:hidden;}
+ .kn-tile .kn-val{font-family:'Newsreader',serif;font-style:italic;
+                  font-size:30px;font-weight:600;line-height:1.05;
+                  color:var(--paper);letter-spacing:-0.01em;}
+ .kn-tile .kn-lbl{font-family:'IBM Plex Mono',monospace;font-size:9.5px;
+                  text-transform:uppercase;letter-spacing:0.18em;
+                  color:var(--paper-dim);margin-top:6px;}
+ .kn-tile.tint-pos{box-shadow:inset 3px 0 0 var(--v-pass);}
+ .kn-tile.tint-neg{box-shadow:inset 3px 0 0 var(--v-broken);}
+ .kn-tile.tint-neu{box-shadow:inset 3px 0 0 var(--accent-dim);}
+ /* Composite stacked bar */
+ .comp-stack{display:flex;height:34px;border:1px solid var(--rule);
+             margin:14px 0 8px 0;font-family:'IBM Plex Mono',monospace;
+             font-size:9.5px;}
+ .comp-stack .seg{display:flex;align-items:center;justify-content:center;
+                  color:var(--ink);font-weight:600;
+                  border-right:1px solid var(--ink);padding:0 6px;
+                  white-space:nowrap;overflow:hidden;}
+ .comp-stack .seg:last-child{border-right:none;}
+ .comp-stack .seg.pos{background:var(--v-pass);}
+ .comp-stack .seg.params{background:var(--accent);}
+ .comp-stack .seg.lat{background:var(--v-derivative);}
+ .vbadge:hover{transform:scale(1.05);filter:brightness(1.15);} </style></head><body>
+<div class='grain'></div>
+<div class='head-grid' style='--i:0'>
+  <div class='head-left'>
+    <div class='tag-display'>sg_only_fib_stride</div>
+    <div class='sub'><span class='pill hyp'>H18</span><span class='pill grp'>G2 — Layer / Channel / Neuron</span><span class='pill ds'>cifar10</span><span class='pill'>seed 0</span>&nbsp;·&nbsp; run dir <span class='mono' style='color:var(--paper)'>sg_only_fib_stride_seed0</span></div>
+  </div>
+  <div class='head-right'>
+    <a class='back' href='../dashboard.html'>← back to dashboard</a>
+    <div class='verdict-row'><span style='margin-right:4px;display:inline-block'><span class='vbadge' style='display:inline-block;padding:3px 10px;border:1px solid #58a6ff;color:#58a6ff;font-weight:600;font-size:10px;font-family:"IBM Plex Mono",monospace;text-transform:uppercase;letter-spacing:0.16em;transition:transform 160ms ease,filter 160ms ease;background:transparent' title='DERIVATIVE+TESTABLE — not pure numerology because stride is a well-defined architectural axis and the {2,3,2,3} configuration is concretely testable, but the φ-rationale is decorative; the experiment will likely show &quot;any non-uniform stride works as well as Fib.&quot;'><span style='opacity:0.65'>sci</span> &nbsp;DERIVATIVE+TESTABLE</span></span></div>
+  </div>
+</div>
+<div class='kn-strip' style='--i:1'><div class='kn-tile tint-neg'><div class='kn-val'>72.55%</div><div class='kn-lbl'>top-1</div></div><div class='kn-tile tint-neu'><div class='kn-val'>0.6872</div><div class='kn-lbl'>composite</div></div><div class='kn-tile tint-neg'><div class='kn-val'>−12.23pp</div><div class='kn-lbl'>Δ vs baseline</div></div><div class='kn-tile tint-neu'><div class='kn-val'>0.259M</div><div class='kn-lbl'>params</div></div><div class='kn-tile tint-neu'><div class='kn-val'>22.52ms</div><div class='kn-lbl'>latency b=1</div></div></div>
+<section class='card' style='--i:2'><h2>Hypothesis H18 — <i>H18 — Fib-Stage Transition (downsampling factors alternate Fib: stride 2, 3, 2, 3)</i></h2><div style='margin:2px 0 18px 0'><span style='margin-right:4px;display:inline-block'><span class='vbadge' style='display:inline-block;padding:3px 10px;border:1px solid #58a6ff;color:#58a6ff;font-weight:600;font-size:10px;font-family:"IBM Plex Mono",monospace;text-transform:uppercase;letter-spacing:0.16em;transition:transform 160ms ease,filter 160ms ease;background:transparent' title='DERIVATIVE+TESTABLE — not pure numerology because stride is a well-defined architectural axis and the {2,3,2,3} configuration is concretely testable, but the φ-rationale is decorative; the experiment will likely show &quot;any non-uniform stride works as well as Fib.&quot;'><span style='opacity:0.65'>sci</span> &nbsp;DERIVATIVE+TESTABLE</span></span></div><p style='font-family:Newsreader,serif;font-style:italic;font-size:1.08em;color:#e6e1d6;line-height:1.5;border-left:2px solid var(--accent);padding-left:14px;margin:6px 0 16px 0'>A 4-stage backbone with alternating stride {2, 3, 2, 3} (Fib pair) yields a finer downsampling cascade than the standard {2, 2, 2, 2}, lifting CIFAR-100 top-1 by 0.3-0.8 pp.</p><h3>Motivation</h3><p>Standard CNNs downsample by stride 2 at each stage, halving the spatial resolution four times to produce a final feature map at 1/16 of the input resolution. This power-of-two cascade is computationally convenient but produces a coarse step from one stage to the next. Biological visual systems (the retinal -&gt; LGN -&gt; V1 -&gt; V2 -&gt; V4 cascade) use intermediate downsampling ratios closer to 2.5x at each step, achieving a finer scale-space coverage. The Fibonacci pair 2, 3 satisfies the recurrence 2 + 3 = 5 and produces alternating downsampling ratios that average phi (geometric mean of 2 and 3 is sqrt(6) = 2.449, close to phi**2 = 2.618). The hypothesis is that {2, 3, 2, 3} downsampling preserves more spatial information at intermediate scales than uniform {2, 2, 2, 2} and produces better features for medium-resolution classification tasks.</p><h3>Formal hypothesis</h3><p style='font-family:Newsreader,serif;font-style:italic;color:#e6e1d6'>Because Fibonacci-stride downsampling ({2, 3, 2, 3} produces resolution cascade 1, 1/2, 1/6, 1/12, 1/36 instead of 1, 1/2, 1/4, 1/8, 1/16), the mechanism by which it should improve CIFAR-100 top-1 is matching the retinal-cortical scale-space cascade more closely than power-of-two downsampling. Per LeCun et al 1998 LeNet (originally used non-uniform strides) we expect a 0.3-0.8 pp top-1 lift at iso-FLOPs.</p><details class='deep'><summary>Read the full design-doc digest</summary><div class='body'><h3>Mechanism (because…)</h3><p>For CIFAR-100 input (B, 3, 32, 32), 4-stage backbone with c0 = 32:</p><h3>Numeric falsifier</h3><p>If a {2, 3, 2, 3}-stride 4-stage backbone does NOT match or exceed the {2, 2, 2, 2}-stride baseline within +/- 0.3 pp top-1 on CIFAR-100 at 3-seed median, AND has no other compensating advantage (FLOPs, params, latency), the hypothesis is FALSIFIED.</p><h3>Predicted Δ</h3><p>| metric | Delta vs baseline | rationale | |---|---|---| | composite | [-0.005, +0.015] | accuracy vs FLOPs trade-off | | top-1 (CIFAR-100, CNN) | [+0.3, +0.8] pp | finer cascade | | perplexity (WikiText-103 LLM) | [+0.5, +1.0] | pooling-info-loss | | params | [-2, +2] pct | unchanged | | FLOPs | [+15, +30] pct | stride-3 dwell | | GPU latency (batch=1) | [+10, +25] pct | proportional | | rotation-equivariance err | [-0.005, +0.005] | not affected | | KV cache @ 32k (LLM, with pool) | [-50, -30] pct | hierarchical compression | | Betti collapse rate | [+0.02, +0.05] | finer cascade |</p><p style='margin-top:14px'><a href='https://github.com/dlmastery/nature_inspired_networks/blob/main/hypotheses/g2_layer_channel_neuron/H18_fib_stage_transition.md'>↗ Full design doc on GitHub</a> &nbsp;·&nbsp; <a href='../../hypotheses/g2_layer_channel_neuron/H18_fib_stage_transition.md'>local: <span class='mono'>hypotheses/g2_layer_channel_neuron/H18_fib_stage_transition.md</span></a></p></div></details></section>
+<section class='card' style='--i:3'><h2>Verdict <span class='mono' style='font-size:0.55em;letter-spacing:0.18em;color:var(--paper-dim);font-style:normal'>FINDINGS.md</span></h2><div class='quote'>`golden_adam` (51.96, above), `group_avg` (65.38), `golden_bottleneck` (69.25, but at **0.21× params** — efficiency outlier worth a second look), `phi_relu` (71.07), `fib_stride` (72.55), `phi_sparse` (73.33), `phi_init` (76.56). The φ-init and sparse-connectivity priors actively hurt at this scale.</div><p style='margin-top:14px'><a href='https://github.com/dlmastery/nature_inspired_networks/blob/main/FINDINGS.md'>↗ Full FINDINGS.md</a> &nbsp;·&nbsp; <a href='../../FINDINGS.md'>local: <span class='mono'>FINDINGS.md</span></a></p></section>
+<section class='card' style='--i:4'><h2>Composite-score breakdown</h2><div class='comp-stack'><div class='seg pos' style='width:88.21%' title='top-1 = 0.72550'>top-1 +0.7255</div><div class='seg params' style='width:3.56%' title='-0.05·log10(params_M)'>params +0.02930</div><div class='seg lat' style='width:8.22%' title='-0.05·log10(latency_ms)'>lat −0.06763</div></div><div style='display:flex;justify-content:space-between;font-family:IBM Plex Mono,monospace;font-size:11px;color:var(--paper-dim);margin-top:6px'><span>Σ recomputed: <b style='color:var(--paper)'>0.68717</b></span><span>reported: <b style='color:var(--paper)'>0.68717</b> &nbsp;·&nbsp; Δ +0.000000</span></div><div class='formula-chip' style='margin-top:14px'>composite ≔ <code>top1 - 0.05*log10(params_M) - 0.05*log10(latency_ms)</code></div></section>
+<section class='card' style='--i:5'><h2>Per-epoch training curves</h2><div class='charts'><div><svg viewBox='0 0 460 320' preserveAspectRatio='xMinYMin meet' width='100%' height='auto' xmlns='http://www.w3.org/2000/svg' style='background:#0a0a0d;border:1px solid #1c1c20;display:block;font-family:"IBM Plex Mono",monospace'><text x='46' y='18' fill='#e6e1d6' font-size='14' font-family='Newsreader,serif' font-style='italic' font-weight='600'>Loss</text><line x1='46' y1='292.0' x2='446' y2='292.0' stroke='#1c1c20' stroke-width='1'/><text x='40' y='295.0' fill='#a89e8c' font-size='9' text-anchor='end'>1.039</text><line x1='46' y1='226.5' x2='446' y2='226.5' stroke='#1c1c20' stroke-width='1'/><text x='40' y='229.5' fill='#a89e8c' font-size='9' text-anchor='end'>1.248</text><line x1='46' y1='161.0' x2='446' y2='161.0' stroke='#1c1c20' stroke-width='1'/><text x='40' y='164.0' fill='#a89e8c' font-size='9' text-anchor='end'>1.456</text><line x1='46' y1='95.5' x2='446' y2='95.5' stroke='#1c1c20' stroke-width='1'/><text x='40' y='98.5' fill='#a89e8c' font-size='9' text-anchor='end'>1.664</text><line x1='46' y1='30.0' x2='446' y2='30.0' stroke='#1c1c20' stroke-width='1'/><text x='40' y='33.0' fill='#a89e8c' font-size='9' text-anchor='end'>1.872</text><text x='46.0' y='310' fill='#a89e8c' font-size='9' text-anchor='middle'>0</text><text x='446.0' y='310' fill='#a89e8c' font-size='9' text-anchor='middle'>11</text><text x='246.0' y='310' fill='#a89e8c' font-size='10' font-family='Newsreader,serif' font-style='italic' text-anchor='middle'>epoch →</text><text x='14' y='161.0' fill='#a89e8c' font-size='10' font-family='Newsreader,serif' font-style='italic' text-anchor='middle' transform='rotate(-90 14 161.0)'>loss →</text><polyline points='46.0,44.0 82.4,133.0 118.7,172.6 155.1,196.1 191.5,216.1 227.8,232.4 264.2,245.2 300.5,256.8 336.9,265.1 373.3,271.7 409.6,275.6 446.0,278.0' fill='none' stroke='#f85149' stroke-width='1.8'/><circle cx='446.0' cy='278.0' r='2.6' fill='#f85149'/><rect x='52' y='35' width='10' height='10' fill='#f85149'/><text x='68' y='44' fill='#e6e1d6' font-size='10' font-family='IBM Plex Mono,monospace'>train loss</text></svg></div><div><svg viewBox='0 0 460 320' preserveAspectRatio='xMinYMin meet' width='100%' height='auto' xmlns='http://www.w3.org/2000/svg' style='background:#0a0a0d;border:1px solid #1c1c20;display:block;font-family:"IBM Plex Mono",monospace'><text x='46' y='18' fill='#e6e1d6' font-size='14' font-family='Newsreader,serif' font-style='italic' font-weight='600'>Accuracy</text><line x1='46' y1='292.0' x2='446' y2='292.0' stroke='#1c1c20' stroke-width='1'/><text x='40' y='295.0' fill='#a89e8c' font-size='9' text-anchor='end'>33.0%</text><line x1='46' y1='226.5' x2='446' y2='226.5' stroke='#1c1c20' stroke-width='1'/><text x='40' y='229.5' fill='#a89e8c' font-size='9' text-anchor='end'>50.2%</text><line x1='46' y1='161.0' x2='446' y2='161.0' stroke='#1c1c20' stroke-width='1'/><text x='40' y='164.0' fill='#a89e8c' font-size='9' text-anchor='end'>67.4%</text><line x1='46' y1='95.5' x2='446' y2='95.5' stroke='#1c1c20' stroke-width='1'/><text x='40' y='98.5' fill='#a89e8c' font-size='9' text-anchor='end'>84.5%</text><line x1='46' y1='30.0' x2='446' y2='30.0' stroke='#1c1c20' stroke-width='1'/><text x='40' y='33.0' fill='#a89e8c' font-size='9' text-anchor='end'>101.7%</text><text x='46.0' y='310' fill='#a89e8c' font-size='9' text-anchor='middle'>0</text><text x='446.0' y='310' fill='#a89e8c' font-size='9' text-anchor='middle'>11</text><text x='246.0' y='310' fill='#a89e8c' font-size='10' font-family='Newsreader,serif' font-style='italic' text-anchor='middle'>epoch →</text><text x='14' y='161.0' fill='#a89e8c' font-size='10' font-family='Newsreader,serif' font-style='italic' text-anchor='middle' transform='rotate(-90 14 161.0)'>accuracy →</text><polyline points='46.0,278.0 82.4,222.8 118.7,198.9 155.1,185.3 191.5,173.1 227.8,162.9 264.2,155.1 300.5,148.2 336.9,143.9 373.3,139.6 409.6,137.8 446.0,135.8' fill='none' stroke='#d29922' stroke-width='1.8'/><circle cx='446.0' cy='135.8' r='2.6' fill='#d29922'/><rect x='52' y='35' width='10' height='10' fill='#d29922'/><text x='68' y='44' fill='#e6e1d6' font-size='10' font-family='IBM Plex Mono,monospace'>train top-1</text><polyline points='46.0,242.2 82.4,219.6 118.7,194.5 155.1,178.9 191.5,175.1 227.8,166.4 264.2,165.4 300.5,153.6 336.9,147.2 373.3,146.5 409.6,142.5 446.0,141.2' fill='none' stroke='#58a6ff' stroke-width='1.8'/><circle cx='446.0' cy='141.2' r='2.6' fill='#58a6ff'/><rect x='52' y='51' width='10' height='10' fill='#58a6ff'/><text x='68' y='60' fill='#e6e1d6' font-size='10' font-family='IBM Plex Mono,monospace'>test top-1</text><polyline points='46.0,63.2 82.4,59.5 118.7,55.3 155.1,49.0 191.5,48.8 227.8,47.8 264.2,46.0 300.5,45.3 336.9,44.2 373.3,44.2 409.6,44.1 446.0,44.0' fill='none' stroke='#3fb950' stroke-width='1.8'/><circle cx='446.0' cy='44.0' r='2.6' fill='#3fb950'/><rect x='52' y='67' width='10' height='10' fill='#3fb950'/><text x='68' y='76' fill='#e6e1d6' font-size='10' font-family='IBM Plex Mono,monospace'>test top-5</text></svg></div></div></section>
+<section class='card' style='--i:6'><h2>Deep inspection</h2><p style='color:var(--paper-dim);font-size:0.9em;margin-bottom:6px'>Audit excerpts, reasoning blob, raw configuration, and full metrics JSON — expand sections of interest.</p><details class='deep'><summary>Research-scientist critique (addendum)</summary><div class='body'><div style='margin-bottom:12px'><span style='margin-right:4px;display:inline-block'><span class='vbadge' style='display:inline-block;padding:3px 10px;border:1px solid #58a6ff;color:#58a6ff;font-weight:600;font-size:10px;font-family:"IBM Plex Mono",monospace;text-transform:uppercase;letter-spacing:0.16em;transition:transform 160ms ease,filter 160ms ease;background:transparent' title='DERIVATIVE+TESTABLE — not pure numerology because stride is a well-defined architectural axis and the {2,3,2,3} configuration is concretely testable, but the φ-rationale is decorative; the experiment will likely show &quot;any non-uniform stride works as well as Fib.&quot;'><span style='opacity:0.65'>sci-critic</span> &nbsp;DERIVATIVE+TESTABLE</span></span></div><pre style='border-left:2px solid var(--v-novel)'>*Reviewer: SciCritic-G2 (elite-research-scientist critic). Critiquing the IDEA, not the implementation (that audit lives at `audits/G2_audit.md`).*
+
+### Prior plausibility (LOW/MED/HIGH + why)
+LOW-MED. Stride-3 convolutions have been tried (Inception-v3 Szegedy et al 2016 CVPR &#39;Rethinking the Inception Architecture for Computer Vision&#39; arXiv:1512.00567 uses stride-3 grid reductions) and the empirical conclusion is that stride-2 is the sweet spot for most regimes because it preserves spatial information better than larger strides. The doc&#39;s CIFAR-100 setup (32x32 input) is particularly hostile to this hypothesis: after stride-2-3-2-3 the final spatial resolution is 1x1, meaning the last block does no spatial mixing — effectively just an FC layer at the end.
+
+### Mechanism scrutiny
+The &quot;retinal-cortical scale-space cascade at 2.5x per step&quot; claim is fabricated. RGC-to-V1 magnification follows a power law (Schwartz 1980 Biological Cybernetics — logarithmic conformal map), not a Fibonacci alternation. The retinal-LGN-V1-V2-V4 RF growth is closer to 2-3x per area with significant overlap (Felleman, Van Essen 1991 Cerebral Cortex). Translating &quot;retina-to-cortex magnification&quot; into &quot;stride pattern&quot; is a category error.
+
+### Confounds (≥ 2 alternatives)
+(1) Stride-3 stages have wider effective kernels (kernel_size=max(3,s) — see §5.1), so they&#39;re really doing &quot;kernel-3 stride-3&quot; vs &quot;kernel-3 stride-2&quot; — the kernel-vs-stride interaction is a confound. (2) FLOPs change by +20-30 % per doc; +20% FLOPs trivially helps a tiny CIFAR network. (3) The final 1x1 spatial map removes spatial inductive bias entirely from the last block.
+
+### Numerology check
+Yes — {2,3,2,3} and {2,5,2,5} (stride pair &quot;{2,5} where 2+3=5&quot;) and {3,2,3,2} (the doc&#39;s reverse-Fib control) and {2,4,2,4} (geometric not Fibonacci) should all give indistinguishable results. The doc&#39;s predicted +0.3-0.8 pp lift is small enough that any 4-stride sequence with average geometric mean ≈ 2.4 will land in the same band.
+
+### Literature precedent
+Szegedy et al 2016 CVPR &#39;Rethinking the Inception Architecture for Computer Vision&#39; (arXiv:1512.00567) — Inception-v3 uses stride-3 grid-reduction; established practice. Sandler, Howard, Zhu, Zhmoginov, Chen 2018 CVPR &#39;MobileNetV2&#39; (arXiv:1801.04381) — non-uniform stride pattern, no Fibonacci. Liu, Mao, Wu, Feichtenhofer, Darrell, Xie 2022 CVPR &#39;A ConvNet for the 2020s&#39; (arXiv:2201.03545) — modern ConvNeXt uses [4, 2, 2, 2, 2] patch-stem + stride-2 (powers of 2). Wu et al 2019 NeurIPS &#39;Wavelet Integrated CNNs for Noise-Robust Image Classification&#39; (arXiv:1907.10455) — anti-aliased strides matter more than the stride number itself.
+
+### Expected effect size (90% CI a priori)
+On CIFAR-100 at 50 epochs with +20-30 % FLOPs: Δtop-1 = [-0.3, +0.6] pp, with most of the upper tail attributable to the FLOPs increase. At iso-FLOPs (which the doc does NOT commit to) Δtop-1 = [-0.4, +0.2] pp. The &quot;finer cascade&quot; intuition is undercut by the loss of 14x14 → 1x1 resolution in the last stages.
+
+### Minimum-distinguishing experiment
+Iso-FLOPs control: tune channel widths so {2,3,2,3} stride pattern matches {2,2,2,2} FLOPs. Then compare {2,2,2,2}, {2,3,2,3} (Fib), {3,2,3,2} (reverse Fib), {2,4,2,4} (geometric non-Fib), {2,3,3,2} (Fib variant). If {2,3,2,3} does not dominate within the falsifier band, H18 is &quot;any non-uniform stride works.&quot; Then add Tiny-ImageNet (64x64) to test the proposed medium-resolution claim.
+
+### Verdict
+DERIVATIVE+TESTABLE — not pure numerology because stride is a well-defined architectural axis and the {2,3,2,3} configuration is concretely testable, but the φ-rationale is decorative; the experiment will likely show &quot;any non-uniform stride works as well as Fib.&quot;</pre></div></details><details class='deep'><summary>Reasoning blob (reasoning.json)</summary><div class='body'><p class='empty'>No <code>reasoning.json</code> for this run directory.</p></div></details><details class='deep'><summary>Configuration dump</summary><div class='body'><p class='mono' style='color:var(--paper-dim);font-size:0.8em;margin-bottom:8px'>inferred from experiment_log.jsonl + metrics.json</p><pre>{
   &quot;tag&quot;: &quot;sg_only_fib_stride&quot;,
   &quot;model&quot;: &quot;natureprior_fib_stride&quot;,
   &quot;dataset&quot;: &quot;cifar10&quot;,
@@ -69,10 +212,25 @@
   &quot;epochs&quot;: 12,
   &quot;seed&quot;: 0,
   &quot;composite_formula&quot;: &quot;composite = top1 - 0.05 * log10(params_M) - 0.05 * log10(latency_ms)&quot;
-}</pre></div>
-<div class='card'><h2>Metrics</h2><table><tbody><tr><td class='k'>Dataset</td><td class='v'>cifar10</td></tr><tr><td class='k'>Seed</td><td class='v'>0</td></tr><tr><td class='k'>Epochs</td><td class='v'>12</td></tr><tr><td class='k'>Top-1 accuracy</td><td class='v'>72.55%</td></tr><tr><td class='k'>Top-5 accuracy</td><td class='v'>98.00%</td></tr><tr><td class='k'>Train top-1</td><td class='v'>73.96%</td></tr><tr><td class='k'>Generalisation gap (train − test)</td><td class='v'>1.41%</td></tr><tr><td class='k'>Parameters</td><td class='v'>259,443 (0.259 M)</td></tr><tr><td class='k'>FLOPs</td><td class='v'>200.4 M MACs</td></tr><tr><td class='k'>Latency (batch=1)</td><td class='v'>22.517 ms</td></tr><tr><td class='k'>Rot-eq error</td><td class='v'>0.671615</td></tr><tr><td class='k'>Epochs-to-target</td><td class='v'>-1</td></tr><tr><td class='k'>Train wall-clock</td><td class='v'>514.2 s</td></tr><tr><td class='k'>Composite score</td><td class='v'>0.687173</td></tr><tr><td class='k'>Composite fingerprint (SHA-256)</td><td class='v'>d65565e9c7b12d14cbce30a801ecc6753aea3eb148074256bfcc051fa61d0893</td></tr></tbody></table></div>
-<div class='card'><h2>Composite-score breakdown</h2><div class='formula-chip'>composite ≔ <code>top1 - 0.05*log10(params_M) - 0.05*log10(latency_ms)</code></div><table class='breakdown'><thead><tr><th>Term</th><th>Expression</th><th style='text-align:right'>Contribution</th></tr></thead><tbody><tr><td class='term'>top-1</td><td class='term mut'>0.72550</td><td class='term pos' style='text-align:right'>+0.72550</td></tr><tr><td class='term'>params penalty</td><td class='term mut'>-0.05·log10(0.2594 M)</td><td class='term pos' style='text-align:right'>+0.02930</td></tr><tr><td class='term'>latency penalty</td><td class='term mut'>-0.05·log10(22.517 ms)</td><td class='term neg' style='text-align:right'>−0.06763</td></tr><tr style='border-top:2px solid #30363d'><td class='term' colspan='2'><b>Σ (recomputed)</b></td><td class='term' style='text-align:right'><b>0.68717</b></td></tr><tr><td class='term mut' colspan='2'>reported composite</td><td class='term mut' style='text-align:right'>0.68717</td></tr></tbody></table></div>
-<div class='card'><h2>Per-epoch training curves</h2><div class='charts'><div><svg width='460' height='240' viewBox='0 0 460 240' xmlns='http://www.w3.org/2000/svg' style='background:#0d1117;border:1px solid #30363d;border-radius:6px'><text x='46' y='16' fill='#c9d1d9' font-size='12' font-weight='600'>Loss</text><line x1='46' y1='212.0' x2='446' y2='212.0' stroke='#21262d' stroke-width='1'/><text x='40' y='215.0' fill='#8b949e' font-size='9' text-anchor='end'>1.039</text><line x1='46' y1='166.5' x2='446' y2='166.5' stroke='#21262d' stroke-width='1'/><text x='40' y='169.5' fill='#8b949e' font-size='9' text-anchor='end'>1.248</text><line x1='46' y1='121.0' x2='446' y2='121.0' stroke='#21262d' stroke-width='1'/><text x='40' y='124.0' fill='#8b949e' font-size='9' text-anchor='end'>1.456</text><line x1='46' y1='75.5' x2='446' y2='75.5' stroke='#21262d' stroke-width='1'/><text x='40' y='78.5' fill='#8b949e' font-size='9' text-anchor='end'>1.664</text><line x1='46' y1='30.0' x2='446' y2='30.0' stroke='#21262d' stroke-width='1'/><text x='40' y='33.0' fill='#8b949e' font-size='9' text-anchor='end'>1.872</text><text x='46.0' y='232' fill='#8b949e' font-size='9' text-anchor='middle'>0</text><text x='446.0' y='232' fill='#8b949e' font-size='9' text-anchor='middle'>11</text><text x='246.0' y='232' fill='#8b949e' font-size='9' text-anchor='middle'>epoch</text><text x='12' y='121.0' fill='#8b949e' font-size='9' text-anchor='middle' transform='rotate(-90 12 121.0)'>loss</text><polyline points='46.0,39.7 82.4,101.5 118.7,129.0 155.1,145.4 191.5,159.3 227.8,170.6 264.2,179.5 300.5,187.6 336.9,193.3 373.3,197.9 409.6,200.6 446.0,202.2' fill='none' stroke='#f85149' stroke-width='1.8'/><circle cx='446.0' cy='202.2' r='2.6' fill='#f85149'/><rect x='52' y='34' width='10' height='10' fill='#f85149' rx='2'/><text x='67' y='42' fill='#c9d1d9' font-size='10'>train loss</text></svg></div><div><svg width='460' height='240' viewBox='0 0 460 240' xmlns='http://www.w3.org/2000/svg' style='background:#0d1117;border:1px solid #30363d;border-radius:6px'><text x='46' y='16' fill='#c9d1d9' font-size='12' font-weight='600'>Accuracy</text><line x1='46' y1='212.0' x2='446' y2='212.0' stroke='#21262d' stroke-width='1'/><text x='40' y='215.0' fill='#8b949e' font-size='9' text-anchor='end'>33.0%</text><line x1='46' y1='166.5' x2='446' y2='166.5' stroke='#21262d' stroke-width='1'/><text x='40' y='169.5' fill='#8b949e' font-size='9' text-anchor='end'>50.2%</text><line x1='46' y1='121.0' x2='446' y2='121.0' stroke='#21262d' stroke-width='1'/><text x='40' y='124.0' fill='#8b949e' font-size='9' text-anchor='end'>67.4%</text><line x1='46' y1='75.5' x2='446' y2='75.5' stroke='#21262d' stroke-width='1'/><text x='40' y='78.5' fill='#8b949e' font-size='9' text-anchor='end'>84.5%</text><line x1='46' y1='30.0' x2='446' y2='30.0' stroke='#21262d' stroke-width='1'/><text x='40' y='33.0' fill='#8b949e' font-size='9' text-anchor='end'>101.7%</text><text x='46.0' y='232' fill='#8b949e' font-size='9' text-anchor='middle'>0</text><text x='446.0' y='232' fill='#8b949e' font-size='9' text-anchor='middle'>11</text><text x='246.0' y='232' fill='#8b949e' font-size='9' text-anchor='middle'>epoch</text><text x='12' y='121.0' fill='#8b949e' font-size='9' text-anchor='middle' transform='rotate(-90 12 121.0)'>accuracy</text><polyline points='46.0,202.3 82.4,164.0 118.7,147.3 155.1,137.9 191.5,129.4 227.8,122.3 264.2,116.9 300.5,112.1 336.9,109.1 373.3,106.1 409.6,104.9 446.0,103.5' fill='none' stroke='#d29922' stroke-width='1.8'/><circle cx='446.0' cy='103.5' r='2.6' fill='#d29922'/><rect x='52' y='34' width='10' height='10' fill='#d29922' rx='2'/><text x='67' y='42' fill='#c9d1d9' font-size='10'>train top-1</text><polyline points='46.0,177.4 82.4,161.7 118.7,144.2 155.1,133.4 191.5,130.8 227.8,124.7 264.2,124.0 300.5,115.9 336.9,111.4 373.3,111.0 409.6,108.1 446.0,107.2' fill='none' stroke='#58a6ff' stroke-width='1.8'/><circle cx='446.0' cy='107.2' r='2.6' fill='#58a6ff'/><rect x='52' y='48' width='10' height='10' fill='#58a6ff' rx='2'/><text x='67' y='56' fill='#c9d1d9' font-size='10'>test top-1</text><polyline points='46.0,53.1 82.4,50.5 118.7,47.5 155.1,43.2 191.5,43.1 227.8,42.4 264.2,41.1 300.5,40.6 336.9,39.9 373.3,39.9 409.6,39.8 446.0,39.8' fill='none' stroke='#3fb950' stroke-width='1.8'/><circle cx='446.0' cy='39.8' r='2.6' fill='#3fb950'/><rect x='52' y='62' width='10' height='10' fill='#3fb950' rx='2'/><text x='67' y='70' fill='#c9d1d9' font-size='10'>test top-5</text></svg></div></div></div>
-<div class='card'><h2>Cross-references</h2><h3>Nearest neighbours in this hypothesis group (by composite distance)</h3><ul class='xrefs'><li><a href='../experiments/cifar10__sg_only_phi_sparse_seed0.html'>sg_only_phi_sparse</a> <span class='mut'>(seed 0, top-1 73.33%, composite Δ +0.0081)</span></li><li><a href='../experiments/cifar10__sg_only_phi_relu_seed0.html'>sg_only_phi_relu</a> <span class='mut'>(seed 0, top-1 71.07%, composite Δ −0.0139)</span></li><li><a href='../experiments/cifar10__sg_only_golden_modulate_seed2.html'>sg_only_golden_modulate</a> <span class='mut'>(seed 2, top-1 77.92%, composite Δ +0.0699)</span></li></ul></div>
-<div class='meta'>composite formula SHA-256: <code>d65565e9c7b12d14cbce30a801ecc6753aea3eb148074256bfcc051fa61d0893</code> &nbsp;·&nbsp; epochs run: <b>12</b> &nbsp;·&nbsp; train wall-clock: <b>514.2 s</b> &nbsp;·&nbsp; generalisation gap (train − test top-1): <b>1.41 pp</b>&nbsp;·&nbsp; metrics.json git commit: <a href='https://github.com/dlmastery/nature_inspired_networks/commit/e105294' style='color:#58a6ff'><code>e105294</code></a><br>run directory: <code>sg_only_fib_stride_seed0</code><br>Generated by <code>nature_inspired_networks.dashboard.render_experiment_page</code> · self-contained inline SVG; no external assets.</div>
+}</pre></div></details><details class='deep'><summary>Full metrics JSON</summary><div class='body'><pre>{
+  &quot;tag&quot;: &quot;sg_only_fib_stride&quot;,
+  &quot;dataset&quot;: &quot;cifar10&quot;,
+  &quot;seed&quot;: 0,
+  &quot;epochs&quot;: 12,
+  &quot;top1&quot;: 0.7255,
+  &quot;top5&quot;: 0.98,
+  &quot;params&quot;: 259443,
+  &quot;flops&quot;: 200431728.0,
+  &quot;latency_ms&quot;: 22.516780000005383,
+  &quot;rot_eq_err&quot;: 0.6716147375603517,
+  &quot;composite&quot;: 0.6871725878943181,
+  &quot;composite_fingerprint&quot;: &quot;d65565e9c7b12d14cbce30a801ecc6753aea3eb148074256bfcc051fa61d0893&quot;,
+  &quot;epochs_to_target&quot;: -1,
+  &quot;train_seconds&quot;: 514.1618564,
+  &quot;train_top1&quot;: 0.7396434294871795,
+  &quot;generalization_gap&quot;: 0.014143429487179504
+}</pre></div></details></section>
+<section class='card' style='--i:7'><h2>Metrics — quick reference</h2><table><tbody><tr><td class='k'>Dataset</td><td class='v'>cifar10</td></tr><tr><td class='k'>Seed</td><td class='v'>0</td></tr><tr><td class='k'>Epochs</td><td class='v'>12</td></tr><tr><td class='k'>Top-1 accuracy</td><td class='v'>72.55%</td></tr><tr><td class='k'>Top-5 accuracy</td><td class='v'>98.00%</td></tr><tr><td class='k'>Train top-1</td><td class='v'>73.96%</td></tr><tr><td class='k'>Generalisation gap (train − test)</td><td class='v'>1.41%</td></tr><tr><td class='k'>Parameters</td><td class='v'>259,443 (0.259 M)</td></tr><tr><td class='k'>FLOPs</td><td class='v'>200.4 M MACs</td></tr><tr><td class='k'>Latency (batch=1)</td><td class='v'>22.517 ms</td></tr><tr><td class='k'>Rot-eq error</td><td class='v'>0.671615</td></tr><tr><td class='k'>Epochs-to-target</td><td class='v'>-1</td></tr><tr><td class='k'>Train wall-clock</td><td class='v'>514.2 s</td></tr><tr><td class='k'>Composite score</td><td class='v'>0.687173</td></tr><tr><td class='k'>Composite fingerprint (SHA-256)</td><td class='v'>d65565e9c7b12d14cbce30a801ecc6753aea3eb148074256bfcc051fa61d0893</td></tr></tbody></table></section>
+<section class='card' style='--i:8'><h2>Cross-references</h2><div class='xrefs-grid'><a class='xref-card' href='../experiments/cifar10__sg_only_phi_sparse_seed0.html'><div class='xref-lbl'>↪ nearest in G2</div><div class='xref-tag'>sg_only_phi_sparse</div><div class='xref-meta'>73.33% · Δ-comp +0.0081</div></a><a class='xref-card' href='../experiments/cifar10__sg_only_phi_relu_seed0.html'><div class='xref-lbl'>↪ nearest in G2</div><div class='xref-tag'>sg_only_phi_relu</div><div class='xref-meta'>71.07% · Δ-comp −0.0139</div></a><a class='xref-card' href='../experiments/cifar10__sg_only_golden_modulate_seed2.html'><div class='xref-lbl'>↪ nearest in G2</div><div class='xref-tag'>sg_only_golden_modulate</div><div class='xref-meta'>77.92% · Δ-comp +0.0699</div></a></div></section>
+<div class='meta'>composite formula SHA-256 &nbsp; <code>d65565e9c7b12d14cbce30a801ecc6753aea3eb148074256bfcc051fa61d0893</code><br>epochs run &nbsp; <code>12</code> &nbsp;·&nbsp; train wall-clock &nbsp; <code>514.2 s</code> &nbsp;·&nbsp; gen-gap (train − test) &nbsp; <code>1.41 pp</code>&nbsp;·&nbsp; metrics.json git commit: <a href='https://github.com/dlmastery/nature_inspired_networks/commit/e105294' style='color:#58a6ff'><code>e105294</code></a><br>run directory &nbsp; <code>sg_only_fib_stride_seed0</code><br>Generated by <code>nature_inspired_networks.dashboard.render_experiment_page</code> &middot; self-contained inline SVG, no external assets &middot; brutalist editorial lab notebook v3</div>
 </body></html>

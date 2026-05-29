@@ -1,67 +1,252 @@
 <!doctype html>
 <html lang='en'><head><meta charset='utf-8'>
 <title>sg_only_fib_depth · seed 0 · cifar100 — experiment page</title>
+<link rel='preconnect' href='https://fonts.googleapis.com'><link rel='preconnect' href='https://fonts.gstatic.com' crossorigin><link href='https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;0,6..72,800;1,6..72,400;1,6..72,600&family=IBM+Plex+Serif:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap' rel='stylesheet'>
 <style>
+ :root{
+   --ink:#0a0a0d; --paper:#e6e1d6; --paper-dim:#a89e8c;
+   --rule:#1c1c20; --rule-bright:#2a2a30;
+   --panel:#111114; --panel2:#16161a;
+   --accent:#bb8c4d; --accent-dim:#7a5e36;
+   --v-pass:#3fb950; --v-minor:#d29922; --v-major:#f0883e; --v-broken:#f85149;
+   --v-novel:#a371f7; --v-derivative:#58a6ff; --v-numerology:#8b949e;
+   --v-falsified:#db6d28; --v-infra:#8b949e;
+ }
+ .grain{position:fixed;inset:0;pointer-events:none;z-index:2;opacity:0.035;
+   background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");}
+ @keyframes reveal{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+ section,.card,.kn-strip,.hero,.findings-row,details.deep{
+   animation:reveal 360ms cubic-bezier(.2,.7,.2,1) both;
+   animation-delay:calc(var(--i, 0) * 60ms);
+ }
+ html{scroll-behavior:smooth;}
+
  *{margin:0;padding:0;box-sizing:border-box;}
- body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:#0d1117;
-      color:#c9d1d9;padding:24px 28px;line-height:1.55;max-width:1180px;margin:0 auto;}
- a{color:#58a6ff;text-decoration:none;} a:hover{text-decoration:underline;}
- h1{color:#58a6ff;font-size:1.6em;margin-bottom:4px;}
- h2{color:#58a6ff;font-size:1.05em;margin-bottom:12px;font-weight:600;
-    letter-spacing:0.3px;}
- .sub{color:#8b949e;font-size:0.95em;margin-bottom:18px;}
- .pill{display:inline-block;background:#21262d;border:1px solid #30363d;
-       border-radius:10px;padding:2px 10px;font-size:0.78em;color:#c9d1d9;
-       font-family:Consolas,monospace;margin-right:6px;}
- .pill.hyp{background:#1f3a5f;border-color:#58a6ff;color:#cfe6ff;}
- .pill.grp{background:#2c1e3a;border-color:#a371f7;color:#dbc9f7;}
- .back{display:inline-block;margin-bottom:14px;font-size:0.9em;}
- .card{background:#161b22;border:1px solid #30363d;border-radius:8px;
-       padding:18px 22px;margin-bottom:18px;}
- .card h2{color:#58a6ff;font-size:1.05em;margin-bottom:12px;font-weight:600;}
- .card h3{color:#c9d1d9;font-size:0.92em;margin:14px 0 6px 0;font-weight:600;
-          text-transform:uppercase;letter-spacing:0.5px;}
- .card p{margin-bottom:10px;font-size:0.92em;}
- .card ul{margin-left:22px;font-size:0.9em;}
- table{width:100%;border-collapse:collapse;font-size:0.86em;}
- th{background:#0d1117;color:#8b949e;text-align:left;padding:7px 10px;
-    border-bottom:2px solid #30363d;font-size:0.74em;text-transform:uppercase;
-    letter-spacing:0.4px;}
- td{padding:7px 10px;border-bottom:1px solid #21262d;}
- td.k{color:#8b949e;width:42%;}
- td.v{color:#c9d1d9;font-family:Consolas,monospace;}
- .formula-chip{background:#0d1117;border:1px solid #30363d;border-radius:6px;
-               padding:10px 12px;font-family:Consolas,monospace;font-size:0.82em;
-               margin-bottom:12px;color:#c9d1d9;word-break:break-all;}
- .breakdown td.term{font-family:Consolas,monospace;}
- .pos{color:#3fb950;} .neg{color:#f85149;} .mut{color:#8b949e;}
- .charts{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
- @media(max-width:980px){.charts{grid-template-columns:1fr;}}
- .meta{font-size:0.78em;color:#484f58;margin-top:18px;line-height:1.6;}
- code{background:#0d1117;padding:1px 5px;border-radius:3px;font-size:0.92em;
-      font-family:Consolas,monospace;}
- pre{background:#0d1117;border:1px solid #30363d;border-radius:6px;
-     padding:12px;overflow-x:auto;font-family:Consolas,monospace;
-     font-size:0.84em;color:#c9d1d9;white-space:pre-wrap;line-height:1.5;}
- .reason-section{margin-bottom:14px;}
- .reason-section .lbl{color:#3fb950;font-size:0.72em;text-transform:uppercase;
-                      letter-spacing:0.6px;margin-bottom:4px;font-weight:600;}
- .reason-section .body{font-size:0.9em;color:#c9d1d9;white-space:pre-wrap;}
- .quote{border-left:3px solid #d29922;padding:8px 14px;background:#0d1117;
-        border-radius:0 6px 6px 0;font-size:0.9em;color:#c9d1d9;
-        margin:8px 0;}
- .verdict-label{color:#d29922;font-weight:600;}
- .empty{color:#8b949e;font-style:italic;font-size:0.88em;}
- .xrefs li{margin:4px 0;font-size:0.9em;font-family:Consolas,monospace;}
-</style></head><body>
-<a class='back' href='../dashboard.html'>&larr; back to dashboard</a>
-<h1>sg_only_fib_depth</h1>
-<div class='sub'><span class='pill hyp'>H02</span><span class='pill grp'>G1 — Scaling &amp; Growth</span><span class='pill'>cifar100</span><span class='pill'>seed 0</span> &nbsp;·&nbsp; run directory <code>sg_only_fib_depth_seed0</code>&nbsp;·&nbsp; <a href='https://github.com/dlmastery/nature_inspired_networks/blob/main/hypotheses/g1_scaling_growth/H02_fibonacci_depth_progression.md' style='color:#58a6ff;font-weight:600'>&#128196; Hypothesis design doc &rarr;</a></div>
-<div class='card'><h2>Hypothesis H02 — H02 — Fibonacci Depth Progression (stage block counts 3-5-8-13-21)</h2><div style='margin:4px 0 14px 0'><a href='https://github.com/dlmastery/nature_inspired_networks/blob/main/hypotheses/g1_scaling_growth/H02_fibonacci_depth_progression.md' style='display:inline-block;background:#1f6feb;color:#fff;padding:6px 14px;border-radius:6px;font-weight:600;font-size:0.86em;border:1px solid #58a6ff;text-decoration:none;margin-right:8px'>&#128196; Hypothesis design doc &rarr;</a><a href='https://github.com/dlmastery/nature_inspired_networks/blob/main/hypotheses/g1_scaling_growth/H02_fibonacci_depth_progression.md' style='text-decoration:none;margin-right:6px'><span style='display:inline-block;padding:2px 10px;border-radius:10px;background:#0f1d33;border:1px solid #58a6ff;color:#58a6ff;font-weight:600;font-size:0.78em;font-family:Consolas,monospace' title='**DERIVATIVE+TESTABLE** — Re-labelling of the known &quot;deeper-stage-3/4 is good&quot; finding as a Fibonacci recurrence. The composite-formula manipulation in §7.1 is a Rule 2 violation that should be flagged separately to the audit agent.'>sci-critic: DERIVATIVE+TESTABLE</span></a></div><p><b style='color:#d29922'>One-line claim:</b> <i>Allocating per-stage block counts to consecutive Fibonacci numbers (3, 5, 8, 13, 21) converges 1.5x to 2x faster than uniform or linearly-spaced depth schedules at iso-parameter budget.</i></p><h3>Motivation</h3><p>The Fibonacci sequence F(n) = F(n-1) + F(n-2) emerges wherever an additive recurrence governs growth: rabbit population dynamics (the original Pisa monk problem, 1202), branching of trees and lung bronchioles, the spiral of mollusc shells, and crucially the segmental patterning of vertebrate somites. The biological precedent is striking: in early embryogenesis, somite pair counts follow Fibonacci-like progressions because each new segment inherits the resource budget of the two previous segments. ResNet-style backbones already place more blocks in deeper stages -- ResNet-50 uses 3-4-6-3 -- but the allocation is found by trial and error. We hypothesise that Fibonacci allocation is not an aesthetic accident but the unique discrete sequence that satisfies (a) monotone growth, (b) bounded ratio (F(n+1)/F(n) -&gt; phi), and (c) sum_{i=1}^{n} F(i) = F(n+2) - 1, which means total depth budget can be predicted in closed form. The information-theoretic optimum for layer allocation in a representation hierarchy follows the same Fibonacci recurrence because each stage&#39;s expressive capacity is the sum of what the previous two stages introduced.</p><h3>Formal hypothesis</h3><p>Because Fibonacci depth progression imposes a F(n) = F(n-1) + F(n-2) recurrence on per-stage block counts, the mechanism through which it should reduce time-to-target is that each new stage receives an expressive-capacity budget equal to the sum of the two prior stages (matching biological somite resource inheritance) per Larsson et al 2017. We expect epochs-to-72-pct-top-1 on CIFAR-100 to drop by 30-50 pct vs a uniform 8-8-8-8 schedule at iso-parameter budget, with no loss in final accuracy.</p><h3>Mechanism (because…)</h3><p>Stage configurations:</p><h3>Numeric falsifier</h3><p>If a Fibonacci-staged backbone (3-5-8-13 blocks, depth 29) reaches top-1 = 72 percent on CIFAR-100 at epoch_F, and a uniform 7-7-7-8 schedule (depth 29) reaches the same accuracy at epoch_U, with epoch_F &gt;= 0.85 * epoch_U at 3-seed median, the convergence-speedup claim is FALSIFIED and Status moves to `x disproved`.</p><h3>Predicted Δ</h3><p>| metric | Delta vs baseline | rationale | |---|---|---| | composite | [+0.000, +0.020] | accuracy preserved, params slightly higher | | top-1 (CIFAR-100, CNN) | [+0.2, +0.8] pp | better hierarchy after equal training time | | perplexity (WikiText-103 LLM) | [-0.3, +0.1] | tied tiers may help or hurt depending on data | | params | [+30, +80] pct vs uniform iso-depth | Fib widening dominates | | FLOPs | [+25, +60] pct | same reason | | GPU latency (batch=1) | [+15, +40] pct | more deep-stage blocks | | rotation-equivariance err | [-0.005, +0.005] | prior is depth-symmetric | | KV cache @ 32k (LLM) | [-50, -20] pct | weight tying compresses KV | | Betti collapse rate | [+0.05, +0.15] | hierarchy compresses faster |</p><p style='margin-top:14px'><a href='https://github.com/dlmastery/nature_inspired_networks/blob/main/hypotheses/g1_scaling_growth/H02_fibonacci_depth_progression.md'>Full design doc on GitHub →</a> · <a href='../../hypotheses/g1_scaling_growth/H02_fibonacci_depth_progression.md'>local: hypotheses/g1_scaling_growth/H02_fibonacci_depth_progression.md</a></p></div>
-<div class='card'><h2>Implementation-critic verdict (audits/G1_audit.md)</h2><div style='margin-bottom:10px'><a href='https://github.com/dlmastery/nature_inspired_networks/blob/main/audits/G1_audit.md#h02-g1' style='text-decoration:none;margin-right:6px'><span style='display:inline-block;padding:2px 10px;border-radius:10px;background:#2c220a;border:1px solid #d29922;color:#d29922;font-weight:600;font-size:0.78em;font-family:Consolas,monospace' title='`fibonacci_sequence(n)` returns the canonical `(1, 1)`-start sequence (scaling.py:84–92). `fibonacci_depths(n_stages=4, start_index=3)` correctly produces `[3, 5, 8, 13]` (the H02 spec schedule). `resolve_blocks_schedule` correctly dispatches uniform / fib / linear.'>impl-critic: MINOR</span></a></div><div class='quote'>`fibonacci_sequence(n)` returns the canonical `(1, 1)`-start sequence (scaling.py:84–92). `fibonacci_depths(n_stages=4, start_index=3)` correctly produces `[3, 5, 8, 13]` (the H02 spec schedule). `resolve_blocks_schedule` correctly dispatches uniform / fib / linear.</div><p style='margin-top:10px'><a href='https://github.com/dlmastery/nature_inspired_networks/blob/main/audits/G1_audit.md#h02-g1'>Full audit on GitHub &rarr;</a> &middot; <a href='../../audits/G1_audit.md'>local: audits/G1_audit.md</a></p></div>
-<div class='card'><h2>Verdict (FINDINGS.md)</h2><div class='quote'>`fib_depth` reaches the #3 composite slot at **0.66× the baseline parameter count** — the priors that touch *scaling* (depth schedule, channel schedule) are consistently the most parameter-efficient family, even when raw top-1 trails. Worth a CIFAR-100 look as the &quot;small-model&quot; graduate.</div><p style='margin-top:10px'><a href='https://github.com/dlmastery/nature_inspired_networks/blob/main/FINDINGS.md'>Full FINDINGS.md →</a> · <a href='../../FINDINGS.md'>local: FINDINGS.md</a></p></div>
-<div class='card'><h2>Reasoning blob</h2><p class='empty'>No <code>reasoning.json</code> for this run directory.</p></div>
-<div class='card'><h2>Configuration (inferred from experiment_log.jsonl + metrics.json)</h2><pre>{
+ html,body{background:var(--ink);}
+ body{font-family:'IBM Plex Serif','Charter',Georgia,serif;color:var(--paper);
+      padding:32px 36px 80px;line-height:1.55;max-width:1180px;margin:0 auto;
+      font-size:16px;font-variant-numeric:tabular-nums;position:relative;}
+ a{color:var(--v-derivative);text-decoration:none;border-bottom:1px solid transparent;
+   transition:border-color 160ms ease;}
+ a:hover{border-bottom-color:var(--v-derivative);text-decoration:none;}
+ h1{font-family:'Newsreader',serif;font-weight:600;font-style:italic;
+    font-size:42px;line-height:1.05;color:var(--paper);letter-spacing:-0.01em;
+    margin-bottom:6px;}
+ h2{font-family:'Newsreader',serif;font-weight:600;font-style:italic;
+    font-size:22px;color:var(--paper);margin-bottom:14px;letter-spacing:-0.005em;}
+ h3{font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:11px;
+    text-transform:uppercase;letter-spacing:0.18em;color:var(--paper-dim);
+    margin:18px 0 8px 0;}
+ .mono{font-family:'IBM Plex Mono',monospace;font-size:0.85em;}
+ .head-grid{display:grid;grid-template-columns:1fr auto;gap:24px;
+            align-items:start;padding-bottom:18px;
+            border-bottom:1px solid var(--rule);margin-bottom:24px;}
+ .head-left .tag-display{font-family:'Newsreader',serif;font-style:italic;
+    font-size:54px;font-weight:600;line-height:1;color:var(--paper);
+    letter-spacing:-0.015em;word-break:break-word;}
+ .head-left .sub{font-family:'IBM Plex Mono',monospace;font-size:11px;
+    text-transform:uppercase;letter-spacing:0.18em;color:var(--paper-dim);
+    margin-top:10px;}
+ .head-right{display:flex;flex-direction:column;align-items:flex-end;gap:8px;
+             min-width:240px;}
+ .head-right .back{font-family:'IBM Plex Mono',monospace;font-size:11px;
+    text-transform:uppercase;letter-spacing:0.18em;color:var(--paper-dim);}
+ .pill{display:inline-block;background:transparent;border:1px solid var(--rule-bright);
+       border-radius:1px;padding:3px 10px;font-size:0.72em;color:var(--paper-dim);
+       font-family:'IBM Plex Mono',monospace;margin:0 4px 4px 0;
+       text-transform:uppercase;letter-spacing:0.12em;}
+ .pill.hyp{border-color:var(--v-derivative);color:var(--v-derivative);}
+ .pill.grp{border-color:var(--v-novel);color:var(--v-novel);}
+ .pill.ds{border-color:var(--accent-dim);color:var(--accent);}
+ .verdict-row{display:flex;flex-wrap:wrap;gap:4px;justify-content:flex-end;}
+ .card{background:var(--panel);border:1px solid var(--rule);
+       padding:24px 28px;margin-bottom:24px;position:relative;}
+ .card::before{content:"";position:absolute;top:0;left:0;width:48px;
+               height:1px;background:var(--accent);}
+ .card p{margin-bottom:12px;font-size:0.96em;line-height:1.6;}
+ .card ul{margin:6px 0 12px 22px;font-size:0.95em;line-height:1.6;}
+ .card ul li{margin-bottom:4px;}
+ details.deep{margin:14px 0;border-top:1px solid var(--rule);
+              padding-top:14px;}
+ details.deep > summary{cursor:pointer;list-style:none;
+    font-family:'IBM Plex Mono',monospace;font-size:11px;text-transform:uppercase;
+    letter-spacing:0.18em;color:var(--paper-dim);display:flex;align-items:center;
+    gap:10px;padding:6px 0;transition:color 160ms ease;}
+ details.deep > summary:hover{color:var(--accent);}
+ details.deep > summary::-webkit-details-marker{display:none;}
+ details.deep > summary::before{content:"▸";display:inline-block;
+    transition:transform 200ms ease;color:var(--accent);font-size:14px;}
+ details.deep[open] > summary::before{transform:rotate(90deg);}
+ details.deep > .body{padding:14px 0 6px 24px;font-size:0.95em;
+    border-left:1px solid var(--rule);margin-left:5px;margin-top:6px;
+    animation:reveal 280ms ease;}
+ table{width:100%;border-collapse:collapse;font-size:0.88em;
+       font-variant-numeric:tabular-nums;}
+ th{background:transparent;color:var(--paper-dim);text-align:left;
+    padding:8px 12px;border-bottom:1px solid var(--rule-bright);
+    font-size:10px;text-transform:uppercase;letter-spacing:0.18em;
+    font-family:'IBM Plex Mono',monospace;font-weight:500;}
+ td{padding:9px 12px;border-bottom:1px solid var(--rule);}
+ td.k{color:var(--paper-dim);width:42%;font-family:'IBM Plex Serif',serif;}
+ td.v{color:var(--paper);font-family:'IBM Plex Mono',monospace;}
+ .formula-chip{background:var(--ink);border:1px solid var(--rule);
+               padding:14px 16px;font-family:'IBM Plex Mono',monospace;
+               font-size:0.82em;margin-bottom:14px;color:var(--paper);
+               word-break:break-all;border-left:2px solid var(--accent);}
+ .breakdown td.term{font-family:'IBM Plex Mono',monospace;}
+ .pos{color:var(--v-pass);} .neg{color:var(--v-broken);} .mut{color:var(--paper-dim);}
+ .charts{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+ @media(max-width:980px){.charts{grid-template-columns:1fr;}
+   .head-grid{grid-template-columns:1fr;} .head-right{align-items:flex-start;}
+   .verdict-row{justify-content:flex-start;}}
+ .meta{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--paper-dim);
+       margin-top:28px;padding-top:18px;border-top:1px solid var(--rule);
+       line-height:1.9;letter-spacing:0.04em;}
+ .meta code{background:var(--ink);padding:1px 5px;color:var(--paper);
+            border:1px solid var(--rule);}
+ code{background:var(--ink);padding:1px 5px;font-size:0.92em;
+      font-family:'IBM Plex Mono',monospace;border:1px solid var(--rule);}
+ pre{background:var(--ink);border:1px solid var(--rule);
+     padding:14px 16px;overflow-x:auto;font-family:'IBM Plex Mono',monospace;
+     font-size:0.82em;color:var(--paper);white-space:pre-wrap;line-height:1.6;
+     border-left:2px solid var(--accent-dim);}
+ .reason-section{margin-bottom:16px;}
+ .reason-section .lbl{color:var(--accent);font-family:'IBM Plex Mono',monospace;
+                      font-size:10px;text-transform:uppercase;
+                      letter-spacing:0.18em;margin-bottom:6px;font-weight:600;}
+ .reason-section .body{font-size:0.95em;color:var(--paper);
+                       white-space:pre-wrap;line-height:1.6;}
+ .quote{border-left:2px solid var(--accent);padding:10px 18px;
+        background:var(--ink);font-size:0.95em;color:var(--paper);
+        margin:10px 0;font-style:italic;font-family:'Newsreader',serif;
+        font-weight:400;line-height:1.55;}
+ .verdict-label{color:var(--accent);font-weight:600;}
+ .empty{color:var(--paper-dim);font-style:italic;font-size:0.9em;}
+ .xrefs-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+             gap:10px;margin-top:6px;}
+ .xref-card{display:block;background:var(--ink);border:1px solid var(--rule);
+            padding:12px 14px;text-decoration:none;
+            transition:border-color 160ms ease,transform 160ms ease;}
+ .xref-card:hover{border-color:var(--accent);transform:translateY(-1px);
+                  text-decoration:none;}
+ .xref-card .xref-lbl{font-family:'IBM Plex Mono',monospace;font-size:9px;
+    text-transform:uppercase;letter-spacing:0.18em;color:var(--paper-dim);
+    margin-bottom:6px;}
+ .xref-card .xref-tag{font-family:'IBM Plex Mono',monospace;font-size:0.88em;
+    color:var(--paper);font-weight:500;}
+ .xref-card .xref-meta{font-family:'IBM Plex Mono',monospace;font-size:0.78em;
+    color:var(--paper-dim);margin-top:4px;}
+ /* Key numbers strip — the "tile bar" near top */
+ .kn-strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
+           gap:1px;background:var(--rule);border:1px solid var(--rule);
+           margin-bottom:24px;}
+ .kn-tile{background:var(--panel);padding:18px 18px 16px 18px;
+          position:relative;overflow:hidden;}
+ .kn-tile .kn-val{font-family:'Newsreader',serif;font-style:italic;
+                  font-size:30px;font-weight:600;line-height:1.05;
+                  color:var(--paper);letter-spacing:-0.01em;}
+ .kn-tile .kn-lbl{font-family:'IBM Plex Mono',monospace;font-size:9.5px;
+                  text-transform:uppercase;letter-spacing:0.18em;
+                  color:var(--paper-dim);margin-top:6px;}
+ .kn-tile.tint-pos{box-shadow:inset 3px 0 0 var(--v-pass);}
+ .kn-tile.tint-neg{box-shadow:inset 3px 0 0 var(--v-broken);}
+ .kn-tile.tint-neu{box-shadow:inset 3px 0 0 var(--accent-dim);}
+ /* Composite stacked bar */
+ .comp-stack{display:flex;height:34px;border:1px solid var(--rule);
+             margin:14px 0 8px 0;font-family:'IBM Plex Mono',monospace;
+             font-size:9.5px;}
+ .comp-stack .seg{display:flex;align-items:center;justify-content:center;
+                  color:var(--ink);font-weight:600;
+                  border-right:1px solid var(--ink);padding:0 6px;
+                  white-space:nowrap;overflow:hidden;}
+ .comp-stack .seg:last-child{border-right:none;}
+ .comp-stack .seg.pos{background:var(--v-pass);}
+ .comp-stack .seg.params{background:var(--accent);}
+ .comp-stack .seg.lat{background:var(--v-derivative);}
+ .vbadge:hover{transform:scale(1.05);filter:brightness(1.15);} </style></head><body>
+<div class='grain'></div>
+<div class='head-grid' style='--i:0'>
+  <div class='head-left'>
+    <div class='tag-display'>sg_only_fib_depth</div>
+    <div class='sub'><span class='pill hyp'>H02</span><span class='pill grp'>G1 — Scaling &amp; Growth</span><span class='pill ds'>cifar100</span><span class='pill'>seed 0</span>&nbsp;·&nbsp; run dir <span class='mono' style='color:var(--paper)'>sg_only_fib_depth_seed0</span></div>
+  </div>
+  <div class='head-right'>
+    <a class='back' href='../dashboard.html'>← back to dashboard</a>
+    <div class='verdict-row'><a href='https://github.com/dlmastery/nature_inspired_networks/blob/main/audits/G1_audit.md#h02-g1' style='text-decoration:none;border-bottom:none;margin-right:4px;display:inline-block'><span class='vbadge' style='display:inline-block;padding:3px 10px;border:1px solid #d29922;color:#d29922;font-weight:600;font-size:10px;font-family:"IBM Plex Mono",monospace;text-transform:uppercase;letter-spacing:0.16em;transition:transform 160ms ease,filter 160ms ease;background:transparent' title='`fibonacci_sequence(n)` returns the canonical `(1, 1)`-start sequence (scaling.py:84–92). `fibonacci_depths(n_stages=4, start_index=3)` correctly produces `[3, 5, 8, 13]` (the H02 spec schedule). `resolve_blocks_schedule` correctly dispatches uniform / fib / linear.'><span style='opacity:0.65'>impl</span> &nbsp;MINOR</span></a><span style='margin-right:4px;display:inline-block'><span class='vbadge' style='display:inline-block;padding:3px 10px;border:1px solid #58a6ff;color:#58a6ff;font-weight:600;font-size:10px;font-family:"IBM Plex Mono",monospace;text-transform:uppercase;letter-spacing:0.16em;transition:transform 160ms ease,filter 160ms ease;background:transparent' title='**DERIVATIVE+TESTABLE** — Re-labelling of the known &quot;deeper-stage-3/4 is good&quot; finding as a Fibonacci recurrence. The composite-formula manipulation in §7.1 is a Rule 2 violation that should be flagged separately to the audit agent.'><span style='opacity:0.65'>sci</span> &nbsp;DERIVATIVE+TESTABLE</span></span></div>
+  </div>
+</div>
+<div class='kn-strip' style='--i:1'><div class='kn-tile tint-neg'><div class='kn-val'>51.78%</div><div class='kn-lbl'>top-1</div></div><div class='kn-tile tint-neu'><div class='kn-val'>0.5187</div><div class='kn-lbl'>composite</div></div><div class='kn-tile tint-neg'><div class='kn-val'>−4.74pp</div><div class='kn-lbl'>Δ vs baseline</div></div><div class='kn-tile tint-neu'><div class='kn-val'>0.184M</div><div class='kn-lbl'>params</div></div><div class='kn-tile tint-neu'><div class='kn-val'>5.22ms</div><div class='kn-lbl'>latency b=1</div></div></div>
+<section class='card' style='--i:2'><h2>Hypothesis H02 — <i>H02 — Fibonacci Depth Progression (stage block counts 3-5-8-13-21)</i></h2><div style='margin:2px 0 18px 0'><a href='https://github.com/dlmastery/nature_inspired_networks/blob/main/audits/G1_audit.md#h02-g1' style='text-decoration:none;border-bottom:none;margin-right:4px;display:inline-block'><span class='vbadge' style='display:inline-block;padding:3px 10px;border:1px solid #d29922;color:#d29922;font-weight:600;font-size:10px;font-family:"IBM Plex Mono",monospace;text-transform:uppercase;letter-spacing:0.16em;transition:transform 160ms ease,filter 160ms ease;background:transparent' title='`fibonacci_sequence(n)` returns the canonical `(1, 1)`-start sequence (scaling.py:84–92). `fibonacci_depths(n_stages=4, start_index=3)` correctly produces `[3, 5, 8, 13]` (the H02 spec schedule). `resolve_blocks_schedule` correctly dispatches uniform / fib / linear.'><span style='opacity:0.65'>impl</span> &nbsp;MINOR</span></a><span style='margin-right:4px;display:inline-block'><span class='vbadge' style='display:inline-block;padding:3px 10px;border:1px solid #58a6ff;color:#58a6ff;font-weight:600;font-size:10px;font-family:"IBM Plex Mono",monospace;text-transform:uppercase;letter-spacing:0.16em;transition:transform 160ms ease,filter 160ms ease;background:transparent' title='**DERIVATIVE+TESTABLE** — Re-labelling of the known &quot;deeper-stage-3/4 is good&quot; finding as a Fibonacci recurrence. The composite-formula manipulation in §7.1 is a Rule 2 violation that should be flagged separately to the audit agent.'><span style='opacity:0.65'>sci</span> &nbsp;DERIVATIVE+TESTABLE</span></span></div><p style='font-family:Newsreader,serif;font-style:italic;font-size:1.08em;color:#e6e1d6;line-height:1.5;border-left:2px solid var(--accent);padding-left:14px;margin:6px 0 16px 0'>Allocating per-stage block counts to consecutive Fibonacci numbers (3, 5, 8, 13, 21) converges 1.5x to 2x faster than uniform or linearly-spaced depth schedules at iso-parameter budget.</p><h3>Motivation</h3><p>The Fibonacci sequence F(n) = F(n-1) + F(n-2) emerges wherever an additive recurrence governs growth: rabbit population dynamics (the original Pisa monk problem, 1202), branching of trees and lung bronchioles, the spiral of mollusc shells, and crucially the segmental patterning of vertebrate somites. The biological precedent is striking: in early embryogenesis, somite pair counts follow Fibonacci-like progressions because each new segment inherits the resource budget of the two previous segments. ResNet-style backbones already place more blocks in deeper stages -- ResNet-50 uses 3-4-6-3 -- but the allocation is found by trial and error. We hypothesise that Fibonacci allocation is not an aesthetic accident but the unique discrete sequence that satisfies (a) monotone growth, (b) bounded ratio (F(n+1)/F(n) -&gt; phi), and (c) sum_{i=1}^{n} F(i) = F(n+2) - 1, which means total depth budget can be predicted in closed form. The information-theoretic optimum for layer allocation in a representation hierarchy follows the same Fibonacci recurrence because each stage&#39;s expressive capacity is the sum of what the previous two stages introduced.</p><h3>Formal hypothesis</h3><p style='font-family:Newsreader,serif;font-style:italic;color:#e6e1d6'>Because Fibonacci depth progression imposes a F(n) = F(n-1) + F(n-2) recurrence on per-stage block counts, the mechanism through which it should reduce time-to-target is that each new stage receives an expressive-capacity budget equal to the sum of the two prior stages (matching biological somite resource inheritance) per Larsson et al 2017. We expect epochs-to-72-pct-top-1 on CIFAR-100 to drop by 30-50 pct vs a uniform 8-8-8-8 schedule at iso-parameter budget, with no loss in final accuracy.</p><details class='deep'><summary>Read the full design-doc digest</summary><div class='body'><h3>Mechanism (because…)</h3><p>Stage configurations:</p><h3>Numeric falsifier</h3><p>If a Fibonacci-staged backbone (3-5-8-13 blocks, depth 29) reaches top-1 = 72 percent on CIFAR-100 at epoch_F, and a uniform 7-7-7-8 schedule (depth 29) reaches the same accuracy at epoch_U, with epoch_F &gt;= 0.85 * epoch_U at 3-seed median, the convergence-speedup claim is FALSIFIED and Status moves to `x disproved`.</p><h3>Predicted Δ</h3><p>| metric | Delta vs baseline | rationale | |---|---|---| | composite | [+0.000, +0.020] | accuracy preserved, params slightly higher | | top-1 (CIFAR-100, CNN) | [+0.2, +0.8] pp | better hierarchy after equal training time | | perplexity (WikiText-103 LLM) | [-0.3, +0.1] | tied tiers may help or hurt depending on data | | params | [+30, +80] pct vs uniform iso-depth | Fib widening dominates | | FLOPs | [+25, +60] pct | same reason | | GPU latency (batch=1) | [+15, +40] pct | more deep-stage blocks | | rotation-equivariance err | [-0.005, +0.005] | prior is depth-symmetric | | KV cache @ 32k (LLM) | [-50, -20] pct | weight tying compresses KV | | Betti collapse rate | [+0.05, +0.15] | hierarchy compresses faster |</p><p style='margin-top:14px'><a href='https://github.com/dlmastery/nature_inspired_networks/blob/main/hypotheses/g1_scaling_growth/H02_fibonacci_depth_progression.md'>↗ Full design doc on GitHub</a> &nbsp;·&nbsp; <a href='../../hypotheses/g1_scaling_growth/H02_fibonacci_depth_progression.md'>local: <span class='mono'>hypotheses/g1_scaling_growth/H02_fibonacci_depth_progression.md</span></a></p></div></details></section>
+<section class='card' style='--i:3'><h2>Verdict <span class='mono' style='font-size:0.55em;letter-spacing:0.18em;color:var(--paper-dim);font-style:normal'>FINDINGS.md</span></h2><div class='quote'>`fib_depth` reaches the #3 composite slot at **0.66× the baseline parameter count** — the priors that touch *scaling* (depth schedule, channel schedule) are consistently the most parameter-efficient family, even when raw top-1 trails. Worth a CIFAR-100 look as the &quot;small-model&quot; graduate.</div><p style='margin-top:14px'><a href='https://github.com/dlmastery/nature_inspired_networks/blob/main/FINDINGS.md'>↗ Full FINDINGS.md</a> &nbsp;·&nbsp; <a href='../../FINDINGS.md'>local: <span class='mono'>FINDINGS.md</span></a></p></section>
+<section class='card' style='--i:4'><h2>Composite-score breakdown</h2><div class='comp-stack'><div class='seg pos' style='width:87.70%' title='top-1 = 0.51780'>top-1 +0.5178</div><div class='seg params' style='width:6.22%' title='-0.05·log10(params_M)'>params +0.03675</div><div class='seg lat' style='width:6.07%' title='-0.05·log10(latency_ms)'>lat −0.03587</div></div><div style='display:flex;justify-content:space-between;font-family:IBM Plex Mono,monospace;font-size:11px;color:var(--paper-dim);margin-top:6px'><span>Σ recomputed: <b style='color:var(--paper)'>0.51868</b></span><span>reported: <b style='color:var(--paper)'>0.51868</b> &nbsp;·&nbsp; Δ +0.000000</span></div><div class='formula-chip' style='margin-top:14px'>composite ≔ <code>top1 - 0.05*log10(params_M) - 0.05*log10(latency_ms)</code></div></section>
+<section class='card' style='--i:5'><h2>Per-epoch training curves</h2><div class='charts'><div><svg viewBox='0 0 460 320' preserveAspectRatio='xMinYMin meet' width='100%' height='auto' xmlns='http://www.w3.org/2000/svg' style='background:#0a0a0d;border:1px solid #1c1c20;display:block;font-family:"IBM Plex Mono",monospace'><text x='46' y='18' fill='#e6e1d6' font-size='14' font-family='Newsreader,serif' font-style='italic' font-weight='600'>Loss</text><line x1='46' y1='292.0' x2='446' y2='292.0' stroke='#1c1c20' stroke-width='1'/><text x='40' y='295.0' fill='#a89e8c' font-size='9' text-anchor='end'>2.098</text><line x1='46' y1='226.5' x2='446' y2='226.5' stroke='#1c1c20' stroke-width='1'/><text x='40' y='229.5' fill='#a89e8c' font-size='9' text-anchor='end'>2.662</text><line x1='46' y1='161.0' x2='446' y2='161.0' stroke='#1c1c20' stroke-width='1'/><text x='40' y='164.0' fill='#a89e8c' font-size='9' text-anchor='end'>3.227</text><line x1='46' y1='95.5' x2='446' y2='95.5' stroke='#1c1c20' stroke-width='1'/><text x='40' y='98.5' fill='#a89e8c' font-size='9' text-anchor='end'>3.791</text><line x1='46' y1='30.0' x2='446' y2='30.0' stroke='#1c1c20' stroke-width='1'/><text x='40' y='33.0' fill='#a89e8c' font-size='9' text-anchor='end'>4.355</text><text x='46.0' y='310' fill='#a89e8c' font-size='9' text-anchor='middle'>0</text><text x='446.0' y='310' fill='#a89e8c' font-size='9' text-anchor='middle'>29</text><text x='246.0' y='310' fill='#a89e8c' font-size='10' font-family='Newsreader,serif' font-style='italic' text-anchor='middle'>epoch →</text><text x='14' y='161.0' fill='#a89e8c' font-size='10' font-family='Newsreader,serif' font-style='italic' text-anchor='middle' transform='rotate(-90 14 161.0)'>loss →</text><polyline points='46.0,44.0 59.8,97.1 73.6,126.1 87.4,151.3 101.2,169.6 115.0,184.4 128.8,195.7 142.6,204.9 156.3,214.8 170.1,221.3 183.9,228.8 197.7,234.6 211.5,239.5 225.3,244.6 239.1,249.1 252.9,252.5 266.7,256.5 280.5,259.1 294.3,262.9 308.1,265.1 321.9,267.4 335.7,269.8 349.4,271.5 363.2,273.5 377.0,274.4 390.8,275.6 404.6,276.6 418.4,277.7 432.2,277.8 446.0,278.0' fill='none' stroke='#f85149' stroke-width='1.8'/><circle cx='446.0' cy='278.0' r='2.6' fill='#f85149'/><rect x='52' y='35' width='10' height='10' fill='#f85149'/><text x='68' y='44' fill='#e6e1d6' font-size='10' font-family='IBM Plex Mono,monospace'>train loss</text></svg></div><div><svg viewBox='0 0 460 320' preserveAspectRatio='xMinYMin meet' width='100%' height='auto' xmlns='http://www.w3.org/2000/svg' style='background:#0a0a0d;border:1px solid #1c1c20;display:block;font-family:"IBM Plex Mono",monospace'><text x='46' y='18' fill='#e6e1d6' font-size='14' font-family='Newsreader,serif' font-style='italic' font-weight='600'>Accuracy</text><line x1='46' y1='292.0' x2='446' y2='292.0' stroke='#1c1c20' stroke-width='1'/><text x='40' y='295.0' fill='#a89e8c' font-size='9' text-anchor='end'>2.0%</text><line x1='46' y1='226.5' x2='446' y2='226.5' stroke='#1c1c20' stroke-width='1'/><text x='40' y='229.5' fill='#a89e8c' font-size='9' text-anchor='end'>23.0%</text><line x1='46' y1='161.0' x2='446' y2='161.0' stroke='#1c1c20' stroke-width='1'/><text x='40' y='164.0' fill='#a89e8c' font-size='9' text-anchor='end'>44.1%</text><line x1='46' y1='95.5' x2='446' y2='95.5' stroke='#1c1c20' stroke-width='1'/><text x='40' y='98.5' fill='#a89e8c' font-size='9' text-anchor='end'>65.1%</text><line x1='46' y1='30.0' x2='446' y2='30.0' stroke='#1c1c20' stroke-width='1'/><text x='40' y='33.0' fill='#a89e8c' font-size='9' text-anchor='end'>86.1%</text><text x='46.0' y='310' fill='#a89e8c' font-size='9' text-anchor='middle'>0</text><text x='446.0' y='310' fill='#a89e8c' font-size='9' text-anchor='middle'>29</text><text x='246.0' y='310' fill='#a89e8c' font-size='10' font-family='Newsreader,serif' font-style='italic' text-anchor='middle'>epoch →</text><text x='14' y='161.0' fill='#a89e8c' font-size='10' font-family='Newsreader,serif' font-style='italic' text-anchor='middle' transform='rotate(-90 14 161.0)'>accuracy →</text><polyline points='46.0,278.0 59.8,253.6 73.6,236.7 87.4,220.5 101.2,208.8 115.0,197.8 128.8,190.8 142.6,183.0 156.3,176.5 170.1,171.0 183.9,165.1 197.7,160.4 211.5,156.6 225.3,152.4 239.1,149.1 252.9,146.3 266.7,143.4 280.5,141.0 294.3,138.0 308.1,135.8 321.9,133.2 335.7,131.8 349.4,130.1 363.2,128.5 377.0,127.4 390.8,125.9 404.6,125.5 418.4,125.0 432.2,125.2 446.0,124.4' fill='none' stroke='#d29922' stroke-width='1.8'/><circle cx='446.0' cy='124.4' r='2.6' fill='#d29922'/><rect x='52' y='35' width='10' height='10' fill='#d29922'/><text x='68' y='44' fill='#e6e1d6' font-size='10' font-family='IBM Plex Mono,monospace'>train top-1</text><polyline points='46.0,266.9 59.8,250.7 73.6,230.5 87.4,220.5 101.2,207.9 115.0,206.4 128.8,197.9 142.6,189.9 156.3,183.3 170.1,173.7 183.9,168.5 197.7,169.8 211.5,167.3 225.3,157.3 239.1,161.2 252.9,157.5 266.7,149.4 280.5,151.3 294.3,148.4 308.1,145.8 321.9,145.5 335.7,141.7 349.4,140.9 363.2,139.7 377.0,138.8 390.8,137.5 404.6,138.1 418.4,137.9 432.2,137.4 446.0,136.9' fill='none' stroke='#58a6ff' stroke-width='1.8'/><circle cx='446.0' cy='136.9' r='2.6' fill='#58a6ff'/><rect x='52' y='51' width='10' height='10' fill='#58a6ff'/><text x='68' y='60' fill='#e6e1d6' font-size='10' font-family='IBM Plex Mono,monospace'>test top-1</text><polyline points='46.0,195.8 59.8,165.7 73.6,136.0 87.4,122.8 101.2,108.1 115.0,104.4 128.8,98.4 142.6,90.9 156.3,81.3 170.1,74.4 183.9,69.1 197.7,69.8 211.5,64.8 225.3,60.1 239.1,65.1 252.9,59.7 266.7,52.4 280.5,53.2 294.3,53.2 308.1,50.6 321.9,50.3 335.7,47.6 349.4,46.5 363.2,46.1 377.0,45.7 390.8,45.2 404.6,44.3 418.4,44.1 432.2,44.0 446.0,44.5' fill='none' stroke='#3fb950' stroke-width='1.8'/><circle cx='446.0' cy='44.5' r='2.6' fill='#3fb950'/><rect x='52' y='67' width='10' height='10' fill='#3fb950'/><text x='68' y='76' fill='#e6e1d6' font-size='10' font-family='IBM Plex Mono,monospace'>test top-5</text></svg></div></div></section>
+<section class='card' style='--i:6'><h2>Deep inspection</h2><p style='color:var(--paper-dim);font-size:0.9em;margin-bottom:6px'>Audit excerpts, reasoning blob, raw configuration, and full metrics JSON — expand sections of interest.</p><details class='deep'><summary>Research-scientist critique (addendum)</summary><div class='body'><div style='margin-bottom:12px'><span style='margin-right:4px;display:inline-block'><span class='vbadge' style='display:inline-block;padding:3px 10px;border:1px solid #58a6ff;color:#58a6ff;font-weight:600;font-size:10px;font-family:"IBM Plex Mono",monospace;text-transform:uppercase;letter-spacing:0.16em;transition:transform 160ms ease,filter 160ms ease;background:transparent' title='**DERIVATIVE+TESTABLE** — Re-labelling of the known &quot;deeper-stage-3/4 is good&quot; finding as a Fibonacci recurrence. The composite-formula manipulation in §7.1 is a Rule 2 violation that should be flagged separately to the audit agent.'><span style='opacity:0.65'>sci-critic</span> &nbsp;DERIVATIVE+TESTABLE</span></span></div><pre style='border-left:2px solid var(--v-novel)'>*Reviewer: SciCritic-G1 (elite-research-scientist critic). Critiquing the IDEA, not the implementation (that audit lives at `audits/G1_audit.md`).*
+
+### Prior plausibility (independent of nature-inspired framing)
+**LOW.** ResNet-50&#39;s 3-4-6-3 schedule was empirically optimised; ResNet-101 uses 3-4-23-3 and ResNet-152 uses 3-8-36-3 — none of these are Fibonacci, none are even monotone within stage. The &quot;3-5-8-13&quot; schedule increases total depth from 16 (ResNet-18) or 50 (ResNet-50) to a regime where stage-4 (13 blocks) is doing the bulk of representational work; this contradicts the empirical finding (He 2016, arXiv:1512.03385) that stage-3 of ResNet-50 (6 blocks) is *already* doing most of the representational work.
+
+### Mechanism scrutiny — does the claimed mechanism predict the effect?
+The &quot;because&quot; clause: *&quot;each new stage receives an expressive-capacity budget equal to the sum of the two prior stages (matching biological somite resource inheritance) per Larsson et al 2017.&quot;* This is wrong on two counts: (i) Larsson 2017 (FractalNet) uses **doubling**, not Fibonacci summation — the citation is being conscripted to support the opposite recurrence; (ii) &quot;expressive-capacity budget = block count&quot; is a category error — capacity in residual networks does not add linearly with depth (cf. Veit et al 2016, arXiv:1605.06431 *&quot;Residual Networks Behave Like Ensembles of Relatively Shallow Networks&quot;*).
+
+### Confounds — what else could explain a positive (or negative) result?
+1. **Param-count drift**: doc admits 0.95M vs ResNet-32&#39;s 0.46M (~2×); any positive result is confounded with raw capacity.
+2. **Stage-4 dominance**: putting 13 blocks at stage-4 with the smallest spatial resolution may simply mean the test set fits better — small spatial maps + many blocks ≈ over-parameterised classifier head.
+3. **Composite-formula gaming**: the doc introduces a new composite term `0.15 * (1 - epochs_to_72/50)` that is *bespoke to this hypothesis*, violating Rule 2 (composite formula is fingerprinted). This is a methodological red flag.
+
+### Numerology check — does φ specifically matter?
+The discrete Fibonacci sequence converges to φ only in the *ratio limit*. At the proposed indices [3,5,8,13] the ratios are 1.67, 1.60, 1.625 — none are φ to better than 3%. **Kill-or-confirm**: compare [3,5,8,13] vs [3,5,9,14] (slightly off-Fibonacci, ratios [1.67, 1.80, 1.56]) vs [4,5,8,13] vs [3,6,9,12] (linear). If [3,5,8,13] does not win by ≥0.5pp at 3-seed, Fibonacci-specificity is unsupported.
+
+### Literature: precedent or rediscovery?
+**Direct rediscovery, mislabelled**. This is functionally equivalent to *trying a deeper stage-4 ResNet variant*, which has been done many times (e.g., ResNet-101&#39;s 3-4-23-3, EfficientNet&#39;s progressive depth scaling). The &quot;Fibonacci&quot; framing adds no testable content beyond &quot;more blocks in stage-4 helps small datasets.&quot; Liu et al 2018 *Progressive Neural Architecture Search* (arXiv:1712.00559) explored this space exhaustively; Fibonacci is in their hypothesis space and was *not* discovered by NAS as optimal.
+
+### Expected effect size — skeptical a-priori re-prediction
+Doc claims 30-50% reduction in epochs-to-72%-top-1. My prior: Δ(epochs) ∈ [−10%, +20%] (90% CI), dominated by the param-count confound. The fairer comparison — iso-param Fibonacci vs iso-param uniform — will show |Δtop-1| &lt; 0.3pp.
+
+### Minimum-distinguishing experiment
+**Two configs, CIFAR-100, 50 epochs, 3 seeds at strictly iso-param (±2%) and iso-FLOPs (±5%)**: (i) [3,5,8,13] Fibonacci; (ii) uniform [7,7,7,8] with channel-widths *adjusted* to match params. If Δ(epochs-to-72%) &lt; 15%, the hypothesis is reduced to &quot;redistribute params to stage-4 (a known finding).&quot;
+
+### Verdict
+**DERIVATIVE+TESTABLE** — Re-labelling of the known &quot;deeper-stage-3/4 is good&quot; finding as a Fibonacci recurrence. The composite-formula manipulation in §7.1 is a Rule 2 violation that should be flagged separately to the audit agent.</pre></div></details><details class='deep'><summary>Implementation-critic audit (audits/G1_audit.md)</summary><div class='body'><div style='margin-bottom:12px'><a href='https://github.com/dlmastery/nature_inspired_networks/blob/main/audits/G1_audit.md#h02-g1' style='text-decoration:none;border-bottom:none;margin-right:4px;display:inline-block'><span class='vbadge' style='display:inline-block;padding:3px 10px;border:1px solid #d29922;color:#d29922;font-weight:600;font-size:10px;font-family:"IBM Plex Mono",monospace;text-transform:uppercase;letter-spacing:0.16em;transition:transform 160ms ease,filter 160ms ease;background:transparent' title='`fibonacci_sequence(n)` returns the canonical `(1, 1)`-start sequence (scaling.py:84–92). `fibonacci_depths(n_stages=4, start_index=3)` correctly produces `[3, 5, 8, 13]` (the H02 spec schedule). `resolve_blocks_schedule` correctly dispatches uniform / fib / linear.'><span style='opacity:0.65'>impl-critic</span> &nbsp;MINOR</span></a></div><div class='quote'>**Module:** `src/nature_inspired_networks/scaling.py`
+(`fibonacci_sequence`, `fibonacci_depths`, `resolve_blocks_schedule`)
+**Verdict:** MINOR
+
+**Mechanism check:** `fibonacci_sequence(n)` returns the canonical
+`(1, 1)`-start sequence (scaling.py:84–92). `fibonacci_depths(n_stages=4,
+start_index=3)` correctly produces `[3, 5, 8, 13]` (the H02 spec
+schedule). `resolve_blocks_schedule` correctly dispatches uniform /
+fib / linear.
+
+**Math correctness:** Verified. `fibonacci_sequence(8)` ==
+`[1, 1, 2, 3, 5, 8, 13, 21]` (test_scaling.py:99) and
+`fibonacci_depths(5, 2)` == `[2, 3, 5, 8, 13]`.
+
+**Test rigor:** Seven H02 tests cover the explicit Fibonacci values,
+both start-index variants, all three modes of
+`resolve_blocks_schedule`, the list-length-mismatch ValueError, the
+end-to-end NaturePriorNet wiring smoke, and the default-mode
+regression. Strong.
+
+**Citation alignment:** Larsson et al. 2017 arXiv:1605.07648 is the
+correct FractalNet reference (closest analogue). He et al. 2016 is
+the ResNet anchor. Correct.
+
+**Bugs / cargo-cult:** None at the primitive layer. **However**, the
+H02 falsifier (section 3) requires a **convergence-speed metric**
+(`epochs-to-72-pct-top-1`), and there is no place in the runner where
+that metric is emitted or scored. The composite formula
+in sec. 7.1 (&quot;0.15 * (1 - epochs_to_72/50)&quot;) is unimplemented. This
+means the **falsifier is not currently reachable** with the existing
+gates: a Fibonacci-depth run can only be scored on the static top-1,
+which H02 explicitly says is NOT the key novelty. **MINOR** because
+the primitive itself is correct; the harness gap demotes it.
+
+**Concrete fix:** Either (a) implement an `epochs_to_target` metric
+hook in the runner and a `convergence_composite` formula behind a new
+fingerprint, or (b) downgrade the H02 status journal to acknowledge
+that only the iso-accuracy/iso-params dimension is currently
+evaluable.
+
+---</div><p style='margin-top:12px'><a href='https://github.com/dlmastery/nature_inspired_networks/blob/main/audits/G1_audit.md#h02-g1'>↗ Full audit on GitHub</a> &nbsp;·&nbsp; <a href='../../audits/G1_audit.md'>local: <span class='mono'>audits/G1_audit.md</span></a></p></div></details><details class='deep'><summary>Reasoning blob (reasoning.json)</summary><div class='body'><p class='empty'>No <code>reasoning.json</code> for this run directory.</p></div></details><details class='deep'><summary>Configuration dump</summary><div class='body'><p class='mono' style='color:var(--paper-dim);font-size:0.8em;margin-bottom:8px'>inferred from experiment_log.jsonl + metrics.json</p><pre>{
   &quot;tag&quot;: &quot;sg_only_fib_depth&quot;,
   &quot;model&quot;: &quot;NaturePrior&quot;,
   &quot;dataset&quot;: &quot;cifar100&quot;,
@@ -77,10 +262,25 @@
     &quot;golden_modulate&quot;: false
   },
   &quot;composite_formula&quot;: &quot;composite = top1 - 0.05 * log10(params_M) - 0.05 * log10(latency_ms)&quot;
-}</pre></div>
-<div class='card'><h2>Metrics</h2><table><tbody><tr><td class='k'>Dataset</td><td class='v'>cifar100</td></tr><tr><td class='k'>Seed</td><td class='v'>0</td></tr><tr><td class='k'>Epochs</td><td class='v'>30</td></tr><tr><td class='k'>Top-1 accuracy</td><td class='v'>51.78%</td></tr><tr><td class='k'>Top-5 accuracy</td><td class='v'>81.44%</td></tr><tr><td class='k'>Train top-1</td><td class='v'>55.79%</td></tr><tr><td class='k'>Generalisation gap (train − test)</td><td class='v'>4.01%</td></tr><tr><td class='k'>Parameters</td><td class='v'>184,084 (0.184 M)</td></tr><tr><td class='k'>FLOPs</td><td class='v'>26.7 M MACs</td></tr><tr><td class='k'>Latency (batch=1)</td><td class='v'>5.216 ms</td></tr><tr><td class='k'>Rot-eq error</td><td class='v'>0.519275</td></tr><tr><td class='k'>Epochs-to-target</td><td class='v'>-1</td></tr><tr><td class='k'>Train wall-clock</td><td class='v'>944.6 s</td></tr><tr><td class='k'>Composite score</td><td class='v'>0.518682</td></tr><tr><td class='k'>Composite fingerprint (SHA-256)</td><td class='v'>d65565e9c7b12d14cbce30a801ecc6753aea3eb148074256bfcc051fa61d0893</td></tr></tbody></table></div>
-<div class='card'><h2>Composite-score breakdown</h2><div class='formula-chip'>composite ≔ <code>top1 - 0.05*log10(params_M) - 0.05*log10(latency_ms)</code></div><table class='breakdown'><thead><tr><th>Term</th><th>Expression</th><th style='text-align:right'>Contribution</th></tr></thead><tbody><tr><td class='term'>top-1</td><td class='term mut'>0.51780</td><td class='term pos' style='text-align:right'>+0.51780</td></tr><tr><td class='term'>params penalty</td><td class='term mut'>-0.05·log10(0.1841 M)</td><td class='term pos' style='text-align:right'>+0.03675</td></tr><tr><td class='term'>latency penalty</td><td class='term mut'>-0.05·log10(5.216 ms)</td><td class='term neg' style='text-align:right'>−0.03587</td></tr><tr style='border-top:2px solid #30363d'><td class='term' colspan='2'><b>Σ (recomputed)</b></td><td class='term' style='text-align:right'><b>0.51868</b></td></tr><tr><td class='term mut' colspan='2'>reported composite</td><td class='term mut' style='text-align:right'>0.51868</td></tr></tbody></table></div>
-<div class='card'><h2>Per-epoch training curves</h2><div class='charts'><div><svg width='460' height='240' viewBox='0 0 460 240' xmlns='http://www.w3.org/2000/svg' style='background:#0d1117;border:1px solid #30363d;border-radius:6px'><text x='46' y='16' fill='#c9d1d9' font-size='12' font-weight='600'>Loss</text><line x1='46' y1='212.0' x2='446' y2='212.0' stroke='#21262d' stroke-width='1'/><text x='40' y='215.0' fill='#8b949e' font-size='9' text-anchor='end'>2.098</text><line x1='46' y1='166.5' x2='446' y2='166.5' stroke='#21262d' stroke-width='1'/><text x='40' y='169.5' fill='#8b949e' font-size='9' text-anchor='end'>2.662</text><line x1='46' y1='121.0' x2='446' y2='121.0' stroke='#21262d' stroke-width='1'/><text x='40' y='124.0' fill='#8b949e' font-size='9' text-anchor='end'>3.227</text><line x1='46' y1='75.5' x2='446' y2='75.5' stroke='#21262d' stroke-width='1'/><text x='40' y='78.5' fill='#8b949e' font-size='9' text-anchor='end'>3.791</text><line x1='46' y1='30.0' x2='446' y2='30.0' stroke='#21262d' stroke-width='1'/><text x='40' y='33.0' fill='#8b949e' font-size='9' text-anchor='end'>4.355</text><text x='46.0' y='232' fill='#8b949e' font-size='9' text-anchor='middle'>0</text><text x='446.0' y='232' fill='#8b949e' font-size='9' text-anchor='middle'>29</text><text x='246.0' y='232' fill='#8b949e' font-size='9' text-anchor='middle'>epoch</text><text x='12' y='121.0' fill='#8b949e' font-size='9' text-anchor='middle' transform='rotate(-90 12 121.0)'>loss</text><polyline points='46.0,39.8 59.8,76.6 73.6,96.8 87.4,114.3 101.2,127.0 115.0,137.2 128.8,145.1 142.6,151.5 156.3,158.4 170.1,162.9 183.9,168.1 197.7,172.2 211.5,175.5 225.3,179.1 239.1,182.2 252.9,184.6 266.7,187.4 280.5,189.1 294.3,191.8 308.1,193.3 321.9,194.9 335.7,196.6 349.4,197.7 363.2,199.1 377.0,199.7 390.8,200.6 404.6,201.3 418.4,202.1 432.2,202.1 446.0,202.3' fill='none' stroke='#f85149' stroke-width='1.8'/><circle cx='446.0' cy='202.3' r='2.6' fill='#f85149'/><rect x='52' y='34' width='10' height='10' fill='#f85149' rx='2'/><text x='67' y='42' fill='#c9d1d9' font-size='10'>train loss</text></svg></div><div><svg width='460' height='240' viewBox='0 0 460 240' xmlns='http://www.w3.org/2000/svg' style='background:#0d1117;border:1px solid #30363d;border-radius:6px'><text x='46' y='16' fill='#c9d1d9' font-size='12' font-weight='600'>Accuracy</text><line x1='46' y1='212.0' x2='446' y2='212.0' stroke='#21262d' stroke-width='1'/><text x='40' y='215.0' fill='#8b949e' font-size='9' text-anchor='end'>2.0%</text><line x1='46' y1='166.5' x2='446' y2='166.5' stroke='#21262d' stroke-width='1'/><text x='40' y='169.5' fill='#8b949e' font-size='9' text-anchor='end'>23.0%</text><line x1='46' y1='121.0' x2='446' y2='121.0' stroke='#21262d' stroke-width='1'/><text x='40' y='124.0' fill='#8b949e' font-size='9' text-anchor='end'>44.1%</text><line x1='46' y1='75.5' x2='446' y2='75.5' stroke='#21262d' stroke-width='1'/><text x='40' y='78.5' fill='#8b949e' font-size='9' text-anchor='end'>65.1%</text><line x1='46' y1='30.0' x2='446' y2='30.0' stroke='#21262d' stroke-width='1'/><text x='40' y='33.0' fill='#8b949e' font-size='9' text-anchor='end'>86.1%</text><text x='46.0' y='232' fill='#8b949e' font-size='9' text-anchor='middle'>0</text><text x='446.0' y='232' fill='#8b949e' font-size='9' text-anchor='middle'>29</text><text x='246.0' y='232' fill='#8b949e' font-size='9' text-anchor='middle'>epoch</text><text x='12' y='121.0' fill='#8b949e' font-size='9' text-anchor='middle' transform='rotate(-90 12 121.0)'>accuracy</text><polyline points='46.0,202.2 59.8,185.3 73.6,173.6 87.4,162.3 101.2,154.2 115.0,146.6 128.8,141.7 142.6,136.3 156.3,131.8 170.1,127.9 183.9,123.9 197.7,120.6 211.5,117.9 225.3,115.0 239.1,112.8 252.9,110.8 266.7,108.8 280.5,107.1 294.3,105.0 308.1,103.5 321.9,101.7 335.7,100.7 349.4,99.5 363.2,98.4 377.0,97.7 390.8,96.7 404.6,96.4 418.4,96.0 432.2,96.2 446.0,95.6' fill='none' stroke='#d29922' stroke-width='1.8'/><circle cx='446.0' cy='95.6' r='2.6' fill='#d29922'/><rect x='52' y='34' width='10' height='10' fill='#d29922' rx='2'/><text x='67' y='42' fill='#c9d1d9' font-size='10'>train top-1</text><polyline points='46.0,194.6 59.8,183.3 73.6,169.3 87.4,162.4 101.2,153.6 115.0,152.5 128.8,146.7 142.6,141.1 156.3,136.5 170.1,129.8 183.9,126.2 197.7,127.1 211.5,125.4 225.3,118.5 239.1,121.1 252.9,118.6 266.7,113.0 280.5,114.2 294.3,112.3 308.1,110.4 321.9,110.2 335.7,107.6 349.4,107.0 363.2,106.2 377.0,105.6 390.8,104.7 404.6,105.1 418.4,104.9 432.2,104.6 446.0,104.3' fill='none' stroke='#58a6ff' stroke-width='1.8'/><circle cx='446.0' cy='104.3' r='2.6' fill='#58a6ff'/><rect x='52' y='48' width='10' height='10' fill='#58a6ff' rx='2'/><text x='67' y='56' fill='#c9d1d9' font-size='10'>test top-1</text><polyline points='46.0,145.2 59.8,124.3 73.6,103.7 87.4,94.5 101.2,84.2 115.0,81.7 128.8,77.5 142.6,72.3 156.3,65.6 170.1,60.8 183.9,57.2 197.7,57.7 211.5,54.2 225.3,50.9 239.1,54.4 252.9,50.6 266.7,45.5 280.5,46.1 294.3,46.1 308.1,44.3 321.9,44.1 335.7,42.2 349.4,41.4 363.2,41.2 377.0,40.9 390.8,40.5 404.6,39.9 418.4,39.8 432.2,39.8 446.0,40.1' fill='none' stroke='#3fb950' stroke-width='1.8'/><circle cx='446.0' cy='40.1' r='2.6' fill='#3fb950'/><rect x='52' y='62' width='10' height='10' fill='#3fb950' rx='2'/><text x='67' y='70' fill='#c9d1d9' font-size='10'>test top-5</text></svg></div></div></div>
-<div class='card'><h2>Cross-references</h2><h3>Same tag on other dataset(s)</h3><ul class='xrefs'><li><a href='../experiments/cifar10__sg_only_fib_depth_seed0.html'>sg_only_fib_depth_seed0</a> <span class='mut'>(<code>cifar10</code>)</span></li></ul><h3>Nearest neighbours in this hypothesis group (by composite distance)</h3><ul class='xrefs'><li><a href='../experiments/cifar100__sg_only_fractal_seed0.html'>sg_only_fractal</a> <span class='mut'>(seed 0, top-1 50.72%, composite Δ −0.0306)</span></li><li><a href='../experiments/cifar100__sg_only_phi_budget_seed2.html'>sg_only_phi_budget</a> <span class='mut'>(seed 2, top-1 57.00%, composite Δ +0.0462)</span></li><li><a href='../experiments/cifar100__sg_only_phi_budget_seed0.html'>sg_only_phi_budget</a> <span class='mut'>(seed 0, top-1 58.05%, composite Δ +0.0628)</span></li></ul></div>
-<div class='meta'>composite formula SHA-256: <code>d65565e9c7b12d14cbce30a801ecc6753aea3eb148074256bfcc051fa61d0893</code> &nbsp;·&nbsp; epochs run: <b>30</b> &nbsp;·&nbsp; train wall-clock: <b>944.6 s</b> &nbsp;·&nbsp; generalisation gap (train − test top-1): <b>4.01 pp</b>&nbsp;·&nbsp; metrics.json git commit: <a href='https://github.com/dlmastery/nature_inspired_networks/commit/9d1c8c1' style='color:#58a6ff'><code>9d1c8c1</code></a><br>run directory: <code>sg_only_fib_depth_seed0</code><br>Generated by <code>nature_inspired_networks.dashboard.render_experiment_page</code> · self-contained inline SVG; no external assets.</div>
+}</pre></div></details><details class='deep'><summary>Full metrics JSON</summary><div class='body'><pre>{
+  &quot;tag&quot;: &quot;sg_only_fib_depth&quot;,
+  &quot;dataset&quot;: &quot;cifar100&quot;,
+  &quot;seed&quot;: 0,
+  &quot;epochs&quot;: 30,
+  &quot;top1&quot;: 0.5178,
+  &quot;top5&quot;: 0.8144,
+  &quot;params&quot;: 184084,
+  &quot;flops&quot;: 26719648.0,
+  &quot;latency_ms&quot;: 5.216075999996974,
+  &quot;rot_eq_err&quot;: 0.5192746557295322,
+  &quot;composite&quot;: 0.5186820023386363,
+  &quot;composite_fingerprint&quot;: &quot;d65565e9c7b12d14cbce30a801ecc6753aea3eb148074256bfcc051fa61d0893&quot;,
+  &quot;epochs_to_target&quot;: -1,
+  &quot;train_seconds&quot;: 944.6033298999973,
+  &quot;train_top1&quot;: 0.5579326923076923,
+  &quot;generalization_gap&quot;: 0.04013269230769223
+}</pre></div></details></section>
+<section class='card' style='--i:7'><h2>Metrics — quick reference</h2><table><tbody><tr><td class='k'>Dataset</td><td class='v'>cifar100</td></tr><tr><td class='k'>Seed</td><td class='v'>0</td></tr><tr><td class='k'>Epochs</td><td class='v'>30</td></tr><tr><td class='k'>Top-1 accuracy</td><td class='v'>51.78%</td></tr><tr><td class='k'>Top-5 accuracy</td><td class='v'>81.44%</td></tr><tr><td class='k'>Train top-1</td><td class='v'>55.79%</td></tr><tr><td class='k'>Generalisation gap (train − test)</td><td class='v'>4.01%</td></tr><tr><td class='k'>Parameters</td><td class='v'>184,084 (0.184 M)</td></tr><tr><td class='k'>FLOPs</td><td class='v'>26.7 M MACs</td></tr><tr><td class='k'>Latency (batch=1)</td><td class='v'>5.216 ms</td></tr><tr><td class='k'>Rot-eq error</td><td class='v'>0.519275</td></tr><tr><td class='k'>Epochs-to-target</td><td class='v'>-1</td></tr><tr><td class='k'>Train wall-clock</td><td class='v'>944.6 s</td></tr><tr><td class='k'>Composite score</td><td class='v'>0.518682</td></tr><tr><td class='k'>Composite fingerprint (SHA-256)</td><td class='v'>d65565e9c7b12d14cbce30a801ecc6753aea3eb148074256bfcc051fa61d0893</td></tr></tbody></table></section>
+<section class='card' style='--i:8'><h2>Cross-references</h2><div class='xrefs-grid'><a class='xref-card' href='../experiments/cifar10__sg_only_fib_depth_seed0.html'><div class='xref-lbl'>↪ same tag, other dataset</div><div class='xref-tag'>sg_only_fib_depth</div><div class='xref-meta'>cifar10 · seed 0</div></a><a class='xref-card' href='../experiments/cifar100__sg_only_fractal_seed0.html'><div class='xref-lbl'>↪ nearest in G1</div><div class='xref-tag'>sg_only_fractal</div><div class='xref-meta'>50.72% · Δ-comp −0.0306</div></a><a class='xref-card' href='../experiments/cifar100__sg_only_phi_budget_seed2.html'><div class='xref-lbl'>↪ nearest in G1</div><div class='xref-tag'>sg_only_phi_budget</div><div class='xref-meta'>57.00% · Δ-comp +0.0462</div></a><a class='xref-card' href='../experiments/cifar100__sg_only_phi_budget_seed0.html'><div class='xref-lbl'>↪ nearest in G1</div><div class='xref-tag'>sg_only_phi_budget</div><div class='xref-meta'>58.05% · Δ-comp +0.0628</div></a></div></section>
+<div class='meta'>composite formula SHA-256 &nbsp; <code>d65565e9c7b12d14cbce30a801ecc6753aea3eb148074256bfcc051fa61d0893</code><br>epochs run &nbsp; <code>30</code> &nbsp;·&nbsp; train wall-clock &nbsp; <code>944.6 s</code> &nbsp;·&nbsp; gen-gap (train − test) &nbsp; <code>4.01 pp</code>&nbsp;·&nbsp; metrics.json git commit: <a href='https://github.com/dlmastery/nature_inspired_networks/commit/9d1c8c1' style='color:#58a6ff'><code>9d1c8c1</code></a><br>run directory &nbsp; <code>sg_only_fib_depth_seed0</code><br>Generated by <code>nature_inspired_networks.dashboard.render_experiment_page</code> &middot; self-contained inline SVG, no external assets &middot; brutalist editorial lab notebook v3</div>
 </body></html>

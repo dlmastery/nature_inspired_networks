@@ -1,67 +1,186 @@
 <!doctype html>
 <html lang='en'><head><meta charset='utf-8'>
 <title>baseline_resnet20 · seed 2 · cifar100 — experiment page</title>
+<link rel='preconnect' href='https://fonts.googleapis.com'><link rel='preconnect' href='https://fonts.gstatic.com' crossorigin><link href='https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;0,6..72,800;1,6..72,400;1,6..72,600&family=IBM+Plex+Serif:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap' rel='stylesheet'>
 <style>
- *{margin:0;padding:0;box-sizing:border-box;}
- body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:#0d1117;
-      color:#c9d1d9;padding:24px 28px;line-height:1.55;max-width:1180px;margin:0 auto;}
- a{color:#58a6ff;text-decoration:none;} a:hover{text-decoration:underline;}
- h1{color:#58a6ff;font-size:1.6em;margin-bottom:4px;}
- h2{color:#58a6ff;font-size:1.05em;margin-bottom:12px;font-weight:600;
-    letter-spacing:0.3px;}
- .sub{color:#8b949e;font-size:0.95em;margin-bottom:18px;}
- .pill{display:inline-block;background:#21262d;border:1px solid #30363d;
-       border-radius:10px;padding:2px 10px;font-size:0.78em;color:#c9d1d9;
-       font-family:Consolas,monospace;margin-right:6px;}
- .pill.hyp{background:#1f3a5f;border-color:#58a6ff;color:#cfe6ff;}
- .pill.grp{background:#2c1e3a;border-color:#a371f7;color:#dbc9f7;}
- .back{display:inline-block;margin-bottom:14px;font-size:0.9em;}
- .card{background:#161b22;border:1px solid #30363d;border-radius:8px;
-       padding:18px 22px;margin-bottom:18px;}
- .card h2{color:#58a6ff;font-size:1.05em;margin-bottom:12px;font-weight:600;}
- .card h3{color:#c9d1d9;font-size:0.92em;margin:14px 0 6px 0;font-weight:600;
-          text-transform:uppercase;letter-spacing:0.5px;}
- .card p{margin-bottom:10px;font-size:0.92em;}
- .card ul{margin-left:22px;font-size:0.9em;}
- table{width:100%;border-collapse:collapse;font-size:0.86em;}
- th{background:#0d1117;color:#8b949e;text-align:left;padding:7px 10px;
-    border-bottom:2px solid #30363d;font-size:0.74em;text-transform:uppercase;
-    letter-spacing:0.4px;}
- td{padding:7px 10px;border-bottom:1px solid #21262d;}
- td.k{color:#8b949e;width:42%;}
- td.v{color:#c9d1d9;font-family:Consolas,monospace;}
- .formula-chip{background:#0d1117;border:1px solid #30363d;border-radius:6px;
-               padding:10px 12px;font-family:Consolas,monospace;font-size:0.82em;
-               margin-bottom:12px;color:#c9d1d9;word-break:break-all;}
- .breakdown td.term{font-family:Consolas,monospace;}
- .pos{color:#3fb950;} .neg{color:#f85149;} .mut{color:#8b949e;}
- .charts{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
- @media(max-width:980px){.charts{grid-template-columns:1fr;}}
- .meta{font-size:0.78em;color:#484f58;margin-top:18px;line-height:1.6;}
- code{background:#0d1117;padding:1px 5px;border-radius:3px;font-size:0.92em;
-      font-family:Consolas,monospace;}
- pre{background:#0d1117;border:1px solid #30363d;border-radius:6px;
-     padding:12px;overflow-x:auto;font-family:Consolas,monospace;
-     font-size:0.84em;color:#c9d1d9;white-space:pre-wrap;line-height:1.5;}
- .reason-section{margin-bottom:14px;}
- .reason-section .lbl{color:#3fb950;font-size:0.72em;text-transform:uppercase;
-                      letter-spacing:0.6px;margin-bottom:4px;font-weight:600;}
- .reason-section .body{font-size:0.9em;color:#c9d1d9;white-space:pre-wrap;}
- .quote{border-left:3px solid #d29922;padding:8px 14px;background:#0d1117;
-        border-radius:0 6px 6px 0;font-size:0.9em;color:#c9d1d9;
-        margin:8px 0;}
- .verdict-label{color:#d29922;font-weight:600;}
- .empty{color:#8b949e;font-style:italic;font-size:0.88em;}
- .xrefs li{margin:4px 0;font-size:0.9em;font-family:Consolas,monospace;}
-</style></head><body>
-<a class='back' href='../dashboard.html'>&larr; back to dashboard</a>
-<h1>baseline_resnet20</h1>
-<div class='sub'><span class='pill'>baseline</span><span class='pill grp'>Baselines</span><span class='pill'>cifar100</span><span class='pill'>seed 2</span> &nbsp;·&nbsp; run directory <code>baseline_resnet20_seed2</code></div>
-<div class='card'><h2>Hypothesis</h2><p class='empty'>No matching hypothesis document — this row is a baseline reference.</p></div>
+ :root{
+   --ink:#0a0a0d; --paper:#e6e1d6; --paper-dim:#a89e8c;
+   --rule:#1c1c20; --rule-bright:#2a2a30;
+   --panel:#111114; --panel2:#16161a;
+   --accent:#bb8c4d; --accent-dim:#7a5e36;
+   --v-pass:#3fb950; --v-minor:#d29922; --v-major:#f0883e; --v-broken:#f85149;
+   --v-novel:#a371f7; --v-derivative:#58a6ff; --v-numerology:#8b949e;
+   --v-falsified:#db6d28; --v-infra:#8b949e;
+ }
+ .grain{position:fixed;inset:0;pointer-events:none;z-index:2;opacity:0.035;
+   background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");}
+ @keyframes reveal{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+ section,.card,.kn-strip,.hero,.findings-row,details.deep{
+   animation:reveal 360ms cubic-bezier(.2,.7,.2,1) both;
+   animation-delay:calc(var(--i, 0) * 60ms);
+ }
+ html{scroll-behavior:smooth;}
 
-<div class='card'><h2>Verdict (FINDINGS.md)</h2><div class='quote'>1. **H09 `phi_budget`** — only top-1 winner; clear #1. 2. **H02 `fib_depth`** — best param-efficiency (comp 0.8261 @ 180 k). 3. **H05 `fractal`** — the original campaign&#39;s only positive single prior. 4. **H48 `golden_momentum`** — closest neutral to baseline (83.52). 5. `baseline_resnet20` rail (always carried).</div><p style='margin-top:10px'><a href='https://github.com/dlmastery/nature_inspired_networks/blob/main/FINDINGS.md'>Full FINDINGS.md →</a> · <a href='../../FINDINGS.md'>local: FINDINGS.md</a></p></div>
-<div class='card'><h2>Reasoning blob</h2><p class='empty'>No <code>reasoning.json</code> for this run directory.</p></div>
-<div class='card'><h2>Configuration (inferred from experiment_log.jsonl + metrics.json)</h2><pre>{
+ *{margin:0;padding:0;box-sizing:border-box;}
+ html,body{background:var(--ink);}
+ body{font-family:'IBM Plex Serif','Charter',Georgia,serif;color:var(--paper);
+      padding:32px 36px 80px;line-height:1.55;max-width:1180px;margin:0 auto;
+      font-size:16px;font-variant-numeric:tabular-nums;position:relative;}
+ a{color:var(--v-derivative);text-decoration:none;border-bottom:1px solid transparent;
+   transition:border-color 160ms ease;}
+ a:hover{border-bottom-color:var(--v-derivative);text-decoration:none;}
+ h1{font-family:'Newsreader',serif;font-weight:600;font-style:italic;
+    font-size:42px;line-height:1.05;color:var(--paper);letter-spacing:-0.01em;
+    margin-bottom:6px;}
+ h2{font-family:'Newsreader',serif;font-weight:600;font-style:italic;
+    font-size:22px;color:var(--paper);margin-bottom:14px;letter-spacing:-0.005em;}
+ h3{font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:11px;
+    text-transform:uppercase;letter-spacing:0.18em;color:var(--paper-dim);
+    margin:18px 0 8px 0;}
+ .mono{font-family:'IBM Plex Mono',monospace;font-size:0.85em;}
+ .head-grid{display:grid;grid-template-columns:1fr auto;gap:24px;
+            align-items:start;padding-bottom:18px;
+            border-bottom:1px solid var(--rule);margin-bottom:24px;}
+ .head-left .tag-display{font-family:'Newsreader',serif;font-style:italic;
+    font-size:54px;font-weight:600;line-height:1;color:var(--paper);
+    letter-spacing:-0.015em;word-break:break-word;}
+ .head-left .sub{font-family:'IBM Plex Mono',monospace;font-size:11px;
+    text-transform:uppercase;letter-spacing:0.18em;color:var(--paper-dim);
+    margin-top:10px;}
+ .head-right{display:flex;flex-direction:column;align-items:flex-end;gap:8px;
+             min-width:240px;}
+ .head-right .back{font-family:'IBM Plex Mono',monospace;font-size:11px;
+    text-transform:uppercase;letter-spacing:0.18em;color:var(--paper-dim);}
+ .pill{display:inline-block;background:transparent;border:1px solid var(--rule-bright);
+       border-radius:1px;padding:3px 10px;font-size:0.72em;color:var(--paper-dim);
+       font-family:'IBM Plex Mono',monospace;margin:0 4px 4px 0;
+       text-transform:uppercase;letter-spacing:0.12em;}
+ .pill.hyp{border-color:var(--v-derivative);color:var(--v-derivative);}
+ .pill.grp{border-color:var(--v-novel);color:var(--v-novel);}
+ .pill.ds{border-color:var(--accent-dim);color:var(--accent);}
+ .verdict-row{display:flex;flex-wrap:wrap;gap:4px;justify-content:flex-end;}
+ .card{background:var(--panel);border:1px solid var(--rule);
+       padding:24px 28px;margin-bottom:24px;position:relative;}
+ .card::before{content:"";position:absolute;top:0;left:0;width:48px;
+               height:1px;background:var(--accent);}
+ .card p{margin-bottom:12px;font-size:0.96em;line-height:1.6;}
+ .card ul{margin:6px 0 12px 22px;font-size:0.95em;line-height:1.6;}
+ .card ul li{margin-bottom:4px;}
+ details.deep{margin:14px 0;border-top:1px solid var(--rule);
+              padding-top:14px;}
+ details.deep > summary{cursor:pointer;list-style:none;
+    font-family:'IBM Plex Mono',monospace;font-size:11px;text-transform:uppercase;
+    letter-spacing:0.18em;color:var(--paper-dim);display:flex;align-items:center;
+    gap:10px;padding:6px 0;transition:color 160ms ease;}
+ details.deep > summary:hover{color:var(--accent);}
+ details.deep > summary::-webkit-details-marker{display:none;}
+ details.deep > summary::before{content:"▸";display:inline-block;
+    transition:transform 200ms ease;color:var(--accent);font-size:14px;}
+ details.deep[open] > summary::before{transform:rotate(90deg);}
+ details.deep > .body{padding:14px 0 6px 24px;font-size:0.95em;
+    border-left:1px solid var(--rule);margin-left:5px;margin-top:6px;
+    animation:reveal 280ms ease;}
+ table{width:100%;border-collapse:collapse;font-size:0.88em;
+       font-variant-numeric:tabular-nums;}
+ th{background:transparent;color:var(--paper-dim);text-align:left;
+    padding:8px 12px;border-bottom:1px solid var(--rule-bright);
+    font-size:10px;text-transform:uppercase;letter-spacing:0.18em;
+    font-family:'IBM Plex Mono',monospace;font-weight:500;}
+ td{padding:9px 12px;border-bottom:1px solid var(--rule);}
+ td.k{color:var(--paper-dim);width:42%;font-family:'IBM Plex Serif',serif;}
+ td.v{color:var(--paper);font-family:'IBM Plex Mono',monospace;}
+ .formula-chip{background:var(--ink);border:1px solid var(--rule);
+               padding:14px 16px;font-family:'IBM Plex Mono',monospace;
+               font-size:0.82em;margin-bottom:14px;color:var(--paper);
+               word-break:break-all;border-left:2px solid var(--accent);}
+ .breakdown td.term{font-family:'IBM Plex Mono',monospace;}
+ .pos{color:var(--v-pass);} .neg{color:var(--v-broken);} .mut{color:var(--paper-dim);}
+ .charts{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+ @media(max-width:980px){.charts{grid-template-columns:1fr;}
+   .head-grid{grid-template-columns:1fr;} .head-right{align-items:flex-start;}
+   .verdict-row{justify-content:flex-start;}}
+ .meta{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--paper-dim);
+       margin-top:28px;padding-top:18px;border-top:1px solid var(--rule);
+       line-height:1.9;letter-spacing:0.04em;}
+ .meta code{background:var(--ink);padding:1px 5px;color:var(--paper);
+            border:1px solid var(--rule);}
+ code{background:var(--ink);padding:1px 5px;font-size:0.92em;
+      font-family:'IBM Plex Mono',monospace;border:1px solid var(--rule);}
+ pre{background:var(--ink);border:1px solid var(--rule);
+     padding:14px 16px;overflow-x:auto;font-family:'IBM Plex Mono',monospace;
+     font-size:0.82em;color:var(--paper);white-space:pre-wrap;line-height:1.6;
+     border-left:2px solid var(--accent-dim);}
+ .reason-section{margin-bottom:16px;}
+ .reason-section .lbl{color:var(--accent);font-family:'IBM Plex Mono',monospace;
+                      font-size:10px;text-transform:uppercase;
+                      letter-spacing:0.18em;margin-bottom:6px;font-weight:600;}
+ .reason-section .body{font-size:0.95em;color:var(--paper);
+                       white-space:pre-wrap;line-height:1.6;}
+ .quote{border-left:2px solid var(--accent);padding:10px 18px;
+        background:var(--ink);font-size:0.95em;color:var(--paper);
+        margin:10px 0;font-style:italic;font-family:'Newsreader',serif;
+        font-weight:400;line-height:1.55;}
+ .verdict-label{color:var(--accent);font-weight:600;}
+ .empty{color:var(--paper-dim);font-style:italic;font-size:0.9em;}
+ .xrefs-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+             gap:10px;margin-top:6px;}
+ .xref-card{display:block;background:var(--ink);border:1px solid var(--rule);
+            padding:12px 14px;text-decoration:none;
+            transition:border-color 160ms ease,transform 160ms ease;}
+ .xref-card:hover{border-color:var(--accent);transform:translateY(-1px);
+                  text-decoration:none;}
+ .xref-card .xref-lbl{font-family:'IBM Plex Mono',monospace;font-size:9px;
+    text-transform:uppercase;letter-spacing:0.18em;color:var(--paper-dim);
+    margin-bottom:6px;}
+ .xref-card .xref-tag{font-family:'IBM Plex Mono',monospace;font-size:0.88em;
+    color:var(--paper);font-weight:500;}
+ .xref-card .xref-meta{font-family:'IBM Plex Mono',monospace;font-size:0.78em;
+    color:var(--paper-dim);margin-top:4px;}
+ /* Key numbers strip — the "tile bar" near top */
+ .kn-strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
+           gap:1px;background:var(--rule);border:1px solid var(--rule);
+           margin-bottom:24px;}
+ .kn-tile{background:var(--panel);padding:18px 18px 16px 18px;
+          position:relative;overflow:hidden;}
+ .kn-tile .kn-val{font-family:'Newsreader',serif;font-style:italic;
+                  font-size:30px;font-weight:600;line-height:1.05;
+                  color:var(--paper);letter-spacing:-0.01em;}
+ .kn-tile .kn-lbl{font-family:'IBM Plex Mono',monospace;font-size:9.5px;
+                  text-transform:uppercase;letter-spacing:0.18em;
+                  color:var(--paper-dim);margin-top:6px;}
+ .kn-tile.tint-pos{box-shadow:inset 3px 0 0 var(--v-pass);}
+ .kn-tile.tint-neg{box-shadow:inset 3px 0 0 var(--v-broken);}
+ .kn-tile.tint-neu{box-shadow:inset 3px 0 0 var(--accent-dim);}
+ /* Composite stacked bar */
+ .comp-stack{display:flex;height:34px;border:1px solid var(--rule);
+             margin:14px 0 8px 0;font-family:'IBM Plex Mono',monospace;
+             font-size:9.5px;}
+ .comp-stack .seg{display:flex;align-items:center;justify-content:center;
+                  color:var(--ink);font-weight:600;
+                  border-right:1px solid var(--ink);padding:0 6px;
+                  white-space:nowrap;overflow:hidden;}
+ .comp-stack .seg:last-child{border-right:none;}
+ .comp-stack .seg.pos{background:var(--v-pass);}
+ .comp-stack .seg.params{background:var(--accent);}
+ .comp-stack .seg.lat{background:var(--v-derivative);}
+ .vbadge:hover{transform:scale(1.05);filter:brightness(1.15);} </style></head><body>
+<div class='grain'></div>
+<div class='head-grid' style='--i:0'>
+  <div class='head-left'>
+    <div class='tag-display'>baseline_resnet20</div>
+    <div class='sub'><span class='pill'>baseline</span><span class='pill grp'>Baselines</span><span class='pill ds'>cifar100</span><span class='pill'>seed 2</span>&nbsp;·&nbsp; run dir <span class='mono' style='color:var(--paper)'>baseline_resnet20_seed2</span></div>
+  </div>
+  <div class='head-right'>
+    <a class='back' href='../dashboard.html'>← back to dashboard</a>
+    <div class='verdict-row'></div>
+  </div>
+</div>
+<div class='kn-strip' style='--i:1'><div class='kn-tile tint-pos'><div class='kn-val'>56.62%</div><div class='kn-lbl'>top-1</div></div><div class='kn-tile tint-neu'><div class='kn-val'>0.5622</div><div class='kn-lbl'>composite</div></div><div class='kn-tile tint-pos'><div class='kn-val'>+0.10pp</div><div class='kn-lbl'>Δ vs baseline</div></div><div class='kn-tile tint-neu'><div class='kn-val'>0.278M</div><div class='kn-lbl'>params</div></div><div class='kn-tile tint-neu'><div class='kn-val'>4.33ms</div><div class='kn-lbl'>latency b=1</div></div></div>
+<section class='card' style='--i:2'><h2>Hypothesis</h2><p class='empty'>No matching hypothesis document — this row is a baseline reference run.</p></section>
+<section class='card' style='--i:3'><h2>Verdict <span class='mono' style='font-size:0.55em;letter-spacing:0.18em;color:var(--paper-dim);font-style:normal'>FINDINGS.md</span></h2><div class='quote'>1. **H09 `phi_budget`** — only top-1 winner; clear #1. 2. **H02 `fib_depth`** — best param-efficiency (comp 0.8261 @ 180 k). 3. **H05 `fractal`** — the original campaign&#39;s only positive single prior. 4. **H48 `golden_momentum`** — closest neutral to baseline (83.52). 5. `baseline_resnet20` rail (always carried).</div><p style='margin-top:14px'><a href='https://github.com/dlmastery/nature_inspired_networks/blob/main/FINDINGS.md'>↗ Full FINDINGS.md</a> &nbsp;·&nbsp; <a href='../../FINDINGS.md'>local: <span class='mono'>FINDINGS.md</span></a></p></section>
+<section class='card' style='--i:4'><h2>Composite-score breakdown</h2><div class='comp-stack'><div class='seg pos' style='width:90.48%' title='top-1 = 0.56620'>top-1 +0.5662</div><div class='seg params' style='width:4.44%' title='-0.05·log10(params_M)'>params +0.02777</div><div class='seg lat' style='width:5.08%' title='-0.05·log10(latency_ms)'>lat −0.03180</div></div><div style='display:flex;justify-content:space-between;font-family:IBM Plex Mono,monospace;font-size:11px;color:var(--paper-dim);margin-top:6px'><span>Σ recomputed: <b style='color:var(--paper)'>0.56217</b></span><span>reported: <b style='color:var(--paper)'>0.56217</b> &nbsp;·&nbsp; Δ +0.000000</span></div><div class='formula-chip' style='margin-top:14px'>composite ≔ <code>top1 - 0.05*log10(params_M) - 0.05*log10(latency_ms)</code></div></section>
+<section class='card' style='--i:5'><h2>Per-epoch training curves</h2><div class='charts'><div><svg viewBox='0 0 460 320' preserveAspectRatio='xMinYMin meet' width='100%' height='auto' xmlns='http://www.w3.org/2000/svg' style='background:#0a0a0d;border:1px solid #1c1c20;display:block;font-family:"IBM Plex Mono",monospace'><text x='46' y='18' fill='#e6e1d6' font-size='14' font-family='Newsreader,serif' font-style='italic' font-weight='600'>Loss</text><line x1='46' y1='292.0' x2='446' y2='292.0' stroke='#1c1c20' stroke-width='1'/><text x='40' y='295.0' fill='#a89e8c' font-size='9' text-anchor='end'>1.856</text><line x1='46' y1='226.5' x2='446' y2='226.5' stroke='#1c1c20' stroke-width='1'/><text x='40' y='229.5' fill='#a89e8c' font-size='9' text-anchor='end'>2.444</text><line x1='46' y1='161.0' x2='446' y2='161.0' stroke='#1c1c20' stroke-width='1'/><text x='40' y='164.0' fill='#a89e8c' font-size='9' text-anchor='end'>3.033</text><line x1='46' y1='95.5' x2='446' y2='95.5' stroke='#1c1c20' stroke-width='1'/><text x='40' y='98.5' fill='#a89e8c' font-size='9' text-anchor='end'>3.622</text><line x1='46' y1='30.0' x2='446' y2='30.0' stroke='#1c1c20' stroke-width='1'/><text x='40' y='33.0' fill='#a89e8c' font-size='9' text-anchor='end'>4.210</text><text x='46.0' y='310' fill='#a89e8c' font-size='9' text-anchor='middle'>0</text><text x='446.0' y='310' fill='#a89e8c' font-size='9' text-anchor='middle'>29</text><text x='246.0' y='310' fill='#a89e8c' font-size='10' font-family='Newsreader,serif' font-style='italic' text-anchor='middle'>epoch →</text><text x='14' y='161.0' fill='#a89e8c' font-size='10' font-family='Newsreader,serif' font-style='italic' text-anchor='middle' transform='rotate(-90 14 161.0)'>loss →</text><polyline points='46.0,44.0 59.8,93.3 73.6,128.6 87.4,154.1 101.2,171.1 115.0,186.0 128.8,197.1 142.6,206.4 156.3,214.9 170.1,221.8 183.9,228.2 197.7,234.2 211.5,239.1 225.3,243.4 239.1,247.7 252.9,251.7 266.7,255.4 280.5,258.6 294.3,261.4 308.1,264.0 321.9,266.7 335.7,269.2 349.4,271.0 363.2,272.6 377.0,274.4 390.8,275.1 404.6,276.2 418.4,276.7 432.2,277.7 446.0,278.0' fill='none' stroke='#f85149' stroke-width='1.8'/><circle cx='446.0' cy='278.0' r='2.6' fill='#f85149'/><rect x='52' y='35' width='10' height='10' fill='#f85149'/><text x='68' y='44' fill='#e6e1d6' font-size='10' font-family='IBM Plex Mono,monospace'>train loss</text></svg></div><div><svg viewBox='0 0 460 320' preserveAspectRatio='xMinYMin meet' width='100%' height='auto' xmlns='http://www.w3.org/2000/svg' style='background:#0a0a0d;border:1px solid #1c1c20;display:block;font-family:"IBM Plex Mono",monospace'><text x='46' y='18' fill='#e6e1d6' font-size='14' font-family='Newsreader,serif' font-style='italic' font-weight='600'>Accuracy</text><line x1='46' y1='292.0' x2='446' y2='292.0' stroke='#1c1c20' stroke-width='1'/><text x='40' y='295.0' fill='#a89e8c' font-size='9' text-anchor='end'>4.6%</text><line x1='46' y1='226.5' x2='446' y2='226.5' stroke='#1c1c20' stroke-width='1'/><text x='40' y='229.5' fill='#a89e8c' font-size='9' text-anchor='end'>25.8%</text><line x1='46' y1='161.0' x2='446' y2='161.0' stroke='#1c1c20' stroke-width='1'/><text x='40' y='164.0' fill='#a89e8c' font-size='9' text-anchor='end'>47.0%</text><line x1='46' y1='95.5' x2='446' y2='95.5' stroke='#1c1c20' stroke-width='1'/><text x='40' y='98.5' fill='#a89e8c' font-size='9' text-anchor='end'>68.2%</text><line x1='46' y1='30.0' x2='446' y2='30.0' stroke='#1c1c20' stroke-width='1'/><text x='40' y='33.0' fill='#a89e8c' font-size='9' text-anchor='end'>89.4%</text><text x='46.0' y='310' fill='#a89e8c' font-size='9' text-anchor='middle'>0</text><text x='446.0' y='310' fill='#a89e8c' font-size='9' text-anchor='middle'>29</text><text x='246.0' y='310' fill='#a89e8c' font-size='10' font-family='Newsreader,serif' font-style='italic' text-anchor='middle'>epoch →</text><text x='14' y='161.0' fill='#a89e8c' font-size='10' font-family='Newsreader,serif' font-style='italic' text-anchor='middle' transform='rotate(-90 14 161.0)'>accuracy →</text><polyline points='46.0,278.0 59.8,251.8 73.6,230.3 87.4,212.4 101.2,199.6 115.0,188.9 128.8,180.4 142.6,173.9 156.3,165.9 170.1,160.1 183.9,155.2 197.7,149.6 211.5,145.8 225.3,141.8 239.1,138.4 252.9,134.5 266.7,131.9 280.5,127.7 294.3,125.7 308.1,123.3 321.9,120.4 335.7,118.4 349.4,117.1 363.2,114.6 377.0,113.5 390.8,113.0 404.6,111.7 418.4,111.1 432.2,110.0 446.0,110.4' fill='none' stroke='#d29922' stroke-width='1.8'/><circle cx='446.0' cy='110.4' r='2.6' fill='#d29922'/><rect x='52' y='35' width='10' height='10' fill='#d29922'/><text x='68' y='44' fill='#e6e1d6' font-size='10' font-family='IBM Plex Mono,monospace'>train top-1</text><polyline points='46.0,270.1 59.8,246.3 73.6,230.8 87.4,215.0 101.2,216.4 115.0,189.5 128.8,185.3 142.6,184.4 156.3,183.0 170.1,184.9 183.9,165.5 197.7,158.5 211.5,156.8 225.3,157.2 239.1,150.9 252.9,147.7 266.7,143.9 280.5,141.9 294.3,142.1 308.1,141.4 321.9,138.4 335.7,137.8 349.4,134.0 363.2,134.2 377.0,133.0 390.8,132.1 404.6,131.7 418.4,131.4 432.2,131.4 446.0,131.3' fill='none' stroke='#58a6ff' stroke-width='1.8'/><circle cx='446.0' cy='131.3' r='2.6' fill='#58a6ff'/><rect x='52' y='51' width='10' height='10' fill='#58a6ff'/><text x='68' y='60' fill='#e6e1d6' font-size='10' font-family='IBM Plex Mono,monospace'>test top-1</text><polyline points='46.0,199.2 59.8,157.7 73.6,130.4 87.4,115.2 101.2,117.5 115.0,91.0 128.8,85.9 142.6,84.2 156.3,83.4 170.1,87.3 183.9,67.7 197.7,63.2 211.5,62.8 225.3,60.5 239.1,55.5 252.9,56.1 266.7,52.5 280.5,51.5 294.3,51.8 308.1,50.6 321.9,48.9 335.7,47.0 349.4,46.8 363.2,46.7 377.0,45.8 390.8,45.2 404.6,44.0 418.4,44.1 432.2,44.2 446.0,44.1' fill='none' stroke='#3fb950' stroke-width='1.8'/><circle cx='446.0' cy='44.1' r='2.6' fill='#3fb950'/><rect x='52' y='67' width='10' height='10' fill='#3fb950'/><text x='68' y='76' fill='#e6e1d6' font-size='10' font-family='IBM Plex Mono,monospace'>test top-5</text></svg></div></div></section>
+<section class='card' style='--i:6'><h2>Deep inspection</h2><p style='color:var(--paper-dim);font-size:0.9em;margin-bottom:6px'>Audit excerpts, reasoning blob, raw configuration, and full metrics JSON — expand sections of interest.</p><details class='deep'><summary>Reasoning blob (reasoning.json)</summary><div class='body'><p class='empty'>No <code>reasoning.json</code> for this run directory.</p></div></details><details class='deep'><summary>Configuration dump</summary><div class='body'><p class='mono' style='color:var(--paper-dim);font-size:0.8em;margin-bottom:8px'>inferred from experiment_log.jsonl + metrics.json</p><pre>{
   &quot;tag&quot;: &quot;baseline_resnet20&quot;,
   &quot;model&quot;: &quot;resnet20&quot;,
   &quot;dataset&quot;: &quot;cifar100&quot;,
@@ -69,10 +188,25 @@
   &quot;epochs&quot;: 30,
   &quot;seed&quot;: 2,
   &quot;composite_formula&quot;: &quot;composite = top1 - 0.05 * log10(params_M) - 0.05 * log10(latency_ms)&quot;
-}</pre></div>
-<div class='card'><h2>Metrics</h2><table><tbody><tr><td class='k'>Dataset</td><td class='v'>cifar100</td></tr><tr><td class='k'>Seed</td><td class='v'>2</td></tr><tr><td class='k'>Epochs</td><td class='v'>30</td></tr><tr><td class='k'>Top-1 accuracy</td><td class='v'>56.62%</td></tr><tr><td class='k'>Top-5 accuracy</td><td class='v'>84.81%</td></tr><tr><td class='k'>Train top-1</td><td class='v'>63.37%</td></tr><tr><td class='k'>Generalisation gap (train − test)</td><td class='v'>6.75%</td></tr><tr><td class='k'>Parameters</td><td class='v'>278,324 (0.278 M)</td></tr><tr><td class='k'>FLOPs</td><td class='v'>41.2 M MACs</td></tr><tr><td class='k'>Latency (batch=1)</td><td class='v'>4.326 ms</td></tr><tr><td class='k'>Rot-eq error</td><td class='v'>0.443128</td></tr><tr><td class='k'>Epochs-to-target</td><td class='v'>-1</td></tr><tr><td class='k'>Train wall-clock</td><td class='v'>943.5 s</td></tr><tr><td class='k'>Composite score</td><td class='v'>0.562169</td></tr><tr><td class='k'>Composite fingerprint (SHA-256)</td><td class='v'>d65565e9c7b12d14cbce30a801ecc6753aea3eb148074256bfcc051fa61d0893</td></tr></tbody></table></div>
-<div class='card'><h2>Composite-score breakdown</h2><div class='formula-chip'>composite ≔ <code>top1 - 0.05*log10(params_M) - 0.05*log10(latency_ms)</code></div><table class='breakdown'><thead><tr><th>Term</th><th>Expression</th><th style='text-align:right'>Contribution</th></tr></thead><tbody><tr><td class='term'>top-1</td><td class='term mut'>0.56620</td><td class='term pos' style='text-align:right'>+0.56620</td></tr><tr><td class='term'>params penalty</td><td class='term mut'>-0.05·log10(0.2783 M)</td><td class='term pos' style='text-align:right'>+0.02777</td></tr><tr><td class='term'>latency penalty</td><td class='term mut'>-0.05·log10(4.326 ms)</td><td class='term neg' style='text-align:right'>−0.03180</td></tr><tr style='border-top:2px solid #30363d'><td class='term' colspan='2'><b>Σ (recomputed)</b></td><td class='term' style='text-align:right'><b>0.56217</b></td></tr><tr><td class='term mut' colspan='2'>reported composite</td><td class='term mut' style='text-align:right'>0.56217</td></tr></tbody></table></div>
-<div class='card'><h2>Per-epoch training curves</h2><div class='charts'><div><svg width='460' height='240' viewBox='0 0 460 240' xmlns='http://www.w3.org/2000/svg' style='background:#0d1117;border:1px solid #30363d;border-radius:6px'><text x='46' y='16' fill='#c9d1d9' font-size='12' font-weight='600'>Loss</text><line x1='46' y1='212.0' x2='446' y2='212.0' stroke='#21262d' stroke-width='1'/><text x='40' y='215.0' fill='#8b949e' font-size='9' text-anchor='end'>1.856</text><line x1='46' y1='166.5' x2='446' y2='166.5' stroke='#21262d' stroke-width='1'/><text x='40' y='169.5' fill='#8b949e' font-size='9' text-anchor='end'>2.444</text><line x1='46' y1='121.0' x2='446' y2='121.0' stroke='#21262d' stroke-width='1'/><text x='40' y='124.0' fill='#8b949e' font-size='9' text-anchor='end'>3.033</text><line x1='46' y1='75.5' x2='446' y2='75.5' stroke='#21262d' stroke-width='1'/><text x='40' y='78.5' fill='#8b949e' font-size='9' text-anchor='end'>3.622</text><line x1='46' y1='30.0' x2='446' y2='30.0' stroke='#21262d' stroke-width='1'/><text x='40' y='33.0' fill='#8b949e' font-size='9' text-anchor='end'>4.210</text><text x='46.0' y='232' fill='#8b949e' font-size='9' text-anchor='middle'>0</text><text x='446.0' y='232' fill='#8b949e' font-size='9' text-anchor='middle'>29</text><text x='246.0' y='232' fill='#8b949e' font-size='9' text-anchor='middle'>epoch</text><text x='12' y='121.0' fill='#8b949e' font-size='9' text-anchor='middle' transform='rotate(-90 12 121.0)'>loss</text><polyline points='46.0,39.8 59.8,74.0 73.6,98.5 87.4,116.2 101.2,128.0 115.0,138.3 128.8,146.1 142.6,152.5 156.3,158.5 170.1,163.2 183.9,167.7 197.7,171.8 211.5,175.3 225.3,178.2 239.1,181.2 252.9,184.0 266.7,186.6 280.5,188.8 294.3,190.7 308.1,192.5 321.9,194.4 335.7,196.1 349.4,197.4 363.2,198.5 377.0,199.8 390.8,200.3 404.6,201.0 418.4,201.4 432.2,202.1 446.0,202.2' fill='none' stroke='#f85149' stroke-width='1.8'/><circle cx='446.0' cy='202.2' r='2.6' fill='#f85149'/><rect x='52' y='34' width='10' height='10' fill='#f85149' rx='2'/><text x='67' y='42' fill='#c9d1d9' font-size='10'>train loss</text></svg></div><div><svg width='460' height='240' viewBox='0 0 460 240' xmlns='http://www.w3.org/2000/svg' style='background:#0d1117;border:1px solid #30363d;border-radius:6px'><text x='46' y='16' fill='#c9d1d9' font-size='12' font-weight='600'>Accuracy</text><line x1='46' y1='212.0' x2='446' y2='212.0' stroke='#21262d' stroke-width='1'/><text x='40' y='215.0' fill='#8b949e' font-size='9' text-anchor='end'>4.6%</text><line x1='46' y1='166.5' x2='446' y2='166.5' stroke='#21262d' stroke-width='1'/><text x='40' y='169.5' fill='#8b949e' font-size='9' text-anchor='end'>25.8%</text><line x1='46' y1='121.0' x2='446' y2='121.0' stroke='#21262d' stroke-width='1'/><text x='40' y='124.0' fill='#8b949e' font-size='9' text-anchor='end'>47.0%</text><line x1='46' y1='75.5' x2='446' y2='75.5' stroke='#21262d' stroke-width='1'/><text x='40' y='78.5' fill='#8b949e' font-size='9' text-anchor='end'>68.2%</text><line x1='46' y1='30.0' x2='446' y2='30.0' stroke='#21262d' stroke-width='1'/><text x='40' y='33.0' fill='#8b949e' font-size='9' text-anchor='end'>89.4%</text><text x='46.0' y='232' fill='#8b949e' font-size='9' text-anchor='middle'>0</text><text x='446.0' y='232' fill='#8b949e' font-size='9' text-anchor='middle'>29</text><text x='246.0' y='232' fill='#8b949e' font-size='9' text-anchor='middle'>epoch</text><text x='12' y='121.0' fill='#8b949e' font-size='9' text-anchor='middle' transform='rotate(-90 12 121.0)'>accuracy</text><polyline points='46.0,202.2 59.8,184.1 73.6,169.1 87.4,156.7 101.2,147.8 115.0,140.4 128.8,134.5 142.6,130.0 156.3,124.4 170.1,120.3 183.9,117.0 197.7,113.1 211.5,110.4 225.3,107.7 239.1,105.3 252.9,102.6 266.7,100.8 280.5,97.8 294.3,96.5 308.1,94.8 321.9,92.8 335.7,91.4 349.4,90.5 363.2,88.8 377.0,88.0 390.8,87.6 404.6,86.7 418.4,86.3 432.2,85.6 446.0,85.8' fill='none' stroke='#d29922' stroke-width='1.8'/><circle cx='446.0' cy='85.8' r='2.6' fill='#d29922'/><rect x='52' y='34' width='10' height='10' fill='#d29922' rx='2'/><text x='67' y='42' fill='#c9d1d9' font-size='10'>train top-1</text><polyline points='46.0,196.8 59.8,180.3 73.6,169.5 87.4,158.5 101.2,159.5 115.0,140.8 128.8,137.8 142.6,137.2 156.3,136.3 170.1,137.6 183.9,124.1 197.7,119.3 211.5,118.1 225.3,118.3 239.1,114.0 252.9,111.8 266.7,109.1 280.5,107.7 294.3,107.9 308.1,107.4 321.9,105.3 335.7,104.9 349.4,102.3 363.2,102.4 377.0,101.6 390.8,100.9 404.6,100.6 418.4,100.4 432.2,100.4 446.0,100.3' fill='none' stroke='#58a6ff' stroke-width='1.8'/><circle cx='446.0' cy='100.3' r='2.6' fill='#58a6ff'/><rect x='52' y='48' width='10' height='10' fill='#58a6ff' rx='2'/><text x='67' y='56' fill='#c9d1d9' font-size='10'>test top-1</text><polyline points='46.0,147.6 59.8,118.7 73.6,99.7 87.4,89.2 101.2,90.8 115.0,72.4 128.8,68.8 142.6,67.6 156.3,67.1 170.1,69.8 183.9,56.2 197.7,53.1 211.5,52.8 225.3,51.2 239.1,47.7 252.9,48.1 266.7,45.6 280.5,44.9 294.3,45.1 308.1,44.3 321.9,43.2 335.7,41.8 349.4,41.7 363.2,41.6 377.0,41.0 390.8,40.5 404.6,39.8 418.4,39.8 432.2,39.9 446.0,39.8' fill='none' stroke='#3fb950' stroke-width='1.8'/><circle cx='446.0' cy='39.8' r='2.6' fill='#3fb950'/><rect x='52' y='62' width='10' height='10' fill='#3fb950' rx='2'/><text x='67' y='70' fill='#c9d1d9' font-size='10'>test top-5</text></svg></div></div></div>
-<div class='card'><h2>Cross-references</h2><h3>Other seeds (same tag, same dataset)</h3><ul class='xrefs'><li><a href='../experiments/cifar100__baseline_resnet20_seed0.html'>baseline_resnet20_seed0</a></li><li><a href='../experiments/cifar100__baseline_resnet20_seed1.html'>baseline_resnet20_seed1</a></li></ul><h3>Same tag on other dataset(s)</h3><ul class='xrefs'><li><a href='../experiments/cifar10__baseline_resnet20_seed0.html'>baseline_resnet20_seed0</a> <span class='mut'>(<code>cifar10</code>)</span></li><li><a href='../experiments/cifar10__baseline_resnet20_seed1.html'>baseline_resnet20_seed1</a> <span class='mut'>(<code>cifar10</code>)</span></li><li><a href='../experiments/cifar10__baseline_resnet20_seed2.html'>baseline_resnet20_seed2</a> <span class='mut'>(<code>cifar10</code>)</span></li></ul></div>
-<div class='meta'>composite formula SHA-256: <code>d65565e9c7b12d14cbce30a801ecc6753aea3eb148074256bfcc051fa61d0893</code> &nbsp;·&nbsp; epochs run: <b>30</b> &nbsp;·&nbsp; train wall-clock: <b>943.5 s</b> &nbsp;·&nbsp; generalisation gap (train − test top-1): <b>6.75 pp</b>&nbsp;·&nbsp; metrics.json git commit: <a href='https://github.com/dlmastery/nature_inspired_networks/commit/24109d1' style='color:#58a6ff'><code>24109d1</code></a><br>run directory: <code>baseline_resnet20_seed2</code><br>Generated by <code>nature_inspired_networks.dashboard.render_experiment_page</code> · self-contained inline SVG; no external assets.</div>
+}</pre></div></details><details class='deep'><summary>Full metrics JSON</summary><div class='body'><pre>{
+  &quot;tag&quot;: &quot;baseline_resnet20&quot;,
+  &quot;dataset&quot;: &quot;cifar100&quot;,
+  &quot;seed&quot;: 2,
+  &quot;epochs&quot;: 30,
+  &quot;top1&quot;: 0.5662,
+  &quot;top5&quot;: 0.8481,
+  &quot;params&quot;: 278324,
+  &quot;flops&quot;: 41224448.0,
+  &quot;latency_ms&quot;: 4.325867000006838,
+  &quot;rot_eq_err&quot;: 0.44312772899866104,
+  &quot;composite&quot;: 0.5621688089922856,
+  &quot;composite_fingerprint&quot;: &quot;d65565e9c7b12d14cbce30a801ecc6753aea3eb148074256bfcc051fa61d0893&quot;,
+  &quot;epochs_to_target&quot;: -1,
+  &quot;train_seconds&quot;: 943.5059180999997,
+  &quot;train_top1&quot;: 0.6337339743589744,
+  &quot;generalization_gap&quot;: 0.06753397435897435
+}</pre></div></details></section>
+<section class='card' style='--i:7'><h2>Metrics — quick reference</h2><table><tbody><tr><td class='k'>Dataset</td><td class='v'>cifar100</td></tr><tr><td class='k'>Seed</td><td class='v'>2</td></tr><tr><td class='k'>Epochs</td><td class='v'>30</td></tr><tr><td class='k'>Top-1 accuracy</td><td class='v'>56.62%</td></tr><tr><td class='k'>Top-5 accuracy</td><td class='v'>84.81%</td></tr><tr><td class='k'>Train top-1</td><td class='v'>63.37%</td></tr><tr><td class='k'>Generalisation gap (train − test)</td><td class='v'>6.75%</td></tr><tr><td class='k'>Parameters</td><td class='v'>278,324 (0.278 M)</td></tr><tr><td class='k'>FLOPs</td><td class='v'>41.2 M MACs</td></tr><tr><td class='k'>Latency (batch=1)</td><td class='v'>4.326 ms</td></tr><tr><td class='k'>Rot-eq error</td><td class='v'>0.443128</td></tr><tr><td class='k'>Epochs-to-target</td><td class='v'>-1</td></tr><tr><td class='k'>Train wall-clock</td><td class='v'>943.5 s</td></tr><tr><td class='k'>Composite score</td><td class='v'>0.562169</td></tr><tr><td class='k'>Composite fingerprint (SHA-256)</td><td class='v'>d65565e9c7b12d14cbce30a801ecc6753aea3eb148074256bfcc051fa61d0893</td></tr></tbody></table></section>
+<section class='card' style='--i:8'><h2>Cross-references</h2><div class='xrefs-grid'><a class='xref-card' href='../experiments/cifar100__baseline_resnet20_seed0.html'><div class='xref-lbl'>↪ other seed</div><div class='xref-tag'>baseline_resnet20</div><div class='xref-meta'>cifar100 · seed 0</div></a><a class='xref-card' href='../experiments/cifar100__baseline_resnet20_seed1.html'><div class='xref-lbl'>↪ other seed</div><div class='xref-tag'>baseline_resnet20</div><div class='xref-meta'>cifar100 · seed 1</div></a><a class='xref-card' href='../experiments/cifar10__baseline_resnet20_seed0.html'><div class='xref-lbl'>↪ same tag, other dataset</div><div class='xref-tag'>baseline_resnet20</div><div class='xref-meta'>cifar10 · seed 0</div></a><a class='xref-card' href='../experiments/cifar10__baseline_resnet20_seed1.html'><div class='xref-lbl'>↪ same tag, other dataset</div><div class='xref-tag'>baseline_resnet20</div><div class='xref-meta'>cifar10 · seed 1</div></a><a class='xref-card' href='../experiments/cifar10__baseline_resnet20_seed2.html'><div class='xref-lbl'>↪ same tag, other dataset</div><div class='xref-tag'>baseline_resnet20</div><div class='xref-meta'>cifar10 · seed 2</div></a></div></section>
+<div class='meta'>composite formula SHA-256 &nbsp; <code>d65565e9c7b12d14cbce30a801ecc6753aea3eb148074256bfcc051fa61d0893</code><br>epochs run &nbsp; <code>30</code> &nbsp;·&nbsp; train wall-clock &nbsp; <code>943.5 s</code> &nbsp;·&nbsp; gen-gap (train − test) &nbsp; <code>6.75 pp</code>&nbsp;·&nbsp; metrics.json git commit: <a href='https://github.com/dlmastery/nature_inspired_networks/commit/24109d1' style='color:#58a6ff'><code>24109d1</code></a><br>run directory &nbsp; <code>baseline_resnet20_seed2</code><br>Generated by <code>nature_inspired_networks.dashboard.render_experiment_page</code> &middot; self-contained inline SVG, no external assets &middot; brutalist editorial lab notebook v3</div>
 </body></html>
