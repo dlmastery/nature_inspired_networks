@@ -529,8 +529,9 @@ def main(argv=None) -> int:
         extra_sections=extra,
         title="NaturePriorBlock &mdash; autoresearch dashboard",
         subtitle=(
-            "Nature-inspired ablations on CIFAR-10 &middot; topology &middot; "
-            "71-hypothesis ledger &middot; T0..T6 tier filter"
+            "84-hypothesis dual-track audit on CIFAR-10 + CIFAR-100 &middot; "
+            "impl-critic + sci-critic + Fixer campaign &middot; "
+            "G1..G8 hypothesis ledger"
         ),
         repo_root=repo_root,
     )

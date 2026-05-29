@@ -3103,7 +3103,7 @@ def render_dashboard(results_dir: str | Path,
                      out_html: Path,
                      extra_sections: list[tuple[str, str]] | None = None,
                      title: str = "NaturePriorBlock — autoresearch dashboard",
-                     subtitle: str = "Nature-inspired ablations on CIFAR-10 + topology / Pareto / hypothesis ledger",
+                     subtitle: str = "84-hypothesis dual-track audit on CIFAR-10 + CIFAR-100 / Pareto / hypothesis ledger",
                      repo_root: str | Path | None = None) -> None:
     """Render the rich dark-theme dashboard.
 
