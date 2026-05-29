@@ -100,11 +100,16 @@ class Trainer:
             "golden", "phi", "golden_momentum",
         ):
             from .schedulers import GoldenMomentumScheduler
-            # Pass T_max=epochs so the gentle per-step decay composes to
-            # 1/φ over the full training horizon (fixes the H48 single-
-            # step saturation reported in the G5 audit).
+            # PAPER_GAP_G5: use the closed-form exponential decay with
+            # ``total_epochs=epochs`` so τ = epochs / 3 yields a smooth
+            # curve over the full training horizon. ``T_max=epochs`` is
+            # also forwarded so the legacy multiplicative path remains
+            # tunable from the same config.
             self.momentum_sched = GoldenMomentumScheduler(
-                self.opt, T_max=int(self.cfg.epochs)
+                self.opt,
+                T_max=int(self.cfg.epochs),
+                mode="exponential",
+                total_epochs=int(self.cfg.epochs),
             )
         # H47 — collect PhiDropout modules so fit() can advance their
         # epoch-keyed curriculum once per epoch.
@@ -207,17 +212,35 @@ class Trainer:
             self.model.train()
             # H47 — advance every PhiDropout's curriculum to this epoch
             # BEFORE the first forward pass so the rate is correct for
-            # the entire epoch interval.
+            # the entire epoch interval. ``set_epoch`` pins the index
+            # explicitly; this is equivalent to (but more robust than)
+            # the duck-typed ``step_epoch`` hook used for arbitrary
+            # epoch-keyed modules.
             for _pd in self._phi_dropouts:
                 _pd.set_epoch(epoch)
+            # Generic duck-typed epoch hook: any module exposing
+            # ``step_epoch`` (other than the PhiDropouts already handled
+            # above via the explicit pin) gets called once per epoch.
+            for _m in self.model.modules():
+                if _m in self._phi_dropouts:
+                    continue
+                hook = getattr(_m, "step_epoch", None)
+                if callable(hook):
+                    hook()
             losses, accs = [], []
             for it, (x, y) in enumerate(self.train_loader):
                 lo, ac = self._step(x, y)
                 losses.append(lo); accs.append(ac)
             self.sched.step()
-            # H48 — decay beta1 once per epoch.
+            # H48 — decay beta1 once per epoch. The momentum scheduler
+            # exposes ``set_epoch`` (closed-form exponential mode); fall
+            # back to ``step`` for the legacy multiplicative path.
             if self.momentum_sched is not None:
-                self.momentum_sched.step()
+                hook = getattr(self.momentum_sched, "set_epoch", None)
+                if callable(hook):
+                    hook(epoch + 1)
+                else:
+                    self.momentum_sched.step()
             # H43 — fibonacci prune at Fib-indexed epochs.
             if self._prune_enabled:
                 from .pruning import fibonacci_prune

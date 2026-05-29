@@ -4,8 +4,9 @@ H10: PhiDecayLR — drop-in replacement for
 ``torch.optim.lr_scheduler.CosineAnnealingLR`` with multiplicative
 phi-decay per step.
 
-H48: GoldenMomentumScheduler — multiplicative phi-decay of an
-Adam-family optimizer's β1 (or SGD's momentum) with a 1/φ² floor.
+H48: GoldenMomentumScheduler — closed-form exponential decay (default)
+or multiplicative phi-decay (legacy) of an Adam-family optimizer's β1
+(or SGD's momentum) with a 1/φ² floor.
 
 Refs:
   Loshchilov, Hutter 2017 ICLR 'SGDR: Stochastic Gradient Descent with
@@ -19,6 +20,7 @@ Refs:
 from __future__ import annotations
 
 import math
+from typing import Literal
 
 import torch
 from torch.optim.lr_scheduler import _LRScheduler
@@ -75,21 +77,36 @@ GOLDEN_MOMENTUM_FLOOR: float = 1.0 / (PHI ** 2)    # ≈ 0.3819660113
 
 
 class GoldenMomentumScheduler:
-    """Gentle φ-decay scheduler for Adam β1 (or SGD momentum).
+    """φ-decay scheduler for Adam β1 (or SGD momentum).
 
-    On each :meth:`step` call the current β1 (or momentum) is updated
-    via ``new = max(floor, current * φ^(-1/T_max))``. Over exactly
-    ``T_max`` steps the cumulative decay multiplier is ``1/φ`` (so β1
-    drops from ``1/φ`` to ``1/φ²`` end-to-end), then the floor clamps.
+    Two decay modes are supported:
 
-    Rationale
-    ---------
-    The original release applied ``× 1/φ`` per step, which saturated to
-    the ``1/φ²`` floor after a single step — making β1 constant from
-    epoch 2 onward and degenerating the curriculum to a one-shot
-    overwrite. The per-``T_max`` decay yields a smooth curve over the
-    full training horizon, preserving the φ-character without instant
-    saturation.
+    * ``mode='exponential'`` (default, PAPER_GAP_G5-correct) — closed-
+      form ``β(e) = floor + span · exp(-e/τ)`` where ``span = init -
+      floor`` and ``τ = total_epochs / 3`` by default (or
+      ``τ=4.0`` if ``total_epochs`` is not supplied — legacy fallback).
+      ``β(0) = init = 1/φ``; ``β(∞) → floor = 1/φ²``. The schedule is
+      advanced by :meth:`set_epoch` (Trainer hook) — :meth:`step`
+      delegates to ``set_epoch(self._step_count + 1)`` so both APIs
+      work.
+    * ``mode='multiplicative'`` (legacy / gentle-φ) — each :meth:`step`
+      multiplies the current β1 by ``φ^(-1/T_max)``. Over ``T_max``
+      steps the cumulative multiplier equals ``1/φ`` (so β drops from
+      ``1/φ`` to ``1/φ²`` end-to-end). Retained for reproducing
+      pre-PAPER_GAP_G5 numbers.
+
+    Rationale for the mode switch
+    -----------------------------
+    The ORIGINAL release applied a hard ``× 1/φ`` per epoch, which
+    saturated to the ``1/φ²`` floor after a SINGLE epoch (because
+    ``(1/φ) × (1/φ) = 1/φ²``), making β1 effectively constant from
+    epoch 2 onward — a one-shot overwrite, not a smooth curriculum.
+    The G5 audit fix introduced the gentler multiplicative
+    ``φ^(-1/T_max)`` schedule; the PAPER_GAP_G5 audit then replaced
+    that with the closed-form exponential decay so the curve is
+    monotonically smooth and reaches the floor only as ``e → ∞``,
+    matching the design-doc reference curve in
+    :func:`golden_momentum_curve`.
 
     The scheduler is stateless on the optimizer side: it reads/writes
     ``param_groups[i]['betas'][0]`` for Adam-family optimizers, or
@@ -110,10 +127,18 @@ class GoldenMomentumScheduler:
         every param-group is overwritten so the schedule starts cleanly
         from the φ-derived initial point.
     T_max
-        Number of :meth:`step` invocations expected over the full
-        training run (typically ``epochs``). Each step multiplies β1 by
-        ``φ^(-1/T_max)`` so the cumulative decay over ``T_max`` steps
-        equals exactly ``1/φ``. Must be >= 1.
+        Legacy multiplicative knob: number of :meth:`step` invocations
+        over which the cumulative decay should equal ``1/φ`` (only used
+        when ``mode='multiplicative'``). Must be >= 1.
+    mode
+        ``'exponential'`` (default) or ``'multiplicative'``.
+    total_epochs
+        Used only in ``'exponential'`` mode to derive the default time
+        constant ``τ = total_epochs / 3``. If ``None`` the constructor
+        falls back to ``tau=4.0`` (legacy reference curve).
+    tau
+        Optional explicit override for the exponential time constant.
+        When set, overrides the ``total_epochs / 3`` default.
     """
 
     def __init__(
@@ -122,6 +147,9 @@ class GoldenMomentumScheduler:
         floor: float = GOLDEN_MOMENTUM_FLOOR,
         init: float | None = GOLDEN_MOMENTUM_INIT,
         T_max: int = 30,
+        mode: Literal["exponential", "multiplicative"] = "exponential",
+        total_epochs: int | None = None,
+        tau: float | None = None,
     ) -> None:
         if not isinstance(optimizer, torch.optim.Optimizer):
             raise TypeError(
@@ -130,16 +158,43 @@ class GoldenMomentumScheduler:
             )
         if T_max < 1:
             raise ValueError(f"T_max must be >= 1, got {T_max}")
+        if mode not in {"exponential", "multiplicative"}:
+            raise ValueError(
+                f"mode must be 'exponential' or 'multiplicative', "
+                f"got {mode!r}"
+            )
         self.optimizer = optimizer
         self.floor = float(floor)
         self.T_max = int(T_max)
-        # Per-step multiplicative factor. Over T_max steps this composes
-        # to exactly 1/φ, matching the design-doc end-to-end decay.
+        self.mode = mode
+        # Initial value remembered so set_epoch() can reset deterministically
+        # from any epoch index (the exponential curve is closed-form).
+        self._init = (
+            float(init) if init is not None else None
+        )
+        # Per-step multiplicative factor (only used in multiplicative mode).
+        # Over T_max steps this composes to exactly 1/φ.
         self._decay = PHI ** (-1.0 / float(T_max))
+        # Exponential-mode time constant.
+        if tau is not None:
+            self._tau = float(tau)
+        elif total_epochs is not None and int(total_epochs) > 0:
+            self._tau = float(total_epochs) / 3.0
+        else:
+            self._tau = 4.0  # legacy reference (matches golden_momentum_curve)
+        self.total_epochs = (
+            int(total_epochs) if total_epochs is not None else None
+        )
         # Detect the field name (betas[0] for Adam-family, momentum for SGD).
         self._uses_betas = "betas" in optimizer.param_groups[0]
-        if init is not None:
+        # Resolve the effective initial value once (defaults to optimizer's
+        # current value if init was None) — needed for exponential closed
+        # form to be reset-from-epoch-0.
+        if init is None:
+            self._init = self._read()
+        else:
             self._write(float(init))
+            self._init = float(init)
         self._step_count = 0
         self._history: list[float] = [self._read()]
 
@@ -159,8 +214,47 @@ class GoldenMomentumScheduler:
             else:
                 g["momentum"] = float(value)
 
+    def _exponential_beta(self, epoch: int) -> float:
+        """Closed-form β(e) = floor + span · exp(-e / tau)."""
+        e = max(0, int(epoch))
+        span = float(self._init) - self.floor
+        # span may be negative if a caller seeded init < floor; clamp.
+        beta = self.floor + span * math.exp(-e / self._tau)
+        return max(self.floor, beta)
+
+    def set_epoch(self, epoch: int) -> float:
+        """Set the schedule to epoch ``epoch`` (exponential mode).
+
+        In ``'exponential'`` mode this re-derives β from the closed form
+        β(epoch) = floor + span · exp(-epoch/τ) and writes it to the
+        optimizer. In ``'multiplicative'`` mode this falls back to
+        repeated multiplicative :meth:`step` calls (the legacy path).
+        Returns the new β1 / momentum.
+        """
+        if self.mode == "exponential":
+            new = self._exponential_beta(epoch)
+            self._write(new)
+            self._step_count = int(max(0, epoch))
+            self._history.append(new)
+            return new
+        # Legacy multiplicative: re-derive from init by composing the
+        # per-step factor ``epoch`` times.
+        decayed = float(self._init) * (self._decay ** max(0, int(epoch)))
+        new = max(self.floor, decayed)
+        self._write(new)
+        self._step_count = int(max(0, epoch))
+        self._history.append(new)
+        return new
+
     def step(self) -> float:
-        """Apply one gentle φ-decay step; returns the new β1 / momentum."""
+        """Advance the schedule by one epoch; returns the new β1.
+
+        In exponential mode this calls ``set_epoch(self._step_count + 1)``.
+        In multiplicative mode this applies the per-step decay factor.
+        """
+        if self.mode == "exponential":
+            return self.set_epoch(self._step_count + 1)
+        # Legacy multiplicative path.
         cur = self._read()
         new = max(self.floor, cur * self._decay)
         self._write(new)
@@ -179,6 +273,10 @@ class GoldenMomentumScheduler:
             "history": list(self._history),
             "uses_betas": self._uses_betas,
             "T_max": self.T_max,
+            "mode": self.mode,
+            "tau": self._tau,
+            "init": self._init,
+            "total_epochs": self.total_epochs,
         }
 
     def load_state_dict(self, state: dict) -> None:  # pragma: no cover
@@ -189,6 +287,14 @@ class GoldenMomentumScheduler:
         if "T_max" in state:
             self.T_max = int(state["T_max"])
             self._decay = PHI ** (-1.0 / float(self.T_max))
+        if "mode" in state:
+            self.mode = state["mode"]
+        if "tau" in state:
+            self._tau = float(state["tau"])
+        if "init" in state and state["init"] is not None:
+            self._init = float(state["init"])
+        if "total_epochs" in state:
+            self.total_epochs = state["total_epochs"]
 
 
 def golden_momentum_curve(epochs: int, tau: float = 5.0) -> list[float]:

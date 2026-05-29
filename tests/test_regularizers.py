@@ -151,6 +151,88 @@ def test_h47_dropout_actually_drops_units():
     assert (y == 0).any().item()
 
 
+# ---------------------------------------------------------------------------
+# PAPER_GAP_G5 — H47 step_unit semantics tests
+# ---------------------------------------------------------------------------
+def test_h47_phi_dropout_step_unit_epoch_is_default():
+    """PAPER_GAP_G5: default ``step_unit`` must be ``'epoch'`` so the
+    curriculum advances once per epoch, not once per forward."""
+    mod = PhiDropout(cycle="fib", length=5)
+    assert mod.step_unit == "epoch", mod.step_unit
+    # Per-forward step() is a no-op in epoch mode.
+    assert int(mod.step_counter.item()) == 0
+    mod.train()
+    for _ in range(100):
+        mod.step()
+        _ = mod(torch.zeros(2, 4))
+    # 100 forward passes + 100 step() calls — counter stays at 0,
+    # epoch stays at 0, current_p constant at schedule[0].
+    assert int(mod.step_counter.item()) == 0
+    assert int(mod.epoch.item()) == 0
+    expected0 = float(mod.schedule[0].item())
+    assert math.isclose(mod.current_p, expected0, abs_tol=1e-12)
+
+
+def test_h47_phi_dropout_advances_once_per_epoch_in_trainer():
+    """PAPER_GAP_G5: ``step_epoch`` must advance the curriculum by
+    exactly one schedule index (the Trainer's per-epoch hook)."""
+    mod = PhiDropout(cycle="fib", length=5)
+    mod.train()
+    seen = [mod.current_p]
+    # Mix in forward passes between step_epoch() calls — they must NOT
+    # contribute to the curriculum advance.
+    for _ in range(4):
+        for _ in range(50):
+            _ = mod(torch.randn(4, 8))
+        mod.step_epoch()
+        seen.append(mod.current_p)
+    # 5 distinct schedule entries visited in order.
+    expected = [1 / 19, 2 / 19, 3 / 19, 5 / 19, 8 / 19]
+    for a, b in zip(seen, expected):
+        assert math.isclose(a, b, abs_tol=1e-6), (a, b)
+    # All visited rates in [0, 1).
+    for v in seen:
+        assert 0.0 <= v < 1.0
+
+
+def test_h47_phi_dropout_legacy_forward_mode_still_works():
+    """PAPER_GAP_G5: explicit ``step_unit='forward'`` re-enables the
+    legacy per-forward counter advance (so the pre-fix bug can be
+    reproduced for ablation)."""
+    mod = PhiDropout(cycle="fib", length=5, step_unit="forward")
+    assert mod.step_unit == "forward"
+    mod.train()
+    # 5 forward passes -> counter ends at 5 -> visits schedule[1..4] then
+    # wraps to schedule[0] on call 5. ``current_p`` is read BEFORE the
+    # counter advances in this test sequence, so we collect post-call
+    # values.
+    rates = []
+    for _ in range(5):
+        _ = mod(torch.zeros(2, 4))
+        rates.append(mod.current_p)
+    # After 5 forwards counter is 5; 5 % 5 = 0 -> schedule[0] again.
+    # Intermediate forwards visited 1,2,3,4,0 (in that order).
+    expected_indices = [1, 2, 3, 4, 0]
+    for r, idx in zip(rates, expected_indices):
+        expected = float(mod.schedule[idx].item())
+        assert math.isclose(r, expected, abs_tol=1e-9), (r, expected, idx)
+    # And step_epoch is a NO-OP in forward mode (the counter, not the
+    # epoch buffer, drives the curriculum).
+    pre = int(mod.epoch.item())
+    mod.step_epoch()
+    assert int(mod.epoch.item()) == pre
+
+
+def test_h47_phi_dropout_rejects_invalid_step_unit():
+    """Constructor must reject unknown step_unit values."""
+    raised = False
+    try:
+        PhiDropout(step_unit="batch")  # type: ignore[arg-type]
+    except ValueError:
+        raised = True
+    assert raised, "expected ValueError for unknown step_unit"
+
+
 if __name__ == "__main__":
     import inspect
 
