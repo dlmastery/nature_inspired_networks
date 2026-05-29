@@ -1,3 +1,5 @@
+**ACCEPTANCE STATUS (2026-05-29): ACCEPT** — Final-Critic reviewer pass confirms all 42 items now PASS; three Phase-8 winners (pair_gm_pdw, slot_act_sine, sg_only_phi_budget post-fix) clear the worst-leader-seed > best-baseline-seed CIFAR-100 3-seed gate; PAPER.md cleared for promotion to FINAL with two recommended framing edits (see `audits/FINAL_CRITIC_REPORT.md`).
+
 # REVIEWER_CHECKLIST — paper-acceptance gate
 
 This is the contract a paper-grade external reviewer (or the project's own "final critic pass") evaluates against before any external publication is permitted. Each item is binary (PASS / FAIL); a single FAIL blocks publication. The checklist is generated from CLAUDE.md Rules 1–25, the autoresearch protocol, and the dual-track audit + Fixer outcomes.
