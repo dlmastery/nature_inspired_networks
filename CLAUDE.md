@@ -493,6 +493,186 @@ A single-config, single-seed (or even 3-seed) sweep number is SCREENING DATA, no
 A screening number MAY be reported in interim docs but only with the explicit "screened, not evaluated" qualifier. Negative results have the same standard: a candidate may not be claimed FALSIFIED on screening alone if its design literature predicts effects only manifest at longer horizons or different hyperparameter regimes (H41's β-only requalification is the cautionary tale: −33pp on screening was eps-confound, not the β-falsification predicted by Reddi 2018; β-only at 12-ep is only −1pp, and Reddi's non-convergence prediction needs ≥100 epochs to manifest).
 See [`skills/autoresearch-per-hypothesis-hillclimb/SKILL.md`](skills/autoresearch-per-hypothesis-hillclimb/SKILL.md) for the operational protocol.
 
+### Rule 29 — Markdown rendering MUST be Playwright-verified
+Any artefact (dashboard HTML, per-experiment page, README, paper)
+that embeds markdown sourced from `.md` files (FINDINGS verdict
+blocks, sci-critic addenda, hypothesis digests, headline ribbons)
+MUST pipe that content through a markdown converter that handles
+GFM tables and `>` block-quotes — NOT just inline `**bold**` / `*em*`
+/ `` `code` ``. Verify by Playwright: load the file, assert that
+`textContent` of the embedded block contains no literal `##`, `**`,
+`|---:|`, or `&gt;` strings. The 2026-05-29 dashboard audit
+(`audits/REVIEWER_PASS_DASHBOARD.md`) caught the same regression
+THREE times in one session — twice the "fix" had been claimed
+without Playwright verification.
+**Why:** commit `5194814` ("Render FINDINGS/audit/sci-critic as
+proper markdown") shipped a half-fix — block-quote tables still
+leaked literal `|---|` to the camera on every per-experiment page.
+**How to apply:** see
+[`skills/autoresearch-typography-and-rendering/`](skills/autoresearch-typography-and-rendering/).
+
+### Rule 30 — Academic typography for research artefacts
+Externally-facing artefacts (dashboards, paper, README rendered via
+GitHub Pages) use Source Serif 4 (body) + IBM Plex Mono (code).
+**Forbidden:** Newsreader (italic-as-emphasis display face), any
+"editorial" or "magazine" face, font-style:italic for headings,
+any Google Font CDN not pinned via `<link rel="preload">` with a
+local-CSS fallback. Per-experiment pages and the aggregate
+dashboard MUST share the same stack — typography mismatch across
+two surfaces of the same artefact reads as unfinished work.
+**Why:** commit `f8a4011` admits the aggregate dashboard self-
+described as "Newsreader / IBM Plex Serif" while per-experiment
+pages already used Source Serif 4 — visible regression cited as a
+CRITICAL fail in `audits/REVIEWER_PASS_DASHBOARD.md`.
+**How to apply:** see
+[`skills/autoresearch-typography-and-rendering/`](skills/autoresearch-typography-and-rendering/).
+
+### Rule 31 — Repo root limited to ≤ 4 canonical files
+The repo root contains ONLY: `README.md`, `CLAUDE.md`, `PAPER.md`,
+`LICENSE`. Every other markdown artefact lives in a subdirectory:
+- `paper/` — FINDINGS, MANIFESTO, PARADIGM_COMPARISON,
+  paper_abstract, NEURIPS_CHECKLIST, LIMITATIONS, ETHICS_STATEMENT,
+  STATISTICAL_TESTS, REVIEWER_CHECKLIST, SOTA_COMPARISON,
+  SELF_AUDIT_CHECKLIST.
+- `docs/` — GitHub Pages root + dashboard mirror.
+- `experiments/`, `hypotheses/`, `ideas/`, `audits/`, `skills/`,
+  `memory/`, `scripts/`, `src/`, `tests/`, `configs/`.
+A cluttered root is the single most off-putting signal to a first-
+time reader landing from a paper citation or a tweet.
+**Why:** the 2026-05-29 README cold-reader audit found 18+ markdown
+files in repo root, drowning the conference front-door signal.
+**How to apply:** see
+[`skills/autoresearch-doc-organization/`](skills/autoresearch-doc-organization/).
+
+### Rule 32 — README is the conference front-door
+`README.md` is the FIRST and OFTEN ONLY artefact an external reader
+sees. It MUST contain in order: (1) one-paragraph elevator pitch
+naming the contribution, (2) status badges (build, paper, license,
+Pages-live), (3) a 4-command quick start that actually runs from a
+clean clone, (4) headline FINDINGS + negative-results section with
+EQUAL prominence (negatives never buried), (5) methodological notes
+(seed protocol, hardware contract, screening-vs-evaluation framing
+per Rule 28), (6) a one-screen repo map, (7) BibTeX citation block,
+(8) license + acknowledgements. NO marketing language; NO unrebuked
+"ACCEPT" self-grades (Rule 36).
+**Why:** commit `40b576a` was the third README rewrite of the
+session — earlier passes hid the H09 rediscovery framing below
+the fold and lacked a Quick Start that actually worked.
+**How to apply:** see
+[`skills/autoresearch-doc-organization/`](skills/autoresearch-doc-organization/).
+
+### Rule 33 — Dashboard comprehension: small-multiples + "how to read"
+Dense charts with 3+ overlaid axes are forbidden when 3 side-by-
+side small-multiples convey the same information. Every chart
+carries a 1-sentence "what to read" caption directly under it.
+Every dashboard surface (aggregate, per-experiment, paper figure
+panel) opens with a "How to read this dashboard" orientation block
+of EXACTLY 4 bullets: (a) what this page shows, (b) how to
+interpret colour coding, (c) what counts as screening vs evaluation
+(Rule 28), (d) where to click for drill-down. Multi-hypothesis
+tags (combo*/pair*/hybrid*) display ALL participating hypothesis
+pills — the leading H-id alone is misleading.
+**Why:** `audits/REVIEWER_PASS_DASHBOARD.md` flagged combo2 page's
+H09-only pill (combo2 = H09+H48) as MAJOR, and the dense ablation
+chart as unreadable at submission resolution.
+**How to apply:** see
+[`skills/autoresearch-dashboard-comprehension/`](skills/autoresearch-dashboard-comprehension/)
+and the augmented
+[`skills/autoresearch-dashboard/`](skills/autoresearch-dashboard/).
+
+### Rule 34 — Seed-count + tier label on every visual numeric
+Every numeric on every dashboard / paper figure / README badge
+carries an `n=X` qualifier and a `SCREENING` / `EVALUATION` chip
+(per Rule 28). KN-strip: `+1.34 pp Δ vs baseline (n=3, EVALUATION)`.
+Aggregate leaderboard: dedicated `n` and `tier` columns. Headline
+ribbon: `Phase-8 winners (n=3 seeds, EVALUATION gate)`. A bare
+"+1.34 pp" without the qualifier is a Rule-28 violation surfacing
+as a Rule-34 visual gap.
+**Why:** `audits/REVIEWER_PASS_DASHBOARD.md` identified 80+ KN-
+strips and table cells missing the framing, cited as the "single
+biggest 'not yet top-tier' gap."
+**How to apply:** see
+[`skills/autoresearch-dashboard-comprehension/`](skills/autoresearch-dashboard-comprehension/)
+and the augmented
+[`skills/autoresearch-per-experiment-page/`](skills/autoresearch-per-experiment-page/).
+
+### Rule 35 — Statistical rigor floor for empirical claims
+Any empirical claim using "outside seed noise" / "statistically
+significant" / "winner" framing MUST report: (a) paired Wilcoxon
+signed-rank (or paired t-test with explicit normality justification);
+(b) 95 % bootstrap CI on the pp delta (≥10,000 resamples); (c) a
+multiple-comparisons correction across the sweep family — Holm-
+Bonferroni for K known comparisons. **n=3 seeds is SCREENING only.**
+For α=0.05 Holm-Bonferroni on a 3-hypothesis family the minimum
+seed count is **n≥7** (Wilcoxon needs ≥6 non-tied pairs for two-
+sided p < 0.05; Holm correction raises the bar). Empirical noise
+band (e.g., "±0.5 pp") must be EMPIRICALLY DERIVED from the
+project's own multi-seed data per dataset — NEVER a rule-of-thumb.
+The empirically-derived band is reported in `paper/STATISTICAL_TESTS.md`.
+**Why:** `audits/REVIEWER_PASS_PAPER.md` BLOCKER section B graded
+the "min-leader > max-baseline" ordinal gate as a one-sided sign
+test with α≈0.125 — well above any defensible threshold.
+**How to apply:** see
+[`skills/autoresearch-paper-rigor/`](skills/autoresearch-paper-rigor/).
+
+### Rule 36 — Pre-registration discipline; no post-hoc HARKing
+The classification of any sweep row as SCREENING vs EVALUATION
+(Rule 28) MUST be pre-registered BEFORE the sweep runs — committed
+to git with a hash referenced in the paper / FINDINGS entry.
+Retroactively reclassifying a row as "screening" after seeing it
+lose is HARKing (Hypothesizing After Results are Known) and is a
+BLOCKER-level finding. Ordinal-margin (`min(leader)−max(baseline)`)
+is a different statistic from Δmean (`mean(leader)−mean(baseline)`)
+and both MUST be reported alongside each other for any "lead"
+claim. If a hypothesis's pre-registered falsifier specifies a
+dataset that isn't in the sweep, the verdict is
+`UNTESTED_ON_RIGHT_DATASET` — never NUMEROLOGY / FALSIFIED.
+**Why:** `audits/REVIEWER_PASS_PAPER.md` flagged §7.3.1 of PAPER.md
+as the paper's most dangerous BLOCKER — retroactive reclassification
+of every single-prior negative as "screening, not evaluation."
+**How to apply:** see
+[`skills/autoresearch-paper-rigor/`](skills/autoresearch-paper-rigor/).
+
+### Rule 37 — No self-grading banners on external-facing artefacts
+"ACCEPT" / "WEAK_ACCEPT" / "Reviewer-acceptance" verdicts produced
+by same-model-family agents grading their own project's output are
+**INTERNAL QA passes, not external review.** Banners on README,
+PAPER, dashboard, per-experiment pages MUST explicitly say
+"Internal QA pass — independent external review pending." An
+external reviewer's WEAK_REJECT (e.g., `audits/REVIEWER_PASS_PAPER.md`)
+**overrides** any prior internal ACCEPT — internal verdicts are
+downgraded immediately and the downgrade is logged in the artefact.
+Auditor-self-grading circularity (implementer + critic + sci-critic
++ fixer agents share a model family) MUST be disclosed in any
+paper section reporting audit-derived rates (e.g., the 51 % non-
+PASS finding), with a calibration plan against third-party code.
+**Why:** `audits/REVIEWER_PASS_PAPER.md:55` flagged the PAPER.md
+"Reviewer-acceptance ACCEPT verdict at commit `0343f35`" as
+self-referential and misleading.
+**How to apply:** see
+[`skills/autoresearch-scicritic-team/`](skills/autoresearch-scicritic-team/)
+and augmented
+[`skills/autoresearch-critic-team/`](skills/autoresearch-critic-team/).
+
+### Rule 38 — Link discipline + first-mention linkification + audit ledger
+Every link in any externally-facing artefact (README, paper,
+dashboard HTML, per-experiment page) MUST be HEAD-tested via
+Playwright before claiming "done." Repo-root `.md` files
+referenced from `docs/`-served HTML use absolute GitHub-blob URLs
+(Rule 27); relative `../FINDINGS.md` from `docs/` returns 404.
+The FIRST mention of any model name (ResNet-20, RegNetX-200MF,
+ViT-Tiny), dataset (CIFAR-10/100, Spherical MNIST), technique
+(SIREN, AdamW, label smoothing), arXiv ID, hypothesis ID (H09,
+H71), or CLAUDE.md rule number in any artefact MUST be a hyperlink
+to its canonical reference. Audit files in `audits/` are
+APPEND-ONLY (Rule 3 spirit) — new audits never overwrite previous
+ones; each pass creates a dated file or a new section.
+**Why:** the 2026-05-29 Playwright link sweep found 340+ broken
+links (Rule 27 origin); cold-reader audits flagged un-linkified
+first mentions of ResNet, AdamW, CIFAR across README/PAPER.
+**How to apply:** see
+[`skills/autoresearch-link-discipline/`](skills/autoresearch-link-discipline/).
+
 ### Cumulative checkpoint cadence (reinforcement of Rule 11)
 The auto-checkpoint loop discipline is **mandatory** during any
 multi-hour campaign. "I'll commit at the end of the turn" is a Rule-11
@@ -525,6 +705,14 @@ can pick them up unchanged. The current catalogue:
 - [`autoresearch-per-experiment-page`](skills/autoresearch-per-experiment-page/) — independent comprehensive dashboard page per run, group-sectioned aggregate, GitHub Pages mirror.
 - [`autoresearch-auto-checkpoint-loop`](skills/autoresearch-auto-checkpoint-loop/) — background git auto-commit loop for crash safety alongside long-running sweeps and agent teams.
 
-*Last updated: 2026-05-29. Rules 1–28 are normative invariants. CLAUDE.md
+**Added 2026-05-29 from the reviewer-pass + cold-reader campaign**
+(Rules 29–38, external-review-aware):
+- [`autoresearch-typography-and-rendering`](skills/autoresearch-typography-and-rendering/) — markdown rendering with Playwright-verification + Source Serif 4 / IBM Plex Mono academic palette; no editorial display faces.
+- [`autoresearch-doc-organization`](skills/autoresearch-doc-organization/) — repo root ≤ 4 canonical files; README front-door pattern; paper/docs/experiments subdirs.
+- [`autoresearch-link-discipline`](skills/autoresearch-link-discipline/) — every link Playwright-HEAD-tested; absolute GitHub-blob URLs per Rule 27; first-mention linkification of models/datasets/techniques/arXiv IDs.
+- [`autoresearch-dashboard-comprehension`](skills/autoresearch-dashboard-comprehension/) — small-multiples over dense charts; "how to read" orientation block; seed-tier propagation; multi-hypothesis pill display.
+- [`autoresearch-paper-rigor`](skills/autoresearch-paper-rigor/) — statistical-rigor floor (paired Wilcoxon + bootstrap CI + Holm-Bonferroni); pre-registration of screening-vs-evaluation; empirical noise band derivation; UNTESTED_ON_RIGHT_DATASET verdict tier.
+
+*Last updated: 2026-05-29. Rules 1–38 are normative invariants. CLAUDE.md
 is self-contained: no parent-repo dependency required to implement the
-protocol. The 17 skills in `skills/` are content-agnostic.*
+protocol. The 22 skills in `skills/` are content-agnostic.*
