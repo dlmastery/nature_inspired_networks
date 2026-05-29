@@ -81,6 +81,34 @@
 > section after the orchestrator (`scripts/launch_postfix_campaign.sh`,
 > task #88) completes.
 
+> ## 🔍 METHODOLOGICAL CAVEAT — screening vs evaluation (2026-05-29)
+>
+> The 12-epoch CIFAR-10 single-config single-seed protocol used for
+> every per-hypothesis row in this document is a **screening filter**,
+> not an evaluation. Single-config single-seed numbers conflate
+> "the hypothesis is bad" with "the hypothesis is bad *at our specific
+> config*". Real evaluation requires per-hypothesis hill-climbing
+> (Phase 9, ahead) across the natural knobs of each prior (β2 for
+> H41, base_wd for H44, dropout floor for H47, T_max-step for H48,
+> width-rounding for H09, etc.), 3-seed re-runs at the best config
+> found, and then the Phase-5 worst-leader-seed > best-baseline-seed
+> gate on CIFAR-100.
+>
+> The **only hypothesis-level claims that survive this distinction
+> today are the three Phase-8 winners**, each of which IS 3-seed
+> CIFAR-100 evaluated and satisfies the Phase-5 gate:
+> `pair_gm_pdw`, `slot_act_sine`, `sg_only_phi_budget` (post-fix).
+> Every other hypothesis-level statement in this document — including
+> "H41 falsified", "H42 PAPER_DISAGREES", "H44 borderline", "H50
+> catastrophic", "H47/H48 WRONG_TEST", etc. — is reclassified as
+> **SCREENING DATA**, not evaluation. The screening signal is real
+> (a hypothesis that flunks at one config has *prima facie* evidence
+> against it) but it is NOT yet a falsification at the level required
+> for an external claim. The Phase-9 hill-climb skill (in flight) is
+> the mechanism by which each screened-negative hypothesis gets a
+> fair re-test at its own most-favourable config before any final
+> verdict is recorded.
+
 > **The pre-audit headline (historical, preserved verbatim):** at the
 > 12-epoch / 127–272 k-parameter scale on CIFAR-10, the nature-inspired
 > priors do *not* compound. The full hybrid (`sg_full_fib`, all six
@@ -115,19 +143,51 @@ fractionally below baseline only because it carries 11 k more params;
 on raw accuracy it wins. Pre-registered falsifier (top-1 ≤ baseline)
 is **not** met → hypothesis survives.
 
-### The clean falsification: H41 Golden-Ratio AdamW
+### The clean falsification: H41 Golden-Ratio AdamW — REQUALIFIED 2026-05-29
 
-| tag | hyp | top-1 | verdict |
-|---|---|---|---|
-| `sg_only_golden_adam` | H41 | **51.96 %** | **falsified — worst run in the entire project** |
+> **CORRECTION (2026-05-29, from `audits/PAPER_GAP_G5.md`).** The
+> "clean falsification" headline as originally stated was wrong: it
+> conflated two simultaneous changes. The pre-fix
+> `GoldenRatioAdamW` shipped both `eps = 1/φ⁴ ≈ 0.146` AND
+> `β1 = 1/φ`, `β2 = 1/φ²` — and the catastrophic −33 pp collapse was
+> driven **entirely by the eps change** (which dominated Adam's
+> denominator at CIFAR gradient scales ~1e-3, pushing effective LR
+> to ~6.85× nominal), NOT by the β change. After Fixer-Opt
+> (commit `8aa0430`) restored stock `eps = 1e-8` and kept ONLY the
+> β-shift, the post-fix CIFAR-10 12-ep top-1 is **0.8394** vs
+> baseline 0.8478 → Δ ≈ **−1 pp**, not −33 pp. The Reddi 2018
+> non-convergence prediction is asymptotic; it does NOT yet manifest
+> at the 12-ep screening horizon. **Revised verdict: WEAKLY NEGATIVE
+> at 12-ep CIFAR-10 screening; the β-only mild regression is
+> consistent with Wilson 2017 ("default β2 ≈ 0.999 is empirically
+> tuned, lower is monotonically worse but not pathologically so at
+> short horizons"); a clean β-only falsification at the Reddi-2018
+> non-convergence scale needs 100+-epoch training and is deferred to
+> the Phase-9 hill-climb at varied β2.** The 0.5196 row is now
+> historically labelled as the eps-confound; the canonical β-only
+> H41 number is 0.8394.
+
+| tag | hyp | pre-fix top-1 (eps+β confound) | post-fix top-1 (β-only) | verdict |
+|---|---|---:|---:|---|
+| `sg_only_golden_adam` | H41 | 51.96 % (eps=1/φ⁴) | **83.94 %** (eps=1e-8, β=φ-defaults) | WEAKLY NEGATIVE at 12 ep; Reddi-2018 β2 non-convergence prediction deferred to Phase-9 long-horizon sweep |
 
 Setting Adam's `β1 = 1/φ ≈ 0.618`, `β2 = 1/φ² ≈ 0.382` sits far below
-the empirically-stable regime (`0.9 / 0.999`). The low `β2` makes the
-second-moment estimate hyper-noisy, so the optimiser never stabilises —
-a 33 pp collapse vs baseline. This is exactly the kind of confidently-
-stated "golden constants improve everything" claim the protocol exists
-to kill. **Verdict: DISCARD**; the golden ratio is not a universal
-substitute for tuned optimiser moments.
+the empirically-stable regime (`0.9 / 0.999`) and the EMA time-constant
+for the second moment becomes τ ≈ 1.6 steps. Reddi et al. 2018
+(arXiv:1904.09237) prove Adam non-convergence in this regime
+asymptotically; Choi 2019 (arXiv:1910.05446) and Wilson 2017
+(arXiv:1705.08292) sweep β2 ∈ [0.95, 0.999] and find that range
+dominates everywhere. At the 12-ep CIFAR-10 screening horizon with
+cosine LR + AdamW decoupling and stock eps, the β-only regression is
+only ~1 pp — the asymptotic non-convergence proof does not yet bite.
+The original `eps = 1/φ⁴ ≈ 0.146` setting (which is what made the
+pre-fix row catastrophic) inflated effective LR by ~6.85× and
+saturated the optimiser; that was a confound, NOT the β claim.
+**Revised verdict: WEAKLY NEGATIVE (screening), pending Phase-9
+β2-sweep at longer training horizons before any final falsification
+is recorded.** The "DISCARD as a universal recipe" framing remains
+appropriate at the screening level, but the catastrophic-collapse
+narrative was eps-driven and is retired.
 
 ### The efficiency story: H02 Fibonacci depth + the φ-channel family
 
@@ -154,7 +214,7 @@ or needs-the-right-dataset" rather than falsified.
 
 ### New strong negatives (join group/cymatic/toroidal)
 
-`golden_adam` (51.96, above), `group_avg` (65.38), `golden_bottleneck`
+`golden_adam` (51.96 pre-fix / **83.94 post-fix β-only**, see correction above — the −33pp was eps-confound, the β-only Δ is only ~−1 pp at 12 ep), `group_avg` (65.38), `golden_bottleneck`
 (69.25, but at **0.21× params** — efficiency outlier worth a second
 look), `phi_relu` (71.07), `fib_stride` (72.55), `phi_sparse` (73.33),
 `phi_init` (76.56). The φ-init and sparse-connectivity priors actively
@@ -255,7 +315,11 @@ overlap?)
   longer training or a different scheduler interaction to be revisited.
 - **All other hypotheses tested at Phase-5 depth:** unchanged from earlier
   verdicts (H02 fib_depth efficiency-only, H05 fractal neutral-positive on
-  C10 only, H41 golden_adam falsified, etc.).
+  C10 only, H41 golden_adam falsified [REQUALIFIED 2026-05-29 — see
+  correction above: post-fix β-only top-1 is 0.8394, not 0.5196; the
+  −33pp was eps-driven; H41 is now WEAKLY NEGATIVE at 12-ep screening
+  rather than a clean catastrophic falsification, pending Phase-9
+  long-horizon β2 sweep], etc.).
 
 ### What Phase 5 proved
 
@@ -265,7 +329,9 @@ end-to-end through 35 + 5 + 6 = **46 GPU runs** spanning two datasets and
 produced exactly one externally defensible accuracy claim plus several
 documented falsifications. **The protocol is the deliverable** — and it
 worked exactly as designed: most "golden-ratio fixes everything" claims
-died (H41 catastrophically, H48 quietly), and the one survivor was made
+died (H41 catastrophically [REQUALIFIED 2026-05-29: the catastrophic
+collapse was eps-confound; β-only post-fix is mild −1 pp at 12 ep —
+clean β-only falsification deferred to Phase-9], H48 quietly), and the one survivor was made
 to prove it twice on independent data and three times on independent
 seeds before earning the headline.
 

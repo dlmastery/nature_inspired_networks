@@ -153,7 +153,7 @@ The Phase-8 SLOT-ablation row `slot_act_sine` — `phi_budget` base × replace R
 
 ### 6.1 · Pre-fix baseline (single seed, 12 epochs)
 
-Across 35 single-prior sweep rows on CIFAR-10 at seed 0 / 12 epochs, the only variant beating the ResNet-20 baseline (84.78 %) was **H09 phi_budget at 85.54 %** (+0.76 pp). The empirically-falsified `golden_adam` (51.96 %, −32.82 pp) was the clean falsification of the campaign, though Track A revealed the falsification conflated β-changes with eps-changes; Fixer-Opt restored stock eps for the β-only re-test.
+Across 35 single-prior sweep rows on CIFAR-10 at seed 0 / 12 epochs, the only variant beating the ResNet-20 baseline (84.78 %) was **H09 phi_budget at 85.54 %** (+0.76 pp). The pre-fix `golden_adam` row at 51.96 % (−32.82 pp) was originally framed as the campaign's clean falsification, **but Track A's H41 audit + the post-fix re-run (2026-05-29) requalified that headline**: the catastrophic collapse was driven by `eps = 1/φ⁴ ≈ 0.146` (which dominated Adam's denominator at CIFAR gradient scales ~1e-3, inflating effective LR ~6.85×), NOT by the β-shift. After Fixer-Opt restored stock `eps = 1e-8` and kept only the φ-defaults for β, **post-fix CIFAR-10 12-ep top-1 = 0.8394, Δ ≈ −1 pp vs baseline**. Reddi 2018's (arXiv:1904.09237) non-convergence proof for β2 < 0.95 is asymptotic and does not yet bite at 12 ep — the β-only regression is mild, not catastrophic. **H41 is therefore re-classified as WEAKLY NEGATIVE at 12-ep CIFAR-10 screening, with the clean β-only Reddi-regime falsification deferred to the Phase-9 hill-climb at varied β2 + longer training horizons (100+ ep).** The pre-fix 0.5196 number is retired as eps-confounded; the canonical β-only H41 number is 0.8394. See `audits/PAPER_GAP_G5.md` for the full audit + correction trail.
 
 ### 6.2 · Pre-fix combo ladder (in-flight)
 
@@ -196,6 +196,25 @@ Combining Tracks A + B + the Fixer outcomes, the hypotheses currently eligible f
 - **12 / 30-epoch budget is the screening, not the convergence regime.** Stronger or different priors may emerge at the 164-epoch full SOTA recipe.
 - **CIFAR-10 / CIFAR-100 is not a sufficient testbed** for several of the equivariance / topological hypotheses (which would shine on rotated CIFAR, spherical MNIST, ModelNet40, ogbg-molhiv, etc.). The dataset coverage is acknowledged in `IDEA_TABLE.md`.
 
+### 7.3.1 · Methodological caveat — screening vs evaluation
+
+A first-principles methodological note that conditions every per-hypothesis number in §6 and every per-hypothesis verdict in `FINDINGS.md`: **the 12-epoch CIFAR-10 single-config single-seed protocol used across the 35-row sweep is a *screening filter*, not an *evaluation*.** Single-config single-seed numbers conflate two distinct claims:
+
+1. **"The hypothesis is bad."** (The mechanism does not help on this dataset family at this compute budget at any reasonable knob setting.)
+2. **"The hypothesis is bad *at our specific config*."** (The mechanism might help at a different β2, different base_wd, different dropout floor, different T_max-step, different width-rounding, different RNG seed, but at the one config we ran it lost to baseline.)
+
+The screening protocol cannot disambiguate (1) from (2). What it CAN do — and what it was designed to do — is identify a small set of hypotheses worth the cost of real evaluation. A real evaluation, in this project, has three layers:
+
+- **Per-hypothesis hill-climb** (Phase 9, in progress) over the natural knobs of each prior — β2 ∈ [0.382, 0.999] for H41; base_wd ∈ {5e-4, 1e-3, 5e-3, 1e-2} for H44; dropout floor + slope for H47; T_max-step for H48; width-rounding strategy for H09; stride / kernel-size for H21 hex_phi; etc. The hill-climb runs the cheap 12-ep grid first, then a focused 30-ep top-3 confirm.
+- **3-seed re-runs at the best config found.** Single-seed differences inside ±0.5 pp on CIFAR-10 12-ep are within seed noise (baseline_resnet20's own 3-seed std on CIFAR-100 30-ep is 0.20 pp; the 12-ep seed spread is wider).
+- **Phase-5 worst-leader-seed > best-baseline-seed gate** on CIFAR-100 30-ep, 3 seeds. This is the binding empirical gate before any external accuracy claim is recorded.
+
+**The only hypothesis-level claims in this paper that have cleared all three layers are the three Phase-8 winners: `pair_gm_pdw`, `slot_act_sine`, and `sg_only_phi_budget` (post-fix).** Each is 3-seed CIFAR-100 evaluated with the worst-leader-seed strictly above the best-baseline-seed (see §5.4–5.6 and `FINDINGS.md` Phase-8 final verdict). These three remain externally defensible.
+
+**Every other hypothesis-level statement** in this paper, in `FINDINGS.md`, and in `audits/*` — including "H41 falsified", "H42 paper-disagrees", "H44 wrong-test", "H47/H48 wrong-schedule", "H50 catastrophic", "H80 Reuleaux mild-negative", "H81 sine-act mid-pack", and all other single-prior verdicts at 12 ep — is reclassified as **SCREENING DATA, not evaluation**. The screening signal is informative (a hypothesis that fails one config has *prima facie* evidence against it, and the screening + audit cascade has correctly identified mechanism bugs in 18 modules) but it is NOT yet a falsification at the level required for an external claim. The Phase-9 hill-climb skill (`skills/autoresearch-hill-climb-per-hypothesis/`, separate work-stream) is the mechanism by which each screened-negative hypothesis gets a fair re-test at its own most-favourable config before any final verdict is published. Until that lands, the project's external-claim surface is the three Phase-8 winners, full stop.
+
+The screening-vs-evaluation distinction also recasts §6.1's H41 correction in its proper frame: the post-fix β-only number 0.8394 is a *screening result at a single config*, not a Reddi-2018 long-horizon test. The Reddi non-convergence proof is asymptotic; demonstrating it empirically requires 100+-epoch training across β2 ∈ {0.382, 0.5, 0.7, 0.9, 0.95, 0.999} — the dedicated Phase-9 sweep. The same logic applies to H44 (per-layer wd schedules need long training to express), H47 (curriculum-dropout needs the corrected per-epoch schedule × longer horizon), H48 (T_max-aware decay needs T_max to span a meaningful range), and roughly half of the G5/G6 hypotheses.
+
 ### 7.4 · Future work
 
 1. **Post-fix re-run completion** (≈ 4.5 GPU h, queued); CIFAR-100 3-seed of the post-fix winner; pre-vs-post comparison table in FINDINGS.md.
@@ -203,6 +222,7 @@ Combining Tracks A + B + the Fixer outcomes, the hypotheses currently eligible f
 3. **H71 IcosaRoPE3D dedicated experiment.** The only NOVEL+TESTABLE verdict deserves a full design + benchmark.
 4. **Dataset transfer** — Tiny ImageNet, rotated-CIFAR, MedMNIST, Spherical MNIST — to test where the equivariance / topology priors are data-aligned.
 5. **A third critic pass** specifically targeting (a) post-fix mechanism correctness and (b) any newly-introduced regressions; this is the final reviewer-acceptance gate.
+6. **Phase 9 — per-hypothesis hill-climb.** Lift every screened-negative hypothesis out of the single-config screening cage and re-run it at its own most-favourable knob settings (β2 grid for H41, base_wd grid for H44, dropout floor + slope grid for H47, T_max-step grid for H48, width-rounding strategies for H09, stride / kernel-size for H21, etc.). Each survivor of the hill-climb gets a 3-seed re-run at the best config, then the Phase-5 worst-leader-seed > best-baseline-seed gate. This is the mechanism by which screened-negative hypotheses earn (or do not earn) a final falsification verdict at the level required for an external claim; until it lands, every per-hypothesis verdict in §6 is screening data, not evaluation (see §7.3.1).
 
 ## 8 · Conclusion
 
@@ -221,7 +241,7 @@ The audit + fixer + re-run cycle, encoded in CLAUDE.md Rules 20–25 and package
 - Sitzmann V et al. 2020 NeurIPS. *SIREN — Implicit Neural Representations with Periodic Activation Functions*. arXiv:2006.09661.
 - Ramsauer H et al. 2020 ICLR. *Hopfield Networks is All You Need*. arXiv:2008.02217.
 - Radosavovic I et al. 2020 CVPR. *Designing Network Design Spaces* (RegNet). arXiv:2003.13678. — H09 phi_budget sits inside its Pareto region.
-- Reddi SJ, Kale S, Kumar S. 2018 ICLR. *On the Convergence of Adam and Beyond*. arXiv:1904.09237. — β2 < 0.95 non-convergence regime; H41 falsification.
+- Reddi SJ, Kale S, Kumar S. 2018 ICLR. *On the Convergence of Adam and Beyond*. arXiv:1904.09237. — β2 < 0.95 non-convergence regime; H41 β-only screening regression at 12 ep is mild (~ −1 pp); the asymptotic non-convergence prediction is deferred to a Phase-9 longer-horizon β2 sweep (the original pre-fix −33 pp "falsification" was eps-confounded; see § 6.1 correction).
 - Su J et al. 2021. *RoFormer: Enhanced Transformer with Rotary Position Embedding*. arXiv:2104.09864.
 - Islam M et al. 2025. *Platonic Transformers: A Solid Choice for Equivariance*. arXiv:2510.03511. — H55 reference.
 
