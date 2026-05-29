@@ -100,11 +100,61 @@ The sci-critic appends THIS exact section to the END of each
 - The single most damning critique (with H-ID)
 - Commit SHA
 
+## Dataset-aware verdict — UNTESTED_ON_RIGHT_DATASET (added 2026-05-29)
+
+A hypothesis whose pre-registered falsifier specifies a dataset
+that ISN'T in the sweep cannot earn a NUMEROLOGY / FALSIFIED
+verdict from that sweep. Add to the tier list:
+
+- **UNTESTED_ON_RIGHT_DATASET** — falsifier specified dataset X
+  (e.g., tiled-texture, Spherical MNIST, WikiText-2); sweep ran on
+  dataset Y (e.g., upright CIFAR-10); verdict deferred until the
+  pre-registered dataset is available.
+
+Example: H22 (toroidal φ-closure) pre-registers "tiled-texture or
+wrap-aware synthetic dataset" as the falsifier. The May-2026
+sweep ran on upright CIFAR-10. The correct verdict is
+`UNTESTED_ON_RIGHT_DATASET`, **not** NUMEROLOGY — and the
+reviewer audit (`audits/REVIEWER_PASS_PAPER.md` BLOCKER section D)
+called the original NUMEROLOGY labelling out as "testing on the
+wrong dataset and then concluding the hypothesis fails."
+
+When in doubt, default to `UNTESTED_ON_RIGHT_DATASET` rather than
+NUMEROLOGY. The latter is a strong claim; the former is the
+honest verdict.
+
+## Auditor-self-grading circularity disclosure (added 2026-05-29)
+
+Per CLAUDE.md Rule 37, the sci-critic agents in this project
+share a model family with the implementer + impl-critic + fixer
+agents. The sci-verdict — NOVEL+TESTABLE in particular — is
+therefore an **internal sci-QA verdict, not independent external
+review**. When referenced externally:
+
+- The "0 NOVEL+TESTABLE-AND-impl-PASS" rate in the May-2026
+  campaign is internal; an external reviewer might revise upward
+  (some "DERIVATIVE+TESTABLE" verdicts could be NOVEL+TESTABLE
+  upon deeper literature review) OR downward (some "NOVEL+TESTABLE"
+  verdicts could be DERIVATIVE upon discovery of prior art).
+- The verdict tier is reported as a snapshot at commit-SHA, not
+  as a permanent classification.
+- External reviewer findings (e.g., `audits/REVIEWER_PASS_PAPER.md`
+  showing H09 is a RegNet rediscovery the project's own §5.4
+  admits) **override** the internal sci-verdict within the same
+  commit that processes the audit.
+
 ## Cross-references
 
-- CLAUDE.md Rule 22 — a hypothesis used in an external claim must
-  pass BOTH impl-critic AND sci-critic.
-- `autoresearch-critic-team` — the code-side counterpart.
-- The original sci-critic dispatch on this repo (May 2026) produced 0
-  NOVEL / 31 DERIVATIVE / 41 NUMEROLOGY / 3 FALSIFIED across 81
-  hypotheses — calibrate expectations accordingly.
+- CLAUDE.md Rules 22 (dual-track audit), 36 (dataset-aware
+  verdicts + pre-registration), 37 (no self-grading + circularity
+  disclosure).
+- `audits/REVIEWER_PASS_PAPER.md` — origin of the
+  UNTESTED_ON_RIGHT_DATASET tier and circularity disclosure.
+- `autoresearch-critic-team` — the code-side counterpart, same
+  circularity caveat applies.
+- `autoresearch-paper-rigor` — the statistical arm: paper-level
+  enforcement of these verdict tiers.
+- The original sci-critic dispatch on this repo (May 2026)
+  produced 0 NOVEL / 31 DERIVATIVE / 41 NUMEROLOGY / 3 FALSIFIED
+  across 81 hypotheses — interpret these as internal-snapshot,
+  not authoritative.

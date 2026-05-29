@@ -114,9 +114,66 @@ near the top with a badge.
 - Updating `dashboard/dashboard.html` without re-mirroring `docs/` —
   GitHub Pages stays stale.
 
+## KN-strip seed-count + tier badge (added 2026-05-29)
+
+Every per-experiment page header carries a KN-strip with the
+seed-count and tier chip, per Rule 34:
+
+```html
+<div class="kn-strip">
+  <span class="tag">pair_gm_pdw</span>
+  <span class="delta">+1.34 pp</span>
+  <span class="vs">Δ vs baseline_resnet20_cifar100</span>
+  <span class="seed-badge n3">n=3</span>
+  <span class="tier-chip evaluation">EVALUATION</span>
+  <span class="commit-sha">e4f286f</span>
+</div>
+```
+
+For multi-hypothesis tags, the H-pills row shows ALL participating
+hypotheses (NOT just the leading one — Rule 33):
+
+```html
+<div class="h-pills">
+  <span class="h-pill">H09 phi_budget</span><span class="plus">+</span>
+  <span class="h-pill">H48 golden_momentum</span><span class="plus">+</span>
+  <span class="h-pill">H44 phi_decay_wd</span>
+</div>
+```
+
+The per-experiment page banner MUST NOT carry a self-graded
+"ACCEPT" / "FINAL" verdict (Rule 37). The verdict block routes
+the FINDINGS markdown through the converter
+(`skills/autoresearch-typography-and-rendering/`) and includes the
+qualifier "Internal QA pass — external review pending" when the
+verdict cited is from a same-family agent.
+
+## Markdown-rendering verification (added 2026-05-29)
+
+The FINDINGS verdict block, sci-critic addendum, and impl-critic
+excerpt all source from `.md` files and MUST pipe through the
+GFM-table + blockquote-aware markdown converter (Pillar 2 of
+`skills/autoresearch-typography-and-rendering/`). After every
+template change, the Playwright probe at
+`scripts/verify_markdown_rendering.py` MUST pass on at least 5
+sampled pages — including the Phase-N headline pages and the
+combo-ladder pages where block-quote tables appear.
+
 ## Cross-references
 
-- CLAUDE.md Rule 24 — full dashboard discipline.
-- `autoresearch-dashboard` — the original aggregate-dashboard skill;
-  this extends it with per-experiment pages + group sectioning.
+- CLAUDE.md Rules 24 (dashboard discipline), 28 (screening-vs-
+  evaluation), 33 (multi-hypothesis pills), 34 (seed-count
+  badges), 37 (no self-grading), 29 (markdown rendering Playwright
+  verification).
+- `autoresearch-dashboard` — the original aggregate-dashboard
+  skill; this extends it with per-experiment pages + group
+  sectioning + KN-strip badges.
+- `autoresearch-dashboard-comprehension` — small-multiples + how-
+  to-read + seed-tier badge patterns.
+- `autoresearch-typography-and-rendering` — the markdown converter
+  + font palette this template depends on.
+- `autoresearch-link-discipline` — absolute GitHub-blob URLs for
+  every cross-reference link on the page.
+- `audits/REVIEWER_PASS_DASHBOARD.md` — origin findings for the
+  KN-strip + multi-pill + markdown-rendering complaints.
 - `dashboard/dashboard.html` example output on this repo.

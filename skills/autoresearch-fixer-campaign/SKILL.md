@@ -91,8 +91,54 @@ FINDINGS.md, not silently re-stated.
   HTML / FINDINGS — keep concerns scoped: Fixer commits code + tests,
   later commits update narratives.
 
+## Playwright-verify the specific complaint (added 2026-05-29)
+
+The single most-repeated mistake in the 2026-05-29 campaign was
+claiming a fix shipped without verifying the SPECIFIC complaint
+no longer reproduces. The markdown-rendering bug was "fixed"
+THREE times (`5194814`, `f8a4011`, and an earlier dashboard pass)
+before Playwright verification caught that block-quote tables
+still leaked literal `|---|` to the camera.
+
+The discipline: after every fix, run the verification PROBE that
+targets the exact complaint, not a generic smoke. Patterns:
+
+| complaint class | verification probe |
+|---|---|
+| markdown rendering on dashboard | `scripts/verify_markdown_rendering.py` (Playwright assert no literal `##`/`**`/`\|---\|` on the embedded blocks) |
+| broken links in published HTML | `scripts/verify_links.py` (Playwright HEAD-test every href) |
+| typography mismatch across surfaces | Playwright `getComputedStyle(el).fontFamily` assert on body of aggregate AND per-experiment pages |
+| hypothesis mechanism bug | the mechanism-verifying test added in step 2 of "three parts" above MUST fail on pre-fix and pass on post-fix |
+| Q&A test name missing (Rule 25) | grep `tests/` for the promised test name; create if absent |
+| sweep row eps-confound (H41 class) | re-run at iso-config with the suspect knob held; report Δ |
+| dataset-mismatched verdict | re-classify as UNTESTED_ON_RIGHT_DATASET; do NOT delete the data |
+
+If the verification probe doesn't exist for the complaint class,
+WRITE one as part of the fix. A fix without a probe regresses on
+the next session.
+
+The Fixer commit message MUST cite the probe and its output:
+
+```
+Fix <complaint> — patch + mechanism test + probe-verified
+
+- patch: <file>:<lines>
+- mechanism test: tests/test_<module>.py::test_<assertion> (FAIL pre, PASS post)
+- probe: scripts/verify_<thing>.py (output below)
+  <paste 1-3 lines of the verifier's PASS output>
+```
+
 ## Cross-references
 
-- CLAUDE.md Rules 21, 25 — post-fix re-run + Q&A-test contract.
-- `autoresearch-critic-team` — the source of fix specs.
+- CLAUDE.md Rules 21 (post-fix re-run), 25 (Q&A-test contract),
+  29 (Playwright markdown verification), 38 (Playwright link
+  sweep + audit ledger append-only).
+- `audits/REVIEWER_PASS_DASHBOARD.md` — the half-fix that prompted
+  the Playwright-probe discipline.
+- `autoresearch-critic-team` — the source of fix specs; post-fix
+  the Fixer routes back through the critic for verdict update.
 - `autoresearch-multi-agent-dispatch` — the dispatch mechanism.
+- `autoresearch-typography-and-rendering` — the probe pattern for
+  markdown-rendering complaints.
+- `autoresearch-link-discipline` — the probe pattern for
+  broken-link complaints.

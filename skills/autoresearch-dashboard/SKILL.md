@@ -91,6 +91,48 @@ To add a new panel:
 
 ## Anti-patterns
 
-- Pulling fonts from Google Fonts (breaks offline + adds tracking).
+- Pulling fonts from Google Fonts WITHOUT a `Charter, Georgia,
+  serif` fallback chain (breaks offline + Pages-edge-cache
+  misses).
 - Using Plotly / Bokeh / D3 — too heavy for a checkpoint dashboard.
 - Auto-refreshing the dashboard from JS — keep it static.
+- A single dense overlaid chart when 3 side-by-side small-
+  multiples convey the same info (per Rule 33 + sibling skill
+  `autoresearch-dashboard-comprehension`).
+- Numeric cells without `n=X` + tier chip (Rule 34 violation).
+- A leading-hypothesis-only pill on multi-hypothesis tags
+  (combo/pair/hybrid).
+- A self-graded ACCEPT banner without the "Internal QA pass —
+  external review pending" qualifier (Rule 37).
+
+## Mandatory companion skills (added 2026-05-29)
+
+A dashboard.html commit is INCOMPLETE without ALL of:
+
+1. **Typography + markdown rendering** —
+   `skills/autoresearch-typography-and-rendering/`. Source Serif 4
+   palette + GFM-table + blockquote markdown converter; Playwright
+   asserts no literal `##`/`**`/`|---|` leak through any embedded
+   block. ALSO covers per-experiment pages — same converter, same
+   font stack, asserted across BOTH surfaces.
+2. **Comprehension** —
+   `skills/autoresearch-dashboard-comprehension/`. Small-multiples
+   over dense charts; mandatory 4-bullet "how to read"
+   orientation block; multi-hypothesis pills; no self-grading
+   banners.
+3. **Link discipline** — `skills/autoresearch-link-discipline/`.
+   Absolute GitHub-blob URLs (Rule 27); first-mention
+   linkification (Rule 38); Playwright HEAD-test every href.
+4. **Seed-count + tier badge** — `n=X` + `SCREENING`/`EVALUATION`
+   chip on every numeric (Rule 34, enforced via
+   `autoresearch-dashboard-comprehension`).
+5. **Per-experiment page mirror** —
+   `skills/autoresearch-per-experiment-page/`. Each
+   leaderboard row navigates to its own page; pages mirror to
+   `docs/dashboard/experiments/`.
+
+After every dashboard generator change, run the Playwright
+verification gate (typography + markdown + links) BEFORE
+marking the change done. The 2026-05-29 audit caught the same
+markdown-rendering regression three times in one session because
+this gate was skipped.
