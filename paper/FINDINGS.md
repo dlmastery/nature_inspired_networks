@@ -31,7 +31,7 @@
 > - H81 SIREN's matched performance shows that a SINGLE well-chosen
 >   activation can be as effective as a 3-prior orthogonal stack
 >
-> Per CLAUDE.md Rule 22 (dual-track gate), all three winning hypotheses
+> Per CLAUDE.md [Rule 22](../CLAUDE.md#rule-22) (dual-track gate), all three winning hypotheses
 > additionally satisfy: (a) impl-critic verdict ≠ MAJOR/BROKEN, and (b)
 > sci-critic verdict ≠ NUMEROLOGY/UNFALSIFIABLE. The accuracy claims are
 > defensible.
@@ -54,7 +54,7 @@
 >    ratio is 1:1.623:2.629 (0.43 % max error). The architecture changed
 >    (widths `[40,48,64]` → `[37,48,61]`). The 85.54 / 58.05 numbers
 >    are NOT representative of the corrected network; the re-run is
->    mandatory before any external claim is restated (Rule 21).
+>    mandatory before any external claim is restated ([Rule 21](../CLAUDE.md#rule-21)).
 > 2. **H41 GoldenRatioAdamW falsification at 51.96 % top-1.** The
 >    falsification was real but invalid as stated — `eps = 1/φ⁴ ≈ 0.146`
 >    dominated Adam's denominator at CIFAR gradient scales, making the

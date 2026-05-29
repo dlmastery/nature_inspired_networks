@@ -83,7 +83,7 @@ Each sci-critic appended an "Addendum: Research-Scientist Critique" to every des
 
 - **H41 GoldenRatioAdamW** — pre-fix 51.96 % CIFAR-10 (−32.82 pp below baseline), but **REQUALIFIED 2026-05-29 (post-fix β-only top-1 = 0.8394, Δ ≈ −1 pp)** — the catastrophic pre-fix collapse was driven by `eps = 1/φ⁴ ≈ 0.146` (eps-confound), NOT by the β-shift. With stock `eps = 1e-8` restored and only β1=1/φ, β2=1/φ² retained, the 12-ep CIFAR-10 regression is mild. Reddi 2018's (arXiv:1904.09237) non-convergence prediction is asymptotic and does not yet manifest at 12 ep; the clean β-only falsification at the Reddi regime is deferred to Phase-9 long-horizon β2 sweep. The pre-fix −32.82 pp number is retired as a confounded result and replaced by the post-fix 0.8394 / Δ ≈ −1 pp β-only number as the canonical H41 result; foreseeable from Choi 2019 (arXiv:1910.05446) and Wilson 2017 (arXiv:1705.08292) which sweep β2 ∈ [0.95, 0.999] and find that range dominates everywhere — but the magnitude predicted at 12 ep is mild, NOT catastrophic.
 - **H48 GoldenMomentumScheduler** — Phase-4 seed-0 looked positive but Phase-5 3-seed gate failed: min seed 56.43 % < baseline max seed 56.62 %. Seed distributions overlap. (Also confounded by the H48 implementation bug — saturated to floor in 1 step — which Fixer-Opt corrected.)
-- **H50 sg_full_fib** — 73.24 % CIFAR-10 (11.54 pp below baseline). All 6 G3–G5 priors stacked on the same conv-block forward path was anti-compounding. Cautionary tale for Rule 23.
+- **H50 sg_full_fib** — 73.24 % CIFAR-10 (11.54 pp below baseline). All 6 G3–G5 priors stacked on the same conv-block forward path was anti-compounding. Cautionary tale for [Rule 23](../CLAUDE.md#rule-23).
 
 ---
 
@@ -128,7 +128,7 @@ This is exactly the kind of correction the protocol is designed to surface BEFOR
 
 ---
 
-## Post-fix re-run plan (Rule 21, in progress)
+## Post-fix re-run plan ([Rule 21](../CLAUDE.md#rule-21), in progress)
 
 The following 14 single-axis sweep rows must re-run because their primary module was patched:
 - `sg_only_phi_budget` (H09 — widths changed)
@@ -173,7 +173,7 @@ The hypotheses that survived implementation-critic PASS but failed sci-critic NU
 
 ## Methodology footnote — why dual-track audit matters
 
-Pure implementation auditing (Team A alone) would have flagged H09's broken realised ratio as MAJOR but would NOT have flagged the φ-mechanism's lack of scientific support — that's the sci-critic's job. Pure science critique (Team B alone) would have rated H09 as DERIVATIVE+TESTABLE but would NOT have caught the realised-ratio bug — that's the impl-critic's job. **Both audits surfaced complementary defects**; either alone would have missed half of the failure modes. CLAUDE.md Rule 22 codifies this — any external claim must pass BOTH bars.
+Pure implementation auditing (Team A alone) would have flagged H09's broken realised ratio as MAJOR but would NOT have flagged the φ-mechanism's lack of scientific support — that's the sci-critic's job. Pure science critique (Team B alone) would have rated H09 as DERIVATIVE+TESTABLE but would NOT have caught the realised-ratio bug — that's the impl-critic's job. **Both audits surfaced complementary defects**; either alone would have missed half of the failure modes. CLAUDE.md [Rule 22](../CLAUDE.md#rule-22) codifies this — any external claim must pass BOTH bars.
 
 The 81-hypothesis audit produced no NOVEL+TESTABLE-AND-impl-PASS pair (H71 is NOVEL but has no implementation audit because it's in the never-smoked G7 cross-paradigm hybrids); the strongest defensible category is DERIVATIVE+TESTABLE+impl-PASS, of which roughly 25 hypotheses qualify. This is the right framing for a paper: **"a research-rigorous re-derivation of golden-ratio-flavoured neural priors, with one cross-dataset replicated positive (H09 phi_budget) that survives the seed-noise gate but is empirically a rediscovery of RegNet's Pareto-optimal width region."**
 

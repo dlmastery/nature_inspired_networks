@@ -481,7 +481,7 @@ the organising frame for the rest of this section.
   attention × equivariance.
 - **Platonic Transformers**, Islam, Kim, Choi 2025 'Platonic
   Transformers: equivariant attention on the regular polyhedra'
-  (arXiv:2502.18654 — to be verified) — restricts SE(3)-Transformer
+  ([arXiv:2502.18654](https://arxiv.org/abs/2502.18654) — to be verified) — restricts SE(3)-Transformer
   to the Platonic subgroups; reports near-SE(3) quality at ~5× lower
   cost on molecular benchmarks. H55 in this repo is the planned
   replication.
@@ -562,7 +562,7 @@ the organising frame for the rest of this section.
   layer; foundational for H51 / H54 / H65.
 - **ripser** and **gudhi** are the workhorse persistent-homology
   libraries (Bauer 2021 'Ripser: efficient computation of
-  Vietoris-Rips persistence barcodes', arXiv:1908.02518; The GUDHI
+  Vietoris-Rips persistence barcodes', [arXiv:1908.02518](https://arxiv.org/abs/1908.02518); The GUDHI
   Project 2024 release).
 - **Trained-feature Betti collapse**, Naitzat, Zhitnikov, Lim 2020
   JMLR 'Topology of deep neural networks' (arXiv:2004.06093) —
@@ -784,7 +784,7 @@ a Mamba SSM by using φ-scaled discretisation timesteps.
 
 - **Geometric GNNs** review, Joshi, Fu, Liao, Mathis, Cesa, Liu,
   Bronstein 2024 'On the expressive power of geometric graph neural
-  networks' (arXiv:2301.09308 + 2024 expanded edition).
+  networks' ([arXiv:2301.09308](https://arxiv.org/abs/2301.09308) + 2024 expanded edition).
 - **Fibration symmetries**, Velarde, Makse 2026 'Fibration
   symmetries in biological networks' (Nature Physics, in press,
   arXiv:TBD — to be verified) — a 2026 paper that proves cortical
@@ -916,7 +916,7 @@ honestly.
 >
 > *Built by a 5-agent parallel team (Awesome-Agent-A through
 > Awesome-Agent-E) reading the 1438-line Grok transcript chunk-by-
-> chunk per [`CLAUDE.md`](https://github.com/dlmastery/nature_inspired_networks/blob/main/CLAUDE.md) Rule 17.*
+> chunk per [`CLAUDE.md`](https://github.com/dlmastery/nature_inspired_networks/blob/main/CLAUDE.md) [Rule 17](../CLAUDE.md#rule-17).*
 
 
 ## 1. Mathematical Foundations
@@ -1837,7 +1837,7 @@ Format: Author1, Author2, Author3 YEAR VENUE 'Title' (arXiv:XXXX.XXXXX) — rele
 - Hu, Li, Samaras, Chen 2024 'Topology-aware loss for medical segmentation' (arXiv:TBD — to be verified) — clinical TDL.
 - Huang, Sun, Liu, Sedra, Weinberger 2016 ECCV 'Deep networks with stochastic depth' (arXiv:1603.09382) — drop-path.
 - Huh, Cheung, Wang, Isola 2024 ICML 'The Platonic Representation Hypothesis' (arXiv:2405.07987) — PRH original.
-- Islam, Kim, Choi 2025 'Platonic Transformers' (arXiv:2502.18654 — to be verified) — discrete-Platonic SE(3) attention.
+- Islam, Kim, Choi 2025 'Platonic Transformers' ([arXiv:2502.18654](https://arxiv.org/abs/2502.18654) — to be verified) — discrete-Platonic SE(3) attention.
 - Jaegle, Gimeno, Brock, Zisserman, Vinyals, Carreira 2021 ICML 'Perceiver' (arXiv:2103.03206) — cross-attention bottleneck.
 - Jaegle et al. 2021 ICLR 'Perceiver-IO' (arXiv:2107.14795) — Perceiver generalised.
 - Jaeger 2020 'Generalised optimisation with the golden ratio' (arXiv:2006.04751) — φ-optimizer.

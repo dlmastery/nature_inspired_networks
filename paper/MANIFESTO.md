@@ -25,10 +25,10 @@ that humans called "sacred geometry" for thousands of years:
 
 | Sacred name | Engineering object | Canonical citation |
 |---|---|---|
-| Honeycomb / Flower-of-Life | hexagonal lattice convolution | HexaConv, Hoogeboom et al. 2018, arXiv:1803.02108 |
-| Icosahedron / dodecahedron | spherical / Platonic equivariance | Icosahedral CNN, Cohen et al. 2019, arXiv:1902.04615 |
-| Flower-of-Life recursion | fractal self-similar architecture | FractalNet, Larsson et al. 2017, arXiv:1605.07648 |
-| Torus / vortex | periodic manifold encoding | Deep Networks on Toroids, Pittorino et al. 2022, arXiv:2202.03038 |
+| Honeycomb / Flower-of-Life | hexagonal lattice convolution | HexaConv, Hoogeboom et al. 2018, [arXiv:1803.02108](https://arxiv.org/abs/1803.02108) |
+| Icosahedron / dodecahedron | spherical / Platonic equivariance | Icosahedral CNN, Cohen et al. 2019, [arXiv:1902.04615](https://arxiv.org/abs/1902.04615) |
+| Flower-of-Life recursion | fractal self-similar architecture | FractalNet, Larsson et al. 2017, [arXiv:1605.07648](https://arxiv.org/abs/1605.07648) |
+| Torus / vortex | periodic manifold encoding | Deep Networks on Toroids, Pittorino et al. 2022, [arXiv:2202.03038](https://arxiv.org/abs/2202.03038) |
 | φ / Fibonacci growth | compound channel scaling | Fibonacci-Net, 2025 |
 | Cymatic vibration → geometry | wavelet / Fourier-mode init | (novel here: Chladni-eigenmode init) |
 | Phyllotaxis / golden angle | rotary / positional modulation | (golden-angle RoPE variants 2025) |

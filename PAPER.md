@@ -17,7 +17,7 @@
 | 8 | BLOCKER | Single-seed limitation buried | **DONE** (moved to abstract) |
 | 9 | MAJOR | Duplicated §5.5 heading | **DONE** (renumbered to §5.6) |
 | 10 | MAJOR | Self-acceptance banner | **DONE** (removed; replaced with internal-QA-pending-external-review language above) |
-| 11 | MAJOR | Citation Rule-4 compliance | **PARTIAL** — Sitzmann venue corrected; Pittorino 2022 marked `[VERIFY]`; Islam 2025 arXiv:2510.03511 marked `[VERIFY: arXiv ID under verification]` |
+| 11 | MAJOR | Citation Rule-4 compliance | **PARTIAL** — Sitzmann venue corrected; Pittorino 2022 marked `[VERIFY]`; Islam 2025 [arXiv:2510.03511](https://arxiv.org/abs/2510.03511) marked `[VERIFY: arXiv ID under verification]` |
 | 12 | MAJOR | Audit calibration on third-party code | **DEFERRED** (§5.8 explicitly acknowledges this is missing; deferred to future work) |
 | 13 | MAJOR | RegNet / tuned-ResNet baseline comparison | **DEFERRED** (§7.3 Limitations explicitly engages; deferred to Phase-9) |
 | 14 | MAJOR | H71 IcosaRoPE3D from contributions to future work | **DONE** (moved to §7.4) |
@@ -71,7 +71,7 @@ We do not engage the calibration empirically in this submission. The "Audit cali
 
 ### 1.4 · Mystical motivation, neutral artifact names
 
-The 84-hypothesis design space is motivated in part by a popular literature suggesting nature-inspired constants (φ, Fibonacci, hexagonal packing, Platonic solids, Chladni patterns) "appear everywhere." We treat that motivation as a **prior over the design space**, not as evidence. Per CLAUDE.md Rule 16, artifact names are neutral (`nature_inspired_networks`, `NaturePrior*`); the mystical inspiration is acknowledged in prose only. §1.1's "this work is the opposite of [claiming broad gains]" is not contradicted by §5.5's protocol-output discussion: §5.5 frames the three Phase-8 candidates as illustrative, NOT as endorsements of golden-ratio priors. The audit RATIFIED the project at the protocol level; the audit produced PROVISIONAL screening-positive signals at the empirical level; the two statements are consistent.
+The 84-hypothesis design space is motivated in part by a popular literature suggesting nature-inspired constants (φ, Fibonacci, hexagonal packing, Platonic solids, Chladni patterns) "appear everywhere." We treat that motivation as a **prior over the design space**, not as evidence. Per CLAUDE.md [Rule 16](CLAUDE.md#rule-16), artifact names are neutral (`nature_inspired_networks`, `NaturePrior*`); the mystical inspiration is acknowledged in prose only. §1.1's "this work is the opposite of [claiming broad gains]" is not contradicted by §5.5's protocol-output discussion: §5.5 frames the three Phase-8 candidates as illustrative, NOT as endorsements of golden-ratio priors. The audit RATIFIED the project at the protocol level; the audit produced PROVISIONAL screening-positive signals at the empirical level; the two statements are consistent.
 
 ## 2 · The autoresearch protocol (inherited)
 
@@ -83,19 +83,19 @@ The composite metric formula is stated explicitly:
 composite = top1 − 0.05 · log10(params_M) − 0.05 · log10(latency_ms)
 ```
 
-with SHA-256 fingerprint `d65565e9c7b12d14cbce30a801ecc6753aea3eb148074256bfcc051fa61d0893` (per CLAUDE.md Rule 2). Editing the formula raises `CompositeFingerprintError` at runner import; new formulas require a new repo branch.
+with SHA-256 fingerprint `d65565e9c7b12d14cbce30a801ecc6753aea3eb148074256bfcc051fa61d0893` (per CLAUDE.md [Rule 2](CLAUDE.md#rule-2)). Editing the formula raises `CompositeFingerprintError` at runner import; new formulas require a new repo branch.
 
 CLAUDE.md (the repo's normative ruleset) was extended by Rules 20–28 during this campaign:
 
-- **Rule 20.** Auto-checkpoint loop alongside any background task > 15 min — a power outage during the multi-hour sweep must lose ≤ 1 run.
-- **Rule 21.** Post-fix re-run discipline — after any Fixer patch, the affected sweep tag MUST re-smoke before the fix is "complete"; if the patched hypothesis was a Phase-4/5 graduate, the CIFAR-100 3-seed is also mandatory.
-- **Rule 22.** Dual-track audit before any external claim — pass BOTH impl-critic (no MAJOR/BROKEN) AND sci-critic (verdict ≠ NUMEROLOGY / UNFALSIFIABLE).
-- **Rule 23.** Compound design uses orthogonal axes only — `sg_full_fib` (6 priors on same forward path, −11.54 pp) is the cautionary tale; the canonical additive test is the combo ladder (2 → N priors, one per row).
-- **Rule 24.** Dashboard discipline — group-sectioned aggregate + independent per-experiment page per run + GitHub Pages mirror + no row-click modals.
-- **Rule 25.** Q&A-test correspondence — every test name promised in a design doc's Verification checklist MUST exist in `tests/`.
-- **Rule 26.** Windows thread-cap safety (KMP/OMP/MKL=2) — crash-prevention discipline for multi-agent + GPU campaigns.
-- **Rule 27.** Pages-link discipline — no repo-root `.md` hrefs in HTML; absolute GitHub-blob URLs only.
-- **Rule 28.** **Screening vs evaluation** — a single-config single-seed (or even 3-seed) sweep number is *screening data*, not *evaluation*. External claims require per-hypothesis hill-climb + 3-seed at best config + cross-dataset Phase-5 gate. Rule 28 was added in this revision specifically to formalise the distinction relied on by §7.3.1.
+- **[Rule 20](CLAUDE.md#rule-20).** Auto-checkpoint loop alongside any background task > 15 min — a power outage during the multi-hour sweep must lose ≤ 1 run.
+- **[Rule 21](CLAUDE.md#rule-21).** Post-fix re-run discipline — after any Fixer patch, the affected sweep tag MUST re-smoke before the fix is "complete"; if the patched hypothesis was a Phase-4/5 graduate, the CIFAR-100 3-seed is also mandatory.
+- **[Rule 22](CLAUDE.md#rule-22).** Dual-track audit before any external claim — pass BOTH impl-critic (no MAJOR/BROKEN) AND sci-critic (verdict ≠ NUMEROLOGY / UNFALSIFIABLE).
+- **[Rule 23](CLAUDE.md#rule-23).** Compound design uses orthogonal axes only — `sg_full_fib` (6 priors on same forward path, −11.54 pp) is the cautionary tale; the canonical additive test is the combo ladder (2 → N priors, one per row).
+- **[Rule 24](CLAUDE.md#rule-24).** Dashboard discipline — group-sectioned aggregate + independent per-experiment page per run + GitHub Pages mirror + no row-click modals.
+- **[Rule 25](CLAUDE.md#rule-25).** Q&A-test correspondence — every test name promised in a design doc's Verification checklist MUST exist in `tests/`.
+- **[Rule 26](CLAUDE.md#rule-26).** Windows thread-cap safety (KMP/OMP/MKL=2) — crash-prevention discipline for multi-agent + GPU campaigns.
+- **[Rule 27](CLAUDE.md#rule-27).** Pages-link discipline — no repo-root `.md` hrefs in HTML; absolute GitHub-blob URLs only.
+- **[Rule 28](CLAUDE.md#rule-28).** **Screening vs evaluation** — a single-config single-seed (or even 3-seed) sweep number is *screening data*, not *evaluation*. External claims require per-hypothesis hill-climb + 3-seed at best config + cross-dataset Phase-5 gate. Rule 28 was added in this revision specifically to formalise the distinction relied on by §7.3.1.
 
 ## 3 · The 84-hypothesis design space
 
@@ -181,7 +181,7 @@ Per area-chair item #6 (reproducibility blocker), the full hyperparameter table 
 | PyTorch | bf16 AMP throughout |
 | DataLoader | `num_workers: 0` (Windows spawn-start workers wedge) |
 | Thread caps | `KMP_DUPLICATE_LIB_OK=TRUE`, `OMP_NUM_THREADS=2`, `MKL_NUM_THREADS=2` |
-| Deterministic | `set_seed(seed)` for torch/numpy/python at run start; `cudnn.benchmark=True` (NOT bit-reproducible by design — Rule 6) |
+| Deterministic | `set_seed(seed)` for torch/numpy/python at run start; `cudnn.benchmark=True` (NOT bit-reproducible by design — [Rule 6](CLAUDE.md#rule-6)) |
 
 **Training hyperparameters (CIFAR-10 12-ep screening):**
 
@@ -497,7 +497,7 @@ Per area-chair item #11 (Rule-4 format compliance audit). Each citation is in `A
 - Hoffer E, Hubara I, Soudry D. 2018. *Train longer, generalize better*. arXiv:1705.08741. — Long-horizon training behaviour; H41 / H48 Phase-9 long-horizon caveat.
 - Pittorino F et al. 2022 [VERIFY: venue, ICLR-W or NeurIPS-W to be confirmed]. *Toroidal flat-minima analysis* [VERIFY: exact title]. arXiv:[VERIFY] — H22 toroidal embedding literature anchor. Citation under verification for Rule-4 compliance.
 - Su J, Lu Y, Pan S, Wen B, Liu Y. 2021. *RoFormer: Enhanced Transformer with Rotary Position Embedding*. arXiv:2104.09864. — H34 / H71 RoPE-family.
-- Islam M et al. 2025 [VERIFY: venue and arXiv ID]. *Platonic Transformers: A Solid Choice for Equivariance*. arXiv:2510.03511 [VERIFY: arXiv ID under verification — citation appears in audit-fix trail but external publication status not yet confirmed]. — H55 PlatonicAttention literature anchor.
+- Islam M et al. 2025 [VERIFY: venue and arXiv ID]. *Platonic Transformers: A Solid Choice for Equivariance*. [arXiv:2510.03511](https://arxiv.org/abs/2510.03511) [VERIFY: arXiv ID under verification — citation appears in audit-fix trail but external publication status not yet confirmed]. — H55 PlatonicAttention literature anchor.
 
 ---
 
@@ -588,7 +588,7 @@ $env:MKL_NUM_THREADS = 2
 $env:SSL_CERT_FILE = ".\.venv\Lib\site-packages\certifi\cacert.pem"
 ```
 
-**SOTA smoke (≤ 2 min, Rule 13 pre-flight).**
+**SOTA smoke (≤ 2 min, [Rule 13](CLAUDE.md#rule-13) pre-flight).**
 
 ```powershell
 .\.venv\Scripts\python -m nature_inspired_networks.runner `
@@ -633,7 +633,7 @@ bash scripts\launch_postfix_campaign.sh
 start dashboard\dashboard.html
 ```
 
-**Per-experiment archive (Rule 8).** Every sweep row lands in `experiments/<dataset>/<tag>_seed<N>/{config.yaml, metrics.json, history.json, best.pt, reasoning.json}`. Per-experiment HTML pages mirror to `docs/dashboard/experiments/<dataset>__<tag>_seed<N>.html` and to the live Pages site.
+**Per-experiment archive ([Rule 8](CLAUDE.md#rule-8)).** Every sweep row lands in `experiments/<dataset>/<tag>_seed<N>/{config.yaml, metrics.json, history.json, best.pt, reasoning.json}`. Per-experiment HTML pages mirror to `docs/dashboard/experiments/<dataset>__<tag>_seed<N>.html` and to the live Pages site.
 
 **Cold-reader reproduction test.** A reader who clones the repo at a tagged commit and runs the four commands above should reproduce every number in this paper within seed-noise. The single source of empirical truth is `experiments/<dataset>/<tag>_seed<N>/metrics.json`; the paper's tables are derived from `experiments/experiment_log.jsonl` via [`scripts/build_report.py`](scripts/build_report.py).
 
