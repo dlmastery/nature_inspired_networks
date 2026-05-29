@@ -2022,11 +2022,16 @@ def _render_hypothesis_section(hid: str | None, group: str,
 
 
 def _render_verdict_section(repo_root: Path, tag: str) -> str:
-    findings_md = repo_root / "FINDINGS.md"
+    # FINDINGS.md was moved to paper/ in the 2026-05-29 root-cleanup pass.
+    # Prefer the new location; fall back to the legacy path so historical
+    # checkouts still resolve correctly.
+    findings_md = repo_root / "paper" / "FINDINGS.md"
+    if not findings_md.exists():
+        findings_md = repo_root / "FINDINGS.md"
     blurb = parse_findings_for_tag(findings_md, tag)
     gh_url = (
         "https://github.com/dlmastery/nature_inspired_networks/blob/main/"
-        "FINDINGS.md"
+        "paper/FINDINGS.md"
     )
     if not blurb:
         return (
@@ -2738,7 +2743,12 @@ def render_experiment_page(metrics: dict, history: list[dict] | None,
 
     # ---- FINDINGS verdict (always visible card) ------------------------
     verdict_html = _render_verdict_section(repo_root, tag)
-    if parse_findings_for_tag(repo_root / "FINDINGS.md", tag):
+    # FINDINGS.md moved to paper/ in the 2026-05-29 root-cleanup. Try the
+    # new location first; fall back to the legacy path.
+    _findings_for_flag = repo_root / "paper" / "FINDINGS.md"
+    if not _findings_for_flag.exists():
+        _findings_for_flag = repo_root / "FINDINGS.md"
+    if parse_findings_for_tag(_findings_for_flag, tag):
         flags["verdict"] = True
 
     # ---- reasoning + config (accordion bodies) -------------------------
@@ -3556,11 +3566,29 @@ def render_dashboard(results_dir: str | Path,
         betti_rows = load_betti(bj)
         plot_betti(betti_rows, betti_png)
 
-    tag_to_tier = parse_experiment_log_tiers(root / "EXPERIMENT_LOG.md")
+    # 2026-05-29 root-cleanup moved EXPERIMENT_LOG.md, IDEA_TABLE.md, and
+    # FINDINGS.md into experiments/, hypotheses/, and paper/ respectively.
+    # Prefer the new locations; fall back to the legacy paths so historical
+    # checkouts still render correctly.
+    def _first_existing(*candidates: Path) -> Path:
+        for c in candidates:
+            if c.exists():
+                return c
+        return candidates[-1]
+
+    tag_to_tier = parse_experiment_log_tiers(
+        _first_existing(root / "experiments" / "EXPERIMENT_LOG.md",
+                        root / "EXPERIMENT_LOG.md")
+    )
     index_rows = parse_hypothesis_index(root / "hypotheses" / "INDEX.md")
-    idea_table_status = parse_idea_table_status(root / "IDEA_TABLE.md")
-    findings_blurb = parse_findings_headline(root / "FINDINGS.md")
-    findings_metrics = parse_findings_metrics(root / "FINDINGS.md")
+    idea_table_status = parse_idea_table_status(
+        _first_existing(root / "hypotheses" / "IDEA_TABLE.md",
+                        root / "IDEA_TABLE.md")
+    )
+    _findings_md = _first_existing(root / "paper" / "FINDINGS.md",
+                                   root / "FINDINGS.md")
+    findings_blurb = parse_findings_headline(_findings_md)
+    findings_metrics = parse_findings_metrics(_findings_md)
 
     if not df.empty:
         df = df.sort_values(["dataset", "composite"], ascending=[True, False])
