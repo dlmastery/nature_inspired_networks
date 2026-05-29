@@ -1687,16 +1687,16 @@ def _render_hypothesis_section(hid: str | None, group: str,
             + "".join(deep_bits)
             + f"<p style='margin-top:14px'>"
             f"<a href='{_esc(gh_url)}'>↗ Full design doc on GitHub</a> "
-            f"&nbsp;·&nbsp; <a href='../../{_esc(rel)}'>"
-            f"local: <span class='mono'>{_esc(rel)}</span></a></p>"
+            f"<span class='mono' style='color:var(--paper-dim);"
+            f"font-size:0.78em'>{_esc(rel)}</span></p>"
             "</div></details>"
         )
     else:
         parts.append(
             f"<p style='margin-top:14px'>"
             f"<a href='{_esc(gh_url)}'>↗ Full design doc on GitHub</a> "
-            f"&nbsp;·&nbsp; <a href='../../{_esc(rel)}'>"
-            f"local: <span class='mono'>{_esc(rel)}</span></a></p>"
+            f"<span class='mono' style='color:var(--paper-dim);"
+            f"font-size:0.78em'>{_esc(rel)}</span></p>"
         )
     parts.append("</section>")
     return "".join(parts)
@@ -1725,9 +1725,7 @@ def _render_verdict_section(repo_root: Path, tag: str) -> str:
         "letter-spacing:0.18em;color:var(--paper-dim);font-style:normal'>"
         "FINDINGS.md</span></h2>"
         f"<div class='quote'>{_esc(blurb)}</div>"
-        f"<p style='margin-top:14px'><a href='{gh_url}'>↗ Full FINDINGS.md</a>"
-        f" &nbsp;·&nbsp; <a href='../../FINDINGS.md'>"
-        f"local: <span class='mono'>FINDINGS.md</span></a></p></section>"
+        f"<p style='margin-top:14px'><a href='{gh_url}'>↗ Full FINDINGS.md on GitHub</a></p></section>"
     )
 
 
@@ -1835,14 +1833,14 @@ def _render_audit_excerpt(hid: str | None, group: str,
     parts.append(f"<div class='quote'>{_esc(body)}</div>")
     if audit.get("url"):
         local = audit.get("local", "")
-        local_link = (
-            f" &nbsp;·&nbsp; <a href='../../{_esc(local)}'>"
-            f"local: <span class='mono'>{_esc(local)}</span></a>"
+        local_caption = (
+            f" <span class='mono' style='color:var(--paper-dim);"
+            f"font-size:0.78em'>{_esc(local)}</span>"
         ) if local else ""
         parts.append(
             f"<p style='margin-top:12px'>"
             f"<a href='{_esc(audit['url'])}'>↗ Full audit on GitHub</a>"
-            f"{local_link}</p>"
+            f"{local_caption}</p>"
         )
     return "".join(parts)
 
@@ -3162,8 +3160,10 @@ def render_dashboard(results_dir: str | Path,
         f"<div class='sub'>{subtitle} &nbsp;·&nbsp; "
         f"<a href='https://github.com/dlmastery/nature_inspired_networks'>"
         f"GitHub</a> &nbsp;·&nbsp; "
-        f"<a href='../FINDINGS.md'>FINDINGS.md</a> &nbsp;·&nbsp; "
-        f"<a href='../EXPERIMENT_LOG.md'>EXPERIMENT_LOG</a></div>"
+        f"<a href='https://github.com/dlmastery/nature_inspired_networks/blob/main/FINDINGS.md'>FINDINGS.md</a> &nbsp;·&nbsp; "
+        f"<a href='https://github.com/dlmastery/nature_inspired_networks/blob/main/EXPERIMENT_LOG.md'>EXPERIMENT_LOG</a> &nbsp;·&nbsp; "
+        f"<a href='https://github.com/dlmastery/nature_inspired_networks/blob/main/PAPER.md'>PAPER.md</a> &nbsp;·&nbsp; "
+        f"<a href='https://github.com/dlmastery/nature_inspired_networks/blob/main/AUDIT_SUMMARY.md'>AUDIT_SUMMARY.md</a></div>"
     )
     if findings_blurb:
         html.append(
