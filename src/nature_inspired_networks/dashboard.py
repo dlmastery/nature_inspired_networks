@@ -1036,7 +1036,7 @@ def _line_chart_svg(series: list[tuple[str, list[float], list[float], str]],
         f"style='background:#0a0a0d;border:1px solid #1c1c20;display:block;"
         f"font-family:\"IBM Plex Mono\",monospace'>",
         f"<text x='{ml}' y='18' fill='#e6e1d6' font-size='14' "
-        f"font-family='Newsreader,serif' font-style='italic' "
+        f"font-family='Source Serif 4,Georgia,serif' "
         f"font-weight='600'>{_esc(title)}</text>",
     ]
     for i in range(5):
@@ -1061,12 +1061,12 @@ def _line_chart_svg(series: list[tuple[str, list[float], list[float], str]],
     )
     parts.append(
         f"<text x='{ml + pw / 2:.1f}' y='{h - 10}' fill='#a89e8c' "
-        f"font-size='10' font-family='Newsreader,serif' font-style='italic' "
+        f"font-size='10' font-family='Source Serif 4,Georgia,serif' "
         f"text-anchor='middle'>epoch →</text>"
     )
     parts.append(
         f"<text x='14' y='{mt + ph / 2:.1f}' fill='#a89e8c' font-size='10' "
-        f"font-family='Newsreader,serif' font-style='italic' "
+        f"font-family='Source Serif 4,Georgia,serif' "
         f"text-anchor='middle' transform='rotate(-90 14 {mt + ph / 2:.1f})'>"
         f"{_esc(y_label)} →</text>"
     )
@@ -1182,31 +1182,32 @@ def _md_to_html(text: str, *, inline_only: bool = False,
     if strip_blockquote:
         text = _strip_blockquote_markers(text)
     # Normalise stray un-paired bold/italic delimiters left over from
-    # source-doc typos. ``****`` parses as empty bold; ``***`` at the
-    # end of a phrase produces the ``</em>**`` literal the audit flagged
-    # on the H09 sci-critic preamble; lone ``*`` after a balanced bold/
-    # italic block survives as raw text. Strategy: collapse 4+ stars to
-    # ``**``, rewrite ``***`` (which markdown spec defines as bold+italic
-    # but in source-doc malformed pairs always intends bold-closure) to
-    # ``**`` whenever it appears at the END of an emphasised word
-    # (...word.*** → ...word.**), then balance odd parity by dropping the
-    # last unmatched delimiter in each paragraph.
+    # source-doc typos. The H09 sci-critic preamble has
+    # ``*A...**B**.***`` (italic-with-bold-inside followed by THREE stars
+    # at end) — that is a single-letter typo over ``*A...**B**.*``.
+    # Markdown parses the malformed pattern as two adjacent italics +
+    # one literal ``*`` left over. Strategy:
+    #   (a) collapse ``****+`` to ``**`` so we never end up with empty
+    #       bold tags,
+    #   (b) rewrite ``...word.***\s|$`` to ``...word.*`` (collapsing the
+    #       extra two stars that were a typo, preserving the intended
+    #       italic-closer),
+    #   (c) balance odd parity of ``**`` per paragraph (drop the last
+    #       unmatched).
     def _fix_stars(line: str) -> str:
         line = re.sub(r"\*{4,}", "**", line)
-        # ``word.***`` or ``word.***\s`` → ``word.**``
-        line = re.sub(r"\*\*\*(\W|$)", r"**\1", line)
-        # ``***word`` → ``**word`` (opener variant)
-        line = re.sub(r"(^|\W)\*\*\*", r"\1**", line)
+        # ``word.***`` at end-of-line → ``word.*`` (preserve italic-close)
+        line = re.sub(r"\*\*\*(\s|$)", r"*\1", line)
+        # ``***word`` at start → ``*word`` (preserve italic-open)
+        line = re.sub(r"(^|\s)\*\*\*", r"\1*", line)
         return line
     text = "\n".join(_fix_stars(ln) for ln in text.splitlines())
-    # Drop unbalanced ``**`` and stray lone ``*`` at end of a paragraph.
+    # Drop unbalanced ``**`` at end of a paragraph (single stranded token).
     cleaned_paras: list[str] = []
     for para in text.split("\n\n"):
         if para.count("**") % 2 == 1:
             idx = para.rfind("**")
             para = para[:idx] + para[idx + 2:]
-        # Then collapse trailing lone ``*`` adjacent to whitespace / EOL.
-        para = re.sub(r"(?<!\*)\*(?=\s*$)", "", para)
         cleaned_paras.append(para)
     text = "\n\n".join(cleaned_paras)
     try:
@@ -1286,9 +1287,9 @@ _EXP_PAGE_CSS = _BRUTALIST_VARS + """
  .head-grid{display:grid;grid-template-columns:1fr auto;gap:24px;
             align-items:start;padding-bottom:18px;
             border-bottom:1px solid var(--rule);margin-bottom:24px;}
- .head-left .tag-display{font-family:'Newsreader',serif;font-style:italic;
-    font-size:54px;font-weight:600;line-height:1;color:var(--paper);
-    letter-spacing:-0.015em;word-break:break-word;}
+ .head-left .tag-display{font-family:'Source Serif 4',Georgia,serif;
+    font-size:48px;font-weight:600;line-height:1.05;color:var(--paper);
+    letter-spacing:-0.012em;word-break:break-word;}
  .head-left .sub{font-family:'IBM Plex Mono',monospace;font-size:11px;
     text-transform:uppercase;letter-spacing:0.18em;color:var(--paper-dim);
     margin-top:10px;}
@@ -1392,9 +1393,9 @@ _EXP_PAGE_CSS = _BRUTALIST_VARS + """
            margin-bottom:24px;}
  .kn-tile{background:var(--panel);padding:18px 18px 16px 18px;
           position:relative;overflow:hidden;}
- .kn-tile .kn-val{font-family:'Newsreader',serif;font-style:italic;
-                  font-size:30px;font-weight:600;line-height:1.05;
-                  color:var(--paper);letter-spacing:-0.01em;}
+ .kn-tile .kn-val{font-family:'Source Serif 4',Georgia,serif;
+                  font-size:28px;font-weight:600;line-height:1.05;
+                  color:var(--paper);letter-spacing:-0.005em;}
  .kn-tile .kn-lbl{font-family:'IBM Plex Mono',monospace;font-size:9.5px;
                   text-transform:uppercase;letter-spacing:0.18em;
                   color:var(--paper-dim);margin-top:6px;}
@@ -1627,7 +1628,7 @@ def _group_scatter_svg(rows: list[pd.Series], group_letter: str,
         f"id='{chart_id}'>",
         # title (Newsreader italic via tspan attrs)
         f"<text x='{ml}' y='22' fill='#e6e1d6' font-size='14' "
-        f"font-family='Newsreader,serif' font-style='italic' "
+        f"font-family='Source Serif 4,Georgia,serif' "
         f"font-weight='600'>{_esc(group_letter)} · composite × params</text>",
     ]
     # Gridlines (5 horizontal)
@@ -1659,12 +1660,12 @@ def _group_scatter_svg(rows: list[pd.Series], group_letter: str,
     # Axis labels (Newsreader italic)
     parts.append(
         f"<text x='{ml + pw - 4}' y='{mt + ph + 30}' fill='#a89e8c' "
-        f"font-size='10' font-family='Newsreader,serif' font-style='italic' "
+        f"font-size='10' font-family='Source Serif 4,Georgia,serif' "
         f"text-anchor='end'>params (M) →</text>"
     )
     parts.append(
         f"<text x='12' y='{mt + ph / 2:.1f}' fill='#a89e8c' "
-        f"font-size='10' font-family='Newsreader,serif' font-style='italic' "
+        f"font-size='10' font-family='Source Serif 4,Georgia,serif' "
         f"text-anchor='middle' "
         f"transform='rotate(-90 12 {mt + ph / 2:.1f})'>composite →</text>"
     )
@@ -1794,7 +1795,7 @@ def _group_visualisation_svg(rows: list[pd.Series], group_letter: str,
         f"font-family:\"IBM Plex Mono\",monospace' "
         f"id='{chart_id}'>",
         f"<text x='{ml}' y='20' fill='#e6e1d6' font-size='14' "
-        f"font-family='Newsreader,serif' font-style='italic' "
+        f"font-family='Source Serif 4,Georgia,serif' "
         f"font-weight='600'>{_esc(group_letter)} · top-1 distribution "
         f"<tspan fill='#a89e8c' font-size='11' "
         f"font-family='IBM Plex Mono,monospace' font-style='normal'>"
@@ -1814,7 +1815,7 @@ def _group_visualisation_svg(rows: list[pd.Series], group_letter: str,
         )
     parts.append(
         f"<text x='{ml + pw - 4}' y='{mt + ph + 26}' fill='#a89e8c' "
-        f"font-size='10' font-family='Newsreader,serif' font-style='italic' "
+        f"font-size='10' font-family='Source Serif 4,Georgia,serif' "
         f"text-anchor='end'>top-1 →</text>"
     )
     # Baseline reference line(s) — accent gold
@@ -1937,8 +1938,8 @@ def _render_hypothesis_section(hid: str | None, group: str,
         )
     if digest["oneline"]:
         parts.append(
-            f"<p style='font-family:Newsreader,serif;font-style:italic;"
-            f"font-size:1.08em;color:#e6e1d6;line-height:1.5;border-left:"
+            f"<p style='font-family:Source Serif 4,Georgia,serif;"
+            f"font-size:1.06em;color:#e6e1d6;line-height:1.5;border-left:"
             f"2px solid var(--accent);padding-left:14px;margin:6px 0 16px 0'>"
             f"{_esc(digest['oneline'])}</p>"
         )
@@ -1949,7 +1950,7 @@ def _render_hypothesis_section(hid: str | None, group: str,
     if digest["formal"]:
         parts.append(
             f"<h3>Formal hypothesis</h3>"
-            f"<p style='font-family:Newsreader,serif;font-style:italic;"
+            f"<p style='font-family:Source Serif 4,Georgia,serif;"
             f"color:#e6e1d6'>{_esc(digest['formal'])}</p>"
         )
     # Expandable deep-dive with mechanism / falsifier / predicted / citation
