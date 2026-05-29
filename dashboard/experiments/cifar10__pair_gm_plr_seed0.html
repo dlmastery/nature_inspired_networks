@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang='en'><head><meta charset='utf-8'>
+<title>pair_gm_plr · seed 0 · cifar10 — experiment page</title>
+<style>
+ *{margin:0;padding:0;box-sizing:border-box;}
+ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:#0d1117;
+      color:#c9d1d9;padding:24px 28px;line-height:1.55;max-width:1180px;margin:0 auto;}
+ a{color:#58a6ff;text-decoration:none;} a:hover{text-decoration:underline;}
+ h1{color:#58a6ff;font-size:1.6em;margin-bottom:4px;}
+ h2{color:#58a6ff;font-size:1.05em;margin-bottom:12px;font-weight:600;
+    letter-spacing:0.3px;}
+ .sub{color:#8b949e;font-size:0.95em;margin-bottom:18px;}
+ .pill{display:inline-block;background:#21262d;border:1px solid #30363d;
+       border-radius:10px;padding:2px 10px;font-size:0.78em;color:#c9d1d9;
+       font-family:Consolas,monospace;margin-right:6px;}
+ .pill.hyp{background:#1f3a5f;border-color:#58a6ff;color:#cfe6ff;}
+ .pill.grp{background:#2c1e3a;border-color:#a371f7;color:#dbc9f7;}
+ .back{display:inline-block;margin-bottom:14px;font-size:0.9em;}
+ .card{background:#161b22;border:1px solid #30363d;border-radius:8px;
+       padding:18px 22px;margin-bottom:18px;}
+ .card h2{color:#58a6ff;font-size:1.05em;margin-bottom:12px;font-weight:600;}
+ .card h3{color:#c9d1d9;font-size:0.92em;margin:14px 0 6px 0;font-weight:600;
+          text-transform:uppercase;letter-spacing:0.5px;}
+ .card p{margin-bottom:10px;font-size:0.92em;}
+ .card ul{margin-left:22px;font-size:0.9em;}
+ table{width:100%;border-collapse:collapse;font-size:0.86em;}
+ th{background:#0d1117;color:#8b949e;text-align:left;padding:7px 10px;
+    border-bottom:2px solid #30363d;font-size:0.74em;text-transform:uppercase;
+    letter-spacing:0.4px;}
+ td{padding:7px 10px;border-bottom:1px solid #21262d;}
+ td.k{color:#8b949e;width:42%;}
+ td.v{color:#c9d1d9;font-family:Consolas,monospace;}
+ .formula-chip{background:#0d1117;border:1px solid #30363d;border-radius:6px;
+               padding:10px 12px;font-family:Consolas,monospace;font-size:0.82em;
+               margin-bottom:12px;color:#c9d1d9;word-break:break-all;}
+ .breakdown td.term{font-family:Consolas,monospace;}
+ .pos{color:#3fb950;} .neg{color:#f85149;} .mut{color:#8b949e;}
+ .charts{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+ @media(max-width:980px){.charts{grid-template-columns:1fr;}}
+ .meta{font-size:0.78em;color:#484f58;margin-top:18px;line-height:1.6;}
+ code{background:#0d1117;padding:1px 5px;border-radius:3px;font-size:0.92em;
+      font-family:Consolas,monospace;}
+ pre{background:#0d1117;border:1px solid #30363d;border-radius:6px;
+     padding:12px;overflow-x:auto;font-family:Consolas,monospace;
+     font-size:0.84em;color:#c9d1d9;white-space:pre-wrap;line-height:1.5;}
+ .reason-section{margin-bottom:14px;}
+ .reason-section .lbl{color:#3fb950;font-size:0.72em;text-transform:uppercase;
+                      letter-spacing:0.6px;margin-bottom:4px;font-weight:600;}
+ .reason-section .body{font-size:0.9em;color:#c9d1d9;white-space:pre-wrap;}
+ .quote{border-left:3px solid #d29922;padding:8px 14px;background:#0d1117;
+        border-radius:0 6px 6px 0;font-size:0.9em;color:#c9d1d9;
+        margin:8px 0;}
+ .verdict-label{color:#d29922;font-weight:600;}
+ .empty{color:#8b949e;font-style:italic;font-size:0.88em;}
+ .xrefs li{margin:4px 0;font-size:0.9em;font-family:Consolas,monospace;}
+</style></head><body>
+<a class='back' href='../dashboard.html'>&larr; back to dashboard</a>
+<h1>pair_gm_plr</h1>
+<div class='sub'><span class='pill'>baseline</span><span class='pill grp'>Uncategorised</span><span class='pill'>cifar10</span><span class='pill'>seed 0</span> &nbsp;·&nbsp; run directory <code>pair_gm_plr_seed0</code></div>
+<div class='card'><h2>Hypothesis</h2><p class='empty'>No matching hypothesis document — this row is a baseline reference.</p></div>
+
+<div class='card'><h2>Verdict (FINDINGS.md)</h2><div class='quote'>| tag | hyp | pre-fix top1 | post-fix top1 | Δ (pp) | survives? | |---|---|---:|---:|---:|---| | `sg_only_phi_budget` | H09 | 85.54 | 85.56 | +0.02 | STABLE | | `sg_only_golden_bottleneck` | H10 | 69.25 | 68.79 | −0.46 | WEAKENED | | `sg_only_cymatic_init` | H29 | 77.44 | 77.64 | +0.20 | STABLE | | `sg_only_golden_spiral_init` | H30 | 80.42 | 80.57 | +0.15 | STABLE | | `sg_only_golden_adam` | H41 | 51.96 | 83.94 | **+31.98** | STRENGTHENED | | `sg_only_phi_dropout` | H44 | 82.80 | 83.03 | +0.23 | STRENGTHENED | | `sg_only_golden_momentum` | H48 | 83.52 | 83.65 | +0.13 | STABLE | | `combo2_pb_gm` | C2 | 86.14 | 85.62 | −0.52 | WEAKENED | | `combo3_pb_gm_pd` | C3 | 86.42 | 85.66 | −0.76 | WEAKENED | | `combo4_pb_gm_pd_pdw` | C4 | 85.80 | 85.44 | −0.36 | WEAKENED | | `combo5_pb_gm_pd_pdw_plr` | C5 | 81.59 | 79.78 | −1.81 | WEAKENED | | `combo6_pb_gm_pd_pdw_plr_fe` | C6 | 85.23 | 84.90 | −0.33 | WEAKENED | | `combo7_pb_gm_pd_pdw_plr_fe_sa` | C7 | 85.05 | 85.29 | +0.24 | STRENGTHENED | | `combo8_pb_gm_pd_pdw_plr_fe_sa_fp` | C8 | 84.08 | 84.96 | +0.88 | STRENGTHENED | | `loo_no_gm` | LOO−gm | N/A — new tag | 84.27 | — | NEW (negative) | | `loo_no_pd` | LOO−pd | N/A — new tag | 85.37 | — </div><p style='margin-top:10px'><a href='https://github.com/dlmastery/nature_inspired_networks/blob/main/FINDINGS.md'>Full FINDINGS.md →</a> · <a href='../../FINDINGS.md'>local: FINDINGS.md</a></p></div>
+<div class='card'><h2>Reasoning blob</h2><p class='empty'>No <code>reasoning.json</code> for this run directory.</p></div>
+<div class='card'><h2>Configuration (inferred from experiment_log.jsonl + metrics.json)</h2><pre>{
+  &quot;tag&quot;: &quot;pair_gm_plr&quot;,
+  &quot;model&quot;: &quot;phi_budget&quot;,
+  &quot;dataset&quot;: &quot;cifar10&quot;,
+  &quot;channel_mode&quot;: &quot;fib&quot;,
+  &quot;epochs&quot;: 12,
+  &quot;seed&quot;: 0,
+  &quot;composite_formula&quot;: &quot;composite = top1 - 0.05 * log10(params_M) - 0.05 * log10(latency_ms)&quot;
+}</pre></div>
+<div class='card'><h2>Metrics</h2><table><tbody><tr><td class='k'>Dataset</td><td class='v'>cifar10</td></tr><tr><td class='k'>Seed</td><td class='v'>0</td></tr><tr><td class='k'>Epochs</td><td class='v'>12</td></tr><tr><td class='k'>Top-1 accuracy</td><td class='v'>80.36%</td></tr><tr><td class='k'>Top-5 accuracy</td><td class='v'>98.46%</td></tr><tr><td class='k'>Train top-1</td><td class='v'>86.89%</td></tr><tr><td class='k'>Generalisation gap (train − test)</td><td class='v'>6.53%</td></tr><tr><td class='k'>Parameters</td><td class='v'>262,078 (0.262 M)</td></tr><tr><td class='k'>FLOPs</td><td class='v'>80.8 M MACs</td></tr><tr><td class='k'>Latency (batch=1)</td><td class='v'>3.455 ms</td></tr><tr><td class='k'>Rot-eq error</td><td class='v'>0.791275</td></tr><tr><td class='k'>Epochs-to-target</td><td class='v'>-1</td></tr><tr><td class='k'>Train wall-clock</td><td class='v'>368.7 s</td></tr><tr><td class='k'>Composite score</td><td class='v'>0.805758</td></tr><tr><td class='k'>Composite fingerprint (SHA-256)</td><td class='v'>d65565e9c7b12d14cbce30a801ecc6753aea3eb148074256bfcc051fa61d0893</td></tr></tbody></table></div>
+<div class='card'><h2>Composite-score breakdown</h2><div class='formula-chip'>composite ≔ <code>top1 - 0.05*log10(params_M) - 0.05*log10(latency_ms)</code></div><table class='breakdown'><thead><tr><th>Term</th><th>Expression</th><th style='text-align:right'>Contribution</th></tr></thead><tbody><tr><td class='term'>top-1</td><td class='term mut'>0.80360</td><td class='term pos' style='text-align:right'>+0.80360</td></tr><tr><td class='term'>params penalty</td><td class='term mut'>-0.05·log10(0.2621 M)</td><td class='term pos' style='text-align:right'>+0.02908</td></tr><tr><td class='term'>latency penalty</td><td class='term mut'>-0.05·log10(3.455 ms)</td><td class='term neg' style='text-align:right'>−0.02692</td></tr><tr style='border-top:2px solid #30363d'><td class='term' colspan='2'><b>Σ (recomputed)</b></td><td class='term' style='text-align:right'><b>0.80576</b></td></tr><tr><td class='term mut' colspan='2'>reported composite</td><td class='term mut' style='text-align:right'>0.80576</td></tr></tbody></table></div>
+<div class='card'><h2>Per-epoch training curves</h2><div class='charts'><div><svg width='460' height='240' viewBox='0 0 460 240' xmlns='http://www.w3.org/2000/svg' style='background:#0d1117;border:1px solid #30363d;border-radius:6px'><text x='46' y='16' fill='#c9d1d9' font-size='12' font-weight='600'>Loss</text><line x1='46' y1='212.0' x2='446' y2='212.0' stroke='#21262d' stroke-width='1'/><text x='40' y='215.0' fill='#8b949e' font-size='9' text-anchor='end'>0.774</text><line x1='46' y1='166.5' x2='446' y2='166.5' stroke='#21262d' stroke-width='1'/><text x='40' y='169.5' fill='#8b949e' font-size='9' text-anchor='end'>0.997</text><line x1='46' y1='121.0' x2='446' y2='121.0' stroke='#21262d' stroke-width='1'/><text x='40' y='124.0' fill='#8b949e' font-size='9' text-anchor='end'>1.221</text><line x1='46' y1='75.5' x2='446' y2='75.5' stroke='#21262d' stroke-width='1'/><text x='40' y='78.5' fill='#8b949e' font-size='9' text-anchor='end'>1.445</text><line x1='46' y1='30.0' x2='446' y2='30.0' stroke='#21262d' stroke-width='1'/><text x='40' y='33.0' fill='#8b949e' font-size='9' text-anchor='end'>1.668</text><text x='46.0' y='232' fill='#8b949e' font-size='9' text-anchor='middle'>0</text><text x='446.0' y='232' fill='#8b949e' font-size='9' text-anchor='middle'>11</text><text x='246.0' y='232' fill='#8b949e' font-size='9' text-anchor='middle'>epoch</text><text x='12' y='121.0' fill='#8b949e' font-size='9' text-anchor='middle' transform='rotate(-90 12 121.0)'>loss</text><polyline points='46.0,39.8 82.4,111.7 118.7,138.4 155.1,154.8 191.5,166.6 227.8,175.3 264.2,181.9 300.5,187.4 336.9,192.0 373.3,195.5 409.6,199.1 446.0,202.2' fill='none' stroke='#f85149' stroke-width='1.8'/><circle cx='446.0' cy='202.2' r='2.6' fill='#f85149'/><rect x='52' y='34' width='10' height='10' fill='#f85149' rx='2'/><text x='67' y='42' fill='#c9d1d9' font-size='10'>train loss</text></svg></div><div><svg width='460' height='240' viewBox='0 0 460 240' xmlns='http://www.w3.org/2000/svg' style='background:#0d1117;border:1px solid #30363d;border-radius:6px'><text x='46' y='16' fill='#c9d1d9' font-size='12' font-weight='600'>Accuracy</text><line x1='46' y1='212.0' x2='446' y2='212.0' stroke='#21262d' stroke-width='1'/><text x='40' y='215.0' fill='#8b949e' font-size='9' text-anchor='end'>44.5%</text><line x1='46' y1='166.5' x2='446' y2='166.5' stroke='#21262d' stroke-width='1'/><text x='40' y='169.5' fill='#8b949e' font-size='9' text-anchor='end'>58.9%</text><line x1='46' y1='121.0' x2='446' y2='121.0' stroke='#21262d' stroke-width='1'/><text x='40' y='124.0' fill='#8b949e' font-size='9' text-anchor='end'>73.3%</text><line x1='46' y1='75.5' x2='446' y2='75.5' stroke='#21262d' stroke-width='1'/><text x='40' y='78.5' fill='#8b949e' font-size='9' text-anchor='end'>87.7%</text><line x1='46' y1='30.0' x2='446' y2='30.0' stroke='#21262d' stroke-width='1'/><text x='40' y='33.0' fill='#8b949e' font-size='9' text-anchor='end'>102.1%</text><text x='46.0' y='232' fill='#8b949e' font-size='9' text-anchor='middle'>0</text><text x='446.0' y='232' fill='#8b949e' font-size='9' text-anchor='middle'>11</text><text x='246.0' y='232' fill='#8b949e' font-size='9' text-anchor='middle'>epoch</text><text x='12' y='121.0' fill='#8b949e' font-size='9' text-anchor='middle' transform='rotate(-90 12 121.0)'>accuracy</text><polyline points='46.0,202.2 82.4,144.8 118.7,124.5 155.1,112.1 191.5,103.3 227.8,96.7 264.2,91.9 300.5,88.6 336.9,84.6 373.3,82.1 409.6,80.4 446.0,78.1' fill='none' stroke='#d29922' stroke-width='1.8'/><circle cx='446.0' cy='78.1' r='2.6' fill='#d29922'/><rect x='52' y='34' width='10' height='10' fill='#d29922' rx='2'/><text x='67' y='42' fill='#c9d1d9' font-size='10'>train top-1</text><polyline points='46.0,185.8 82.4,178.3 118.7,137.4 155.1,138.7 191.5,113.0 227.8,113.7 264.2,121.2 300.5,101.0 336.9,100.6 373.3,103.4 409.6,88.8 446.0,98.7' fill='none' stroke='#58a6ff' stroke-width='1.8'/><circle cx='446.0' cy='98.7' r='2.6' fill='#58a6ff'/><rect x='52' y='48' width='10' height='10' fill='#58a6ff' rx='2'/><text x='67' y='56' fill='#c9d1d9' font-size='10'>test top-1</text><polyline points='46.0,56.4 82.4,50.0 118.7,44.9 155.1,45.9 191.5,41.7 227.8,41.9 264.2,43.9 300.5,39.8 336.9,40.9 373.3,40.4 409.6,39.8 446.0,41.5' fill='none' stroke='#3fb950' stroke-width='1.8'/><circle cx='446.0' cy='41.5' r='2.6' fill='#3fb950'/><rect x='52' y='62' width='10' height='10' fill='#3fb950' rx='2'/><text x='67' y='70' fill='#c9d1d9' font-size='10'>test top-5</text></svg></div></div></div>
+<div class='card'><h2>Cross-references</h2><h3>Nearest neighbours in this hypothesis group (by composite distance)</h3><ul class='xrefs'><li><a href='../experiments/cifar10__combo5_pb_gm_pd_pdw_plr_seed0.html'>combo5_pb_gm_pd_pdw_plr</a> <span class='mut'>(seed 0, top-1 79.78%, composite Δ −0.0057)</span></li><li><a href='../experiments/cifar10__pair_pd_plr_seed0.html'>pair_pd_plr</a> <span class='mut'>(seed 0, top-1 81.31%, composite Δ +0.0157)</span></li><li><a href='../experiments/cifar10__loo_no_plr_seed0.html'>loo_no_plr</a> <span class='mut'>(seed 0, top-1 83.83%, composite Δ +0.0284)</span></li></ul></div>
+<div class='meta'>composite formula SHA-256: <code>d65565e9c7b12d14cbce30a801ecc6753aea3eb148074256bfcc051fa61d0893</code> &nbsp;·&nbsp; epochs run: <b>12</b> &nbsp;·&nbsp; train wall-clock: <b>368.7 s</b> &nbsp;·&nbsp; generalisation gap (train − test top-1): <b>6.53 pp</b>&nbsp;·&nbsp; metrics.json git commit: <a href='https://github.com/dlmastery/nature_inspired_networks/commit/ea27415' style='color:#58a6ff'><code>ea27415</code></a><br>run directory: <code>pair_gm_plr_seed0</code><br>Generated by <code>nature_inspired_networks.dashboard.render_experiment_page</code> · self-contained inline SVG; no external assets.</div>
+</body></html>

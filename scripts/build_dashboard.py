@@ -216,6 +216,8 @@ def main(argv=None) -> int:
         print(
             "[ok] section coverage (real content vs. fallback): "
             f"hypothesis={coverage['hypothesis']}/{n}, "
+            f"audit={coverage.get('audit', 0)}/{n}, "
+            f"scicritic={coverage.get('scicritic', 0)}/{n}, "
             f"verdict={coverage['verdict']}/{n}, "
             f"reasoning={coverage['reasoning']}/{n}, "
             f"config={coverage['config']}/{n}, "

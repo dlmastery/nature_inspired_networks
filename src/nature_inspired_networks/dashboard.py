@@ -16,6 +16,7 @@ from __future__ import annotations
 import hashlib
 import json
 import re
+import subprocess
 from pathlib import Path
 from typing import Iterable
 
@@ -25,6 +26,15 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+
+
+# ---------------------------------------------------------------------------
+# Baseline reference accuracies for per-group SVG visualisations
+# ---------------------------------------------------------------------------
+BASELINE_TOP1 = {
+    "cifar10": 0.8478,   # baseline_resnet20 seed=0 (FINDINGS.md)
+    "cifar100": 0.5652,  # baseline_resnet20 3-seed median (FINDINGS.md)
+}
 
 
 # ---------------------------------------------------------------------------
@@ -456,6 +466,118 @@ def find_hypothesis_path(repo_root: Path, hid: str) -> Path | None:
     return None
 
 
+def parse_audit_verdict(repo_root: Path, hid: str, group: str) -> dict[str, str]:
+    """Parse ``audits/G<N>_audit.md`` for a specific hypothesis verdict.
+
+    Returns a dict with keys: ``verdict`` (PASS/MINOR/MAJOR/BROKEN/""),
+    ``summary`` (first sentence of audit body), ``url`` (GitHub link),
+    ``local`` (relative local link). All empty if missing.
+    """
+    out = {"verdict": "", "summary": "", "url": "", "local": ""}
+    if not hid or not group or not group.startswith("G"):
+        return out
+    audit_md = repo_root / "audits" / f"{group}_audit.md"
+    if not audit_md.exists():
+        return out
+    try:
+        text = audit_md.read_text(encoding="utf-8", errors="ignore")
+    except Exception:
+        return out
+    # Find the hypothesis subsection block: ### H09 — ... up to next ### or end.
+    m = re.search(
+        rf"^###\s+{re.escape(hid)}\b.*?\n(.+?)(?=^###\s+H\d{{2}}\b|\Z)",
+        text, re.DOTALL | re.MULTILINE,
+    )
+    if not m:
+        return out
+    block = m.group(1)
+    vm = re.search(r"\*\*Verdict:\*\*\s*([A-Z]+(?:\s+\([^)]+\))?)", block)
+    if vm:
+        # Keep only the first all-caps word as the canonical verdict.
+        raw = vm.group(1).strip()
+        kw = re.match(r"([A-Z]+)", raw)
+        out["verdict"] = kw.group(1) if kw else raw
+    # First non-empty paragraph after Verdict line as a 1-sentence summary.
+    sm = re.search(r"\*\*Mechanism check:\*\*\s*(.+?)(?:\n\n|\Z)",
+                   block, re.DOTALL)
+    if sm:
+        summary = re.sub(r"\s+", " ", sm.group(1)).strip()
+        out["summary"] = summary[:400]
+    rel = audit_md.relative_to(repo_root).as_posix()
+    out["local"] = rel
+    out["url"] = (
+        f"https://github.com/dlmastery/nature_inspired_networks/blob/main/"
+        f"{rel}#{hid.lower()}-{group.lower()}"
+    )
+    return out
+
+
+def parse_scicritic_verdict(md_path: Path | None) -> dict[str, str]:
+    """Parse the trailing 'Addendum: Research-Scientist Critique' verdict.
+
+    Returns dict with keys: ``verdict`` (NOVEL/DERIVATIVE/NUMEROLOGY/
+    FALSIFIED/UNFALSIFIABLE/INFRASTRUCTURE/""), ``raw`` (first sentence of
+    the verdict block), ``found`` (bool).
+    """
+    out = {"verdict": "", "raw": "", "found": False}
+    if md_path is None or not md_path.exists():
+        return out
+    try:
+        text = md_path.read_text(encoding="utf-8", errors="ignore")
+    except Exception:
+        return out
+    # Match "### Verdict" inside the addendum, capture body to next "##" or EOF
+    m = re.search(
+        r"##\s+Addendum:\s*Research-Scientist.*?###\s+Verdict\s*\n(.+?)(?=\n##\s|\Z)",
+        text, re.DOTALL | re.IGNORECASE,
+    )
+    if not m:
+        return out
+    body = m.group(1).strip()
+    out["found"] = True
+    # First all-caps token, possibly with "+TESTABLE" / "+CONFIRMED" suffix.
+    vm = re.search(
+        r"\*?\*?(NOVEL|DERIVATIVE|NUMEROLOGY|FALSIFIED|UNFALSIFIABLE|"
+        r"INFRASTRUCTURE)\b(?:\+[A-Z]+)?",
+        body,
+    )
+    if vm:
+        out["verdict"] = vm.group(0).replace("*", "").strip()
+    # First sentence-ish chunk for tooltip / inline display.
+    cleaned = re.sub(r"\s+", " ", body).strip()
+    out["raw"] = cleaned[:420]
+    return out
+
+
+def _git_short_sha(repo_root: Path, target: Path | None) -> str:
+    """Return the short SHA of the last commit touching ``target``.
+
+    Falls back to repo HEAD if the target is missing from git history,
+    or empty string if git is not available.
+    """
+    try:
+        if target is not None and target.exists():
+            try:
+                rel = target.relative_to(repo_root).as_posix()
+            except Exception:
+                rel = str(target)
+            r = subprocess.run(
+                ["git", "log", "-1", "--format=%h", "--", rel],
+                cwd=str(repo_root), capture_output=True, text=True, timeout=5,
+            )
+            sha = r.stdout.strip()
+            if sha:
+                return sha
+        # Fallback: HEAD
+        r = subprocess.run(
+            ["git", "rev-parse", "--short", "HEAD"],
+            cwd=str(repo_root), capture_output=True, text=True, timeout=5,
+        )
+        return r.stdout.strip()
+    except Exception:
+        return ""
+
+
 def parse_findings_for_tag(findings_md: Path, tag: str) -> str:
     """Extract a short verdict blurb for the given tag from FINDINGS.md."""
     if not findings_md.exists() or not tag:
@@ -793,6 +915,228 @@ _EXP_PAGE_CSS = """
 """
 
 
+def _load_experiment_log_row(experiment_log: Path,
+                             tag: str, seed, dataset: str) -> dict | None:
+    """Return the latest matching jsonl row for (tag, seed, dataset)."""
+    if not experiment_log.exists():
+        return None
+    try:
+        try:
+            seed_int = int(seed)
+        except Exception:
+            seed_int = None
+        match: dict | None = None
+        with experiment_log.open("r", encoding="utf-8", errors="ignore") as fh:
+            for ln in fh:
+                ln = ln.strip()
+                if not ln or not ln.startswith("{"):
+                    continue
+                try:
+                    row = json.loads(ln)
+                except Exception:
+                    continue
+                if row.get("tag") != tag:
+                    continue
+                if dataset and row.get("dataset") != dataset:
+                    continue
+                if seed_int is not None and row.get("seed") != seed_int:
+                    continue
+                match = row  # keep last (newest) match
+        return match
+    except Exception:
+        return None
+
+
+# Two-tone palette for hypothesis verdict badges.
+_VERDICT_COLORS = {
+    "PASS":      ("#3fb950", "#0d2818"),
+    "MINOR":     ("#d29922", "#2c220a"),
+    "MAJOR":     ("#f0883e", "#3a1f0c"),
+    "BROKEN":    ("#f85149", "#3a0e0e"),
+    "NOVEL":     ("#3fb950", "#0d2818"),
+    "DERIVATIVE": ("#58a6ff", "#0f1d33"),
+    "NUMEROLOGY": ("#f85149", "#3a0e0e"),
+    "FALSIFIED":  ("#f85149", "#3a0e0e"),
+    "UNFALSIFIABLE": ("#a371f7", "#1c142e"),
+    "INFRASTRUCTURE": ("#8b949e", "#21262d"),
+}
+
+
+def _verdict_badge(label: str, verdict: str, url: str = "",
+                   tooltip: str = "") -> str:
+    if not verdict:
+        return ""
+    base = verdict.split("+")[0].strip()
+    fg, bg = _VERDICT_COLORS.get(base, ("#c9d1d9", "#21262d"))
+    title = _esc(tooltip) if tooltip else _esc(verdict)
+    inner = (
+        f"<span style='display:inline-block;padding:2px 10px;border-radius:10px;"
+        f"background:{bg};border:1px solid {fg};color:{fg};font-weight:600;"
+        f"font-size:0.78em;font-family:Consolas,monospace' "
+        f"title='{title}'>{_esc(label)}: {_esc(verdict)}</span>"
+    )
+    if url:
+        return (
+            f"<a href='{_esc(url)}' style='text-decoration:none;"
+            f"margin-right:6px'>{inner}</a>"
+        )
+    return f"<span style='margin-right:6px'>{inner}</span>"
+
+
+# ---------------------------------------------------------------------------
+# Per-group SVG visualisation for the aggregate dashboard
+# ---------------------------------------------------------------------------
+
+def _group_visualisation_svg(rows: list[pd.Series], group_letter: str,
+                             chart_id: str, width: int = 960,
+                             height: int = 280) -> str:
+    """Render a compact horizontal-bar SVG chart for a hypothesis group.
+
+    Each row becomes one bar (top-1 %). Baseline reference is overlaid as a
+    vertical dashed line per dataset.
+    """
+    if not rows:
+        return ""
+    bars: list[dict] = []
+    for r in rows:
+        try:
+            top1 = float(r.get("top1"))
+        except Exception:
+            continue
+        bars.append({
+            "tag": str(r.get("tag", ""))[:30],
+            "seed": r.get("seed", ""),
+            "dataset": str(r.get("dataset", "")),
+            "top1": top1,
+            "params": float(r.get("params", 0) or 0),
+            "composite": float(r.get("composite", 0) or 0),
+            "run_dir": str(r.get("_run_dir", "")),
+        })
+    if not bars:
+        return ""
+    # Sort descending by top-1 so the best is at the top.
+    bars.sort(key=lambda d: d["top1"], reverse=True)
+    # Cap to 20 bars to keep chart compact.
+    bars = bars[:20]
+
+    # Layout
+    ml, mr, mt, mb = 200, 60, 28, 28
+    pw = width - ml - mr
+    bh = 14
+    gap = 6
+    ph = len(bars) * (bh + gap)
+    h = mt + mb + ph + 12  # +12 for baseline legend
+    # x-axis: from 0 to max(top1, baseline) * 1.05
+    datasets_in_group = {b["dataset"] for b in bars}
+    baselines = [BASELINE_TOP1[d] for d in datasets_in_group if d in BASELINE_TOP1]
+    xmax = max([b["top1"] for b in bars] + baselines + [0.5]) * 1.06
+    xmin = 0.0
+
+    def sx(x: float) -> float:
+        return ml + pw * (x - xmin) / (xmax - xmin)
+
+    parts: list[str] = [
+        f"<svg viewBox='0 0 {width} {h}' preserveAspectRatio='xMinYMin meet' "
+        f"xmlns='http://www.w3.org/2000/svg' "
+        f"style='width:100%;height:auto;background:#0d1117;border:1px solid "
+        f"#30363d;border-radius:6px;display:block;margin-bottom:8px' "
+        f"id='{chart_id}'>",
+        f"<text x='{ml}' y='18' fill='#c9d1d9' font-size='12' "
+        f"font-weight='600'>Top-1 by tag · {_esc(group_letter)} "
+        f"(n={len(bars)})</text>",
+    ]
+    # Grid + x-axis ticks at 25 %, 50 %, 75 % of xmax
+    for frac in (0.25, 0.5, 0.75, 1.0):
+        xv = xmin + (xmax - xmin) * frac
+        xx = sx(xv)
+        parts.append(
+            f"<line x1='{xx:.1f}' y1='{mt}' x2='{xx:.1f}' "
+            f"y2='{mt + ph}' stroke='#21262d' stroke-width='1'/>"
+        )
+        parts.append(
+            f"<text x='{xx:.1f}' y='{mt + ph + 14}' fill='#8b949e' "
+            f"font-size='9' text-anchor='middle'>{xv*100:.0f}%</text>"
+        )
+    # Baseline reference line(s)
+    bl_colors = {"cifar10": "#d29922", "cifar100": "#f0883e"}
+    legend_x = ml
+    for ds in sorted(datasets_in_group):
+        if ds not in BASELINE_TOP1:
+            continue
+        bx = sx(BASELINE_TOP1[ds])
+        col = bl_colors.get(ds, "#d29922")
+        parts.append(
+            f"<line x1='{bx:.1f}' y1='{mt - 4}' x2='{bx:.1f}' "
+            f"y2='{mt + ph + 4}' stroke='{col}' stroke-width='1.6' "
+            f"stroke-dasharray='4,3' opacity='0.85'/>"
+        )
+        parts.append(
+            f"<text x='{bx + 4:.1f}' y='{mt - 4}' fill='{col}' "
+            f"font-size='9'>{_esc(ds)} baseline {BASELINE_TOP1[ds]*100:.1f}%</text>"
+        )
+    # Bars + labels
+    palette = {
+        "cifar10": "#58a6ff",
+        "cifar100": "#a371f7",
+    }
+    for i, b in enumerate(bars):
+        y = mt + i * (bh + gap)
+        bx0 = ml
+        bx1 = sx(b["top1"])
+        col = palette.get(b["dataset"], "#58a6ff")
+        ds_tag = f"{b['tag']} · {b['dataset']} · seed{b['seed']}"
+        parts.append(
+            f"<rect x='{bx0:.1f}' y='{y}' width='{bx1 - bx0:.1f}' "
+            f"height='{bh}' fill='{col}' opacity='0.85' rx='2'>"
+            f"<title>{_esc(ds_tag)} · top-1 {b['top1']*100:.2f}% · "
+            f"params {b['params']/1e6:.3f}M · composite {b['composite']:.4f}</title>"
+            f"</rect>"
+        )
+        parts.append(
+            f"<text x='{ml - 6}' y='{y + bh - 3}' fill='#c9d1d9' "
+            f"font-size='10' text-anchor='end' "
+            f"font-family='Consolas,monospace'>{_esc(b['tag'][:24])}</text>"
+        )
+        parts.append(
+            f"<text x='{bx1 + 4:.1f}' y='{y + bh - 3}' fill='#8b949e' "
+            f"font-size='9'>{b['top1']*100:.2f}%</text>"
+        )
+    parts.append("</svg>")
+    return "".join(parts)
+
+
+def _nearest_in_group(df: pd.DataFrame, group_letter: str, this_tag: str,
+                      this_dataset: str, this_composite: float,
+                      k: int = 3) -> list[dict]:
+    """Return up to k nearest-by-composite tags inside the same group/dataset."""
+    if df is None or df.empty:
+        return []
+    sub = df[df["__group"] == group_letter] if "__group" in df.columns else None
+    if sub is None or sub.empty:
+        return []
+    sub = sub[sub["dataset"] == this_dataset]
+    sub = sub[sub["tag"] != this_tag]
+    if sub.empty:
+        return []
+    sub = sub.copy()
+    try:
+        sub["__dist"] = (sub["composite"].astype(float) - float(this_composite)).abs()
+    except Exception:
+        return []
+    sub = sub.sort_values("__dist").head(k)
+    out: list[dict] = []
+    for _, r in sub.iterrows():
+        out.append({
+            "tag": r.get("tag", ""),
+            "seed": r.get("seed", ""),
+            "dataset": r.get("dataset", ""),
+            "composite": float(r.get("composite", 0) or 0),
+            "top1": float(r.get("top1", 0) or 0),
+            "run_dir": str(r.get("_run_dir", "")),
+        })
+    return out
+
+
 def _render_hypothesis_section(hid: str | None, group: str,
                                repo_root: Path) -> str:
     """Build the inline hypothesis digest block for a per-experiment page."""
@@ -812,9 +1156,24 @@ def _render_hypothesis_section(hid: str | None, group: str,
     digest = parse_hypothesis_doc(md)
     rel = md.relative_to(repo_root).as_posix()
     gh_url = f"https://github.com/dlmastery/nature_inspired_networks/blob/main/{rel}"
+    sci = parse_scicritic_verdict(md)
     parts: list[str] = [
         f"<div class='card'><h2>Hypothesis {_esc(hid)} — {_esc(digest['title'] or hid)}</h2>"
     ]
+    # Prominent GitHub design-doc CTA up front + sci-critic badge inline
+    cta_bits = [
+        f"<a href='{_esc(gh_url)}' style='display:inline-block;background:"
+        f"#1f6feb;color:#fff;padding:6px 14px;border-radius:6px;font-weight:600;"
+        f"font-size:0.86em;border:1px solid #58a6ff;text-decoration:none;"
+        f"margin-right:8px'>&#128196; Hypothesis design doc &rarr;</a>"
+    ]
+    if sci["verdict"]:
+        cta_bits.append(_verdict_badge(
+            "sci-critic", sci["verdict"], url=gh_url, tooltip=sci["raw"],
+        ))
+    parts.append(
+        f"<div style='margin:4px 0 14px 0'>{''.join(cta_bits)}</div>"
+    )
     if digest["oneline"]:
         parts.append(
             f"<p><b style='color:#d29922'>One-line claim:</b> "
@@ -917,7 +1276,8 @@ def _render_reasoning_section(reasoning_path: Path | None) -> str:
     return "".join(parts)
 
 
-def _render_configuration_section(run_dir: Path, metrics: dict) -> str:
+def _render_configuration_section(run_dir: Path, metrics: dict,
+                                  results_dir: Path | None = None) -> str:
     cfg_yaml = run_dir / "config.yaml"
     if cfg_yaml.exists():
         try:
@@ -928,30 +1288,77 @@ def _render_configuration_section(run_dir: Path, metrics: dict) -> str:
             "<div class='card'><h2>Configuration</h2>"
             f"<pre>{_esc(text)}</pre></div>"
         )
-    # Fallback: reconstruct from metrics.json fields.
-    inferred = {}
-    for k in ("model", "dataset", "channel_mode", "n_stages", "n_blocks",
-              "epochs", "batch_size", "lr", "optimizer", "weight_decay",
-              "scheduler", "seed", "flags"):
-        if k in metrics:
-            inferred[k] = metrics[k]
+    # Fallback 1: enrich with the matching experiments/experiment_log.jsonl row.
+    log_row: dict | None = None
+    if results_dir is not None:
+        log_row = _load_experiment_log_row(
+            results_dir / "experiment_log.jsonl",
+            metrics.get("tag", ""), metrics.get("seed"),
+            metrics.get("dataset", ""),
+        )
+    # Build the inferred dict: prefer log_row keys when both present
+    keys_of_interest = (
+        "tag", "model", "dataset", "channel_mode", "n_stages", "n_blocks",
+        "epochs", "batch_size", "lr", "optimizer", "weight_decay",
+        "scheduler", "seed", "flags", "composite_formula",
+    )
+    inferred: dict = {}
+    for k in keys_of_interest:
+        v = (log_row or {}).get(k)
+        if v is None:
+            v = metrics.get(k)
+        if v is not None:
+            inferred[k] = v
     if not inferred:
         return (
             "<div class='card'><h2>Configuration</h2>"
             "<p class='empty'>No <code>config.yaml</code> in run directory "
-            "and metrics.json carries no recoverable config overrides.</p>"
-            "</div>"
+            "and neither <code>metrics.json</code> nor "
+            "<code>experiment_log.jsonl</code> carries recoverable config "
+            "overrides.</p></div>"
         )
+    src = "experiment_log.jsonl + metrics.json" if log_row else "metrics.json"
     return (
-        "<div class='card'><h2>Configuration (inferred from metrics.json)</h2>"
+        f"<div class='card'><h2>Configuration (inferred from {src})</h2>"
         f"<pre>{_esc(json.dumps(inferred, indent=2))}</pre></div>"
     )
 
 
+def _render_audit_verdict_section(hid: str | None, group: str,
+                                  repo_root: Path) -> str:
+    """Implementation-critic verdict card (parsed from audits/G<X>_audit.md)."""
+    if not hid:
+        return ""
+    audit = parse_audit_verdict(repo_root, hid, group)
+    if not audit["verdict"]:
+        return ""
+    badge = _verdict_badge("impl-critic", audit["verdict"],
+                           url=audit["url"], tooltip=audit["summary"])
+    body = audit["summary"] or "(see full audit on GitHub)"
+    local_link = (
+        f"<a href='../../{_esc(audit['local'])}'>"
+        f"local: {_esc(audit['local'])}</a>"
+    ) if audit["local"] else ""
+    return (
+        f"<div class='card'><h2>Implementation-critic verdict "
+        f"(audits/{group}_audit.md)</h2>"
+        f"<div style='margin-bottom:10px'>{badge}</div>"
+        f"<div class='quote'>{_esc(body)}</div>"
+        f"<p style='margin-top:10px'>"
+        f"<a href='{_esc(audit['url'])}'>Full audit on GitHub &rarr;</a>"
+        f"{' &middot; ' + local_link if local_link else ''}</p></div>"
+    )
+
+
 def _render_cross_refs(run_dir_name: str, tag: str, dataset: str,
-                       results_dir: Path) -> str:
-    """Discover other seeds / datasets for the same tag."""
-    items: list[str] = []
+                       results_dir: Path,
+                       df: pd.DataFrame | None = None,
+                       group_letter: str | None = None,
+                       composite: float | None = None) -> str:
+    """Discover other seeds / datasets / nearest-in-group neighbours."""
+    items_seed: list[str] = []
+    items_dataset: list[str] = []
+    items_group: list[str] = []
     # Other seeds, same dataset
     same_ds_dir = results_dir / dataset
     if same_ds_dir.exists():
@@ -963,9 +1370,8 @@ def _render_cross_refs(run_dir_name: str, tag: str, dataset: str,
             if sib.name == run_dir_name:
                 continue
             href = f"../experiments/{run_page_filename(sib.name, dataset=dataset)}"
-            items.append(
-                f"<li><a href='{_esc(href)}'>{_esc(sib.name)}</a> "
-                f"<span class='mut'>(same tag, different seed)</span></li>"
+            items_seed.append(
+                f"<li><a href='{_esc(href)}'>{_esc(sib.name)}</a></li>"
             )
     # Same tag on other dataset(s)
     for ds_dir in sorted(results_dir.iterdir()):
@@ -977,19 +1383,57 @@ def _render_cross_refs(run_dir_name: str, tag: str, dataset: str,
             if not sib.name.startswith(f"{tag}_seed"):
                 continue
             href = f"../experiments/{run_page_filename(sib.name, dataset=ds_dir.name)}"
-            items.append(
+            items_dataset.append(
                 f"<li><a href='{_esc(href)}'>{_esc(sib.name)}</a> "
-                f"<span class='mut'>(same tag on "
+                f"<span class='mut'>("
                 f"<code>{_esc(ds_dir.name)}</code>)</span></li>"
             )
-    if not items:
+    # Nearest neighbours in the same hypothesis group
+    if (df is not None and group_letter is not None
+            and composite is not None and not df.empty):
+        neighbours = _nearest_in_group(
+            df, group_letter, tag, dataset, composite, k=3,
+        )
+        for n in neighbours:
+            run_name = n["run_dir"].split("/")[-1]
+            href = (
+                f"../experiments/{run_page_filename(run_name, dataset=n['dataset'])}"
+            )
+            delta = (n["composite"] - composite)
+            sign = "+" if delta >= 0 else "−"
+            items_group.append(
+                f"<li><a href='{_esc(href)}'>{_esc(n['tag'])}</a> "
+                f"<span class='mut'>(seed {_esc(n['seed'])}, top-1 "
+                f"{n['top1']*100:.2f}%, composite Δ {sign}"
+                f"{abs(delta):.4f})</span></li>"
+            )
+
+    blocks: list[str] = []
+    if items_seed:
+        blocks.append(
+            "<h3>Other seeds (same tag, same dataset)</h3>"
+            "<ul class='xrefs'>" + "".join(items_seed) + "</ul>"
+        )
+    if items_dataset:
+        blocks.append(
+            "<h3>Same tag on other dataset(s)</h3>"
+            "<ul class='xrefs'>" + "".join(items_dataset) + "</ul>"
+        )
+    if items_group:
+        blocks.append(
+            "<h3>Nearest neighbours in this hypothesis group "
+            "(by composite distance)</h3>"
+            "<ul class='xrefs'>" + "".join(items_group) + "</ul>"
+        )
+    if not blocks:
         body = "<p class='empty'>No companion runs found.</p>"
     else:
-        body = "<ul class='xrefs'>" + "".join(items) + "</ul>"
+        body = "".join(blocks)
     return f"<div class='card'><h2>Cross-references</h2>{body}</div>"
 
 
-def _render_footer(metrics: dict, run_dir: Path) -> str:
+def _render_footer(metrics: dict, run_dir: Path,
+                   repo_root: Path | None = None) -> str:
     fp = metrics.get("composite_fingerprint", "")
     epochs = metrics.get("epochs", "?")
     train_s = metrics.get("train_seconds", "?")
@@ -1002,13 +1446,34 @@ def _render_footer(metrics: dict, run_dir: Path) -> str:
         train_s_disp = f"{float(train_s):.1f} s"
     except Exception:
         train_s_disp = str(train_s)
+    sha = ""
+    if repo_root is not None:
+        try:
+            sha = _git_short_sha(repo_root, run_dir / "metrics.json")
+        except Exception:
+            sha = ""
+    sha_html = ""
+    if sha:
+        sha_url = (
+            f"https://github.com/dlmastery/nature_inspired_networks/commit/{sha}"
+        )
+        sha_html = (
+            f"&nbsp;·&nbsp; metrics.json git commit: "
+            f"<a href='{_esc(sha_url)}' style='color:#58a6ff'>"
+            f"<code>{_esc(sha)}</code></a>"
+        )
+    try:
+        run_path_rel = str(run_dir.relative_to(repo_root)) if repo_root else run_dir.name
+    except Exception:
+        run_path_rel = run_dir.name
     return (
         "<div class='meta'>"
         f"composite formula SHA-256: <code>{_esc(fp)}</code> &nbsp;·&nbsp; "
         f"epochs run: <b>{_esc(epochs)}</b> &nbsp;·&nbsp; "
         f"train wall-clock: <b>{train_s_disp}</b> &nbsp;·&nbsp; "
-        f"generalisation gap (train − test top-1): <b>{gen_gap_disp}</b> "
-        f"&nbsp;·&nbsp; run directory: <code>{_esc(run_dir.name)}</code>"
+        f"generalisation gap (train − test top-1): <b>{gen_gap_disp}</b>"
+        f"{sha_html}"
+        f"<br>run directory: <code>{_esc(run_path_rel)}</code>"
         "<br>Generated by "
         "<code>nature_inspired_networks.dashboard.render_experiment_page</code>"
         " · self-contained inline SVG; no external assets."
@@ -1020,7 +1485,8 @@ def render_experiment_page(metrics: dict, history: list[dict] | None,
                            run_dir_name: str, out_html: Path,
                            run_dir: Path | None = None,
                            results_dir: Path | None = None,
-                           repo_root: Path | None = None) -> dict[str, bool]:
+                           repo_root: Path | None = None,
+                           runs_df: pd.DataFrame | None = None) -> dict[str, bool]:
     """Write a single self-contained per-experiment HTML page.
 
     Returns a dict of section presence flags so callers can build coverage
@@ -1048,6 +1514,8 @@ def render_experiment_page(metrics: dict, history: list[dict] | None,
         "config": False,
         "history": history is not None and len(history) > 0,
         "cross_refs": False,
+        "audit": False,
+        "scicritic": False,
     }
 
     # ---- metrics table -------------------------------------------------
@@ -1193,8 +1661,16 @@ def render_experiment_page(metrics: dict, history: list[dict] | None,
 
     # ---- hypothesis / verdict / reasoning / config / cross-refs --------
     hyp_html = _render_hypothesis_section(hid, group, repo_root)
-    if hid is not None and find_hypothesis_path(repo_root, hid) is not None:
+    md_path = find_hypothesis_path(repo_root, hid) if hid else None
+    if hid is not None and md_path is not None:
         flags["hypothesis"] = True
+        if parse_scicritic_verdict(md_path)["verdict"]:
+            flags["scicritic"] = True
+
+    # Implementation-critic verdict from audits/G<X>_audit.md
+    audit_html = _render_audit_verdict_section(hid, group, repo_root)
+    if audit_html:
+        flags["audit"] = True
 
     verdict_html = _render_verdict_section(repo_root, tag)
     if parse_findings_for_tag(repo_root / "FINDINGS.md", tag):
@@ -1206,16 +1682,27 @@ def render_experiment_page(metrics: dict, history: list[dict] | None,
     )
     flags["reasoning"] = reasoning_path.exists()
 
-    config_html = _render_configuration_section(run_dir, metrics)
-    if (run_dir / "config.yaml").exists():
+    config_html = _render_configuration_section(
+        run_dir, metrics, results_dir=results_dir,
+    )
+    # "config" flag counts ANY successfully rendered config block — exact
+    # config.yaml OR an experiment_log.jsonl row OR sufficient metrics fields.
+    if (run_dir / "config.yaml").exists() or "Configuration (inferred" in config_html:
         flags["config"] = True
 
-    xrefs_html = _render_cross_refs(run_dir_name, tag, dataset, results_dir)
-    # Count cross-refs as "filled" if more than the placeholder
+    # Composite for nearest-neighbour distance ranking
+    try:
+        comp = float(metrics.get("composite"))
+    except Exception:
+        comp = None
+    xrefs_html = _render_cross_refs(
+        run_dir_name, tag, dataset, results_dir,
+        df=runs_df, group_letter=group, composite=comp,
+    )
     if "<li>" in xrefs_html:
         flags["cross_refs"] = True
 
-    footer_html = _render_footer(metrics, run_dir)
+    footer_html = _render_footer(metrics, run_dir, repo_root=repo_root)
 
     # ---- header pills --------------------------------------------------
     hyp_pill = (
@@ -1226,6 +1713,23 @@ def render_experiment_page(metrics: dict, history: list[dict] | None,
     ds_pill = f"<span class='pill'>{_esc(dataset)}</span>"
     seed_pill = f"<span class='pill'>seed {_esc(seed)}</span>"
 
+    # Hypothesis-doc GitHub link for the header strip
+    hyp_url = ""
+    if hid:
+        mdp = find_hypothesis_path(repo_root, hid)
+        if mdp is not None:
+            rel = mdp.relative_to(repo_root).as_posix()
+            hyp_url = (
+                "https://github.com/dlmastery/nature_inspired_networks/blob/"
+                f"main/{rel}"
+            )
+    hyp_link_html = (
+        f"&nbsp;·&nbsp; <a href='{_esc(hyp_url)}' "
+        f"style='color:#58a6ff;font-weight:600'>"
+        f"&#128196; Hypothesis design doc &rarr;</a>"
+        if hyp_url else ""
+    )
+
     page = (
         "<!doctype html>\n"
         "<html lang='en'><head><meta charset='utf-8'>\n"
@@ -1234,8 +1738,10 @@ def render_experiment_page(metrics: dict, history: list[dict] | None,
         "<a class='back' href='../dashboard.html'>&larr; back to dashboard</a>\n"
         f"<h1>{_esc(tag)}</h1>\n"
         f"<div class='sub'>{hyp_pill}{grp_pill}{ds_pill}{seed_pill}"
-        f" &nbsp;·&nbsp; run directory <code>{_esc(run_dir_name)}</code></div>\n"
+        f" &nbsp;·&nbsp; run directory <code>{_esc(run_dir_name)}</code>"
+        f"{hyp_link_html}</div>\n"
         f"{hyp_html}\n"
+        f"{audit_html}\n"
         f"{verdict_html}\n"
         f"{reasoning_html}\n"
         f"{config_html}\n"
@@ -1267,8 +1773,15 @@ def render_all_experiment_pages(results_dir: str | Path,
     written: list[str] = []
     coverage = {
         "hypothesis": 0, "verdict": 0, "reasoning": 0, "config": 0,
-        "history": 0, "cross_refs": 0,
+        "history": 0, "cross_refs": 0, "audit": 0, "scicritic": 0,
     }
+    # Build the runs dataframe once so we can drive per-group nearest-neighbour
+    # cross-references without re-globbing.
+    runs_df = load_runs(rp)
+    if not runs_df.empty:
+        runs_df["__group"] = runs_df["tag"].map(
+            lambda t: TAG_TO_HYP.get(t, (None, "Uncategorized"))[1]
+        )
     for mj in sorted(rp.glob("**/metrics.json")):
         run_dir = mj.parent
         try:
@@ -1287,10 +1800,11 @@ def render_all_experiment_pages(results_dir: str | Path,
         flags = render_experiment_page(
             metrics, hist, run_dir.name, od / fname,
             run_dir=run_dir, results_dir=rp, repo_root=root,
+            runs_df=runs_df,
         )
         for k, present in flags.items():
             if present:
-                coverage[k] += 1
+                coverage[k] = coverage.get(k, 0) + 1
         written.append(fname)
     return sorted(written), coverage
 
@@ -1366,6 +1880,10 @@ HTML_HEAD = """<!doctype html>
  .group-section h2{margin-top:0;color:#58a6ff;font-size:1.1em;}
  .group-empty{color:#8b949e;font-style:italic;font-size:0.88em;
               padding:6px 0;}
+ .group-chart{margin:8px 0 10px 0;}
+ table.runs.compact{font-size:0.78em;}
+ table.runs.compact th{padding:5px 7px;font-size:0.66em;}
+ table.runs.compact td{padding:4px 7px;}
  .hyp-link{color:#58a6ff;font-family:Consolas,monospace;font-size:0.78em;
            white-space:nowrap;}
  /* side panel (hypothesis quick-open) */
@@ -1550,17 +2068,15 @@ def _composite_formula_chip(df: pd.DataFrame) -> str:
     )
 
 
+# Compact table: only the essentials.  Heavier columns (FLOPs, latency,
+# rot-eq, top-5) live on the per-experiment page now.
 _RUNS_COLS = [
     ("tag", "Tag"),
-    ("dataset", "Dataset"),
+    ("dataset", "DS"),
     ("seed", "Seed"),
-    ("epochs", "Epochs"),
     ("top1", "Top-1"),
-    ("top5", "Top-5"),
-    ("params", "Params"),
-    ("flops", "FLOPs"),
-    ("latency_ms", "Latency"),
     ("composite", "Composite"),
+    ("params", "Params"),
 ]
 
 
@@ -1606,12 +2122,22 @@ def _group_section_html(group_letter: str,
         )
         parts.append("</section>")
         return "".join(parts)
-    parts.append(f"<table class='runs' id='{table_id}' data-dir='asc'><thead><tr>")
+    # Compact per-group SVG visualisation BEFORE the table.
+    chart = _group_visualisation_svg(
+        rows, group_letter,
+        chart_id=f"svg-{table_id}",
+    )
+    if chart:
+        parts.append("<div class='group-chart'>" + chart + "</div>")
+    parts.append(
+        f"<table class='runs compact' id='{table_id}' data-dir='asc'>"
+        "<thead><tr>"
+    )
     for i, (_k, label) in enumerate(_RUNS_COLS):
         parts.append(
             f"<th onclick=\"sortTable('{table_id}', {i})\">{label}</th>"
         )
-    parts.append("<th>Hypothesis</th>")
+    parts.append("<th>Hyp</th>")
     parts.append("</tr></thead><tbody>")
 
     for r in rows:
