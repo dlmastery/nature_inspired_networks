@@ -1,0 +1,40 @@
+{
+  "count": 7,
+  "links": [
+    {
+      "href": "/dlmastery/nature_inspired_networks/blob/main/IDEA_TABLE.md",
+      "resolved": "https://github.com/dlmastery/nature_inspired_networks/blob/main/IDEA_TABLE.md",
+      "text": "IDEA_TABLE.md"
+    },
+    {
+      "href": "/dlmastery/nature_inspired_networks/blob/main/hypotheses/INDEX.md",
+      "resolved": "https://github.com/dlmastery/nature_inspired_networks/blob/main/hypotheses/INDEX.md",
+      "text": ""
+    },
+    {
+      "href": "/dlmastery/nature_inspired_networks/blob/main/CLAUDE.md",
+      "resolved": "https://github.com/dlmastery/nature_inspired_networks/blob/main/CLAUDE.md",
+      "text": "CLAUDE.md"
+    },
+    {
+      "href": "/dlmastery/nature_inspired_networks/blob/IDEA_TABLE.md",
+      "resolved": "https://github.com/dlmastery/nature_inspired_networks/blob/IDEA_TABLE.md",
+      "text": "IDEA_TABLE.md"
+    },
+    {
+      "href": "/dlmastery/nature_inspired_networks/blob/FINDINGS.md",
+      "resolved": "https://github.com/dlmastery/nature_inspired_networks/blob/FINDINGS.md",
+      "text": "Original repo FINDINGS.md — Full Hybrid Negative Result on C"
+    },
+    {
+      "href": "/dlmastery/nature_inspired_networks/blob/experiment_log.jsonl",
+      "resolved": "https://github.com/dlmastery/nature_inspired_networks/blob/experiment_log.jsonl",
+      "text": "experiment_log.jsonl — append-only ablation log"
+    },
+    {
+      "href": "/dlmastery/nature_inspired_networks/blob/RESULTS.md",
+      "resolved": "https://github.com/dlmastery/nature_inspired_networks/blob/RESULTS.md",
+      "text": "RESULTS.md — Pareto dashboard (acc / (params × FLOPs × laten"
+    }
+  ]
+}
