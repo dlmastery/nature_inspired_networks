@@ -723,6 +723,12 @@ locally):
 - [`autoresearch-explainability-report`](skills/autoresearch-explainability-report/) — 14-section data-scientist-grade audit (executive summary, permutation feature importance, top-N analysis, SHAP-style local, per-fold drift, calibration, uncertainty sanity, prediction distribution, per-sample attribution, risk audit, data-pipeline re-assertion, model-config dump, known limitations, deployment checklist). Ported from `autoresearch` Explainability & Auditability Report rule.
 - [`autoresearch-session-resume`](skills/autoresearch-session-resume/) — self-contained crash-recovery checkpoint document (`memory/project_autoresearch_checkpoint.md`) that a fresh session reads on startup to resume without re-reading logs / dashboards. Ported from the Session-Start ritual common to all five sister repos.
 
-*Last updated: 2026-05-29 PM. Rules 1–38 are normative invariants. CLAUDE.md
+**Added 2026-05-30 from the parity-audit follow-up + autoresearchtabular
+deep-read** (closing the two NICE-TO-HAVE gaps deferred in
+`audits/SKILLS_PARITY_AUDIT.md` §6.2):
+- [`autoresearch-shuffle-test`](skills/autoresearch-shuffle-test/) — semantic leakage detection by permuting `y_train`, refitting, and asserting the validation metric collapses to the chance baseline; three modes (hard / within-group / block) covering tabular, grouped, and time-series CV. Catches the bug class the structural data-split audit cannot see (target-encoded features, label-conditional augmentation, off-by-one alignment). Ported from `autoresearch` (FX) §3.5 shuffle audit where a +8.78-Sharpe alignment bug had a green structural audit for three weeks before this test caught it.
+- [`autoresearch-data-contract-validator`](skills/autoresearch-data-contract-validator/) — `(x, y)` pairing contract validator: asserts feature shape / dtype / label-set / value-range / pair-count / index-pair invariant match between training and evaluator loaders. Static counterpart to the shuffle test — catches the off-by-one alignment in < 1 second instead of after a full retrain. Refuse-to-launch at runner pre-flight, no `--skip-contract` flag. Ported from the same FX §3.5 retrospective.
+
+*Last updated: 2026-05-30. Rules 1–38 are normative invariants. CLAUDE.md
 is self-contained: no parent-repo dependency required to implement the
-protocol. The 27 skills in `skills/` are content-agnostic.*
+protocol. The 29 skills in `skills/` are content-agnostic.*
