@@ -21,7 +21,9 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 
 from nature_inspired_networks.activations import (  # noqa: E402
     PhiGELU,
+    SLOT_ACTIVATION_FACTORIES,
     phi_act,
+    swap_relu_with,
 )
 from nature_inspired_networks.priors import PHI  # noqa: E402
 
@@ -108,6 +110,117 @@ def test_phigelu_drop_in_replacement_for_relu():
     y1 = relu_net(x)
     y2 = phi_net(x)
     assert y1.shape == y2.shape
+
+
+def test_swap_relu_with_replaces_all_relus_in_resnet20():
+    """Control 2: every nn.ReLU submodule in ResNet-20 must be replaced
+    by the factory's output. Functional F.relu inside forward bodies
+    is documented as out-of-scope (sibling helpers behave identically)."""
+    from nature_inspired_networks.models import ResNet20
+    m = ResNet20(num_classes=10)
+    # Stem has an nn.ReLU; BasicBlocks use F.relu (functional) only.
+    n_relu_before = sum(1 for mm in m.modules() if isinstance(mm, nn.ReLU))
+    assert n_relu_before >= 1, "expected at least one nn.ReLU in ResNet-20 stem"
+    swap_relu_with(m, lambda: nn.Tanh())
+    n_relu_after = sum(1 for mm in m.modules() if isinstance(mm, nn.ReLU))
+    n_tanh = sum(1 for mm in m.modules() if isinstance(mm, nn.Tanh))
+    assert n_relu_after == 0, f"residual nn.ReLU count {n_relu_after}"
+    assert n_tanh >= n_relu_before, (n_tanh, n_relu_before)
+
+
+def test_swap_relu_with_preserves_other_layers():
+    """Conv / BN / Linear modules must NOT be touched -- only nn.ReLU."""
+    m = nn.Sequential(
+        nn.Conv2d(3, 8, 3, padding=1),
+        nn.BatchNorm2d(8),
+        nn.ReLU(inplace=True),
+        nn.Conv2d(8, 8, 3, padding=1),
+        nn.BatchNorm2d(8),
+        nn.ReLU(),
+        nn.AdaptiveAvgPool2d(1),
+        nn.Flatten(),
+        nn.Linear(8, 10),
+    )
+    # Snapshot id() of every non-ReLU child.
+    non_relu_ids_before = {
+        id(child) for child in m if not isinstance(child, nn.ReLU)
+    }
+    swap_relu_with(m, lambda: nn.GELU())
+    non_relu_ids_after = {
+        id(child) for child in m if not isinstance(child, nn.GELU)
+    }
+    # Same set: id() preserved for Conv/BN/Linear/Flatten/Pool.
+    assert non_relu_ids_before == non_relu_ids_after, (
+        "swap_relu_with mutated a non-ReLU module"
+    )
+    # Forward still runs end-to-end.
+    y = m(torch.randn(2, 3, 8, 8))
+    assert y.shape == (2, 10)
+
+
+def _run_slot_activation_branch(slot: str, expected_cls: type) -> None:
+    """Helper: build resnet20, run post_build_mutators with the slot,
+    assert that every nn.ReLU was replaced by a fresh ``expected_cls``."""
+    from nature_inspired_networks.models import ResNet20
+    from nature_inspired_networks.runner import post_build_mutators
+    m = ResNet20(num_classes=10)
+    cfg = {"slot_activation": slot}
+    out = post_build_mutators(m, cfg)
+    assert out is m  # in-place, returns the same object.
+    n_relu = sum(1 for mm in m.modules() if isinstance(mm, nn.ReLU))
+    n_target = sum(1 for mm in m.modules() if isinstance(mm, expected_cls))
+    assert n_relu == 0, f"{slot}: residual nn.ReLU count {n_relu}"
+    assert n_target >= 1, f"{slot}: no {expected_cls.__name__} created"
+    # Forward sanity.
+    y = m(torch.randn(2, 3, 32, 32))
+    assert y.shape == (2, 10)
+
+
+def test_slot_activation_tanh_dispatches_correctly():
+    _run_slot_activation_branch("tanh", nn.Tanh)
+
+
+def test_slot_activation_softplus_dispatches_correctly():
+    _run_slot_activation_branch("softplus", nn.Softplus)
+
+
+def test_slot_activation_gelu_dispatches_correctly():
+    _run_slot_activation_branch("gelu", nn.GELU)
+
+
+def test_slot_activation_swish_dispatches_correctly():
+    """swish is canonically SiLU; both 'swish' and 'silu' must dispatch
+    to nn.SiLU (Sitzmann's SIREN-aside in the design doc names ω=1
+    SIREN sin(x) as "Swish-1"; we keep the more common engineering
+    convention here)."""
+    _run_slot_activation_branch("swish", nn.SiLU)
+    _run_slot_activation_branch("silu", nn.SiLU)
+
+
+def test_slot_activation_unknown_rejected():
+    """Defensive guard: unrecognised activation alias raises ValueError
+    (Rule 7 -- no silent fall-through)."""
+    from nature_inspired_networks.models import ResNet20
+    from nature_inspired_networks.runner import post_build_mutators
+    m = ResNet20(num_classes=10)
+    try:
+        post_build_mutators(m, {"slot_activation": "bogus_activation"})
+    except ValueError:
+        return
+    raise AssertionError("expected ValueError on unknown slot_activation")
+
+
+def test_slot_activation_factories_table_coverage():
+    """SLOT_ACTIVATION_FACTORIES must list every alias required by
+    Control 2 (tanh, softplus, gelu, swish) plus the silu alias."""
+    required = {"tanh", "softplus", "gelu", "swish", "silu"}
+    assert required.issubset(SLOT_ACTIVATION_FACTORIES.keys())
+    # Each factory call must return a FRESH module (independent state).
+    for name, fac in SLOT_ACTIVATION_FACTORIES.items():
+        m1 = fac()
+        m2 = fac()
+        assert isinstance(m1, nn.Module), name
+        assert m1 is not m2, f"factory {name!r} returns the same instance"
 
 
 def test_phigelu_state_dict_roundtrip():

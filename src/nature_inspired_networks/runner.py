@@ -100,6 +100,33 @@ def post_build_mutators(model, cfg: dict):
         from .sinusoidal_activation import swap_relu_with_sine
         swap_relu_with_sine(model, omega_init=float(cfg.get("omega_init", 1.0)))
 
+    # Control 2 (reviewer-flagged) — generic activation swap.
+    # ``slot_activation`` ∈ {"tanh", "softplus", "gelu", "swish", "silu"}
+    # dispatches to swap_relu_with(model, factory). The "sine" / "phi"
+    # ablations remain on the existing dedicated helpers above so the
+    # H81 omega-init / H39 beta-init wiring is preserved byte-for-byte.
+    slot_act = str(cfg.get("slot_activation", "") or "").lower()
+    if slot_act:
+        from .activations import SLOT_ACTIVATION_FACTORIES, swap_relu_with
+        if slot_act in SLOT_ACTIVATION_FACTORIES:
+            swap_relu_with(model, SLOT_ACTIVATION_FACTORIES[slot_act])
+        elif slot_act in ("sine", "sin"):
+            # Delegate to the existing sine helper so omega_init is
+            # respected.
+            from .sinusoidal_activation import swap_relu_with_sine
+            swap_relu_with_sine(
+                model, omega_init=float(cfg.get("omega_init", 1.0)),
+            )
+        elif slot_act in ("phi", "phi_gelu", "phigelu"):
+            from .activations import swap_relu_with_phigelu
+            swap_relu_with_phigelu(model)
+        else:
+            raise ValueError(
+                f"unknown slot_activation {slot_act!r}; "
+                f"expected one of {sorted(SLOT_ACTIVATION_FACTORIES)} "
+                f"+ {'sine'!r} / {'phi'!r}"
+            )
+
     # H80 (G8) — constant-width (Reuleaux) kernel swap. Replaces every
     # square Conv2d (kernel >= 3) with a weight-preserving ConstantWidthConv2d
     # so the receptive field is near-isotropic. 1x1 skip convs are untouched.

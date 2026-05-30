@@ -19,6 +19,8 @@ the ``β`` buffer.
 """
 from __future__ import annotations
 
+from typing import Callable
+
 import torch
 import torch.nn as nn
 
@@ -95,3 +97,55 @@ def swap_relu_with_phigelu(module: nn.Module,
             swap_relu_with_phigelu(child, learnable=learnable,
                                     beta_init=beta_init)
     return module
+
+
+def swap_relu_with(module: nn.Module,
+                   factory: Callable[[], nn.Module]) -> nn.Module:
+    """Recursively replace every ``nn.ReLU`` in ``module`` with a fresh
+    activation produced by ``factory()``.
+
+    Generic counterpart to :func:`swap_relu_with_phigelu` and
+    :func:`sinusoidal_activation.swap_relu_with_sine`. A FRESH module
+    is created per replacement so the activations do not share state
+    (each call ``factory()`` returns a new instance). Returns the
+    module for chaining.
+
+    Used by the runner's ``slot_activation`` cfg dispatch (Control 2,
+    reviewer-flagged): swap ReLU for {tanh, softplus, gelu, swish}
+    under the same SLOT recipe used by ``slot_act_sine``.
+
+    Parameters
+    ----------
+    module : nn.Module
+        The model whose submodule tree is mutated in-place.
+    factory : Callable[[], nn.Module]
+        Zero-arg callable returning a fresh activation module per call
+        (e.g., ``lambda: nn.Tanh()``).
+
+    Notes
+    -----
+    Functional ``F.relu(...)`` calls inside hand-written forward
+    methods are NOT touched -- this helper only addresses the
+    submodule tree. The same caveat applies to all sibling
+    ``swap_relu_with_*`` helpers in this package.
+    """
+    for name, child in list(module.named_children()):
+        if isinstance(child, nn.ReLU):
+            setattr(module, name, factory())
+        else:
+            swap_relu_with(child, factory)
+    return module
+
+
+# Factories used by the runner's ``slot_activation`` cfg dispatch.
+# Single source of truth for the activation aliases the reviewer's
+# Control 2 matrix requires: {tanh, softplus, gelu, swish}.
+# ``sine`` and ``phi`` remain routed via their dedicated helpers
+# (sinusoidal_activation.swap_relu_with_sine / swap_relu_with_phigelu).
+SLOT_ACTIVATION_FACTORIES: dict[str, Callable[[], nn.Module]] = {
+    "tanh":     lambda: nn.Tanh(),
+    "softplus": lambda: nn.Softplus(),
+    "gelu":     lambda: nn.GELU(),
+    "swish":    lambda: nn.SiLU(),     # canonical "Swish-1" = SiLU
+    "silu":     lambda: nn.SiLU(),     # alias of swish
+}
