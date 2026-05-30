@@ -189,20 +189,38 @@ nature_inspired_networks/
     └── dashboard/           ← byte-identical mirror of dashboard/ for live Pages
 ```
 
-## 4. Headline claims (post-fix)
+## 4. Headline claims (CERTIFIED, n=7, 2026-05-29)
 
-After the Fixer campaign (CLAUDE.md Rule 21) and dual-track audit
-(CLAUDE.md Rule 22), **three hypotheses graduate** to deeper evaluation
-and Phase-5 multi-seed gating. All composites use the SHA-256-
-fingerprinted formula
-`top1 − 0.05·log10(params_M) − 0.05·log10(latency_ms)`
-(fingerprint `d65565e9c7b12d14cbce30a801ecc6753aea3eb148074256bfcc051fa61d0893`).
+After the Fixer campaign (CLAUDE.md Rule 21), dual-track audit
+(CLAUDE.md Rule 22), and the 2026-05-29 PM **n=7 CIFAR-100 extension**,
+the three Phase-8 winners are now **formally certified at α=0.05 under
+Holm-Bonferroni** (paired Wilcoxon W=0, exact one-sided p=(1/2)^7
+= **0.0078** < α'=0.0167 for each winner across the k=3 family; see
+[`paper/STATISTICAL_TESTS.md`](paper/STATISTICAL_TESTS.md) §0). Per
+CLAUDE.md Rule 28 these are PROMOTED from SCREENING to EVALUATION
+tier and constitute the project's **first formally-certified empirical
+claims**.
 
-| Rank | Hypothesis (tag) | Top-1 | Params | Composite | Seeds | Phase-5 3-seed gate | Audit verdict |
-|---|---|---|---|---|---|---|---|
-| 1 | **H09 `sg_only_phi_budget`** | 85.54 % | 284 k | **0.8429** | 3 (post-fix) | PASS | Impl: PASS · Sci: DERIVATIVE+TESTABLE |
-| 2 | **H02 `sg_only_fib_depth`** | 82.18 % | 180 k | **0.8261** (at 0.66× params) | 3 (post-fix) | PASS | Impl: PASS · Sci: DERIVATIVE+TESTABLE |
-| 3 | **H17 `sg_only_golden_momentum`** | 83.52 % | 272 k | **0.8307** | 3 (post-fix) | PASS | Impl: PASS · Sci: DERIVATIVE+TESTABLE |
+| Rank | Hypothesis (tag) | CIFAR-100 Δmean (n=7) | 95% bootstrap CI | Wilcoxon p | Holm-cleared? |
+|---|---|---:|---|---:|:---:|
+| 1 | **H81 `slot_act_sine`** (SIREN single prior) | **+1.78 pp** | [+1.38, +2.18] pp | **0.0078** | YES |
+| 2 | **`pair_gm_pdw`** (H09+H48+H44 orthogonal 3-axis stack) | **+1.74 pp** | [+1.42, +2.09] pp | **0.0078** | YES |
+| 3 | **H09 `sg_only_phi_budget`** (post-fix 1:1.623:2.629) | **+1.24 pp** | [+0.84, +1.67] pp | **0.0078** | YES |
+
+CIFAR-100 baseline reference (n=7): `baseline_resnet20` mean=0.5612, σ=0.451 pp.
+CIFAR-10 12-ep screening composites (all use the SHA-256-fingerprinted
+formula `top1 − 0.05·log10(params_M) − 0.05·log10(latency_ms)`,
+fingerprint `d65565e9c7b12d14cbce30a801ecc6753aea3eb148074256bfcc051fa61d0893`)
+for the same tags: `sg_only_phi_budget` 85.54 % top-1 / 0.8429
+composite; `pair_gm_pdw` 85.85 % top-1 (post-fix combo ladder winner);
+`slot_act_sine` 84.30 % top-1.
+
+**Honest caveat (preserved):** the n=7 certification holds at the
+12-ep CIFAR-10 + 30-ep CIFAR-100 screening compute budget. The
+Phase-9a hill-climb at converged 164-ep training budget + tuned
+RegNetX-200MF baseline (`PAPER.md` §7.4-4) remains open. The φ-content
+vs any-three-orthogonal-axes attribution question (the non-φ control
+in §5.5.1) is also open.
 
 (The H41 `golden_adam` β-only requalification — clarified from
 −33 pp single-config to −1 pp under Reddi-2018 testing — remains a
