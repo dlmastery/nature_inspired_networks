@@ -24,6 +24,42 @@
 [![hypotheses](https://img.shields.io/badge/hypotheses-75-orange)](hypotheses/INDEX.md)
 [![awesome](https://img.shields.io/badge/awesome-list-pink)](#part-ii--curated-awesome-links)
 
+## Quick-map: 10-section state-of-the-field index
+
+For reviewers landing from a paper citation, the post-restructure
+state-of-the-field organisation maps the literature into **10 thematic
+sections**. Each section below carries (a) foundational arXiv papers in
+[CLAUDE.md Rule 4](https://github.com/dlmastery/nature_inspired_networks/blob/main/CLAUDE.md#rule-4)
+citation format, (b) 2–3 community resources, and (c) cross-references
+to the repo's `hypotheses/g<N>_*/H<NN>_*.md` design docs. The deep prose
+treatment lives in Part I; the curated link sets are in Part II.
+
+| # | Theme | Prose anchor (Part I) | Links anchor (Part II) | Hypothesis cross-refs |
+|---|---|---|---|---|
+| 1 | **Geometric Deep Learning** (group equivariance, spherical / icosahedral / hexagonal symmetry, blueprint) | [§3.1–3.3, §3.12, §3.14](#3-geometric-and-topological-deep-learning-literature-2024-2026) | [§3 (links)](#3-geometric--topological-deep-learning-literature-2024-2026-links), [§6.1, §6.5–6.6](#6-code-libraries--toolkits) | [H21 hex_layer](https://github.com/dlmastery/nature_inspired_networks/tree/main/hypotheses/g3_topologies_graphs), [H22 toroidal_layer](https://github.com/dlmastery/nature_inspired_networks/tree/main/hypotheses/g3_topologies_graphs), [H58 group_pool](https://github.com/dlmastery/nature_inspired_networks/tree/main/hypotheses/g6_topological_bridging), [H71 IcosaRoPE3D](https://github.com/dlmastery/nature_inspired_networks/tree/main/hypotheses/g7_cross_paradigm_hybrids) |
+| 2 | **Topological Deep Learning** (persistent homology, Betti probes, differentiable PH, drop-path anytime) | [§3.7, §3.13](#3-geometric-and-topological-deep-learning-literature-2024-2026) | [§3.7, §3.11 (links)](#37-topological-deep-learning), [§6.2](#62-topological-data-analysis-differentiable-ph) | [H51 ph_loss](https://github.com/dlmastery/nature_inspired_networks/tree/main/hypotheses/g6_topological_bridging), [H60 betti_probe](https://github.com/dlmastery/nature_inspired_networks/tree/main/hypotheses/g6_topological_bridging) |
+| 3 | **Scaling & Width Allocation** (φ / Fibonacci compound scaling, depth progression, golden bottleneck) | [§1.1, §1.8, §3.6](#1-mathematical-foundations) | [§1.1, §3.6, §3.10 (links)](#11-the-golden-ratio--continued-fraction-optimality) | [H01 phi_compound](https://github.com/dlmastery/nature_inspired_networks/tree/main/hypotheses/g1_scaling_growth), [H02 fib_depth](https://github.com/dlmastery/nature_inspired_networks/tree/main/hypotheses/g1_scaling_growth), [H04 sg_chan_phi](https://github.com/dlmastery/nature_inspired_networks/tree/main/hypotheses/g1_scaling_growth), [H09 phi_budget](https://github.com/dlmastery/nature_inspired_networks/tree/main/hypotheses/g1_scaling_growth) |
+| 4 | **Fractal & Self-similar architectures** (FractalNet, recursive depth, fractal dimension, anytime drop-path) | [§1.5, §3.4](#15-fractal-dimension-and-the-natural-mid-band) | [§1.5, §3.4, §3.8 (links)](#15-fractal-dimension-and-natural-mid-band) | [H05 sg_only_fractal](https://github.com/dlmastery/nature_inspired_networks/tree/main/hypotheses/g1_scaling_growth) |
+| 5 | **Spectral & Cymatic init / activations** (SIREN, Chladni eigenmodes, harmonic activations) | [§1.6, §3.9](#16-cymatics-and-chladni-eigenmodes) | [§1.6, §3.9, §3.13 (links)](#16-cymatics-and-chladni-eigenmodes) | [H35 cymatic_init](https://github.com/dlmastery/nature_inspired_networks/tree/main/hypotheses/g4_kernels_attention_filters), [H39 phi_activation](https://github.com/dlmastery/nature_inspired_networks/tree/main/hypotheses/g4_kernels_attention_filters), [H81 sine_act](https://github.com/dlmastery/nature_inspired_networks/tree/main/hypotheses/g8_esoteric_extensions) |
+| 6 | **Hexagonal / Toroidal / Polar topologies** (HexConv, grid-cell toroidal RNN, golden-angle positional, phyllotaxis) | [§1.2, §1.4, §2.1, §3.2, §3.5, §3.10](#12-the-honeycomb-conjecture-and-hexagonal-optimality) | [§1.2, §1.4, §3.2, §3.5, §3.10 (links)](#12-the-honeycomb-conjecture--hexagonal-optimality) | [H21 hex_layer](https://github.com/dlmastery/nature_inspired_networks/tree/main/hypotheses/g3_topologies_graphs), [H22 toroidal_layer](https://github.com/dlmastery/nature_inspired_networks/tree/main/hypotheses/g3_topologies_graphs) |
+| 7 | **Optimisation with golden ratio** (golden-momentum schedulers, φ-AdamW, Fibonacci pruning, φ-dropout, φ-decay) | [§3.6 (links section)](#36-fibonacci-and-golden-ratio-neural-networks) | [§3.6, §3.10 (links)](#310-fibonacci-golden-ratio--fibottention-networks) | [H41 golden_adam](https://github.com/dlmastery/nature_inspired_networks/tree/main/hypotheses/g5_optimization_init_reg_nas), [H44 phi_decay](https://github.com/dlmastery/nature_inspired_networks/tree/main/hypotheses/g5_optimization_init_reg_nas), [H48 golden_momentum](https://github.com/dlmastery/nature_inspired_networks/tree/main/hypotheses/g5_optimization_init_reg_nas) |
+| 8 | **Cross-Paradigm Hybrids** (Liquid, JEPA, KAN, Mamba, S4, ViT, GNN cross-pollination) | [§4.1–4.6, §3.12](#4-cross-paradigm-landscape-and-the-2026-frontier) | [§4 (links)](#4-cross-paradigm-landscape--2026-frontier) | [H61–H75](https://github.com/dlmastery/nature_inspired_networks/tree/main/hypotheses/g7_cross_paradigm_hybrids) (G7 group, no CIFAR sweep rows yet) |
+| 9 | **Esoteric Extensions** (Reuleaux constant-width, tetrahedral dual paths, radial-12 attention, spectral Hopfield) | (G8 is repo-original — see Part III) | [§6.3 sacred primitives, §7.6 synthetic benchmarks](#63-hexagonal--platonic--sacred-primitives) | [H76–H84](https://github.com/dlmastery/nature_inspired_networks/tree/main/hypotheses/g8_esoteric_extensions) (G8 group) |
+| 10 | **Pareto / SOTA reference points** (efficient frontier networks, CIFAR-10/100 SOTA, MedMNIST, MobileNet/EfficientNet, RegNet baselines) | [§4.7, §4.8](#47-edge-ml-hardware-contract) | [§7.1–7.5 (links)](#7-datasets-benchmarks--negative-results) | The `baseline_resnet20` reference + repo `paper/SOTA_COMPARISON.md` |
+
+Sections 1–10 above index the same content the field has converged on
+post-2024. The 10-section labels match the Phase F scope passed by the
+2026-05-29 dashboard-redesign campaign. The deep prose for each lives in
+Part I §1–§4; the curated link sets live in Part II §1–§10; the repo's
+hypothesis docs are linked in the rightmost column.
+
+**Community-hub bullets** for each of the 10 sections live in
+[Part II §10 (Meta — Awesome Lists, Surveys & Community Hubs)](#10-meta--awesome-lists-surveys--community-hubs)
+which catalogues conferences (NeurIPS, ICML, ICLR, LoG, MICCAI),
+workshops (GeometryGrounded, TAG-ML, GRaM), Discord/Slack hubs, and
+reading groups. Each Part II section also embeds 2–3 such community
+resources inline.
+
 ## Table of contents
 
 - [Part I — State of the Field (prose, May 2026)](#part-i--state-of-the-field-prose-may-2026)
