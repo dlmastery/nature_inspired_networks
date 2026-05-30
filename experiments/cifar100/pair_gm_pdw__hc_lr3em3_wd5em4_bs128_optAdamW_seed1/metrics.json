@@ -1,0 +1,26 @@
+{
+  "tag": "pair_gm_pdw__hc_lr3em3_wd5em4_bs128_optAdamW_seed1",
+  "dataset": "cifar100",
+  "seed": 1,
+  "epochs": 30,
+  "top1": 0.6057,
+  "top5": 0.8684,
+  "params": 267658,
+  "flops": 80816212.0,
+  "latency_ms": 3.274228999798652,
+  "rot_eq_err": 0.3978206440806389,
+  "composite": 0.6085655360391834,
+  "composite_fingerprint": "d65565e9c7b12d14cbce30a801ecc6753aea3eb148074256bfcc051fa61d0893",
+  "epochs_to_target": 26,
+  "train_seconds": 993.7508901999972,
+  "train_top1": 0.7010817307692307,
+  "generalization_gap": 0.09538173076923073,
+  "config_id": "lr3em3_wd5em4_bs128_optAdamW",
+  "hc_cell": {
+    "lr": 0.003,
+    "weight_decay": 0.0005,
+    "batch_size": 128,
+    "optimizer": "AdamW"
+  },
+  "hc_seed": 1
+}
