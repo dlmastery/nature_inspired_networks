@@ -98,11 +98,39 @@ Sweep still training sg_chan_phi seed=0; remaining 8 runs queued.
   there's an upstream change. → On a single-owner repo this is fine;
   on shared repos, `git pull --rebase` before pushing.
 
+## Sister-repo cadence (sharpened 2026-05-29 from parity audit)
+
+The five `dlmastery/autoresearch*` sister repos converged on a stricter
+cadence that this skill now adopts as a SHOULD (not a MUST — the GPU
+sweep cadence in this repo is slower per run):
+
+- **Per-experiment commit + push BEFORE moving to next experiment.**
+  No batching. Every experiment's full state — JSONL row, reasoning
+  annotation, dashboard sync, checkpoint document — lands on GitHub
+  before the next launch. See sister `autoresearchindexstock`
+  CLAUDE.md "Per-Experiment Sync + Commit Rule".
+- **Allowed exception: cheap-burst commits.** For very-cheap (<60s)
+  rapid-fire bursts of 3–5 sequential experiments at the same baseline,
+  a single commit covering the burst is acceptable IF the dashboard is
+  synced + pushed at the END of the burst BEFORE switching backbones.
+- **Pre-flight check on every experiment:** if `git status` shows
+  uncommitted changes from the PRIOR experiment, STOP. Commit + push
+  first, then re-read this section, THEN launch the next experiment.
+
+This sharpened cadence is enforced indirectly via
+[`autoresearch-session-resume`](../autoresearch-session-resume/SKILL.md)
+— a fresh session reads the checkpoint, which expects "git status
+clean" as part of the Session Start ritual.
+
 ## Cross-references
 
 - `memory/feedback_checkpoint_discipline.md` — the user directive
   that introduced this skill.
 - `CLAUDE.md` § "Always-true assertions" rule 11 — the normative
   invariant.
+- [`autoresearch-auto-checkpoint-loop`](../autoresearch-auto-checkpoint-loop/SKILL.md)
+  — the BACKGROUND loop that automates this skill during long sweeps.
+- [`autoresearch-session-resume`](../autoresearch-session-resume/SKILL.md)
+  — the document this skill persists; "git status clean" gate.
 - Every other SKILL.md assumes this discipline is active in the
   background.

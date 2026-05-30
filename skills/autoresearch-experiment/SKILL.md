@@ -105,3 +105,23 @@ python scripts/build_report.py
 - Cherry-picking the best of N seeds and reporting that as the
   headline.
 - Citing `(Author2024)` without title, venue, arXiv ID.
+
+## Cross-references
+
+- [`autoresearch-reasoning-entry`](../autoresearch-reasoning-entry/SKILL.md)
+  — Steps 1–4 + 6–7 are validated by this skill's word-count + citation
+  format gates.
+- [`autoresearch-data-split-audit`](../autoresearch-data-split-audit/SKILL.md)
+  — Step 5 (Execute) calls the runner's `audit_or_die()` before any
+  model build. New dataset? Run the audit first.
+- [`autoresearch-winner-archive`](../autoresearch-winner-archive/SKILL.md)
+  — if the verdict is KEEP and the composite beats the global best,
+  this skill's Step 7 (Checkpoint) triggers winner archiving.
+- [`autoresearch-session-resume`](../autoresearch-session-resume/SKILL.md)
+  — Step 7 also updates the crash-recovery checkpoint document so the
+  next session can pick up the next experiment without context loss.
+- [`autoresearch-per-hypothesis-hillclimb`](../autoresearch-per-hypothesis-hillclimb/SKILL.md)
+  — after a screening sweep produces a candidate, the hill-climb is
+  the proper evaluation tier before any external claim.
+- [`autoresearch-paper-rigor`](../autoresearch-paper-rigor/SKILL.md)
+  — the statistical-rigor floor every external claim references back.

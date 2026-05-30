@@ -129,6 +129,18 @@ Anything that surprised us, any caveat. Bullet list.
   design.
 - The global `experiment_log.jsonl` at the repo root has one summary
   row per archive sub-directory.
+- [`autoresearch-winner-archive`](../autoresearch-winner-archive/SKILL.md)
+  — when an experiment in this archive becomes the GLOBAL champion, a
+  SECOND archive (the winner archive) is created on top with frozen
+  code, inference script, 14-section audit report, and reproduction
+  log. This per-experiment archive stays in place; the winner archive
+  is additive.
+- [`autoresearch-per-experiment-page`](../autoresearch-per-experiment-page/SKILL.md)
+  — the dashboard page generated from this archive's metrics +
+  reasoning blob.
+- [`autoresearch-explainability-report`](../autoresearch-explainability-report/SKILL.md)
+  — for champion-archives, the 14-section audit ships at
+  `<winner>/audit_report.md`.
 
 ## Anti-patterns
 

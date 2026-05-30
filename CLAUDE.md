@@ -712,7 +712,17 @@ can pick them up unchanged. The current catalogue:
 - [`autoresearch-link-discipline`](skills/autoresearch-link-discipline/) — every link Playwright-HEAD-tested; absolute GitHub-blob URLs per Rule 27; first-mention linkification of models/datasets/techniques/arXiv IDs.
 - [`autoresearch-dashboard-comprehension`](skills/autoresearch-dashboard-comprehension/) — small-multiples over dense charts; "how to read" orientation block; seed-tier propagation; multi-hypothesis pill display.
 - [`autoresearch-paper-rigor`](skills/autoresearch-paper-rigor/) — statistical-rigor floor (paired Wilcoxon + bootstrap CI + Holm-Bonferroni); pre-registration of screening-vs-evaluation; empirical noise band derivation; UNTESTED_ON_RIGHT_DATASET verdict tier.
+- [`autoresearch-per-hypothesis-hillclimb`](skills/autoresearch-per-hypothesis-hillclimb/) — 20–25-trial coordinate-descent hill-climb over (lr × wd × batch × seed × optimizer) on the screening winner, per-hypothesis dashboard, 3-seed statistical confirmation before any external claim.
 
-*Last updated: 2026-05-29. Rules 1–38 are normative invariants. CLAUDE.md
+**Added 2026-05-29 PM from the sister-repo parity audit**
+(`audits/SKILLS_PARITY_AUDIT.md` — porting load-bearing patterns from
+the five `dlmastery/autoresearch*` sister repos that were absent
+locally):
+- [`autoresearch-data-split-audit`](skills/autoresearch-data-split-audit/) — triple-check leakage / disjointness / protocol-conformance / size-floor / reproducibility-fingerprint audit; runner refuses to launch without a green report. Ported from `autoresearchimage` (Camelyon17 hospital split) + `autoresearchtabular` (Higgs Baldi 2014 frozen split).
+- [`autoresearch-winner-archive`](skills/autoresearch-winner-archive/) — fully-portable champion archive (README + config + checkpoint + frozen code + inference script + per-fold results + audit report + reproduction log + optional Colab notebook). Ported from `autoresearch` (FX) + `autoresearchspy` + `autoresearchindexstock`.
+- [`autoresearch-explainability-report`](skills/autoresearch-explainability-report/) — 14-section data-scientist-grade audit (executive summary, permutation feature importance, top-N analysis, SHAP-style local, per-fold drift, calibration, uncertainty sanity, prediction distribution, per-sample attribution, risk audit, data-pipeline re-assertion, model-config dump, known limitations, deployment checklist). Ported from `autoresearch` Explainability & Auditability Report rule.
+- [`autoresearch-session-resume`](skills/autoresearch-session-resume/) — self-contained crash-recovery checkpoint document (`memory/project_autoresearch_checkpoint.md`) that a fresh session reads on startup to resume without re-reading logs / dashboards. Ported from the Session-Start ritual common to all five sister repos.
+
+*Last updated: 2026-05-29 PM. Rules 1–38 are normative invariants. CLAUDE.md
 is self-contained: no parent-repo dependency required to implement the
-protocol. The 22 skills in `skills/` are content-agnostic.*
+protocol. The 27 skills in `skills/` are content-agnostic.*
