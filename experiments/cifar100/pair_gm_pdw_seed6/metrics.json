@@ -1,0 +1,18 @@
+{
+  "tag": "pair_gm_pdw",
+  "dataset": "cifar100",
+  "seed": 6,
+  "epochs": 30,
+  "top1": 0.577,
+  "top5": 0.86,
+  "params": 267658,
+  "flops": 80816212.0,
+  "latency_ms": 3.3874680000008084,
+  "rot_eq_err": 0.3952174745500088,
+  "composite": 0.5791272285102317,
+  "composite_fingerprint": "d65565e9c7b12d14cbce30a801ecc6753aea3eb148074256bfcc051fa61d0893",
+  "epochs_to_target": -1,
+  "train_seconds": 949.4473016999837,
+  "train_top1": 0.6585536858974359,
+  "generalization_gap": 0.08155368589743595
+}
