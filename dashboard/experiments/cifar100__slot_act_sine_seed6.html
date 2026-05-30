@@ -1,0 +1,401 @@
+<!doctype html>
+<html lang='en'><head><meta charset='utf-8'>
+<title>slot_act_sine · seed 6 · cifar100 — experiment page</title>
+<link rel='preconnect' href='https://fonts.googleapis.com'><link rel='preconnect' href='https://fonts.gstatic.com' crossorigin><link href='https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600;8..60,700&family=IBM+Plex+Mono:wght@400;500;600&display=swap' rel='stylesheet'>
+<style>
+ :root{
+   --ink:#0a0a0d; --paper:#e6e1d6; --paper-dim:#a89e8c;
+   --rule:#1c1c20; --rule-bright:#2a2a30;
+   --panel:#111114; --panel2:#16161a;
+   --accent:#bb8c4d; --accent-dim:#7a5e36;
+   --v-pass:#3fb950; --v-minor:#d29922; --v-major:#f0883e; --v-broken:#f85149;
+   --v-novel:#a371f7; --v-derivative:#58a6ff; --v-numerology:#8b949e;
+   --v-falsified:#db6d28; --v-infra:#8b949e;
+ }
+ .grain{position:fixed;inset:0;pointer-events:none;z-index:2;opacity:0.035;
+   background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");}
+ @keyframes reveal{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+ section,.card,.kn-strip,.hero,.findings-row,details.deep{
+   animation:reveal 360ms cubic-bezier(.2,.7,.2,1) both;
+   animation-delay:calc(var(--i, 0) * 60ms);
+ }
+ html{scroll-behavior:smooth;}
+
+ *{margin:0;padding:0;box-sizing:border-box;}
+ html,body{background:var(--ink);}
+ body{font-family:'Source Serif 4','Charter','Source Serif Pro',Georgia,serif;
+      color:var(--paper);padding:32px 36px 80px;line-height:1.6;
+      max-width:1180px;margin:0 auto;font-size:16px;
+      font-variant-numeric:tabular-nums;position:relative;}
+ a{color:var(--v-derivative);text-decoration:none;border-bottom:1px solid transparent;
+   transition:border-color 160ms ease;}
+ a:hover{border-bottom-color:var(--v-derivative);text-decoration:none;}
+ h1{font-family:'Source Serif 4',Georgia,serif;font-weight:600;
+    font-size:34px;line-height:1.15;color:var(--paper);letter-spacing:-0.005em;
+    margin-bottom:6px;}
+ h2{font-family:'Source Serif 4',Georgia,serif;font-weight:600;
+    font-size:20px;color:var(--paper);margin-bottom:14px;letter-spacing:-0.003em;}
+ h3{font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:11px;
+    text-transform:uppercase;letter-spacing:0.16em;color:var(--paper-dim);
+    margin:18px 0 8px 0;}
+ .md-body p{margin:8px 0 12px 0;}
+ .md-body p:first-child{margin-top:0;} .md-body p:last-child{margin-bottom:0;}
+ .md-body strong,.md-body b{color:var(--paper);font-weight:600;}
+ .md-body em,.md-body i{font-style:italic;}
+ .md-body code{font-family:'IBM Plex Mono',monospace;font-size:0.86em;
+    background:var(--panel2);padding:1px 5px;border-radius:3px;}
+ .md-body pre{font-family:'IBM Plex Mono',monospace;font-size:0.85em;
+    background:var(--panel2);padding:10px 12px;border-radius:5px;
+    border:1px solid var(--rule);overflow-x:auto;margin:10px 0;}
+ .md-body ul,.md-body ol{margin:8px 0 12px 22px;}
+ .md-body li{margin:3px 0;}
+ .md-body blockquote{border-left:3px solid var(--accent-dim);
+    padding:6px 14px;margin:10px 0;color:var(--paper-dim);font-style:italic;}
+ .md-body table{border-collapse:collapse;margin:10px 0;font-size:0.92em;}
+ .md-body th,.md-body td{border:1px solid var(--rule);padding:6px 10px;
+    text-align:left;}
+ .md-body th{background:var(--panel2);font-weight:600;}
+ .mono{font-family:'IBM Plex Mono',monospace;font-size:0.85em;}
+ .head-grid{display:grid;grid-template-columns:1fr auto;gap:24px;
+            align-items:start;padding-bottom:18px;
+            border-bottom:1px solid var(--rule);margin-bottom:24px;}
+ .head-left .tag-display{font-family:'Source Serif 4',Georgia,serif;
+    font-size:48px;font-weight:600;line-height:1.05;color:var(--paper);
+    letter-spacing:-0.012em;word-break:break-word;}
+ .head-left .sub{font-family:'IBM Plex Mono',monospace;font-size:11px;
+    text-transform:uppercase;letter-spacing:0.18em;color:var(--paper-dim);
+    margin-top:10px;}
+ .head-right{display:flex;flex-direction:column;align-items:flex-end;gap:8px;
+             min-width:240px;}
+ .head-right .back{font-family:'IBM Plex Mono',monospace;font-size:11px;
+    text-transform:uppercase;letter-spacing:0.18em;color:var(--paper-dim);}
+ .pill{display:inline-block;background:transparent;border:1px solid var(--rule-bright);
+       border-radius:1px;padding:3px 10px;font-size:0.72em;color:var(--paper-dim);
+       font-family:'IBM Plex Mono',monospace;margin:0 4px 4px 0;
+       text-transform:uppercase;letter-spacing:0.12em;}
+ .pill.hyp{border-color:var(--v-derivative);color:var(--v-derivative);}
+ .pill.grp{border-color:var(--v-novel);color:var(--v-novel);}
+ .pill.ds{border-color:var(--accent-dim);color:var(--accent);}
+ /* Masthead CTA pills — repo / paper / literature survey (Phase 7) */
+ .mast-pill{display:inline-block;padding:3px 10px;margin-right:6px;
+            border:1px solid var(--accent-dim);color:var(--accent);
+            font-family:'IBM Plex Mono',monospace;font-size:10px;
+            text-transform:uppercase;letter-spacing:0.16em;font-weight:600;
+            text-decoration:none;}
+ .mast-pill:hover{background:var(--accent-dim);color:var(--ink);
+                  border-bottom-color:var(--accent-dim);}
+ .mast-pill.repo{border-color:var(--v-novel);color:var(--v-novel);}
+ .mast-pill.repo:hover{background:var(--v-novel);color:var(--ink);}
+ .mast-pill.lit{border-color:var(--v-derivative);color:var(--v-derivative);}
+ .mast-pill.lit:hover{background:var(--v-derivative);color:var(--ink);}
+ .mast-pill.paper{border-color:var(--v-pass);color:var(--v-pass);}
+ .mast-pill.paper:hover{background:var(--v-pass);color:var(--ink);}
+ .live-link{display:inline-block;padding:3px 10px;border:1px solid var(--v-pass);
+            color:var(--v-pass);font-family:'IBM Plex Mono',monospace;
+            font-size:10px;text-transform:uppercase;letter-spacing:0.18em;
+            font-weight:600;text-decoration:none;}
+ .live-link:hover{background:var(--v-pass);color:var(--ink);}
+ /* Footer cross-link row */
+ .doc-footer{margin:18px 0 6px 0;font-family:'IBM Plex Mono',monospace;
+             font-size:10px;color:var(--paper-dim);letter-spacing:0.12em;
+             text-transform:uppercase;}
+ .doc-footer a{color:var(--accent);text-decoration:none;
+               border-bottom:1px dotted var(--accent-dim);}
+ .doc-footer a:hover{color:var(--v-pass);border-bottom-color:var(--v-pass);}
+ .verdict-row{display:flex;flex-wrap:wrap;gap:4px;justify-content:flex-end;}
+ .card{background:var(--panel);border:1px solid var(--rule);
+       padding:24px 28px;margin-bottom:24px;position:relative;}
+ .card::before{content:"";position:absolute;top:0;left:0;width:48px;
+               height:1px;background:var(--accent);}
+ .card p{margin-bottom:12px;font-size:0.96em;line-height:1.6;}
+ .card ul{margin:6px 0 12px 22px;font-size:0.95em;line-height:1.6;}
+ .card ul li{margin-bottom:4px;}
+ details.deep{margin:14px 0;border-top:1px solid var(--rule);
+              padding-top:14px;}
+ details.deep > summary{cursor:pointer;list-style:none;
+    font-family:'IBM Plex Mono',monospace;font-size:11px;text-transform:uppercase;
+    letter-spacing:0.18em;color:var(--paper-dim);display:flex;align-items:center;
+    gap:10px;padding:6px 0;transition:color 160ms ease;}
+ details.deep > summary:hover{color:var(--accent);}
+ details.deep > summary::-webkit-details-marker{display:none;}
+ details.deep > summary::before{content:"▸";display:inline-block;
+    transition:transform 200ms ease;color:var(--accent);font-size:14px;}
+ details.deep[open] > summary::before{transform:rotate(90deg);}
+ details.deep > .body{padding:14px 0 6px 24px;font-size:0.95em;
+    border-left:1px solid var(--rule);margin-left:5px;margin-top:6px;
+    animation:reveal 280ms ease;}
+ table{width:100%;border-collapse:collapse;font-size:0.88em;
+       font-variant-numeric:tabular-nums;}
+ th{background:transparent;color:var(--paper-dim);text-align:left;
+    padding:8px 12px;border-bottom:1px solid var(--rule-bright);
+    font-size:10px;text-transform:uppercase;letter-spacing:0.18em;
+    font-family:'IBM Plex Mono',monospace;font-weight:500;}
+ td{padding:9px 12px;border-bottom:1px solid var(--rule);}
+ td.k{color:var(--paper-dim);width:42%;font-family:'IBM Plex Serif',serif;}
+ td.v{color:var(--paper);font-family:'IBM Plex Mono',monospace;}
+ .formula-chip{background:var(--ink);border:1px solid var(--rule);
+               padding:14px 16px;font-family:'IBM Plex Mono',monospace;
+               font-size:0.82em;margin-bottom:14px;color:var(--paper);
+               word-break:break-all;border-left:2px solid var(--accent);}
+ .breakdown td.term{font-family:'IBM Plex Mono',monospace;}
+ .pos{color:var(--v-pass);} .neg{color:var(--v-broken);} .mut{color:var(--paper-dim);}
+ .charts{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+ @media(max-width:980px){.charts{grid-template-columns:1fr;}
+   .head-grid{grid-template-columns:1fr;} .head-right{align-items:flex-start;}
+   .verdict-row{justify-content:flex-start;}}
+ .meta{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--paper-dim);
+       margin-top:28px;padding-top:18px;border-top:1px solid var(--rule);
+       line-height:1.9;letter-spacing:0.04em;}
+ .meta code{background:var(--ink);padding:1px 5px;color:var(--paper);
+            border:1px solid var(--rule);}
+ code{background:var(--ink);padding:1px 5px;font-size:0.92em;
+      font-family:'IBM Plex Mono',monospace;border:1px solid var(--rule);}
+ pre{background:var(--ink);border:1px solid var(--rule);
+     padding:14px 16px;overflow-x:auto;font-family:'IBM Plex Mono',monospace;
+     font-size:0.82em;color:var(--paper);white-space:pre-wrap;line-height:1.6;
+     border-left:2px solid var(--accent-dim);}
+ .reason-section{margin-bottom:16px;}
+ .reason-section .lbl{color:var(--accent);font-family:'IBM Plex Mono',monospace;
+                      font-size:10px;text-transform:uppercase;
+                      letter-spacing:0.18em;margin-bottom:6px;font-weight:600;}
+ .reason-section .body{font-size:0.95em;color:var(--paper);
+                       white-space:pre-wrap;line-height:1.6;}
+ .quote{border-left:2px solid var(--accent);padding:10px 18px;
+        background:var(--ink);font-size:0.95em;color:var(--paper);
+        margin:10px 0;font-family:'Source Serif 4',Georgia,serif;
+        font-weight:400;line-height:1.55;}
+ .quote.md-body{font-style:normal;}
+ .findings-quote{border-left:2px solid var(--accent);padding:10px 18px;
+        background:var(--ink);font-size:0.95em;color:var(--paper);
+        margin:10px 0;font-family:'Source Serif 4',Georgia,serif;
+        font-weight:400;line-height:1.55;}
+ .verdict-label{color:var(--accent);font-weight:600;}
+ .empty{color:var(--paper-dim);font-style:italic;font-size:0.9em;}
+ .xrefs-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+             gap:10px;margin-top:6px;}
+ .xref-card{display:block;background:var(--ink);border:1px solid var(--rule);
+            padding:12px 14px;text-decoration:none;
+            transition:border-color 160ms ease,transform 160ms ease;}
+ .xref-card:hover{border-color:var(--accent);transform:translateY(-1px);
+                  text-decoration:none;}
+ .xref-card .xref-lbl{font-family:'IBM Plex Mono',monospace;font-size:9px;
+    text-transform:uppercase;letter-spacing:0.18em;color:var(--paper-dim);
+    margin-bottom:6px;}
+ .xref-card .xref-tag{font-family:'IBM Plex Mono',monospace;font-size:0.88em;
+    color:var(--paper);font-weight:500;}
+ .xref-card .xref-meta{font-family:'IBM Plex Mono',monospace;font-size:0.78em;
+    color:var(--paper-dim);margin-top:4px;}
+ /* Key numbers strip — the "tile bar" near top */
+ .kn-strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
+           gap:1px;background:var(--rule);border:1px solid var(--rule);
+           margin-bottom:24px;}
+ .kn-tile{background:var(--panel);padding:18px 18px 16px 18px;
+          position:relative;overflow:hidden;}
+ .kn-tile .kn-val{font-family:'Source Serif 4',Georgia,serif;
+                  font-size:28px;font-weight:600;line-height:1.05;
+                  color:var(--paper);letter-spacing:-0.005em;}
+ .kn-tile .kn-lbl{font-family:'IBM Plex Mono',monospace;font-size:9.5px;
+                  text-transform:uppercase;letter-spacing:0.18em;
+                  color:var(--paper-dim);margin-top:6px;}
+ .kn-tile.tint-pos{box-shadow:inset 3px 0 0 var(--v-pass);}
+ .kn-tile.tint-neg{box-shadow:inset 3px 0 0 var(--v-broken);}
+ .kn-tile.tint-neu{box-shadow:inset 3px 0 0 var(--accent-dim);}
+ /* Composite stacked bar */
+ .comp-stack{display:flex;height:34px;border:1px solid var(--rule);
+             margin:14px 0 8px 0;font-family:'IBM Plex Mono',monospace;
+             font-size:9.5px;}
+ .comp-stack .seg{display:flex;align-items:center;justify-content:center;
+                  color:var(--ink);font-weight:600;
+                  border-right:1px solid var(--ink);padding:0 6px;
+                  white-space:nowrap;overflow:hidden;}
+ .comp-stack .seg:last-child{border-right:none;}
+ .comp-stack .seg.pos{background:var(--v-pass);}
+ .comp-stack .seg.params{background:var(--accent);}
+ .comp-stack .seg.lat{background:var(--v-derivative);}
+ .vbadge:hover{transform:scale(1.05);filter:brightness(1.15);} </style></head><body>
+<div class='grain'></div>
+<div class='head-grid' style='--i:0'>
+  <div class='head-left'>
+    <div class='tag-display'>slot_act_sine</div>
+    <div class='sub'><span class='pill hyp'>H09</span><span class='pill hyp'>H81</span><span class='pill grp'>G8 — Esoteric Extensions</span><span class='pill ds'>cifar100</span><span class='pill'>seed 6</span><span class='pill' style='border-color:var(--v-pass);color:var(--v-pass)' title='Rule 28 (CLAUDE.md): SCREENING = n=1 seed; EVALUATION = n>=3 seeds AND worst-leader-seed > best-baseline-seed Phase-5 gate cleared'>tier evaluation &nbsp;n=7</span>&nbsp;·&nbsp; run dir <span class='mono' style='color:var(--paper)'>slot_act_sine_seed6</span></div>
+    <div class='mast-row' style='margin-top:8px;'><a class='mast-pill repo' href='https://github.com/dlmastery/nature_inspired_networks' target='_blank' rel='noopener'>🔗 source</a><a class='mast-pill lit' href='https://github.com/dlmastery/nature_inspired_networks/blob/main/paper/NATURE_INSPIRED_NETWORKS.md' target='_blank' rel='noopener'>📚 background reading</a><a class='mast-pill paper' href='https://github.com/dlmastery/nature_inspired_networks/blob/main/PAPER.md' target='_blank' rel='noopener'>📄 paper</a><a class='live-link' href='https://dlmastery.github.io/nature_inspired_networks/' target='_blank' rel='noopener'>📡 live</a></div>
+  </div>
+  <div class='head-right'>
+    <a class='back' href='../dashboard.html'>← back to dashboard</a>
+    <div class='verdict-row'><a href='https://github.com/dlmastery/nature_inspired_networks/blob/main/audits/G8_audit.md#h81-g8' style='text-decoration:none;border-bottom:none;margin-right:4px;display:inline-block'><span class='vbadge' style='display:inline-block;padding:3px 10px;border:1px solid #d29922;color:#d29922;font-weight:600;font-size:10px;font-family:"IBM Plex Mono",monospace;text-transform:uppercase;letter-spacing:0.16em;transition:transform 160ms ease,filter 160ms ease;background:transparent' title='MINOR'><span style='opacity:0.65'>impl</span> &nbsp;MINOR</span></a><span style='margin-right:4px;display:inline-block'><span class='vbadge' style='display:inline-block;padding:3px 10px;border:1px solid #58a6ff;color:#58a6ff;font-weight:600;font-size:10px;font-family:"IBM Plex Mono",monospace;text-transform:uppercase;letter-spacing:0.16em;transition:transform 160ms ease,filter 160ms ease;background:transparent' title='DERIVATIVE+TESTABLE — SIREN (arXiv:2006.09661) applied to classification with a sub-optimal ω-init that hobbles the prior; the proper SIREN-recipe arm is the only experiment that genuinely tests the hypothesis.'><span style='opacity:0.65'>sci</span> &nbsp;DERIVATIVE+TESTABLE</span></span></div>
+  </div>
+</div>
+<div class='kn-strip' style='--i:1'><div class='kn-tile tint-pos'><div class='kn-val'>57.25%</div><div class='kn-lbl'>top-1</div></div><div class='kn-tile tint-neu'><div class='kn-val'>0.5758</div><div class='kn-lbl'>composite</div></div><div class='kn-tile tint-pos'><div class='kn-val'>+0.73pp</div><div class='kn-lbl'>Δ vs baseline (n=7, evaluation)</div></div><div class='kn-tile tint-neu'><div class='kn-val'>0.268M</div><div class='kn-lbl'>params</div></div><div class='kn-tile tint-neu'><div class='kn-val'>3.21ms</div><div class='kn-lbl'>latency b=1</div></div></div>
+<section class='card' style='--i:2'><h2>Hypothesis H81 — <i>H81 — SinusoidalHarmonicActivation (SIREN-style periodic activation with learnable frequency)</i></h2><div style='margin:2px 0 18px 0'><a href='https://github.com/dlmastery/nature_inspired_networks/blob/main/audits/G8_audit.md#h81-g8' style='text-decoration:none;border-bottom:none;margin-right:4px;display:inline-block'><span class='vbadge' style='display:inline-block;padding:3px 10px;border:1px solid #d29922;color:#d29922;font-weight:600;font-size:10px;font-family:"IBM Plex Mono",monospace;text-transform:uppercase;letter-spacing:0.16em;transition:transform 160ms ease,filter 160ms ease;background:transparent' title='MINOR'><span style='opacity:0.65'>impl</span> &nbsp;MINOR</span></a><span style='margin-right:4px;display:inline-block'><span class='vbadge' style='display:inline-block;padding:3px 10px;border:1px solid #58a6ff;color:#58a6ff;font-weight:600;font-size:10px;font-family:"IBM Plex Mono",monospace;text-transform:uppercase;letter-spacing:0.16em;transition:transform 160ms ease,filter 160ms ease;background:transparent' title='DERIVATIVE+TESTABLE — SIREN (arXiv:2006.09661) applied to classification with a sub-optimal ω-init that hobbles the prior; the proper SIREN-recipe arm is the only experiment that genuinely tests the hypothesis.'><span style='opacity:0.65'>sci</span> &nbsp;DERIVATIVE+TESTABLE</span></span></div><p style='font-family:Source Serif 4,Georgia,serif;font-size:1.06em;color:#e6e1d6;line-height:1.5;border-left:2px solid var(--accent);padding-left:14px;margin:6px 0 16px 0'>Replacing a CNN&#39;s ReLU activations with a SIREN-style sinusoidal activation `sin(ω·x)` carrying a learnable per-activation frequency `ω` (init 1.0) is at worst neutral on CIFAR-10 top-1 (within ±0.5 pp of ReLU at 12 ep) and improves the fidelity of high-frequency / fine-texture features, measured as ≥1 pp higher accuracy on a high-frequency-emphasised test split.</p><h3>Motivation</h3><p>Piecewise-linear activations (ReLU) are spectrally biased: networks built from them learn low-frequency components of a target function far faster than high-frequency ones (the &quot;spectral bias&quot; of Rahaman et al. 2019), and their second derivatives are zero almost everywhere, so they struggle to represent signals whose derivatives matter. Sitzmann et al. 2020 (SIREN) showed that a sinusoidal activation `sin(ω·x)` fixes both: periodic activations represent a signal *and* its derivatives with high fidelity, dramatically improving implicit-neural-representation quality on images, audio, and PDE residuals. The per-layer frequency ω is the key knob — SIREN initialises the first layer&#39;s ω to 30 to cover the input&#39;s frequency content, with a careful weight init to keep pre-activations in `[-1, 1]`. For a CIFAR-scale classifier the hypothesis is narrower and more conservative: making ω *learnable* (init 1.0, so `sin(x) ≈ x` near the origin and the network starts close to a smooth identity) lets each activation discover its own preferred frequency, potentially capturing fine texture that ReLU&#39;s spectral bias suppresses, while a drop-in swap helper keeps the architecture otherwise identical. The esoteric &quot;harmonic vibration&quot; motivation maps cleanly onto this well-cited, falsifiable activation.</p><h3>Formal hypothesis</h3><p style='font-family:Source Serif 4,Georgia,serif;color:#e6e1d6'>Because ReLU networks exhibit spectral bias toward low frequencies and have vanishing higher-order derivatives, **mechanism**-wise replacing ReLU with a learnable-frequency sinusoid `sin(ω·x)` should let each activation tune its own frequency band *because* gradient descent can raise ω where high-frequency detail is informative and lower it (toward the near-identity `sin(x)≈x`) elsewhere; we therefore predict CIFAR-10 top-1 within ±0.5 pp of the ReLU baseline at equal architecture and a measurable gain on high-frequency-emphasised inputs.</p><details class='deep'><summary>Read the full design-doc digest</summary><div class='body'><h3>Mechanism (because…)</h3><p>`SinusoidalActivation` computes `sin(ω·x)` element-wise. `ω` is a single learnable scalar by default (init `omega_init=1.0`), or a per-channel learnable vector when `num_channels=C` is supplied (broadcasts along the channel dim). A `learnable=False` flag stores ω as a fixed buffer to recover the original SIREN treatment for ablation. `swap_relu_with_sine` walks a model recursively and replaces every `nn.ReLU` (including nested and `inplace=True` ReLUs) with a fresh `SinusoidalActivation`, leaving all other modules untouched. Input shape is preserved (element-wise). At init with `omega=1.0`, `s</p><h3>Numeric falsifier</h3><p>If, at 3-seed median, the sine-activation network scores **more than 0.5 pp below** the ReLU baseline on standard CIFAR-10 (12 ep) **AND** shows no advantage (within noise) on a high-frequency test split, **OR** if training diverges (loss NaN) on any seed at `omega_init=1.0` with the standard recipe, the hypothesis is **DISCARDED**. `omega_init` is fixed at 1.0 in v0; the SIREN `omega_init=30.0` first-layer recipe is the targeted follow-up.</p><h3>Predicted Δ</h3><p>| metric | Δ vs. ReLU baseline | rationale | |---|---|---| | top-1 standard (12 ep) | [-0.5, +0.8] pp | near-identity init, mild gain | | top-1 high-freq split | [+0.5, +2.0] pp | periodic act fits HF detail | | params | [+0.0 %, +0.01 %] | one ω scalar per activation | | FLOPs | [+0.0 %, +0.2 %] | sin vs. max, negligible | | learned ω (mean, final) | [0.8, 3.0] | activations raise frequency a bit |</p><p style='margin-top:14px'><a href='https://github.com/dlmastery/nature_inspired_networks/blob/main/hypotheses/g8_esoteric_extensions/H81_sinusoidal_activation.md'>↗ Full design doc on GitHub</a> <span class='mono' style='color:var(--paper-dim);font-size:0.78em'>hypotheses/g8_esoteric_extensions/H81_sinusoidal_activation.md</span></p></div></details></section>
+<section class='card' style='--i:3'><h2>Verdict <span class='mono' style='font-size:0.55em;letter-spacing:0.18em;color:var(--paper-dim);font-style:normal'>FINDINGS.md</span></h2><div class='quote md-body'><h2>🏆 2026-05-29 PM PROMOTION — Phase-8 winners → EVALUATION tier (CERTIFIED at α=0.05 Holm-Bonferroni, n=7)</h2>
+<p>The Phase-8 family was extended from n=3 to <strong>n=7 seeds</strong> on CIFAR-100
+30-ep. All three winners produced 7/7 positive paired deltas against
+baseline, yielding paired Wilcoxon W=0 with exact one-sided p=(1/2)^7
+= <strong>0.0078</strong> — below the Holm-Bonferroni-corrected per-test α&rsquo;=0.05/3
+= 0.0167 demanded for the k=3 simultaneous-test family. <strong>All three
+winners CLEAR α=0.05 under Holm-Bonferroni step-down.</strong></p>
+<table>
+<thead>
+<tr>
+<th>tag</th>
+<th style="text-align: right;">C100 mean (n=7)</th>
+<th style="text-align: right;">Δmean</th>
+<th style="text-align: right;">95% bootstrap CI</th>
+<th style="text-align: right;">Wilcoxon p</th>
+<th style="text-align: center;">Holm cleared?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>pair_gm_pdw</code> (H09+H48+H44)</td>
+<td style="text-align: right;"><strong>0.5786</strong></td>
+<td style="text-align: right;"><strong>+1.74 pp</strong></td>
+<td style="text-align: right;">[+1.42, +2.09] pp</td>
+<td style="text-align: right;">0.0078</td>
+<td style="text-align: center;"><strong>YES</strong></td>
+</tr>
+<tr>
+<td><code>slot_act_sine</code> (H81 SIREN)</td>
+<td style="text-align: right;"><strong>0.5790</strong></td>
+<td style="text-align: right;"><strong>+1.78 pp</strong></td>
+<td style="text-align: right;">[+1.38, +2.18] pp</td>
+<td style="text-align: right;">0.0078</td>
+<td style="text-align: center;"><strong>YES</strong></td>
+</tr>
+<tr>
+<td><code>sg_only_phi_budget</code> (H09 post-fix)</td>
+<td style="text-align: right;"><strong>0.5736</strong></td>
+<td style="text-align: right;"><strong>+1.24 pp</strong></td>
+<td style="text-align: right;">[+0.84, +1.67] pp</td>
+<td style="text-align: right;">0.0078</td>
+<td style="text-align: center;"><strong>YES</strong></td>
+</tr>
+<tr>
+<td><code>baseline_resnet20</code> (rail, n=7)</td>
+<td style="text-align: right;">0.5612</td>
+<td style="text-align: right;">—</td>
+<td style="text-align: right;">—</td>
+<td style="text-align: right;">—</td>
+<td style="text-align: center;">—</td>
+</tr>
+</tbody>
+</table>
+<p>Per CLAUDE.md <a href="../CLAUDE.md#rule-28">Rule 28</a>, the three winners are
+<strong>PROMOTED from SCREENING to EVALUATION tier</strong> on 2026-05-29 PM. These
+are the project&rsquo;s <strong>first formally-certified empirical claims at
+NeurIPS-standard α=0.05</strong>.</p>
+<p><strong>Honest caveat (preserved):</strong> 12-ep CIFAR-10 and 30-ep CIFAR-100 are
+still NOT the convergence regime. The certification holds AT THIS
+COMPUTE BUDGET. Whether the lift survives at the literature-canonical
+164-ep training + tuned RegNetX-200MF baseline (Phase-9a hill-climb)
+is open. The case-study framing of PAPER.md §5.5 is unchanged: the
+protocol&rsquo;s screen + n=7 evaluation surfaced three candidates that
+pass formal rigor at the screening budget; the φ-content vs
+any-three-orthogonal-axes attribution question remains.</p>
+<p>Full per-claim certification table + Holm step-down derivation:
+<a href="STATISTICAL_TESTS.md"><code>paper/STATISTICAL_TESTS.md</code></a> §0–§3.</p></div><p style='margin-top:14px'><a href='https://github.com/dlmastery/nature_inspired_networks/blob/main/paper/FINDINGS.md'>↗ Full FINDINGS.md on GitHub</a></p></section>
+<section class='card' style='--i:4'><h2>Composite-score breakdown</h2><div class='comp-stack'><div class='seg pos' style='width:91.39%' title='top-1 = 0.57250'>top-1 +0.5725</div><div class='seg params' style='width:4.57%' title='-0.05·log10(params_M)'>params +0.02862</div><div class='seg lat' style='width:4.05%' title='-0.05·log10(latency_ms)'>lat −0.02535</div></div><div style='display:flex;justify-content:space-between;font-family:IBM Plex Mono,monospace;font-size:11px;color:var(--paper-dim);margin-top:6px'><span>Σ recomputed: <b style='color:var(--paper)'>0.57577</b></span><span>reported: <b style='color:var(--paper)'>0.57577</b> &nbsp;·&nbsp; Δ +0.000000</span></div><div class='formula-chip' style='margin-top:14px'>composite ≔ <code>top1 - 0.05*log10(params_M) - 0.05*log10(latency_ms)</code></div></section>
+<section class='card' style='--i:5'><h2>Per-epoch training curves</h2><div class='charts'><div><svg viewBox='0 0 460 320' preserveAspectRatio='xMinYMin meet' width='100%' height='auto' xmlns='http://www.w3.org/2000/svg' style='background:#0a0a0d;border:1px solid #1c1c20;display:block;font-family:"IBM Plex Mono",monospace'><text x='46' y='18' fill='#e6e1d6' font-size='14' font-family='Source Serif 4,Georgia,serif' font-weight='600'>Loss</text><line x1='46' y1='292.0' x2='446' y2='292.0' stroke='#1c1c20' stroke-width='1'/><text x='40' y='295.0' fill='#a89e8c' font-size='9' text-anchor='end'>1.819</text><line x1='46' y1='226.5' x2='446' y2='226.5' stroke='#1c1c20' stroke-width='1'/><text x='40' y='229.5' fill='#a89e8c' font-size='9' text-anchor='end'>2.418</text><line x1='46' y1='161.0' x2='446' y2='161.0' stroke='#1c1c20' stroke-width='1'/><text x='40' y='164.0' fill='#a89e8c' font-size='9' text-anchor='end'>3.017</text><line x1='46' y1='95.5' x2='446' y2='95.5' stroke='#1c1c20' stroke-width='1'/><text x='40' y='98.5' fill='#a89e8c' font-size='9' text-anchor='end'>3.616</text><line x1='46' y1='30.0' x2='446' y2='30.0' stroke='#1c1c20' stroke-width='1'/><text x='40' y='33.0' fill='#a89e8c' font-size='9' text-anchor='end'>4.215</text><text x='46.0' y='310' fill='#a89e8c' font-size='9' text-anchor='middle'>0</text><text x='446.0' y='310' fill='#a89e8c' font-size='9' text-anchor='middle'>29</text><text x='246.0' y='310' fill='#a89e8c' font-size='10' font-family='Source Serif 4,Georgia,serif' text-anchor='middle'>epoch →</text><text x='14' y='161.0' fill='#a89e8c' font-size='10' font-family='Source Serif 4,Georgia,serif' text-anchor='middle' transform='rotate(-90 14 161.0)'>loss →</text><polyline points='46.0,44.0 59.8,99.6 73.6,135.5 87.4,157.8 101.2,175.3 115.0,188.3 128.8,199.4 142.6,208.9 156.3,217.1 170.1,223.7 183.9,229.9 197.7,235.0 211.5,240.9 225.3,244.7 239.1,248.8 252.9,252.6 266.7,255.6 280.5,259.0 294.3,262.0 308.1,264.7 321.9,266.8 335.7,269.3 349.4,271.1 363.2,272.9 377.0,274.1 390.8,275.7 404.6,276.4 418.4,277.3 432.2,277.5 446.0,278.0' fill='none' stroke='#f85149' stroke-width='1.8'/><circle cx='446.0' cy='278.0' r='2.6' fill='#f85149'/><rect x='52' y='35' width='10' height='10' fill='#f85149'/><text x='68' y='44' fill='#e6e1d6' font-size='10' font-family='IBM Plex Mono,monospace'>train loss</text></svg></div><div><svg viewBox='0 0 460 320' preserveAspectRatio='xMinYMin meet' width='100%' height='auto' xmlns='http://www.w3.org/2000/svg' style='background:#0a0a0d;border:1px solid #1c1c20;display:block;font-family:"IBM Plex Mono",monospace'><text x='46' y='18' fill='#e6e1d6' font-size='14' font-family='Source Serif 4,Georgia,serif' font-weight='600'>Accuracy</text><line x1='46' y1='292.0' x2='446' y2='292.0' stroke='#1c1c20' stroke-width='1'/><text x='40' y='295.0' fill='#a89e8c' font-size='9' text-anchor='end'>4.7%</text><line x1='46' y1='226.5' x2='446' y2='226.5' stroke='#1c1c20' stroke-width='1'/><text x='40' y='229.5' fill='#a89e8c' font-size='9' text-anchor='end'>26.2%</text><line x1='46' y1='161.0' x2='446' y2='161.0' stroke='#1c1c20' stroke-width='1'/><text x='40' y='164.0' fill='#a89e8c' font-size='9' text-anchor='end'>47.7%</text><line x1='46' y1='95.5' x2='446' y2='95.5' stroke='#1c1c20' stroke-width='1'/><text x='40' y='98.5' fill='#a89e8c' font-size='9' text-anchor='end'>69.2%</text><line x1='46' y1='30.0' x2='446' y2='30.0' stroke='#1c1c20' stroke-width='1'/><text x='40' y='33.0' fill='#a89e8c' font-size='9' text-anchor='end'>90.6%</text><text x='46.0' y='310' fill='#a89e8c' font-size='9' text-anchor='middle'>0</text><text x='446.0' y='310' fill='#a89e8c' font-size='9' text-anchor='middle'>29</text><text x='246.0' y='310' fill='#a89e8c' font-size='10' font-family='Source Serif 4,Georgia,serif' text-anchor='middle'>epoch →</text><text x='14' y='161.0' fill='#a89e8c' font-size='10' font-family='Source Serif 4,Georgia,serif' text-anchor='middle' transform='rotate(-90 14 161.0)'>accuracy →</text><polyline points='46.0,278.0 59.8,248.6 73.6,225.8 87.4,209.9 101.2,197.3 115.0,186.9 128.8,177.3 142.6,169.8 156.3,162.5 170.1,158.3 183.9,151.6 197.7,147.4 211.5,142.8 225.3,139.3 239.1,135.6 252.9,132.0 266.7,128.9 280.5,125.9 294.3,123.9 308.1,120.8 321.9,118.3 335.7,116.0 349.4,114.2 363.2,112.5 377.0,111.4 390.8,109.9 404.6,108.9 418.4,108.8 432.2,108.1 446.0,107.3' fill='none' stroke='#d29922' stroke-width='1.8'/><circle cx='446.0' cy='107.3' r='2.6' fill='#d29922'/><rect x='52' y='35' width='10' height='10' fill='#d29922'/><text x='68' y='44' fill='#e6e1d6' font-size='10' font-family='IBM Plex Mono,monospace'>train top-1</text><polyline points='46.0,266.9 59.8,243.5 73.6,221.6 87.4,215.1 101.2,203.0 115.0,199.4 128.8,185.1 142.6,175.6 156.3,177.6 170.1,180.1 183.9,183.2 197.7,164.7 211.5,162.7 225.3,157.5 239.1,152.5 252.9,151.9 266.7,151.3 280.5,147.2 294.3,141.6 308.1,142.0 321.9,139.4 335.7,137.1 349.4,135.9 363.2,134.6 377.0,132.9 390.8,133.3 404.6,131.9 418.4,131.5 432.2,131.7 446.0,131.8' fill='none' stroke='#58a6ff' stroke-width='1.8'/><circle cx='446.0' cy='131.8' r='2.6' fill='#58a6ff'/><rect x='52' y='51' width='10' height='10' fill='#58a6ff'/><text x='68' y='60' fill='#e6e1d6' font-size='10' font-family='IBM Plex Mono,monospace'>test top-1</text><polyline points='46.0,192.0 59.8,156.0 73.6,123.7 87.4,115.6 101.2,100.3 115.0,102.3 128.8,84.6 142.6,75.8 156.3,79.6 170.1,82.0 183.9,84.9 197.7,70.6 211.5,66.4 225.3,64.7 239.1,58.6 252.9,59.4 266.7,57.2 280.5,54.6 294.3,51.7 308.1,52.8 321.9,48.3 335.7,48.4 349.4,47.1 363.2,45.8 377.0,45.7 390.8,44.7 404.6,44.6 418.4,44.5 432.2,44.0 446.0,44.2' fill='none' stroke='#3fb950' stroke-width='1.8'/><circle cx='446.0' cy='44.2' r='2.6' fill='#3fb950'/><rect x='52' y='67' width='10' height='10' fill='#3fb950'/><text x='68' y='76' fill='#e6e1d6' font-size='10' font-family='IBM Plex Mono,monospace'>test top-5</text></svg></div></div></section>
+<section class='card' style='--i:6'><h2>Deep inspection</h2><p style='color:var(--paper-dim);font-size:0.9em;margin-bottom:6px'>Audit excerpts, reasoning blob, raw configuration, and full metrics JSON — expand sections of interest.</p><details class='deep'><summary>Research-scientist critique (addendum)</summary><div class='body'><div style='margin-bottom:12px'><span style='margin-right:4px;display:inline-block'><span class='vbadge' style='display:inline-block;padding:3px 10px;border:1px solid #58a6ff;color:#58a6ff;font-weight:600;font-size:10px;font-family:"IBM Plex Mono",monospace;text-transform:uppercase;letter-spacing:0.16em;transition:transform 160ms ease,filter 160ms ease;background:transparent' title='DERIVATIVE+TESTABLE — SIREN (arXiv:2006.09661) applied to classification with a sub-optimal ω-init that hobbles the prior; the proper SIREN-recipe arm is the only experiment that genuinely tests the hypothesis.'><span style='opacity:0.65'>sci-critic</span> &nbsp;DERIVATIVE+TESTABLE</span></span></div><div class='md-body' style='border-left:2px solid var(--v-novel);padding:8px 14px;background:var(--panel2);border-radius:5px'><p><em>Reviewer: SciCritic-G8 (elite-research-scientist critic). Critiquing
+the IDEA, not the implementation (audit at <code>audits/G8_audit.md</code>).</em></p>
+<h3>Prior plausibility (LOW/MED/HIGH + why)</h3>
+<p>LOW for classification. SIREN (Sitzmann, Martel, Bergman, Lindell,
+Wetzstein 2020 NeurIPS &lsquo;Implicit Neural Representations with
+Periodic Activation Functions&rsquo; (arXiv:2006.09661)) was <em>engineered</em>
+for implicit-representation regression problems (image / SDF / NeRF
+coordinate-to-value mapping), where representing high-frequency
+content of a target <em>function</em> is the whole point. Image
+classification is a discriminative task; the target is a class
+label, not a high-frequency signal. The spectral-bias literature
+(Rahaman, Baratin, Arpit, Draxler, Lin, Hamprecht, Bengio, Courville
+2019 ICML &lsquo;On the Spectral Bias of Neural Networks&rsquo; (arXiv:
+1806.08734)) shows ReLU networks bias toward <em>low-frequency
+generalisation</em> — which is <em>helpful</em>, not harmful, for
+classification. Switching to a high-frequency activation may
+generalise worse, not better.</p>
+<h3>Mechanism scrutiny — does the NEUTRAL recast match the cited real technique?</h3>
+<p>PARTIALLY. The <code>sin(ω·x)</code> activation is exactly SIREN&rsquo;s. But SIREN
+requires careful weight initialisation (uniform <code>[−√(6/fan_in)/ω,
++√(6/fan_in)/ω]</code>) to keep pre-activations in <code>[−1, 1]</code>, and ω₀=30
+on the <em>first</em> layer with ω=1 on subsequent layers. The doc&rsquo;s
+<code>omega_init=1.0</code> everywhere bypasses the canonical SIREN recipe
+entirely — recovering at best a &ldquo;near-identity smooth perturbation
+of ReLU&rdquo; rather than SIREN&rsquo;s actual high-frequency capability. The
+80.62 % empirical result (cited in task prompt) is consistent with
+<em>underrating</em> SIREN by using ω=1 throughout: SIREN&rsquo;s ω₀=30 first
+layer is what gives it its frequency reach.</p>
+<h3>Does the esoteric origin contaminate the implementation or framing?</h3>
+<p>PARTIALLY. The &ldquo;everything is vibration / harmonic&rdquo; framing leads to
+the choice of <code>sin</code> over the equally plausible <code>cos</code>, <code>tanh-of-sine</code>,
+or <code>sin²</code> — none of which would be different empirically but each of
+which has equal &ldquo;vibration&rdquo; claim. More importantly, the framing
+elevates sinusoidal activation above more relevant alternatives for
+classification (GELU, SiLU, Mish — Misra 2019 &lsquo;Mish: A Self
+Regularized Non-Monotonic Activation Function&rsquo; (arXiv:1908.08681))
+which all outperform ReLU on CIFAR-10 with proper recipes.</p>
+<h3>Confounds (≥2)</h3>
+<ol>
+<li><strong>ω-init choice.</strong> ω=1 makes <code>sin(x) ≈ x</code> near origin — the
+   network starts as a near-linear identity perturbation of ReLU,
+   not as a SIREN. The 80.62 % result conflates &ldquo;sin activation
+   poor for classification&rdquo; with &ldquo;ω=1 is the wrong init for
+   SIREN&rdquo;.</li>
+<li><strong>Weight init unchanged.</strong> SIREN&rsquo;s weight init (uniform with ω-
+   dependent scale) is required for the pre-activation
+   distribution to land in <code>[−1, 1]</code>. The implementation reuses
+   ReLU-era He init — every forward pass starts in the chaotic
+   regime where <code>sin</code> is approximately white noise.</li>
+<li><strong>No optimiser change.</strong> SIREN typically uses Adam with reduced
+   learning rate; standard CIFAR-10 SGD at lr=0.1 likely destroys
+   the sine network within the first epoch via NaN-adjacent
+   activations.</li>
+</ol>
+<h3>Numerology / specificity check</h3>
+<p>Sine is the natural eigenfunction of the Laplacian, so the
+&ldquo;vibration&rdquo; framing has <em>some</em> mathematical content. But the
+hypothesis does not distinguish sine from cosine, from
+<code>sin(x)·exp(-x²)</code> (Gabor), or from <code>tanh(sin(x))</code> — all are
+&ldquo;vibrational&rdquo;. The specificity to <code>sin(ω·x)</code> comes from SIREN, not
+from the cymatic motif.</p>
+<h3>Literature precedent — was the neutral recast already known?</h3>
+<p>YES, but in a different task family. SIREN (arXiv:2006.09661) is
+canonical for implicit representations. Periodic activations for
+classification have been tried sporadically (Parascandolo, Huttunen,
+Virtanen 2017 ICLR Workshop &lsquo;Taming the Waves: Sine as Activation
+Function in Deep Neural Networks&rsquo; (https://openreview.net/forum?id=
+Sks3zF9eg)) with consistently modest-to-negative results. So the
+classification-track prior </p></div></div></details><details class='deep'><summary>Implementation-critic audit (audits/G8_audit.md)</summary><div class='body'><div style='margin-bottom:12px'><a href='https://github.com/dlmastery/nature_inspired_networks/blob/main/audits/G8_audit.md#h81-g8' style='text-decoration:none;border-bottom:none;margin-right:4px;display:inline-block'><span class='vbadge' style='display:inline-block;padding:3px 10px;border:1px solid #d29922;color:#d29922;font-weight:600;font-size:10px;font-family:"IBM Plex Mono",monospace;text-transform:uppercase;letter-spacing:0.16em;transition:transform 160ms ease,filter 160ms ease;background:transparent' title='MINOR'><span style='opacity:0.65'>impl-critic</span> &nbsp;MINOR</span></a></div><div class='quote md-body'><ul>
+<li><strong>Mechanism:</strong> <code>sin(ω · x)</code> with a learnable scalar <code>ω</code> (or per-channel vector). <code>swap_relu_with_sine</code> walks a model and replaces every <code>nn.ReLU</code> with a fresh <code>SinusoidalActivation</code>. Cites Sitzmann et al. 2020 NeurIPS SIREN (<code>arXiv:2006.09661</code>) correctly.</li>
+<li><strong>Math:</strong> Element-wise <code>sin</code>; shape preserved; per-channel <code>ω</code> broadcasts along configurable <code>dim</code>. Tests verify <code>sin(0)=0</code>, periodicity <code>act(x) == act(x + 2π/ω)</code>, learnable parameter receives gradient, swap helper correctly replaces nested ReLUs, channel-0 with <code>ω=0</code> yields zero output, <code>learnable=False</code> stores a buffer.</li>
+<li><strong>Concern (MINOR, the requested SIREN canonical):</strong> The default <code>omega_init=1.0</code> is <strong>not</strong> the canonical SIREN first-layer recipe of <code>ω₀=30</code>. The module docstring acknowledges this explicitly (&ldquo;SIREN&rsquo;s canonical first-layer value is <code>30.0</code>&rdquo;) and the swap-helper signature exposes <code>omega_init</code>, so the canonical recipe is reachable via <code>swap_relu_with_sine(model, omega_init=30.0)</code>. The TODO runner-wiring comment also flags &ldquo;a second sweep row flips that one number&rdquo; for the ω₀=30 stem variant. Because the default deviates from the canonical SIREN recipe used in the literature, an out-of-the-box smoke run is <strong>not</strong> a faithful SIREN reproduction; only the documented <code>omega_init=30.0</code> variant is. This is a documentation/discoverability nit rather than a correctness bug.</li>
+<li><strong>Verdict:</strong> MINOR — code is correct, default is not the canonical SIREN ω₀=30 but is labelled in the docstring. Recommend the CIFAR sweep row use <code>omega_init=30.0</code> (with sub-rows at 1.0 for ablation).</li>
+</ul></div><p style='margin-top:12px'><a href='https://github.com/dlmastery/nature_inspired_networks/blob/main/audits/G8_audit.md#h81-g8'>↗ Full audit on GitHub</a> <span class='mono' style='color:var(--paper-dim);font-size:0.78em'>audits/G8_audit.md</span></p></div></details><details class='deep'><summary>Reasoning blob (reasoning.json)</summary><div class='body'><p class='empty'>No <code>reasoning.json</code> archived for this run directory &mdash; see the <b>Verdict</b> card above for the FINDINGS-derived verdict and the <b>Implementation-critic audit</b> accordion for the code-level diagnosis.</p></div></details><details class='deep'><summary>Configuration dump</summary><div class='body'><p class='mono' style='color:var(--paper-dim);font-size:0.8em;margin-bottom:8px'>inferred from experiment_log.jsonl + metrics.json</p><pre>{
+  &quot;tag&quot;: &quot;slot_act_sine&quot;,
+  &quot;model&quot;: &quot;phi_budget&quot;,
+  &quot;dataset&quot;: &quot;cifar100&quot;,
+  &quot;channel_mode&quot;: &quot;fib&quot;,
+  &quot;epochs&quot;: 30,
+  &quot;seed&quot;: 6,
+  &quot;composite_formula&quot;: &quot;composite = top1 - 0.05 * log10(params_M) - 0.05 * log10(latency_ms)&quot;
+}</pre></div></details><details class='deep'><summary>Full metrics JSON</summary><div class='body'><pre>{
+  &quot;tag&quot;: &quot;slot_act_sine&quot;,
+  &quot;dataset&quot;: &quot;cifar100&quot;,
+  &quot;seed&quot;: 6,
+  &quot;epochs&quot;: 30,
+  &quot;top1&quot;: 0.5725,
+  &quot;top5&quot;: 0.8599,
+  &quot;params&quot;: 267659,
+  &quot;flops&quot;: 80816212.0,
+  &quot;latency_ms&quot;: 3.2134450000012293,
+  &quot;rot_eq_err&quot;: 0.3926875541607539,
+  &quot;composite&quot;: 0.5757723638916588,
+  &quot;composite_fingerprint&quot;: &quot;d65565e9c7b12d14cbce30a801ecc6753aea3eb148074256bfcc051fa61d0893&quot;,
+  &quot;epochs_to_target&quot;: -1,
+  &quot;train_seconds&quot;: 855.3285041000054,
+  &quot;train_top1&quot;: 0.6528044871794871,
+  &quot;generalization_gap&quot;: 0.08030448717948713
+}</pre></div></details></section>
+<section class='card' style='--i:7'><h2>Metrics — quick reference</h2><table><tbody><tr><td class='k'>Dataset</td><td class='v'>cifar100</td></tr><tr><td class='k'>Seed</td><td class='v'>6</td></tr><tr><td class='k'>Epochs</td><td class='v'>30</td></tr><tr><td class='k'>Top-1 accuracy</td><td class='v'>57.25%</td></tr><tr><td class='k'>Top-5 accuracy</td><td class='v'>85.99%</td></tr><tr><td class='k'>Train top-1</td><td class='v'>65.28%</td></tr><tr><td class='k'>Generalisation gap (train − test)</td><td class='v'>8.03%</td></tr><tr><td class='k'>Parameters</td><td class='v'>267,659 (0.268 M)</td></tr><tr><td class='k'>FLOPs</td><td class='v'>80.8 M MACs</td></tr><tr><td class='k'>Latency (batch=1)</td><td class='v'>3.213 ms</td></tr><tr><td class='k'>Rot-eq error</td><td class='v'>0.392688</td></tr><tr><td class='k'>Epochs-to-target</td><td class='v'>-1</td></tr><tr><td class='k'>Train wall-clock</td><td class='v'>855.3 s</td></tr><tr><td class='k'>Composite score</td><td class='v'>0.575772</td></tr><tr><td class='k'>Composite fingerprint (SHA-256)</td><td class='v'>d65565e9c7b12d14cbce30a801ecc6753aea3eb148074256bfcc051fa61d0893</td></tr></tbody></table></section>
+<section class='card' style='--i:8'><h2>Cross-references</h2><div class='xrefs-grid'><a class='xref-card' href='../experiments/cifar100__slot_act_sine_seed0.html'><div class='xref-lbl'>↪ other seed</div><div class='xref-tag'>slot_act_sine</div><div class='xref-meta'>cifar100 · seed 0</div></a><a class='xref-card' href='../experiments/cifar100__slot_act_sine_seed1.html'><div class='xref-lbl'>↪ other seed</div><div class='xref-tag'>slot_act_sine</div><div class='xref-meta'>cifar100 · seed 1</div></a><a class='xref-card' href='../experiments/cifar100__slot_act_sine_seed2.html'><div class='xref-lbl'>↪ other seed</div><div class='xref-tag'>slot_act_sine</div><div class='xref-meta'>cifar100 · seed 2</div></a><a class='xref-card' href='../experiments/cifar100__slot_act_sine_seed3.html'><div class='xref-lbl'>↪ other seed</div><div class='xref-tag'>slot_act_sine</div><div class='xref-meta'>cifar100 · seed 3</div></a><a class='xref-card' href='../experiments/cifar100__slot_act_sine_seed4.html'><div class='xref-lbl'>↪ other seed</div><div class='xref-tag'>slot_act_sine</div><div class='xref-meta'>cifar100 · seed 4</div></a><a class='xref-card' href='../experiments/cifar100__slot_act_sine_seed5.html'><div class='xref-lbl'>↪ other seed</div><div class='xref-tag'>slot_act_sine</div><div class='xref-meta'>cifar100 · seed 5</div></a><a class='xref-card' href='../experiments/cifar10__slot_act_sine_seed0.html'><div class='xref-lbl'>↪ same tag, other dataset</div><div class='xref-tag'>slot_act_sine</div><div class='xref-meta'>cifar10 · seed 0</div></a></div></section>
+<div class='doc-footer'><a href='https://github.com/dlmastery/nature_inspired_networks' target='_blank' rel='noopener'>Repo</a> &middot; <a href='https://github.com/dlmastery/nature_inspired_networks/blob/main/PAPER.md' target='_blank' rel='noopener'>Paper</a> &middot; <a href='https://github.com/dlmastery/nature_inspired_networks/blob/main/paper/NATURE_INSPIRED_NETWORKS.md' target='_blank' rel='noopener'>Background reading</a> &middot; <a href='https://dlmastery.github.io/nature_inspired_networks/' target='_blank' rel='noopener'>Live demo</a> &middot; <a href='https://dlmastery.github.io/nature_inspired_networks/' target='_blank' rel='noopener'>GitHub Pages</a></div><div class='meta'>composite formula SHA-256 &nbsp; <code>d65565e9c7b12d14cbce30a801ecc6753aea3eb148074256bfcc051fa61d0893</code><br>epochs run &nbsp; <code>30</code> &nbsp;·&nbsp; train wall-clock &nbsp; <code>855.3 s</code> &nbsp;·&nbsp; gen-gap (train − test) &nbsp; <code>8.03 pp</code>&nbsp;·&nbsp; metrics.json git commit: <a href='https://github.com/dlmastery/nature_inspired_networks/commit/c96d4f8' style='color:#58a6ff'><code>c96d4f8</code></a><br>run directory &nbsp; <code>slot_act_sine_seed6</code><br>Generated by <code>nature_inspired_networks.dashboard.render_experiment_page</code> &middot; self-contained inline SVG, no external assets &middot; brutalist editorial lab notebook v3</div>
+</body></html>
