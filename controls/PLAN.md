@@ -63,33 +63,38 @@ non-φ analog at iso-params / iso-recipe cost**.
   3-stage net (~50/50/50); FLOPs and latency within ±5%.
 - **3 runs × ~50 min ≈ 2.5 GPU-h.**
 
-**Implementation-gap status: BLOCKED_ON_UNIFORM_BUDGET_AND_LINEAR_WD.**
+**Implementation-gap status: READY (2026-05-30).**
 
-Three primitives are missing from the current source tree:
+All three primitives have landed in the source tree:
 
-1. `phi_budget_widths(..., budget_mode="uniform")` — `phi_scaling.py`
-   currently only supports `budget_mode in {"phi", "fib"}`; needs a
-   uniform-allocation branch that solves for `c_uniform` such that the
-   total realised params match `B_total`. Single-file additive patch
-   to `phi_scaling.py:phi_budget_widths` + a thin route in
-   `models.build_phi_model`.
-2. `train.TrainConfig.const_beta1` (new field) — to apply a constant
-   β1 to AdamW without H48's schedule. Currently `momentum_schedule`
-   only takes `""` (no-op) or `"golden"` (H48). Single-line additive
-   patch: when `cfg.const_beta1 is not None`, post-init mutate the
-   optimiser's β1 to that constant value.
-3. `phi_decay.linear_decay_param_groups` — analog of
-   `phi_decay_param_groups` but with `wd_k = base_wd · (1 - k/(K-1))/2`.
-   New 30-line function in `phi_decay.py`; runner wiring picks it up
-   via `wd_schedule="linear"` in the cfg.
+1. `phi_budget_widths(..., budget_mode='uniform')` — added to
+   `src/nature_inspired_networks/phi_scaling.py` via the new
+   `_uniform_budget_widths` helper; `PhiBudgetNet` now routes both
+   modes through the unified allocator. Tests: 4 new in
+   `tests/test_phi_scaling.py` (`test_budget_mode_uniform_returns_equal_widths`,
+   `test_budget_mode_uniform_param_count_matches_phi_at_iso_target`,
+   `test_budget_mode_phi_default_unchanged`,
+   `test_budget_mode_rejects_invalid_mode`).
+2. `train.TrainConfig.const_beta1` — new field plus the
+   `Trainer._pin_beta1` static helper that bypasses the H48
+   `GoldenMomentumScheduler` when set; re-applied after
+   growth_pruning rebuilds the optimizer. `runner.run_one` forwards
+   `cfg['const_beta1']`. Tests: 3 new in
+   `tests/test_integration_optimizer.py`
+   (`test_const_beta1_holds_value_across_epochs`,
+   `test_const_beta1_compatible_with_golden_momentum_beta2_decay`,
+   `test_const_beta1_pin_beta1_static_helper`).
+3. `phi_decay.linear_decay_param_groups` — arithmetic per-layer
+   weight-decay schedule `wd_k = base_wd · max(0, 1 - depth_factor · k / max_depth)`.
+   Symmetric to `phi_decay_param_groups`; same coverage / no-
+   duplicate invariants. Tests: 6 new in `tests/test_phi_decay.py`
+   (`test_linear_decay_param_groups_strictly_decreasing_wd`,
+   `test_linear_decay_param_groups_first_group_equals_base_wd`,
+   `test_linear_decay_param_groups_iso_total_wd_to_phi_decay_at_matched_total`,
+   `test_linear_decay_covers_all_params_no_duplicates`,
+   `test_linear_decay_rejects_invalid_depth_factor`).
 
-The `control1_nonphi_3axis.yaml` config is shipped as a documented
-SPEC; `scripts/run_control_sweeps.py` will raise a clear
-`NotImplementedError("control1 requires uniform_budget + const_beta1 +
-linear_wd wiring")` when invoked with `--control 1 --launch` until the
-three patches land. The patches are intentionally documented but
-**NOT applied** in this deliverable per the user's "do not modify
-existing scripts/runner.py" constraint.
+Commit: `2d29f18` (Set 1).
 
 ---
 
@@ -142,24 +147,31 @@ of this control because it is itself a φ-derivative.
   (GELU has erf overhead, swish has sigmoid). Average ≈ 50 min.
 - **12 runs × ~50 min ≈ 10 GPU-h.**
 
-**Implementation-gap status: BLOCKED_ON_GENERIC_ACTIVATION_SWAP.**
+**Implementation-gap status: READY (2026-05-30).**
 
-`src/nature_inspired_networks/sinusoidal_activation.py` and
-`src/nature_inspired_networks/activations.py` only offer SIREN-sin and
-PhiGELU swap helpers. To add four more, a generic helper
+The generic helper has landed in
+`src/nature_inspired_networks/activations.py`:
 
-```python
-def swap_relu_with(model: nn.Module, factory: Callable[[], nn.Module]) -> nn.Module:
-    ...
-```
+- `swap_relu_with(model, factory)` — recursively replaces every
+  `nn.ReLU` with a fresh `factory()` instance.
+- `SLOT_ACTIVATION_FACTORIES` table covers the `{tanh, softplus,
+  gelu, swish, silu}` aliases the reviewer's Control 2 matrix
+  requires. Sine and PhiGELU remain on their dedicated helpers so
+  the `omega_init` / `beta_init` wiring is preserved byte-for-byte.
+- `runner.post_build_mutators` has a new `slot_activation` branch
+  that dispatches to `swap_relu_with(model, factory)` for standard
+  aliases and delegates to the existing helpers for `sine` / `phi`.
+  Unknown aliases raise `ValueError` (Rule 7 — no silent fall-
+  through).
 
-is needed, plus a runner override `slot_activation: {tanh, softplus,
-gelu, swish}` that dispatches to the right factory. A 30-line patch
-to `sinusoidal_activation.py` (or new
-`controls/lib_act_swap.py`) plus 5 lines in
-`runner.post_build_mutators`. **NOT APPLIED** here per scope
-constraint; the `control2_act_ablation.yaml` config documents the
-sweep matrix and SPEC.
+Tests: 8 new in `tests/test_activations.py`
+(`test_swap_relu_with_replaces_all_relus_in_resnet20`,
+`test_swap_relu_with_preserves_other_layers`,
+`test_slot_activation_{tanh,softplus,gelu,swish}_dispatches_correctly`,
+`test_slot_activation_unknown_rejected`,
+`test_slot_activation_factories_table_coverage`).
+
+Commit: `1d09411` (Set 2).
 
 ---
 
@@ -235,22 +247,37 @@ This plan goes with **Option A** to preserve iso-params comparison.
   ≈ 50 min × 3 seeds ≈ **2.5 GPU-h.**
 - **Total: ~11.25 GPU-h.**
 
-**Implementation-gap status: PARTIAL.**
+**Implementation-gap status: READY (2026-05-30).**
 
-- (3a) Tuned ResNet-20 hill-climb: **READY** — only `lr` and
-  `weight_decay` need to vary in the YAML; both are first-class cfg
-  keys. The `scripts/run_control_sweeps.py` orchestrator just emits
-  N+3 calls to `run_one` with different lr/wd overrides.
-- (3b) RegNetX-200MF: **BLOCKED_ON_BUILD_MODEL_DISPATCH**. The current
-  `nature_inspired_networks.models.build_model` only knows `resnet20`,
-  `NaturePrior`, `golden_bottleneck`, `phi_budget`, `golden_skip` (and
-  the H13/H18/H19 self-registered variants). Adding `regnetx_200mf`
-  requires a new dispatch branch + import of
-  `torchvision.models.regnet_x_200mf` (note: stock torchvision
-  RegNetX-200MF is ~2.7M params; shrinking to 270k needs explicit
-  `RegNetParams` plumbing). Documented SPEC in
-  `control3_baseline_tuned.yaml`; the orchestrator marks it
-  `BLOCKED` until the dispatch branch is added.
+- (3a) Tuned ResNet-20 hill-climb: **READY** — `lr` and
+  `weight_decay` are first-class cfg keys; the orchestrator emits
+  N+3 calls to `run_one` with different lr/wd overrides. Unchanged.
+- (3b) RegNetX-200MF: **READY**. `models.build_regnetx(name,
+  num_classes, target_params)` now builds stock RegNetX-200MF (via
+  the canonical Radosavovic 2020 Table 9 init parameters,
+  `BlockParams.from_init_params(depth=13, w_0=24, w_a=36.44,
+  w_m=2.49, group_width=8)`) and a shrunk variant via
+  `width_multiplier_search(target_params)`. The shrunk variant
+  binary-searches a uniform `(w_0, w_a)` scale (with `w_0`
+  quantised to a multiple of 8) until the realised param count
+  lands within +/- 5 % of the target. `build_model` dispatches
+  `regnetx_200mf` / `regnetx_200mf_shrunk`; `runner._MODEL_BUILD_KW`
+  forwards `regnetx_param_budget`. NOTE: torchvision >= 0.21
+  dropped the `regnet_x_200mf` factory helper (smallest stock
+  factory is now 400MF), so we re-implement the 200MF init in our
+  own dispatch — the Radosavovic 2020 paper is the authoritative
+  source. The import error surfaces with a clear "install
+  torchvision >= 0.15" hint when the BlockParams import fails.
+
+Tests: 6 new in `tests/test_models.py`
+(`test_regnetx_200mf_builds`,
+`test_regnetx_param_count_at_default_is_at_least_2M`,
+`test_regnetx_width_multiplier_search_hits_target_within_5_percent`,
+`test_build_regnetx_shrunk_via_build_model_dispatch`,
+`test_build_model_rejects_unknown_name`,
+`test_width_multiplier_search_rejects_invalid_target`).
+
+Commit: `00b79e7` (Set 3).
 
 ---
 

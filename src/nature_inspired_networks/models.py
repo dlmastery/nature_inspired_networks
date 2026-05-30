@@ -355,6 +355,27 @@ def build_model(name: str, num_classes: int, flags: NaturePriorFlags | None = No
                                 fib_start=fib_start,
                                 input_resolution=input_resolution)
         return NaturePriorNet(cfg)
+    # Control 4 (reviewer-flagged) — ViT-Tiny smoke (H71 IcosaRoPE3D).
+    if n in ("vit_tiny", "vit_tiny_icosa", "vit_tiny_rope1d"):
+        from .vit_tiny import build_vit_tiny
+        # The cfg keys are namespaced ``vit_*`` so they don't collide
+        # with the existing phi_* family.
+        rope_kind = str(kwargs.get("vit_rope_kind", ""))
+        if not rope_kind:
+            # Sensible default per the cfg row.
+            rope_kind = "icosa3d" if n == "vit_tiny_icosa" else "rope1d"
+        return build_vit_tiny(
+            num_classes=num_classes,
+            embed_dim=int(kwargs.get("vit_embed_dim", 198)),
+            num_heads=int(kwargs.get("vit_num_heads", 6)),
+            head_dim=int(kwargs.get("vit_head_dim", 33)),
+            depth=int(kwargs.get("vit_depth", 12)),
+            patch_size=int(kwargs.get("vit_patch_size", 4)),
+            img_size=int(kwargs.get("vit_img_size", 32)),
+            mlp_ratio=float(kwargs.get("vit_mlp_ratio", 4.0)),
+            rope_kind=rope_kind,
+            rope_base=float(kwargs.get("vit_rope_base", 10_000.0)),
+        )
     # Control 3b (reviewer-flagged) — RegNetX-200MF stock + shrunk.
     if n in ("regnetx_200mf", "regnet_x_200mf",
              "regnetx_200mf_shrunk", "regnet_x_200mf_shrunk"):

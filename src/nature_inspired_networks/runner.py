@@ -65,6 +65,10 @@ _MODEL_BUILD_KW: tuple[str, ...] = (
     "phi_skip_init", "phi_skip_trainable",
     # Control 3b — RegNetX-200MF dispatch keys.
     "regnetx_param_budget",
+    # Control 4 — ViT-Tiny / H71 IcosaRoPE3D dispatch keys.
+    "vit_embed_dim", "vit_num_heads", "vit_head_dim",
+    "vit_depth", "vit_patch_size", "vit_img_size",
+    "vit_mlp_ratio", "vit_rope_kind", "vit_rope_base",
 )
 
 
