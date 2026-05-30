@@ -1,0 +1,26 @@
+{
+  "tag": "slot_act_sine__hc_lr3em3_wd2em3_bs256_optSGD_seed0",
+  "dataset": "cifar100",
+  "seed": 0,
+  "epochs": 30,
+  "top1": 0.6035,
+  "top5": 0.8712,
+  "params": 267659,
+  "flops": 80816212.0,
+  "latency_ms": 3.7001160002546385,
+  "rot_eq_err": 0.42567132661739987,
+  "composite": 0.6037101404667848,
+  "composite_fingerprint": "d65565e9c7b12d14cbce30a801ecc6753aea3eb148074256bfcc051fa61d0893",
+  "epochs_to_target": 25,
+  "train_seconds": 2692.8259016000084,
+  "train_top1": 0.6984375,
+  "generalization_gap": 0.09493750000000001,
+  "config_id": "lr3em3_wd2em3_bs256_optSGD",
+  "hc_cell": {
+    "lr": 0.003,
+    "weight_decay": 0.002,
+    "batch_size": 256,
+    "optimizer": "SGD"
+  },
+  "hc_seed": 0
+}
