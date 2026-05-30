@@ -63,6 +63,8 @@ _MODEL_BUILD_KW: tuple[str, ...] = (
     "phi_budget_total", "phi_budget_n_stages", "phi_budget_mode",
     "phi_budget_blocks_per_stage",
     "phi_skip_init", "phi_skip_trainable",
+    # Control 3b — RegNetX-200MF dispatch keys.
+    "regnetx_param_budget",
 )
 
 

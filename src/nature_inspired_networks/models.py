@@ -176,6 +176,159 @@ class NaturePriorNet(nn.Module):
         return feats
 
 
+def _regnetx_stock_baseline_widths() -> dict[str, tuple]:
+    """Hard-coded RegNetX-200MF reference parameters from the original
+    paper (Radosavovic et al. 2020 "Designing Network Design Spaces",
+    arXiv:2003.13678 Table 9 / torchvision.models.regnet docstring).
+
+    RegNetX-200MF was dropped from torchvision >= 0.21 (the smallest
+    stock RegNetX is now 400MF). We provide the canonical 200MF init
+    parameters here so the reviewer-flagged Control 3b row can build a
+    stock 200MF (~2.7M params) AND a shrunk variant at iso-params with
+    ``phi_budget`` (~270k params) via a binary search over ``w_0``.
+    """
+    # Reference: Designing Network Design Spaces paper Table 9.
+    return {
+        "regnet_x_200mf": dict(
+            depth=13, w_0=24, w_a=36.44, w_m=2.49, group_width=8,
+        ),
+        "regnet_x_400mf": dict(
+            depth=22, w_0=24, w_a=24.48, w_m=2.54, group_width=16,
+        ),
+    }
+
+
+def _build_regnet_from_params(init_params: dict, num_classes: int,
+                              stem_width: int = 32) -> nn.Module:
+    """Wrap ``BlockParams.from_init_params`` + ``RegNet(...)`` so a single
+    callable produces a fresh CIFAR-shaped RegNet. ``stem_width`` is
+    forwarded as RegNet's stem; default 32 matches torchvision."""
+    from torchvision.models.regnet import BlockParams, RegNet
+    bp = BlockParams.from_init_params(**init_params)
+    return RegNet(bp, num_classes=num_classes, stem_width=stem_width)
+
+
+def width_multiplier_search(target_params: int,
+                            base_init: dict | None = None,
+                            num_classes: int = 100,
+                            tol_frac: float = 0.05,
+                            max_iter: int = 32) -> tuple[dict, int, float]:
+    """Binary-search the ``w_0`` width multiplier of a RegNetX-200MF
+    base such that the realised total param count lands within
+    ``tol_frac`` of ``target_params``.
+
+    Returns
+    -------
+    tuple[dict, int, float]
+        ``(init_params, realised_params, w0_scale)`` -- the resolved
+        BlockParams kwargs (with both ``w_0`` and ``w_a`` scaled by
+        ``w0_scale``), the realised param count of the resulting model,
+        and the discovered ``w0_scale`` itself.
+
+    Notes
+    -----
+    Both ``w_0`` and ``w_a`` are scaled because the RegNet width
+    parameterisation widens both the starting width and the per-block
+    growth slope; scaling only ``w_0`` would otherwise leave the deep
+    stages largely unchanged. The search is monotone in ``w0_scale``
+    (param count grows ~quadratically), so a bisection converges in
+    log2(range/tol) iterations.
+    """
+    if base_init is None:
+        base_init = _regnetx_stock_baseline_widths()["regnet_x_200mf"]
+    if target_params <= 0:
+        raise ValueError(f"target_params must be positive, got {target_params}")
+
+    def _count(scale: float) -> tuple[int, dict]:
+        init = dict(base_init)
+        # RegNet's BlockParams.from_init_params asserts w_0 % 8 == 0;
+        # quantise to the nearest multiple of 8 with a floor of 8.
+        w0_raw = init["w_0"] * scale
+        init["w_0"] = max(8, int(round(w0_raw / 8.0)) * 8)
+        init["w_a"] = max(0.0, float(init["w_a"]) * scale)
+        m = _build_regnet_from_params(init, num_classes=num_classes)
+        n = sum(p.numel() for p in m.parameters())
+        return n, init
+
+    lo, hi = 0.05, 4.0
+    # Verify the bracket actually straddles the target.
+    n_lo, _ = _count(lo)
+    n_hi, _ = _count(hi)
+    if n_lo > target_params * (1 + tol_frac):
+        # Even the smallest scale overshoots — return the lo bracket.
+        n, init = _count(lo)
+        return init, n, lo
+    if n_hi < target_params * (1 - tol_frac):
+        # Even the largest scale undershoots — return the hi bracket.
+        n, init = _count(hi)
+        return init, n, hi
+
+    best: tuple[float, int, dict, float] | None = None  # (err, n, init, scale)
+    for _ in range(max_iter):
+        mid = 0.5 * (lo + hi)
+        n_mid, init_mid = _count(mid)
+        err = abs(n_mid - target_params) / target_params
+        if best is None or err < best[0]:
+            best = (err, n_mid, init_mid, mid)
+        if err < tol_frac:
+            return init_mid, n_mid, mid
+        if n_mid < target_params:
+            lo = mid
+        else:
+            hi = mid
+    # Best-effort return: tightest match found.
+    assert best is not None
+    return best[2], best[1], best[3]
+
+
+def build_regnetx(name: str, num_classes: int = 100,
+                  target_params: int | None = None) -> nn.Module:
+    """Build a RegNetX model.
+
+    Names:
+      - ``"regnetx_200mf"`` -- stock RegNetX-200MF (~2.7M params, the
+        canonical baseline from Radosavovic 2020 Table 9). Built via
+        local BlockParams since torchvision >= 0.21 no longer exposes
+        the 200MF helper directly.
+      - ``"regnetx_200mf_shrunk"`` -- RegNetX-200MF shrunk via
+        :func:`width_multiplier_search` to hit ``target_params``
+        (default 270_000 to iso-compare with the H09 ``phi_budget``).
+
+    Raises
+    ------
+    ImportError
+        If torchvision is unavailable (the venv lacks the RegNet
+        module). The error message points the user at the
+        ``torchvision>=0.15`` install requirement (RegNetX has been
+        present since torchvision 0.14).
+    """
+    try:
+        from torchvision.models.regnet import (  # noqa: F401
+            BlockParams,
+            RegNet,
+        )
+    except ImportError as exc:  # pragma: no cover — env-only
+        raise ImportError(
+            "torchvision RegNetX not present in env; install "
+            "torchvision >= 0.15 (Control 3b wiring; see "
+            "controls/PLAN.md control3_baseline_tuned.yaml)"
+        ) from exc
+
+    n = name.lower()
+    baseline = _regnetx_stock_baseline_widths()
+    if n in ("regnetx_200mf", "regnet_x_200mf"):
+        init = dict(baseline["regnet_x_200mf"])
+        return _build_regnet_from_params(init, num_classes=num_classes)
+    if n in ("regnetx_200mf_shrunk", "regnet_x_200mf_shrunk"):
+        budget = target_params if target_params is not None else 270_000
+        init, _, _ = width_multiplier_search(
+            int(budget), base_init=baseline["regnet_x_200mf"],
+            num_classes=num_classes,
+        )
+        return _build_regnet_from_params(init, num_classes=num_classes)
+    raise ValueError(f"unknown RegNetX variant {name!r}")
+
+
 def build_model(name: str, num_classes: int, flags: NaturePriorFlags | None = None,
                 channel_mode: str = "fib",
                 blocks_mode: str = "uniform",
@@ -202,6 +355,14 @@ def build_model(name: str, num_classes: int, flags: NaturePriorFlags | None = No
                                 fib_start=fib_start,
                                 input_resolution=input_resolution)
         return NaturePriorNet(cfg)
+    # Control 3b (reviewer-flagged) — RegNetX-200MF stock + shrunk.
+    if n in ("regnetx_200mf", "regnet_x_200mf",
+             "regnetx_200mf_shrunk", "regnet_x_200mf_shrunk"):
+        target = None
+        if "regnetx_param_budget" in kwargs:
+            target = int(kwargs["regnetx_param_budget"])
+        return build_regnetx(n, num_classes=num_classes,
+                             target_params=target)
     # H06 / H09 / H17.pure — phi-scaling family. Route via build_phi_model
     # (imported lazily to avoid a circular dep at module load time).
     if n in ("golden_bottleneck", "phi_budget", "golden_skip"):
