@@ -366,10 +366,23 @@ answer is in one table not buried in commit history.
 
 ## 9. Commit SHAs
 
-- Baseline (pre-audit): `c04c573e78eaa1b613fe696c0f6b365b01ed58a6`.
-- This audit's commit chain will be appended once the user
-  confirms — separate commits for: (1) parity-audit report, (2) 4 new
-  skills, (3) 3 augmented skills, (4) CLAUDE.md §11 catalogue update.
+- **Baseline (pre-audit):** `c04c573e78eaa1b613fe696c0f6b365b01ed58a6`
+  (commit `c04c573` — "Phase G — SELF_AUDIT_CHECKLIST.md pass count").
+- **Audit landed in two commits** (the auto-checkpoint loop swept the
+  in-progress work into the first commit; we explicitly created the
+  second):
+  - `df094c5` — "Auto-checkpoint: conference-grade campaign (tick 21)".
+    Includes the 4 new skills (`autoresearch-data-split-audit`,
+    `autoresearch-winner-archive`, `autoresearch-explainability-report`,
+    `autoresearch-session-resume`), the 3 augmented existing skills
+    (`autoresearch-checkpoint`, `autoresearch-experiment`,
+    `autoresearch-experiment-archive`), and the CLAUDE.md §11 catalogue
+    update. Net: +1381 / -3 lines across 11 files.
+  - `067492f` — "Sister-repo parity audit: SKILLS_PARITY_AUDIT.md +
+    cleanup scratch". This audit report itself, plus removal of 5
+    intermediate `_sister_*_CLAUDE.md` scratch files the auto-checkpoint
+    captured. Net: +408 / -6004 lines across 6 files.
+- Both pushed to `dlmastery/nature_inspired_networks` `main`.
 
 ---
 
