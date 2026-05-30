@@ -2934,6 +2934,623 @@ def render_experiment_page(metrics: dict, history: list[dict] | None,
     return flags
 
 
+# ---------------------------------------------------------------------------
+# Phase-8 winners (Rule 28 + Rule 34) — exposed for SVG annotation
+# ---------------------------------------------------------------------------
+PHASE8_WINNERS: set[str] = {"pair_gm_pdw", "slot_act_sine", "sg_only_phi_budget"}
+
+# Per-group colour palette for small-multiples (Phase C / D).
+# Distinct hues per CLAUDE.md hypothesis group; baseline + combo override last.
+GROUP_COLORS: dict[str, str] = {
+    "Baseline":     "#bb8c4d",  # accent gold
+    "G1":           "#58a6ff",  # azure (scaling)
+    "G2":           "#3fb950",  # green (layer/channel)
+    "G3":           "#a371f7",  # violet (topologies)
+    "G4":           "#f0883e",  # orange (kernels/attention)
+    "G5":           "#d29922",  # amber (optimisation)
+    "G6":           "#db6d28",  # ember (topological-bridging)
+    "G7":           "#f85149",  # red (cross-paradigm hybrids)
+    "G8":           "#8b949e",  # slate (esoteric)
+    "Combo":        "#e6e1d6",  # paper (combo/pair/loo/slot stacks)
+    "Uncategorized": "#484f58",
+}
+
+
+def _group_for_tag(tag: str) -> str:
+    """Resolve a tag to its CLAUDE.md hypothesis-group letter for colouring.
+
+    Combo / pair / loo / slot stacks resolve to the "Combo" pseudo-group so
+    they read as a distinct family on the Pareto + ablation small-multiples.
+    """
+    if tag.startswith("baseline_"):
+        return "Baseline"
+    if tag.startswith(("combo", "pair_", "loo_", "slot_")):
+        return "Combo"
+    hp = TAG_TO_HYP.get(tag)
+    if hp and hp[1]:
+        return hp[1]
+    return "Uncategorized"
+
+
+def _pareto_panels_svg(rows: list[dict],
+                       title_prefix: str = "Pareto fronts") -> str:
+    """Three side-by-side SVG panels: top-1 vs params / FLOPs / latency.
+
+    Replaces the legacy single PNG `plot_pareto.png` with 3 small-multiples
+    per CLAUDE.md Rule 33 (autoresearch-dashboard-comprehension SKILL.md
+    Pillar 1). Each panel ~360px wide, log-scale x-axis, shared y-axis
+    (top-1 %). Points coloured by hypothesis group (GROUP_COLORS); the
+    3 Phase-8 winners (`pair_gm_pdw`, `slot_act_sine`, `sg_only_phi_budget`)
+    are rendered as larger filled circles with a star (★) marker;
+    baseline_resnet20 is explicitly labelled. A dashed convex-frontier
+    overlay highlights Pareto-efficient points per panel. Each panel
+    carries a 1-sentence "what to read" caption ABOVE; a shared
+    group→colour legend sits BELOW. Hover tooltips list tag, top-1,
+    axis value, composite, n=seeds.
+
+    rows: list of dicts with keys tag, dataset, seed, top1, params,
+    flops, latency_ms, composite. The SVG is dataset-agnostic — it
+    plots every row regardless of dataset (typical caller passes the
+    CIFAR-10 12-ep sweep).
+    """
+    import math
+    pts: list[dict] = []
+    for r in rows:
+        try:
+            top1 = float(r.get("top1") or 0)
+            params = float(r.get("params") or 0)
+            flops = float(r.get("flops") or 0)
+            lat = float(r.get("latency_ms") or 0)
+            comp = float(r.get("composite") or 0)
+        except Exception:
+            continue
+        if top1 <= 0 or params <= 0 or lat <= 0:
+            continue
+        tag = str(r.get("tag", ""))
+        pts.append({
+            "tag": tag,
+            "top1": top1 * 100,           # display as %
+            "params_m": params / 1e6,
+            "flops_m": flops / 1e6 if flops > 0 else None,
+            "lat": lat,
+            "comp": comp,
+            "dataset": str(r.get("dataset", "")),
+            "seed": r.get("seed", ""),
+            "group": _group_for_tag(tag),
+            "is_baseline": tag.startswith("baseline_"),
+            "is_winner": tag in PHASE8_WINNERS,
+        })
+    if len(pts) < 3:
+        return "<p class='empty'>Insufficient rows for the Pareto small-multiples.</p>"
+
+    panel_w, panel_h = 360, 280
+    ml, mr, mt, mb = 50, 14, 32, 38
+    pw, ph = panel_w - ml - mr, panel_h - mt - mb
+
+    # Shared y-axis from min/max top1 across all rows.
+    y_all = [p["top1"] for p in pts]
+    ymin, ymax = min(y_all), max(y_all)
+    yspan = ymax - ymin
+    ymin -= yspan * 0.06
+    ymax += yspan * 0.08
+
+    def sy(y: float) -> float:
+        return mt + ph * (1 - (y - ymin) / (ymax - ymin))
+
+    captions = {
+        "params": "Which architectures are Pareto-efficient on parameter count.",
+        "flops":  "Which architectures are Pareto-efficient on FLOPs (compute).",
+        "lat":    "Which architectures are Pareto-efficient on inference latency.",
+    }
+    axis_labels = {
+        "params": "params (M)",
+        "flops":  "FLOPs (M)",
+        "lat":    "latency b=1 (ms)",
+    }
+
+    def _panel(axis_key: str, panel_idx: int) -> str:
+        if axis_key == "params":
+            vals = [(p, p["params_m"]) for p in pts]
+        elif axis_key == "flops":
+            vals = [(p, p["flops_m"]) for p in pts if p["flops_m"]]
+        else:
+            vals = [(p, p["lat"]) for p in pts]
+        if len(vals) < 2:
+            return f"<div class='ms-panel ms-empty'><i>no data</i></div>"
+        xs = [math.log10(v) for _, v in vals if v and v > 0]
+        if not xs:
+            return f"<div class='ms-panel ms-empty'><i>no data</i></div>"
+        xmin, xmax = min(xs), max(xs)
+        if xmax == xmin:
+            xmax = xmin + 0.5
+        xspan = xmax - xmin
+        xmin -= xspan * 0.10
+        xmax += xspan * 0.14
+
+        def sx(lx: float) -> float:
+            return ml + pw * (lx - xmin) / (xmax - xmin)
+
+        parts: list[str] = []
+        # Caption ABOVE panel.
+        parts.append(
+            f"<div class='ms-caption'>Panel {panel_idx + 1}: "
+            f"{_esc(captions[axis_key])}</div>"
+        )
+        parts.append(
+            f"<svg viewBox='0 0 {panel_w} {panel_h}' "
+            f"preserveAspectRatio='xMinYMin meet' "
+            f"width='100%' height='auto' "
+            f"xmlns='http://www.w3.org/2000/svg' "
+            f"style='background:#0a0a0d;border:1px solid #1c1c20;"
+            f"display:block;font-family:\"IBM Plex Mono\",monospace'>"
+        )
+        # Y gridlines + labels (5 ticks).
+        for i in range(5):
+            yv = ymin + (ymax - ymin) * i / 4
+            yy = sy(yv)
+            parts.append(
+                f"<line x1='{ml}' y1='{yy:.1f}' x2='{ml + pw}' y2='{yy:.1f}' "
+                f"stroke='#1c1c20' stroke-width='1'/>"
+            )
+            parts.append(
+                f"<text x='{ml - 6}' y='{yy + 3:.1f}' fill='#a89e8c' "
+                f"font-size='9' text-anchor='end'>{yv:.1f}%</text>"
+            )
+        # X log-decade ticks.
+        for lx in range(int(math.floor(xmin)), int(math.ceil(xmax)) + 1):
+            if lx < xmin or lx > xmax:
+                continue
+            xx = sx(lx)
+            parts.append(
+                f"<line x1='{xx:.1f}' y1='{mt}' x2='{xx:.1f}' "
+                f"y2='{mt + ph}' stroke='#1c1c20' stroke-width='1' "
+                f"stroke-dasharray='2,3'/>"
+            )
+            parts.append(
+                f"<text x='{xx:.1f}' y='{mt + ph + 14}' fill='#a89e8c' "
+                f"font-size='9' text-anchor='middle'>10^{lx}</text>"
+            )
+        # Axis labels.
+        parts.append(
+            f"<text x='{ml + pw - 4}' y='{mt + ph + 28}' fill='#a89e8c' "
+            f"font-size='10' font-family='Source Serif 4,Georgia,serif' "
+            f"text-anchor='end'>{_esc(axis_labels[axis_key])} →</text>"
+        )
+        parts.append(
+            f"<text x='14' y='{mt + ph / 2:.1f}' fill='#a89e8c' "
+            f"font-size='10' font-family='Source Serif 4,Georgia,serif' "
+            f"text-anchor='middle' "
+            f"transform='rotate(-90 14 {mt + ph / 2:.1f})'>top-1 (%) →</text>"
+        )
+        # Compute Pareto frontier: maximise (top1) while minimising (axis).
+        # A point is on the frontier if no other has both >= top1 AND <= axis.
+        pts_with_x = [(p, lv) for (p, v), lv in zip(vals, xs)]
+        frontier = []
+        for i, (pi, lxi) in enumerate(pts_with_x):
+            dominated = False
+            for j, (pj, lxj) in enumerate(pts_with_x):
+                if i == j:
+                    continue
+                if (pj["top1"] >= pi["top1"] and lxj <= lxi
+                        and (pj["top1"] > pi["top1"] or lxj < lxi)):
+                    dominated = True
+                    break
+            if not dominated:
+                frontier.append((pi, lxi))
+        # Sort frontier by axis-value ascending.
+        frontier.sort(key=lambda t: t[1])
+        # Frontier dashed polyline.
+        if len(frontier) >= 2:
+            fpts = " ".join(
+                f"{sx(lxi):.1f},{sy(p['top1']):.1f}" for p, lxi in frontier
+            )
+            parts.append(
+                f"<polyline points='{fpts}' fill='none' stroke='#bb8c4d' "
+                f"stroke-width='1.4' stroke-dasharray='5,4' opacity='0.75'/>"
+            )
+        # Plot each point.
+        for (p, lxi) in pts_with_x:
+            cx = sx(lxi)
+            cy = sy(p["top1"])
+            col = GROUP_COLORS.get(p["group"], "#8b949e")
+            tooltip = (
+                f"{p['tag']} · {p['dataset']} seed{p['seed']} · "
+                f"top1 {p['top1']:.2f}% · {axis_labels[axis_key]}="
+                f"{10**lxi:.3g} · composite {p['comp']:.4f}"
+            )
+            if p["is_winner"]:
+                # Larger filled circle + star marker.
+                parts.append(
+                    f"<circle cx='{cx:.1f}' cy='{cy:.1f}' r='6' "
+                    f"fill='{col}' stroke='#e6e1d6' stroke-width='1.5'>"
+                    f"<title>{_esc(tooltip)} · PHASE-8 WINNER (n=3 seeds)</title>"
+                    f"</circle>"
+                )
+                parts.append(
+                    f"<text x='{cx:.1f}' y='{cy + 3.5:.1f}' fill='#0a0a0d' "
+                    f"font-size='9' font-weight='700' text-anchor='middle' "
+                    f"pointer-events='none'>★</text>"
+                )
+            elif p["is_baseline"]:
+                # Hollow ring + explicit label.
+                parts.append(
+                    f"<circle cx='{cx:.1f}' cy='{cy:.1f}' r='5.5' fill='none' "
+                    f"stroke='{col}' stroke-width='2'>"
+                    f"<title>{_esc(tooltip)} · baseline reference</title>"
+                    f"</circle>"
+                )
+                parts.append(
+                    f"<text x='{cx + 8:.1f}' y='{cy + 3:.1f}' fill='{col}' "
+                    f"font-size='9' font-family='IBM Plex Mono,monospace' "
+                    f"font-weight='600'>baseline</text>"
+                )
+            else:
+                parts.append(
+                    f"<circle cx='{cx:.1f}' cy='{cy:.1f}' r='3.2' fill='{col}' "
+                    f"fill-opacity='0.85' stroke='#0a0a0d' stroke-width='0.6'>"
+                    f"<title>{_esc(tooltip)}</title>"
+                    f"</circle>"
+                )
+        parts.append("</svg>")
+        return f"<div class='ms-panel'>{''.join(parts)}</div>"
+
+    panels_html = "".join(
+        _panel(k, idx) for idx, k in enumerate(("params", "flops", "lat"))
+    )
+    # Shared legend BELOW the 3 panels.
+    legend_groups = ["Baseline", "G1", "G2", "G3", "G4", "G5",
+                     "G6", "G7", "G8", "Combo"]
+    legend_bits = []
+    for g in legend_groups:
+        col = GROUP_COLORS[g]
+        label = g
+        if g == "G1":
+            label = "G1 scaling"
+        elif g == "G2":
+            label = "G2 layer/channel"
+        elif g == "G3":
+            label = "G3 topologies"
+        elif g == "G4":
+            label = "G4 kernels/attn"
+        elif g == "G5":
+            label = "G5 optim/init"
+        elif g == "G6":
+            label = "G6 topo-bridging"
+        elif g == "G7":
+            label = "G7 hybrids"
+        elif g == "G8":
+            label = "G8 esoteric"
+        legend_bits.append(
+            f"<span class='ms-legend-item'>"
+            f"<span class='ms-swatch' style='background:{col}'></span>"
+            f"{_esc(label)}</span>"
+        )
+    # Winner / baseline glyph legend
+    legend_bits.append(
+        "<span class='ms-legend-item'>★ <em>Phase-8 winner</em> (n=3, EVALUATION)</span>"
+    )
+    legend_bits.append(
+        "<span class='ms-legend-item'>○ baseline_resnet20 (n=3 reference)</span>"
+    )
+    legend_bits.append(
+        "<span class='ms-legend-item ms-frontier'>"
+        "<span style='display:inline-block;width:22px;height:0;"
+        "border-top:1.5px dashed #bb8c4d;vertical-align:middle;"
+        "margin-right:4px'></span>Pareto frontier</span>"
+    )
+    legend_html = (
+        "<div class='ms-legend'>"
+        + " ".join(legend_bits)
+        + "</div>"
+    )
+    return (
+        f"<div class='ms-grid ms-pareto'>{panels_html}</div>"
+        f"{legend_html}"
+    )
+
+
+def _ablation_group_panels_svg(rows: list[dict],
+                               baseline_top1: dict[str, float] | None = None,
+                               noise_band_pp: float = 1.21,
+                               dataset_pref: str = "cifar10") -> str:
+    """8 small horizontal-bar panels (one per CLAUDE.md group G1..G8).
+
+    Replaces the legacy single PNG `plot_ablation.png` with 8 small-
+    multiples per CLAUDE.md Rule 33 (autoresearch-dashboard-comprehension
+    SKILL.md Pillar 1). Arranged in a CSS 4×2 grid; each panel ~280×200.
+
+    Each bar = one tag's Δtop1 (pp) vs the baseline on `dataset_pref`.
+    Sorted within group descending by Δ (positive at top). Divergent
+    colour scale: green (Δ above noise band), neutral (within noise),
+    red (Δ below noise band). Vertical reference line marks the
+    empirical noise band ±noise_band_pp (default 1.21pp = 2σ for
+    CIFAR-10 pooled σ_seed=0.607pp per paper/STATISTICAL_TESTS.md).
+    Per-bar label: tag + Δpp + n=X chip + tier badge. Per-group caption
+    ("what this group tested") above each panel.
+
+    rows: list of dicts with tag, dataset, top1, seed.
+    baseline_top1: dict[dataset→top1 fraction] for Δ computation;
+    defaults to module BASELINE_TOP1.
+    """
+    if baseline_top1 is None:
+        baseline_top1 = BASELINE_TOP1
+    base_top1 = baseline_top1.get(dataset_pref)
+    if base_top1 is None:
+        return (
+            f"<p class='empty'>No baseline_resnet20 reference for "
+            f"{_esc(dataset_pref)} — ablation panels need a baseline for "
+            f"Δ computation.</p>"
+        )
+
+    # Group → 1-sentence caption.
+    group_captions: dict[str, str] = {
+        "G1": "G1 — φ/Fibonacci scaling of depth, width, resolution, "
+              "parameter budgets, LR schedules (H01–H10).",
+        "G2": "G2 — Fibonacci channel/MLP sizes, golden skip-modulation, "
+              "φ-threshold activations, head diversity, ensembles (H11–H20).",
+        "G3": "G3 — hexagonal lattices, toroidal closures, Platonic / "
+              "icosa equivariance, fractal toroidal (H21–H30).",
+        "G4": "G4 — golden-spiral kernels, Fibonacci dilation, vesica "
+              "filters, golden-angle rotary, cymatic / harmonic acts (H31–H40).",
+        "G5": "G5 — golden-ratio AdamW, φ-weight init, Fibonacci pruning, "
+              "φ-dropout, golden-momentum (H41–H50).",
+        "G6": "G6 — persistent-homology losses, drop-path anytime, icosa-"
+              "unfold bridges, C4-group avg-pool, Betti probes (H51–H60).",
+        "G7": "G7 — Liquid / JEPA / KAN / Transformer / GNN cross-paradigm "
+              "hybrids (H61–H75). No CIFAR sweep rows yet.",
+        "G8": "G8 — Reuleaux constant-width kernels, SIREN sinusoidal, "
+              "tetrahedral, radial-12 attention, spectral Hopfield (H76–H84).",
+    }
+
+    # Group by G1..G8 from rows. Filter to the requested dataset, exclude
+    # baseline_*.
+    by_group: dict[str, list[dict]] = {g: [] for g in group_captions}
+    seed_counts: dict[str, int] = {}  # tag → seed count across this dataset
+    for r in rows:
+        try:
+            top1 = float(r.get("top1") or 0)
+        except Exception:
+            continue
+        if top1 <= 0:
+            continue
+        if str(r.get("dataset", "")) != dataset_pref:
+            continue
+        tag = str(r.get("tag", ""))
+        if tag.startswith("baseline_"):
+            continue
+        g = _group_for_tag(tag)
+        # Combo / pair / loo / slot tags belong to their underlying
+        # hypothesis group for the per-axis ablation read. Re-map.
+        if g == "Combo":
+            hp = TAG_TO_HYP.get(tag)
+            g = hp[1] if hp and hp[1] else "Uncategorized"
+        if g not in by_group:
+            continue
+        delta_pp = (top1 - base_top1) * 100
+        by_group[g].append({
+            "tag": tag, "top1": top1, "delta_pp": delta_pp,
+            "seed": r.get("seed", ""),
+        })
+        seed_counts[tag] = seed_counts.get(tag, 0) + 1
+
+    # For tags with multiple seeds, collapse to median.
+    for g, bars in list(by_group.items()):
+        # Aggregate by tag.
+        by_tag: dict[str, list[float]] = {}
+        for b in bars:
+            by_tag.setdefault(b["tag"], []).append(b["delta_pp"])
+        agg = []
+        for tag, ds in by_tag.items():
+            ds_sorted = sorted(ds)
+            mid = len(ds_sorted) // 2
+            if len(ds_sorted) % 2 == 1:
+                med = ds_sorted[mid]
+            else:
+                med = 0.5 * (ds_sorted[mid - 1] + ds_sorted[mid])
+            agg.append({
+                "tag": tag, "delta_pp": med,
+                "n": len(ds_sorted),
+            })
+        agg.sort(key=lambda d: d["delta_pp"], reverse=True)
+        by_group[g] = agg
+
+    # Compute global Δ-range for shared x-axis across all 8 panels
+    # (so visual comparison across groups is meaningful).
+    all_deltas = [b["delta_pp"] for bars in by_group.values() for b in bars]
+    if not all_deltas:
+        return "<p class='empty'>No non-baseline rows for ablation panels.</p>"
+    dmin = min(all_deltas + [-noise_band_pp * 1.2])
+    dmax = max(all_deltas + [noise_band_pp * 1.2])
+    dspan = dmax - dmin
+    dmin -= dspan * 0.06
+    dmax += dspan * 0.10
+
+    panel_w, panel_h_min = 290, 150
+    ml, mr, mt, mb = 100, 50, 28, 28
+
+    def _panel(g: str, bars: list[dict]) -> str:
+        caption = group_captions.get(g, g)
+        if not bars:
+            return (
+                f"<div class='ms-panel'>"
+                f"<div class='ms-caption'>{_esc(caption)}</div>"
+                f"<div class='ms-panel-empty'>No sweep rows in this group "
+                f"on {_esc(dataset_pref)} yet.</div>"
+                f"</div>"
+            )
+        n = len(bars)
+        bh = 14
+        gap = 5
+        panel_h = max(panel_h_min, mt + mb + n * (bh + gap))
+        pw, ph = panel_w - ml - mr, panel_h - mt - mb
+
+        def sx(d: float) -> float:
+            return ml + pw * (d - dmin) / (dmax - dmin)
+
+        parts: list[str] = []
+        parts.append(f"<div class='ms-caption'>{_esc(caption)}</div>")
+        parts.append(
+            f"<svg viewBox='0 0 {panel_w} {panel_h}' "
+            f"preserveAspectRatio='xMinYMin meet' "
+            f"width='100%' height='auto' "
+            f"xmlns='http://www.w3.org/2000/svg' "
+            f"style='background:#0a0a0d;border:1px solid #1c1c20;"
+            f"display:block;font-family:\"IBM Plex Mono\",monospace'>"
+        )
+        # Vertical zero line.
+        x0 = sx(0)
+        parts.append(
+            f"<line x1='{x0:.1f}' y1='{mt - 4}' x2='{x0:.1f}' "
+            f"y2='{mt + ph + 4}' stroke='#a89e8c' stroke-width='1.2'/>"
+        )
+        # Noise band (±noise_band_pp).
+        x_pos = sx(noise_band_pp)
+        x_neg = sx(-noise_band_pp)
+        parts.append(
+            f"<line x1='{x_pos:.1f}' y1='{mt}' x2='{x_pos:.1f}' "
+            f"y2='{mt + ph}' stroke='#bb8c4d' stroke-width='1' "
+            f"stroke-dasharray='3,3' opacity='0.7'/>"
+        )
+        parts.append(
+            f"<line x1='{x_neg:.1f}' y1='{mt}' x2='{x_neg:.1f}' "
+            f"y2='{mt + ph}' stroke='#bb8c4d' stroke-width='1' "
+            f"stroke-dasharray='3,3' opacity='0.7'/>"
+        )
+        # X-axis label at bottom.
+        parts.append(
+            f"<text x='{x0:.1f}' y='{mt + ph + 16}' fill='#a89e8c' "
+            f"font-size='9' text-anchor='middle' "
+            f"font-family='Source Serif 4,Georgia,serif'>0 pp</text>"
+        )
+        parts.append(
+            f"<text x='{x_pos:.1f}' y='{mt - 4}' fill='#bb8c4d' "
+            f"font-size='8' text-anchor='middle'>+{noise_band_pp:.2f}pp band</text>"
+        )
+        parts.append(
+            f"<text x='{x_neg:.1f}' y='{mt - 4}' fill='#bb8c4d' "
+            f"font-size='8' text-anchor='middle'>−{noise_band_pp:.2f}pp band</text>"
+        )
+        # Bars.
+        for i, b in enumerate(bars):
+            y = mt + i * (bh + gap)
+            d = b["delta_pp"]
+            x = sx(d)
+            # Divergent colour: green above +noise_band, red below -noise_band,
+            # neutral grey within.
+            if d > noise_band_pp:
+                col = "#3fb950"
+            elif d < -noise_band_pp:
+                col = "#f85149"
+            else:
+                col = "#8b949e"
+            # bar from x0 to x.
+            bx0 = min(x0, x)
+            bw = abs(x - x0)
+            parts.append(
+                f"<rect x='{bx0:.1f}' y='{y}' width='{bw:.1f}' "
+                f"height='{bh}' fill='{col}' opacity='0.85'>"
+                f"<title>{_esc(b['tag'])} · Δ{d:+.2f}pp vs baseline · "
+                f"n={b['n']}</title>"
+                f"</rect>"
+            )
+            # Tag label LEFT of bar area.
+            tag_disp = b["tag"][:20]
+            parts.append(
+                f"<text x='{ml - 6}' y='{y + bh - 3}' fill='#e6e1d6' "
+                f"font-size='9' text-anchor='end' "
+                f"font-family='IBM Plex Mono,monospace'>{_esc(tag_disp)}</text>"
+            )
+            # Δ value + n chip RIGHT of bar.
+            sign = "+" if d >= 0 else "−"
+            tier_short = "EVAL" if b["n"] >= 3 and b["tag"] in PHASE8_WINNERS else "SCR"
+            value_x = x + (4 if d >= 0 else -4)
+            anchor = "start" if d >= 0 else "end"
+            parts.append(
+                f"<text x='{value_x:.1f}' y='{y + bh - 3}' fill='#a89e8c' "
+                f"font-size='9' text-anchor='{anchor}' "
+                f"font-family='IBM Plex Mono,monospace'>"
+                f"{sign}{abs(d):.2f}pp · n={b['n']} {tier_short}</text>"
+            )
+        parts.append("</svg>")
+        return f"<div class='ms-panel'>{''.join(parts)}</div>"
+
+    panels_html = "".join(
+        _panel(g, by_group.get(g, [])) for g in ("G1", "G2", "G3", "G4",
+                                                 "G5", "G6", "G7", "G8")
+    )
+    legend_html = (
+        "<div class='ms-legend'>"
+        "<span class='ms-legend-item'>"
+        "<span class='ms-swatch' style='background:#3fb950'></span>"
+        "Δ &gt; +1.21pp (above 2σ noise band → meaningful gain)</span>"
+        "<span class='ms-legend-item'>"
+        "<span class='ms-swatch' style='background:#8b949e'></span>"
+        "|Δ| ≤ 1.21pp (within seed noise → no claim)</span>"
+        "<span class='ms-legend-item'>"
+        "<span class='ms-swatch' style='background:#f85149'></span>"
+        "Δ &lt; −1.21pp (below noise → regression vs baseline)</span>"
+        "<span class='ms-legend-item ms-frontier'>"
+        "<span style='display:inline-block;width:22px;height:0;"
+        "border-top:1.5px dashed #bb8c4d;vertical-align:middle;"
+        "margin-right:4px'></span>±1.21pp noise band "
+        "(2σ for CIFAR-10 pooled σ_seed=0.607pp per "
+        "<code>paper/STATISTICAL_TESTS.md</code>)</span>"
+        "</div>"
+    )
+    return (
+        f"<div class='ms-grid ms-ablation'>{panels_html}</div>"
+        f"{legend_html}"
+    )
+
+
+def _how_to_read_block() -> str:
+    """Render the mandatory 4-bullet 'How to read this dashboard' orientation.
+
+    Required by CLAUDE.md Rule 33 / skill autoresearch-dashboard-comprehension
+    SKILL.md Pillar 2. EXACTLY 4 bullets. Inserted between the masthead and
+    the headline ribbon so every reviewer sees the framing before any
+    numerics.
+    """
+    return (
+        "<section class='how-to-read'>"
+        "<h3>How to read this dashboard</h3>"
+        "<ul>"
+        "<li><b>Numbers shown.</b> top-1 accuracy on "
+        "<a href='https://www.cs.toronto.edu/~kriz/cifar.html' "
+        "target='_blank' rel='noopener'>CIFAR-10</a> (12 epochs) or "
+        "<a href='https://www.cs.toronto.edu/~kriz/cifar.html' "
+        "target='_blank' rel='noopener'>CIFAR-100</a> (30 epochs) per the "
+        "<code>DS</code> column. <code>composite</code> = "
+        "<code>top1 − 0.05·log10(params_M) − 0.05·log10(latency_ms)</code> "
+        "(SHA-256-fingerprinted per "
+        "<a href='https://github.com/dlmastery/nature_inspired_networks/"
+        "blob/main/CLAUDE.md#rule-2'>Rule 2</a>).</li>"
+        "<li><b>Tiers per "
+        "<a href='https://github.com/dlmastery/nature_inspired_networks/"
+        "blob/main/CLAUDE.md#rule-28'>Rule 28</a>.</b> "
+        "<span class='chip-scr'>SCREENING (n=1)</span> = one seed, "
+        "candidate-only — NOT a defensible external claim. "
+        "<span class='chip-eval'>EVALUATION (n≥3, Phase-5 gate cleared)</span> "
+        "= formally measured. Only the 3 Phase-8 winners "
+        "(<code>pair_gm_pdw</code>, <code>slot_act_sine</code>, "
+        "<code>sg_only_phi_budget</code>) currently hold the EVALUATION tier.</li>"
+        "<li><b>Colours by group.</b> G1 scaling · G2 layer/channel · "
+        "G3 topologies · G4 kernels/attention · G5 optimisation · "
+        "G6 topological-bridging · G7 hybrids · G8 esoteric. Baseline + "
+        "Combo (combo*/pair*/loo*/slot* multi-prior stacks) have distinct "
+        "colours on the Pareto small-multiples; group panels of the ablation "
+        "matrix break the same data out per hypothesis group.</li>"
+        "<li><b>Navigation.</b> click any leaderboard row → independent "
+        "per-experiment page (10 sections: hypothesis-doc digest, impl-critic "
+        "verdict, sci-critic verdict, FINDINGS verdict, reasoning blob, "
+        "config, metrics, composite breakdown, training curves, "
+        "cross-references). All numbers traceable to the build-stamp commit "
+        "SHA in the footer.</li>"
+        "</ul>"
+        "</section>"
+    )
+
+
 def render_all_experiment_pages(results_dir: str | Path,
                                 out_dir: str | Path,
                                 repo_root: str | Path | None = None,
@@ -3191,6 +3808,60 @@ HTML_HEAD = """<!doctype html>
  .grain{position:fixed;inset:0;pointer-events:none;z-index:2;opacity:0.035;
    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");}
  .vbadge:hover{transform:scale(1.05);filter:brightness(1.15);}
+ /* ---- Phase E: "How to read this dashboard" 4-bullet orientation block ---- */
+ .how-to-read{background:var(--panel);border:1px solid var(--rule);
+              border-left:2px solid var(--v-pass);padding:18px 24px;
+              margin:18px 0;font-family:'Source Serif 4',Georgia,serif;
+              line-height:1.6;}
+ .how-to-read h3{font-family:'IBM Plex Mono',monospace;font-size:11px;
+                 text-transform:uppercase;letter-spacing:0.18em;
+                 color:var(--paper-dim);margin:0 0 12px 0;}
+ .how-to-read ul{list-style:none;margin:0;padding:0;
+                 display:grid;grid-template-columns:1fr 1fr;gap:10px 22px;}
+ .how-to-read li{padding-left:14px;border-left:1px solid var(--rule-bright);
+                 color:var(--paper);font-size:14.5px;line-height:1.55;}
+ .how-to-read li b{color:var(--paper);font-weight:600;}
+ .how-to-read code{background:var(--ink);padding:1px 5px;
+                   font-family:'IBM Plex Mono',monospace;font-size:0.88em;
+                   border:1px solid var(--rule);}
+ .how-to-read a{color:var(--v-derivative);}
+ .how-to-read .chip-scr{background:#fff4e5;color:#8a5800;padding:1px 6px;
+                        border-radius:3px;font-family:'IBM Plex Mono',monospace;
+                        font-size:0.82em;font-weight:600;
+                        letter-spacing:0.04em;}
+ .how-to-read .chip-eval{background:#e8f4e8;color:#1f5320;padding:1px 6px;
+                         border-radius:3px;font-family:'IBM Plex Mono',monospace;
+                         font-size:0.82em;font-weight:600;
+                         letter-spacing:0.04em;}
+ @media(max-width:880px){.how-to-read ul{grid-template-columns:1fr;}}
+ /* ---- Phase C / D: small-multiples grid for Pareto + ablation panels ---- */
+ .ms-grid{display:grid;gap:14px;margin:12px 0 8px 0;}
+ .ms-grid.ms-pareto{grid-template-columns:repeat(3,minmax(0,1fr));}
+ .ms-grid.ms-ablation{grid-template-columns:repeat(4,minmax(0,1fr));}
+ @media(max-width:1200px){
+   .ms-grid.ms-ablation{grid-template-columns:repeat(2,minmax(0,1fr));}
+ }
+ @media(max-width:880px){
+   .ms-grid.ms-pareto{grid-template-columns:1fr;}
+   .ms-grid.ms-ablation{grid-template-columns:1fr;}
+ }
+ .ms-panel{display:flex;flex-direction:column;}
+ .ms-caption{font-family:'Source Serif 4',Georgia,serif;font-size:12.5px;
+             color:var(--paper-dim);margin-bottom:6px;line-height:1.4;
+             min-height:34px;}
+ .ms-panel-empty{font-family:'IBM Plex Mono',monospace;font-size:10.5px;
+                 color:var(--paper-dim);background:var(--panel2);
+                 border:1px dashed var(--rule);padding:18px 14px;text-align:center;}
+ .ms-legend{display:flex;flex-wrap:wrap;gap:10px 18px;font-family:'IBM Plex Mono',monospace;
+            font-size:10.5px;color:var(--paper-dim);
+            margin:6px 0 4px 0;padding:10px 14px;background:var(--panel2);
+            border:1px solid var(--rule);letter-spacing:0.04em;}
+ .ms-legend em{color:var(--paper);font-style:normal;font-weight:600;}
+ .ms-legend code{background:var(--ink);padding:1px 4px;font-size:0.94em;
+                 border:1px solid var(--rule);color:var(--paper);}
+ .ms-legend-item{display:inline-flex;align-items:center;}
+ .ms-swatch{display:inline-block;width:11px;height:11px;margin-right:5px;
+            vertical-align:middle;border:1px solid var(--rule-bright);}
 </style>
 </head><body>
 <div class='grain'></div>
@@ -3642,6 +4313,11 @@ def render_dashboard(results_dir: str | Path,
         f"<a href='https://github.com/dlmastery/nature_inspired_networks/blob/main/paper/REVIEWER_CHECKLIST.md'>REVIEWER_CHECKLIST</a> &nbsp;·&nbsp; "
         f"<a href='https://github.com/dlmastery/nature_inspired_networks/blob/main/hypotheses/IDEA_TABLE.md'>IDEA_TABLE</a></div>"
     )
+    # Phase E (Rule 33): "How to read this dashboard" 4-bullet orientation
+    # block — inserted AFTER the masthead but BEFORE the headline ribbon so
+    # every reviewer sees the framing before any numerics.
+    html.append(_how_to_read_block())
+
     if findings_blurb:
         # Render the FINDINGS headline through the same markdown converter
         # used everywhere else — the blockquote-stripped table + bold
@@ -3654,15 +4330,29 @@ def render_dashboard(results_dir: str | Path,
     html.append(_composite_formula_chip(df))
     html.append(_ribbon_html(findings_metrics))
 
-    # PNG plot grid
+    # ------------------------------------------------------------------
+    # Phase C: Pareto small-multiples (3 SVG panels, shared y-axis).
+    # Phase D: Ablation 8-group panels (one panel per G1..G8, divergent
+    #          Δ-vs-baseline colour, ±1.21pp noise band reference line).
+    # Both replace the legacy single-PNG cards. The PNG plots still get
+    # generated (line above) as a fallback / archival copy, but the live
+    # dashboard now embeds the SVG small-multiples directly.
+    # ------------------------------------------------------------------
+    pareto_rows: list[dict] = []
+    if not df.empty:
+        pareto_rows = df.to_dict("records")
     html.append("<div class='grid'>")
     html.append(
-        f"<div class='card'><h3>Pareto: accuracy vs. params / FLOPs / latency</h3>"
-        f"<img src='{pareto_png.name}'/></div>"
+        "<div class='card panel-2col'>"
+        "<h3>Pareto small-multiples · top-1 vs params / FLOPs / latency</h3>"
+        + _pareto_panels_svg(pareto_rows)
+        + "</div>"
     )
     html.append(
-        f"<div class='card'><h3>Ablation matrix: each nature-inspired prior toggled "
-        f"independently</h3><img src='{ablate_png.name}'/></div>"
+        "<div class='card panel-2col'>"
+        "<h3>Ablation matrix · 8 group panels · Δ vs baseline_resnet20 on CIFAR-10</h3>"
+        + _ablation_group_panels_svg(pareto_rows, dataset_pref="cifar10")
+        + "</div>"
     )
     html.append(
         f"<div class='card panel-2col'><h3>Training curves</h3>"
