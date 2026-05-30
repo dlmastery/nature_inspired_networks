@@ -331,6 +331,56 @@ def test_h09_phi_budget_net_total_budget_within_15pct():
         assert drift < 0.15, (B_total, total, drift)
 
 
+def test_budget_mode_uniform_returns_equal_widths():
+    """Control 1 unblocking: budget_mode='uniform' must return n_stages
+    copies of a single width (no per-stage geometric ratio)."""
+    widths = phi_budget_widths(270_000, 3, blocks_per_stage=2,
+                               budget_mode="uniform")
+    assert len(widths) == 3
+    assert widths[0] == widths[1] == widths[2], widths
+    assert widths[0] >= 8
+
+
+def test_budget_mode_uniform_param_count_matches_phi_at_iso_target():
+    """Iso-budget invariant: uniform and phi modes at the same B_total
+    must both realise total params within +/- 15 % of B_total. This is
+    what makes the Control 1 row comparable to ``pair_gm_pdw``."""
+    for B_total in (200_000, 270_000, 500_000):
+        phi_net = PhiBudgetNet(num_classes=10, B_total=B_total,
+                               n_stages=3, blocks_per_stage=2,
+                               budget_mode="phi")
+        uni_net = PhiBudgetNet(num_classes=10, B_total=B_total,
+                               n_stages=3, blocks_per_stage=2,
+                               budget_mode="uniform")
+        phi_total = sum(p.numel() for p in phi_net.parameters())
+        uni_total = sum(p.numel() for p in uni_net.parameters())
+        phi_drift = abs(phi_total - B_total) / B_total
+        uni_drift = abs(uni_total - B_total) / B_total
+        assert phi_drift < 0.15, (B_total, phi_total, phi_drift)
+        assert uni_drift < 0.15, (B_total, uni_total, uni_drift)
+
+
+def test_budget_mode_phi_default_unchanged():
+    """Default budget_mode must be 'phi' so the H09 mechanism is
+    preserved when callers do not pass the new kwarg."""
+    widths_default = phi_budget_widths(270_000, 3, blocks_per_stage=2)
+    widths_phi = phi_budget_widths(270_000, 3, blocks_per_stage=2,
+                                   budget_mode="phi")
+    assert widths_default == widths_phi
+    # Default must be strictly monotone-increasing (phi grows widths).
+    assert widths_default[0] < widths_default[-1], widths_default
+
+
+def test_budget_mode_rejects_invalid_mode():
+    """Defensive guard: bad budget_mode raises ValueError, not a silent
+    fall-through. Rule 7 — no emergency-bypass mode."""
+    try:
+        phi_budget_widths(270_000, 3, budget_mode="bogus")  # type: ignore[arg-type]
+    except ValueError:
+        return
+    raise AssertionError("expected ValueError on invalid budget_mode")
+
+
 def test_h09_edge_case_invalid_budget_raises():
     """Edge case: zero/negative budget must raise ValueError."""
     try:

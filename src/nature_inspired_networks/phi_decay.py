@@ -156,6 +156,104 @@ def phi_decay_param_groups(
     )
 
 
+def linear_decay_param_groups(
+    model: nn.Module,
+    base_wd: float = 1e-2,
+    depth_factor: float = 1.0,
+    block_attr: str | None = None,
+) -> list[dict]:
+    """Arithmetic (linear) per-layer weight-decay schedule.
+
+    Symmetric to :func:`phi_decay_param_groups` but with the φ-geometric
+    schedule replaced by a linear ramp:
+
+        wd_k = base_wd · max(0, 1 - depth_factor · k / max_depth)
+
+    where ``k`` is the layer index (0-indexed from shallowest learnable
+    child) and ``max_depth`` is ``num_groups - 1`` (so the deepest layer
+    receives ``base_wd · (1 - depth_factor)``). Used by Control 1
+    (reviewer-flagged, non-φ 3-axis stack) to defend
+    ``phi_decay_wd``: same total wd-budget shape but a non-geometric
+    fall-off so the φ-content of H44 can be tested in isolation.
+
+    Parameters
+    ----------
+    model : nn.Module
+        Same semantics as :func:`build_phi_decay_param_groups`.
+    base_wd : float, default 1e-2
+        Weight decay applied at ``k = 0`` (shallowest layer).
+    depth_factor : float, default 1.0
+        Total drop from layer 0 to layer ``max_depth``. With
+        ``depth_factor=1.0`` the deepest layer gets ``wd = 0``; with
+        ``depth_factor=0.5`` (the Control 1 spec value) the deepest
+        layer gets ``wd = base_wd / 2``. Must be in ``[0, 1]``.
+    block_attr : str, optional
+        If supplied, only the children of ``getattr(model, block_attr)``
+        form the indexed schedule; non-block children keep ``base_wd``
+        (mirrors :func:`build_phi_decay_param_groups`).
+
+    Returns
+    -------
+    list of dict
+        AdamW-ready param groups; each carries ``params``,
+        ``weight_decay``, and ``layer_name``.
+    """
+    if base_wd < 0:
+        raise ValueError(f"base_wd must be >= 0, got {base_wd}")
+    if depth_factor < 0 or depth_factor > 1:
+        raise ValueError(
+            f"depth_factor must be in [0, 1], got {depth_factor}"
+        )
+
+    groups: list[dict] = []
+    if block_attr is not None and hasattr(model, block_attr):
+        block_container = getattr(model, block_attr)
+        # 1) non-block children get base_wd.
+        seen: set[int] = set()
+        for name, params in _named_layer_groups(model):
+            if name == block_attr:
+                continue
+            for p in params:
+                seen.add(id(p))
+            groups.append(dict(
+                params=params, weight_decay=base_wd, layer_name=name,
+            ))
+        # 2) block children get the linear schedule.
+        K = len(list(block_container))
+        max_depth = max(1, K - 1)
+        for k, block in enumerate(block_container):
+            params = [
+                p for p in block.parameters(recurse=True)
+                if p.requires_grad and id(p) not in seen
+            ]
+            for p in params:
+                seen.add(id(p))
+            if not params:
+                continue
+            frac = depth_factor * (k / max_depth)
+            wd = base_wd * max(0.0, 1.0 - frac)
+            groups.append(dict(
+                params=params, weight_decay=wd,
+                layer_name=f"{block_attr}[{k}]",
+            ))
+    else:
+        all_groups = _named_layer_groups(model)
+        K = len(all_groups)
+        max_depth = max(1, K - 1)
+        for k, (name, params) in enumerate(all_groups):
+            frac = depth_factor * (k / max_depth)
+            wd = base_wd * max(0.0, 1.0 - frac)
+            groups.append(dict(
+                params=params, weight_decay=wd, layer_name=name,
+            ))
+    if not groups:
+        raise RuntimeError(
+            "linear_decay_param_groups produced no groups -- "
+            "model has no learnable parameters"
+        )
+    return groups
+
+
 class GoldenRegularizer:
     """Apply φ-decay weight-decay to an existing optimiser's groups.
 

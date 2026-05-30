@@ -28,6 +28,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 from nature_inspired_networks.phi_decay import (  # noqa: E402
     GoldenRegularizer,
     build_phi_decay_param_groups,
+    linear_decay_param_groups,
+    phi_decay_param_groups,
 )
 from nature_inspired_networks.priors import PHI  # noqa: E402
 
@@ -181,6 +183,103 @@ def test_golden_regularizer_rejects_empty_optimizer():
     except ValueError:
         return
     raise AssertionError("expected ValueError on empty param_groups")
+
+
+def test_linear_decay_param_groups_strictly_decreasing_wd():
+    """Control 1: linear_decay schedule must be strictly decreasing
+    when depth_factor > 0 (no plateau, no zig-zag)."""
+    model = _toy_model()
+    groups = linear_decay_param_groups(
+        model, base_wd=1e-2, depth_factor=1.0, block_attr="blocks",
+    )
+    block_wds = [g["weight_decay"] for g in groups
+                 if g["layer_name"].startswith("blocks[")]
+    for a, b in zip(block_wds[:-1], block_wds[1:]):
+        assert b < a, f"linear schedule must be strictly decreasing: {a} -> {b}"
+    # First block: full base_wd; last block: 0 at depth_factor=1.0.
+    assert abs(block_wds[0] - 1e-2) < 1e-12
+    assert abs(block_wds[-1] - 0.0) < 1e-12
+
+
+def test_linear_decay_param_groups_first_group_equals_base_wd():
+    """Layer 0 of the linear schedule must receive exactly base_wd
+    regardless of depth_factor (the ramp starts at base_wd)."""
+    model = _toy_model()
+    for df in (0.1, 0.5, 0.9, 1.0):
+        groups = linear_decay_param_groups(
+            model, base_wd=2e-3, depth_factor=df, block_attr="blocks",
+        )
+        block_groups = [g for g in groups
+                         if g["layer_name"].startswith("blocks[")]
+        assert abs(block_groups[0]["weight_decay"] - 2e-3) < 1e-12, (
+            df, block_groups[0]["weight_decay"]
+        )
+
+
+def test_linear_decay_param_groups_iso_total_wd_to_phi_decay_at_matched_total():
+    """Iso-WD-budget invariant: by choosing ``base_wd`` for the linear
+    schedule the total weight-decay over the block stack can be matched
+    to the φ-decay total to within 5 %. This makes Control 1's
+    linear-wd row a clean iso-total-wd comparison vs ``phi_decay_wd``.
+
+    The analytic solve is exact: under linear decay with
+    ``depth_factor = df`` and K blocks, the per-block sum is
+    ``base_lin · K · (1 - df / 2)`` (closed form). Set this equal to
+    ``base_phi · sum_{k=0}^{K-1} φ^{-k}`` and solve for ``base_lin``.
+    """
+    model = _toy_model()
+    base_phi = 1e-2
+    phi_groups = phi_decay_param_groups(model, base_wd=base_phi,
+                                        block_attr="blocks")
+    phi_block_wds = [g["weight_decay"] for g in phi_groups
+                      if g["layer_name"].startswith("blocks[")]
+    phi_total = sum(phi_block_wds)
+    K = len(phi_block_wds)
+    # Linear schedule sum (closed form):
+    #   sum_{k=0}^{K-1} base * (1 - df * k / (K-1)) = base * K * (1 - df/2)
+    df = 0.5  # Control 1 spec uses depth_factor=0.5; lin sum = base*K*0.75.
+    target_base_lin = phi_total / (K * (1.0 - df / 2.0))
+    lin_groups = linear_decay_param_groups(
+        model, base_wd=target_base_lin,
+        depth_factor=df, block_attr="blocks",
+    )
+    lin_block_wds = [g["weight_decay"] for g in lin_groups
+                      if g["layer_name"].startswith("blocks[")]
+    lin_total = sum(lin_block_wds)
+    rel_err = abs(lin_total - phi_total) / phi_total
+    assert rel_err < 0.05, (
+        f"iso-total: linear={lin_total:.6f}, phi={phi_total:.6f}, "
+        f"rel_err={rel_err:.4f}, base_lin={target_base_lin:.6f}, df={df}"
+    )
+
+
+def test_linear_decay_covers_all_params_no_duplicates():
+    """Every learnable parameter appears in exactly one group --
+    mirrors the φ-decay coverage invariant."""
+    model = _toy_model()
+    groups = linear_decay_param_groups(
+        model, base_wd=1e-2, depth_factor=0.5, block_attr="blocks",
+    )
+    all_ids: list[int] = []
+    for g in groups:
+        all_ids.extend(id(p) for p in g["params"])
+    expected = {id(p) for p in model.parameters() if p.requires_grad}
+    assert set(all_ids) == expected, "param coverage mismatch"
+    assert len(all_ids) == len(set(all_ids)), "duplicate param across groups"
+
+
+def test_linear_decay_rejects_invalid_depth_factor():
+    """depth_factor outside [0, 1] is a hard error (Rule 7)."""
+    model = _toy_model()
+    for bad in (-0.1, 1.5, 2.0):
+        try:
+            linear_decay_param_groups(model, base_wd=1e-2,
+                                       depth_factor=bad)
+        except ValueError:
+            continue
+        raise AssertionError(
+            f"expected ValueError on depth_factor={bad}"
+        )
 
 
 def test_phi_decay_rejects_negative_base_wd():

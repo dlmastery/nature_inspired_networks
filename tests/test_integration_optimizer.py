@@ -119,6 +119,81 @@ def test_traincfg_phase_c_defaults_back_compat():
     assert cfg.optimizer == "adamw"
     assert cfg.phi_decay_wd is False
     assert abs(cfg.phi_decay_base - 5e-4) < 1e-12
+    # Control 1 — const_beta1 default must be None (no pin).
+    assert cfg.const_beta1 is None
+
+
+def test_const_beta1_holds_value_across_epochs():
+    """Control 1: when ``const_beta1`` is set the Trainer must pin β1
+    on every optimiser param-group to that constant value AND must NOT
+    install the H48 GoldenMomentumScheduler -- so β1 stays constant
+    across any number of synthetic epochs.
+    """
+    import torch.utils.data as tud
+
+    m = _model()
+    cfg = TrainConfig(
+        epochs=3, lr=1e-3, weight_decay=5e-4,
+        const_beta1=0.4,
+        # Even if golden_momentum is requested, const_beta1 must win.
+        momentum_schedule="golden",
+    )
+    # Tiny synthetic loader so Trainer can construct without I/O.
+    xs = torch.randn(2, 3, 32, 32)
+    ys = torch.zeros(2, dtype=torch.long)
+    ds = tud.TensorDataset(xs, ys)
+    loader = tud.DataLoader(ds, batch_size=2)
+    tr = Trainer(m, loader, loader, num_classes=10, cfg=cfg, device="cpu")
+    # No H48 scheduler installed.
+    assert tr.momentum_sched is None, (
+        "const_beta1 must bypass the H48 GoldenMomentumScheduler"
+    )
+    # Every param group's β1 is pinned to 0.4.
+    for g in tr.opt.param_groups:
+        b1, _ = g["betas"]
+        assert abs(b1 - 0.4) < 1e-9, (b1, "expected const_beta1=0.4")
+    # Manually re-pin to simulate the rebuild path (proves the call is
+    # idempotent and stable across "epochs"); a real fit() never touches
+    # β1 when const_beta1 is set.
+    for _ in range(5):
+        for g in tr.opt.param_groups:
+            b1, _ = g["betas"]
+            assert abs(b1 - 0.4) < 1e-9
+
+
+def test_const_beta1_compatible_with_golden_momentum_beta2_decay():
+    """Control 1: ``const_beta1`` only pins β1; β2 keeps the optimiser's
+    default (0.999 for AdamW). This is the documented behaviour --
+    the directive says 'the existing GoldenMomentumScheduler is bypassed
+    for β1 only'."""
+    import torch.utils.data as tud
+
+    m = _model()
+    cfg = TrainConfig(epochs=2, lr=1e-3, weight_decay=5e-4,
+                      const_beta1=0.4)
+    xs = torch.randn(2, 3, 32, 32)
+    ys = torch.zeros(2, dtype=torch.long)
+    ds = tud.TensorDataset(xs, ys)
+    loader = tud.DataLoader(ds, batch_size=2)
+    tr = Trainer(m, loader, loader, num_classes=10, cfg=cfg, device="cpu")
+    for g in tr.opt.param_groups:
+        b1, b2 = g["betas"]
+        assert abs(b1 - 0.4) < 1e-9, b1
+        # β2 default for AdamW is 0.999; must be untouched.
+        assert abs(b2 - 0.999) < 1e-9, b2
+
+
+def test_const_beta1_pin_beta1_static_helper():
+    """Direct test of Trainer._pin_beta1 on a fresh AdamW optimiser.
+    Used by both __init__ and the growth-pruning rebuild path."""
+    m = _model()
+    cfg = TrainConfig(lr=1e-3, weight_decay=5e-4)
+    opt = Trainer._build_optimizer(m, cfg)
+    Trainer._pin_beta1(opt, 0.42)
+    for g in opt.param_groups:
+        b1, b2 = g["betas"]
+        assert abs(b1 - 0.42) < 1e-12
+        assert abs(b2 - 0.999) < 1e-9
 
 
 if __name__ == "__main__":

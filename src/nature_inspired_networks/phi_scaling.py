@@ -35,7 +35,7 @@ References (Citation Rigor):
 """
 from __future__ import annotations
 
-from typing import Sequence
+from typing import Literal, Sequence
 
 import torch
 import torch.nn as nn
@@ -307,10 +307,67 @@ def _stage_param_cost(c_prev: int, c_out: int, blocks_per_stage: int,
     return total
 
 
+def _uniform_budget_widths(B_total: int, n_stages: int,
+                            kernel: int = 3,
+                            blocks_per_stage: int = 2) -> list[int]:
+    """Derive an equal-width-per-stage allocator under an iso-params budget.
+
+    Used by ``phi_budget_widths(..., budget_mode='uniform')`` for the
+    reviewer-flagged Control 1 (non-φ 3-axis stack). The allocator
+    searches a single integer width ``c`` shared by every stage such
+    that the realised total params (stem + n_stages × stage_cost + fc)
+    are within +/- 15 % of ``B_total``, then prefers the ``c`` that
+    minimises absolute drift. The returned list is ``[c] * n_stages``.
+
+    The uniform-width allocator is the non-φ analog of
+    :func:`phi_budget_widths` (φ-mode) used to defend the φ-content of
+    the H09 ``phi_budget`` mechanism: with this branch and the same
+    ``B_total``/``n_stages`` the only delta between the two rows is the
+    per-stage width ratio.
+    """
+    if B_total <= 0 or n_stages <= 0:
+        raise ValueError("B_total and n_stages must be positive")
+    denom_factor = 2.0 * float(blocks_per_stage) * float(kernel * kernel)
+    # Crude initial guess: invert the per-block conv cost.
+    c_guess = max(8, int((B_total / (denom_factor * n_stages)) ** 0.5))
+    w_max = max(64, c_guess * 3 + 32)
+
+    best: tuple[float, int, int] | None = None
+    for c in range(8, w_max + 1):
+        sp = []
+        c_prev = c  # uniform: all stages have width c; transition cost equals
+        for k in range(n_stages):
+            stride = 1 if k == 0 else 2
+            spk = _stage_param_cost(c_prev, c, blocks_per_stage, stride, kernel)
+            sp.append(spk)
+            c_prev = c
+        stem = 3 * c * kernel * kernel + 2 * c
+        fc = c * 10 + 10  # rough; matches phi-mode's guidance estimate.
+        total_full = sum(sp) + stem + fc
+        drift = abs(total_full - B_total) / B_total
+        if best is None or drift < best[0]:
+            best = (drift, c, total_full)
+        if total_full > B_total * 1.5:
+            break
+    if best is None:
+        # Should not happen for reasonable budgets — fallback to crude guess.
+        return [c_guess] * n_stages
+    return [best[1]] * n_stages
+
+
 def phi_budget_widths(B_total: int, n_stages: int, c_in: int = 3,
-                      kernel: int = 3, blocks_per_stage: int = 2) -> list[int]:
-    """Derive per-stage channel widths so REALIZED per-stage params follow
-    the 1 : phi : phi**2 : ... ratio (H09 mechanism).
+                      kernel: int = 3, blocks_per_stage: int = 2,
+                      budget_mode: Literal["phi", "uniform"] = "phi") -> list[int]:
+    """Derive per-stage channel widths under an iso-parameter budget.
+
+    Two modes:
+
+    - ``budget_mode='phi'`` (default, H09 mechanism) — realised per-stage
+      params follow the 1 : φ : φ² : ... ratio.
+    - ``budget_mode='uniform'`` (Control 1, reviewer-flagged) — every
+      stage gets the SAME width ``c`` such that the realised total
+      params stay within +/- 15 % of ``B_total``. This is the non-φ
+      analog used to defend the φ-content of ``pair_gm_pdw``.
 
     Fix (audit 2026-05-27 -- the headline-defending finding): the previous
     implementation used the closed-form approximation
@@ -345,6 +402,15 @@ def phi_budget_widths(B_total: int, n_stages: int, c_in: int = 3,
     """
     if B_total <= 0 or n_stages <= 0:
         raise ValueError("B_total and n_stages must be positive")
+    if budget_mode == "uniform":
+        return _uniform_budget_widths(
+            B_total, n_stages, kernel=kernel,
+            blocks_per_stage=blocks_per_stage,
+        )
+    if budget_mode != "phi":
+        raise ValueError(
+            f"budget_mode must be 'phi' or 'uniform', got {budget_mode!r}"
+        )
     target_ratios = [PHI ** k for k in range(n_stages)]
     # Crude upper bound: stage-0 width <= sqrt(B_total / (2 * blocks * k^2))
     denom_factor = 2.0 * float(blocks_per_stage) * float(kernel * kernel)
@@ -444,16 +510,11 @@ class PhiBudgetNet(nn.Module):
         self.budget_mode = budget_mode
         self.B_total = B_total
         self.n_stages = n_stages
-        if budget_mode == "phi":
-            widths = phi_budget_widths(B_total, n_stages,
-                                       blocks_per_stage=blocks_per_stage)
-        else:
-            per = B_total // n_stages
-            widths = []
-            denom_factor = 2.0 * float(blocks_per_stage) * 9.0
-            for _ in range(n_stages):
-                c_sq = max(64.0, per / denom_factor)
-                widths.append(_round8(int(round(c_sq ** 0.5))))
+        widths = phi_budget_widths(
+            B_total, n_stages,
+            blocks_per_stage=blocks_per_stage,
+            budget_mode=budget_mode,
+        )
         self.widths = widths
         self.stem = nn.Sequential(
             nn.Conv2d(3, widths[0], 3, padding=1, bias=False),

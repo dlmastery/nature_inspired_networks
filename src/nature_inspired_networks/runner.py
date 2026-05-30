@@ -251,6 +251,9 @@ def run_one(cfg: dict, tag: str, seed: int, root: str = "experiments") -> Path:
         prune_length=int(cfg.get("prune_length", 5)),
         momentum_schedule=str(cfg.get("momentum_schedule", "")),
         fib_ensemble=cfg.get("fib_ensemble", None),
+        # Control 1 (reviewer-flagged) — pin β1 to a constant value,
+        # bypassing the H48 schedule. None preserves legacy behaviour.
+        const_beta1=cfg.get("const_beta1", None),
     )
     tr = Trainer(model, tr_loader, te_loader, n_cls, train_cfg, device=device)
     fit_info = tr.fit()

@@ -53,6 +53,14 @@ class TrainConfig:
     prune_length: int = 5
     momentum_schedule: str = ""
     fib_ensemble: object = None  # dict {enabled: bool, K: int} or None
+    # Control 1 (reviewer-flagged, non-φ 3-axis stack) — hold β1 at a
+    # constant value across training. When set, the GoldenMomentumScheduler
+    # is bypassed (or never installed) so β1 stays at ``const_beta1`` and
+    # only β2 follows the default optimiser path. The kwarg replaces H48
+    # for ``pair_nonphi_3axis``: const_beta1=0.4 (close to H48's terminal
+    # 1/φ² ≈ 0.382) with NO schedule. Default None preserves legacy
+    # behaviour byte-for-byte.
+    const_beta1: float | None = None
     # H64 — Dynamic Growth + Pruning schedule. When True, the Trainer
     # invokes ``GrowthPruningSchedule.step(epoch, model)`` at the end of
     # each epoch. The pre-constructed schedule object is attached via
@@ -95,8 +103,17 @@ class Trainer:
         # H48 — optional golden-momentum scheduler that decays beta1 once
         # per epoch. Constructed AFTER the optimizer so the override
         # respects the optimizer family detected by GoldenMomentumScheduler.
+        #
+        # Control 1 (reviewer-flagged): ``const_beta1`` short-circuits the
+        # momentum schedule entirely. When set, β1 is pinned to the
+        # constant value on every param-group and the H48 scheduler is
+        # NEVER installed, so the trainer never re-writes β1 across
+        # epochs. β2 keeps the optimiser's default (0.999 for AdamW).
         self.momentum_sched = None
-        if (getattr(self.cfg, "momentum_schedule", "") or "").lower() in (
+        const_b1 = getattr(self.cfg, "const_beta1", None)
+        if const_b1 is not None:
+            self._pin_beta1(self.opt, float(const_b1))
+        elif (getattr(self.cfg, "momentum_schedule", "") or "").lower() in (
             "golden", "phi", "golden_momentum",
         ):
             from .schedulers import GoldenMomentumScheduler
@@ -151,6 +168,22 @@ class Trainer:
                 )
             self.growth_pruning_schedule = obj
             self._growth_pruning_step_calls = 0
+
+    @staticmethod
+    def _pin_beta1(opt: torch.optim.Optimizer, value: float) -> None:
+        """Pin β1 (Adam-family) or momentum (SGD) to ``value`` on every
+        param_group. Used by ``const_beta1`` to bypass the H48 schedule.
+
+        Re-applied at construction time; because the H48 scheduler is
+        also NOT installed when ``const_beta1`` is set, β1 then stays at
+        ``value`` throughout training (no per-epoch overwrite).
+        """
+        for g in opt.param_groups:
+            if "betas" in g:
+                _, b2 = g["betas"]
+                g["betas"] = (float(value), b2)
+            elif "momentum" in g:
+                g["momentum"] = float(value)
 
     @staticmethod
     def _build_optimizer(model: nn.Module, cfg: "TrainConfig") -> torch.optim.Optimizer:
@@ -265,6 +298,12 @@ class Trainer:
                     self.opt = self._build_optimizer(self.model, self.cfg)
                     # Rebuild the LR scheduler too so it tracks the new opt.
                     self.sched = _build_scheduler(self.opt, self.cfg)
+                    # Re-apply const_beta1 pin on the rebuilt optimizer
+                    # (Control 1 — bypasses any default β1 from the
+                    # newly constructed optimizer).
+                    _cb1 = getattr(self.cfg, "const_beta1", None)
+                    if _cb1 is not None:
+                        self._pin_beta1(self.opt, float(_cb1))
             tr_loss = sum(losses) / len(losses)
             tr_acc = sum(accs) / len(accs)
             train_top1_final = tr_acc
