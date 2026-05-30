@@ -1,0 +1,18 @@
+{
+  "tag": "sg_only_phi_budget",
+  "dataset": "cifar100",
+  "seed": 3,
+  "epochs": 30,
+  "top1": 0.5785,
+  "top5": 0.8561,
+  "params": 267658,
+  "flops": 80816212.0,
+  "latency_ms": 3.6922159997629933,
+  "rot_eq_err": 0.4112250755230586,
+  "composite": 0.5787566335790041,
+  "composite_fingerprint": "d65565e9c7b12d14cbce30a801ecc6753aea3eb148074256bfcc051fa61d0893",
+  "epochs_to_target": -1,
+  "train_seconds": 874.9599860000017,
+  "train_top1": 0.6483373397435898,
+  "generalization_gap": 0.06983733974358974
+}
