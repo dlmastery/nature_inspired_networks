@@ -191,4 +191,26 @@ The 81-hypothesis audit produced no NOVEL+TESTABLE-AND-impl-PASS pair (H71 is NO
 
 ---
 
+## Appendix — 2026-05-29 PM update: Phase-9 n=7 certification landed
+
+The "open work" items above are now resolved as follows. The empirical-rigor row of the 16 + 4 reviewer-pass status table (item: "statistical unsupport on Phase-8 numbers") moves from **MAJOR (open)** to **RESOLVED**.
+
+| status row | prior verdict | 2026-05-29 PM verdict |
+|---|---|---|
+| Phase-8 winners n=3 → n=7 extension | OPEN | **DONE** — seeds 3,4,5,6 added on CIFAR-100 30-ep for `pair_gm_pdw`, `slot_act_sine`, `sg_only_phi_budget`, plus `baseline_resnet20` rail. |
+| Paired Wilcoxon at α=0.05 | FAILS (n=3 floor 0.125) | **CLEARS** — exact one-sided p=(1/2)^7=0.0078 for each winner (7/7 positive deltas). |
+| Holm-Bonferroni α'=0.05/3=0.0167 across k=3 family | FAILS | **CLEARS** — 0.0078 < 0.0167; step-down monotonicity holds for second + third tests. |
+| Bootstrap 95% CI on Δmean (excludes 0?) | excluded with comfortable margin (n=3) | **excluded with tighter margin (n=7), CI width ≈ half** |
+| Phase-5 ordinal-gate α=(1/2)^n | 0.125 (n=3, looser than 0.05) | **0.0078 (n=7, stricter than 0.05) — gate now more stringent than NeurIPS α** |
+| Empirical-rigor row of reviewer-pass status table | MAJOR (open) | **RESOLVED** |
+| Promotion under CLAUDE.md Rule 28 | n/a (still SCREENING) | **SCREENING → EVALUATION** for all three winners |
+
+Per [`paper/STATISTICAL_TESTS.md`](STATISTICAL_TESTS.md) §0 (promotion banner) and §1 (per-claim CERTIFIED rows): the three Phase-8 winners are the project's first formally-certified empirical claims at NeurIPS-standard α. The remaining open items (Phase-9a hill-climb at converged budget, tuned-RegNet head-to-head, non-φ 3-axis control) remain open and do not block the n=7 certification at the screening compute budget.
+
+---
+
+*Appendix added 2026-05-29 PM. Original audit-summary body above is preserved verbatim for archival completeness.*
+
+---
+
 *Generated 2026-05-27. References: `audits/G{1..8}_audit.md`, addenda in `hypotheses/g{1..8}_*/H*.md`, commits 519cdf3 · 253dc94 · afac553 · 3efd2dd · c395769+5f09814 · 8aa0430 · 16fe2b6 · 2e7ee45.*

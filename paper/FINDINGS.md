@@ -1,6 +1,39 @@
 ﻿# FINDINGS — nature_inspired_networks curated CIFAR-10 sweep (seed 0, 12 epochs)
 
-> ## ✅ PHASE-8 FINAL VERDICT (2026-05-29) — THREE replicated cross-dataset positives
+> ## 🏆 2026-05-29 PM PROMOTION — Phase-8 winners → EVALUATION tier (CERTIFIED at α=0.05 Holm-Bonferroni, n=7)
+>
+> The Phase-8 family was extended from n=3 to **n=7 seeds** on CIFAR-100
+> 30-ep. All three winners produced 7/7 positive paired deltas against
+> baseline, yielding paired Wilcoxon W=0 with exact one-sided p=(1/2)^7
+> = **0.0078** — below the Holm-Bonferroni-corrected per-test α'=0.05/3
+> = 0.0167 demanded for the k=3 simultaneous-test family. **All three
+> winners CLEAR α=0.05 under Holm-Bonferroni step-down.**
+>
+> | tag | C100 mean (n=7) | Δmean | 95% bootstrap CI | Wilcoxon p | Holm cleared? |
+> |---|---:|---:|---:|---:|:---:|
+> | `pair_gm_pdw` (H09+H48+H44) | **0.5786** | **+1.74 pp** | [+1.42, +2.09] pp | 0.0078 | **YES** |
+> | `slot_act_sine` (H81 SIREN) | **0.5790** | **+1.78 pp** | [+1.38, +2.18] pp | 0.0078 | **YES** |
+> | `sg_only_phi_budget` (H09 post-fix) | **0.5736** | **+1.24 pp** | [+0.84, +1.67] pp | 0.0078 | **YES** |
+> | `baseline_resnet20` (rail, n=7) | 0.5612 | — | — | — | — |
+>
+> Per CLAUDE.md [Rule 28](../CLAUDE.md#rule-28), the three winners are
+> **PROMOTED from SCREENING to EVALUATION tier** on 2026-05-29 PM. These
+> are the project's **first formally-certified empirical claims at
+> NeurIPS-standard α=0.05**.
+>
+> **Honest caveat (preserved):** 12-ep CIFAR-10 and 30-ep CIFAR-100 are
+> still NOT the convergence regime. The certification holds AT THIS
+> COMPUTE BUDGET. Whether the lift survives at the literature-canonical
+> 164-ep training + tuned RegNetX-200MF baseline (Phase-9a hill-climb)
+> is open. The case-study framing of PAPER.md §5.5 is unchanged: the
+> protocol's screen + n=7 evaluation surfaced three candidates that
+> pass formal rigor at the screening budget; the φ-content vs
+> any-three-orthogonal-axes attribution question remains.
+>
+> Full per-claim certification table + Holm step-down derivation:
+> [`paper/STATISTICAL_TESTS.md`](STATISTICAL_TESTS.md) §0–§3.
+
+> ## ✅ PHASE-8 FINAL VERDICT (2026-05-29 AM, n=3) — THREE replicated cross-dataset positives (now superseded by n=7 certification above)
 >
 > The audit + Fixer + post-fix re-run + 3-seed CIFAR-100 graduation cycle
 > is complete. **Three independent hypotheses cleared the worst-leader-seed
@@ -18,7 +51,10 @@
 > ~0.6 pp LOWER than the pre-fix broken-architecture median (58.05 %),
 > which is exactly what an honest audit predicts — the broken realised
 > ratio happened to land a fortuitously-high seed-0 number. The corrected
-> mechanism gives a more modest but statistically robust lead.
+> mechanism gives a more modest but statistically robust lead. *The
+> 2026-05-29 PM n=7 extension subsequently elevates this from
+> "screening-gate pass" to "formally certified at α=0.05 Holm-Bonferroni"
+> — see the PROMOTION block above.*
 >
 > **The dual-track audit RATIFIED, not destroyed, the project**:
 > - the audit caught a headline produced by broken code BEFORE publication
@@ -95,9 +131,10 @@
 > gate on CIFAR-100.
 >
 > The **only hypothesis-level claims that survive this distinction
-> today are the three Phase-8 winners**, each of which IS 3-seed
-> CIFAR-100 evaluated and satisfies the Phase-5 gate:
-> `pair_gm_pdw`, `slot_act_sine`, `sg_only_phi_budget` (post-fix).
+> today are the three Phase-8 winners**, each of which IS **n=7
+> CIFAR-100 evaluated and CERTIFIED at α=0.05 Holm-Bonferroni**
+> (2026-05-29 PM promotion): `pair_gm_pdw`, `slot_act_sine`,
+> `sg_only_phi_budget` (post-fix). Verdict tier: **CERTIFIED, n=7**.
 > Every other hypothesis-level statement in this document — including
 > "H41 falsified", "H42 PAPER_DISAGREES", "H44 borderline", "H50
 > catastrophic", "H47/H48 WRONG_TEST", etc. — is reclassified as

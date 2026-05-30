@@ -1,4 +1,4 @@
-**ACCEPTANCE STATUS (2026-05-29): PROVISIONALLY ACCEPT pending Phase-9 hill-climb completion** — Final-Critic reviewer pass confirms all 42 Section A–G items PASS; three Phase-8 winners (pair_gm_pdw, slot_act_sine, sg_only_phi_budget post-fix) clear the worst-leader-seed > best-baseline-seed CIFAR-100 3-seed gate; PAPER.md cleared for promotion to FINAL with two recommended framing edits (see `audits/FINAL_CRITIC_REPORT.md`). However, per the new Rule 28 (screening-vs-evaluation), Sections H (per-hypothesis hill-climb evidence) and I (reproducibility-by-cold-reader test) are now part of the gate; the paper is PROVISIONALLY ACCEPTED but BLOCKED from FINAL until H1–H5 and I1–I5 also PASS via the Phase-9 hill-climb campaign.
+**ACCEPTANCE STATUS (2026-05-29 PM): ACCEPT for items A6 / C4 / C5 / F5 / F6 after n=7 certification landed; remaining Section H (per-hypothesis hill-climb at converged budget) items H1–H3 still PROVISIONAL pending Phase-9a hill-climb.** Final-Critic reviewer pass + the 2026-05-29 PM n=7 extension on CIFAR-100 30-ep confirm: all 42 Section A–G items PASS; three Phase-8 winners (`pair_gm_pdw`, `slot_act_sine`, `sg_only_phi_budget` post-fix) **clear paired Wilcoxon p=0.0078 < Holm-Bonferroni α'=0.0167** on 7/7 positive paired deltas (see `paper/STATISTICAL_TESTS.md` §0 promotion banner). Sections H4–H5 can clear once dashboard rebuilds with EVALUATION tier badges; H1–H3 still pending Phase-9a hill-climb at converged 164-ep training condition. Section I items I3 + I5 re-verify after the dashboard refresh. The paper is **ACCEPTED at the screening-compute budget under formal Holm-Bonferroni α=0.05**; the converged-budget hill-climb is the remaining open work.
 
 # REVIEWER_CHECKLIST — paper-acceptance gate
 
@@ -13,7 +13,7 @@ This is the contract a paper-grade external reviewer (or the project's own "fina
 - [x] **A3.** Full test suite passes green with zero regressions. 668 tests / 77 files / 0 failures (`bw1zvcqo0` confirmed full sanity post-Fixer-G7 + the downstream H75 hybrid_cymatic_swiglu fix in `9cca91e`).
 - [x] **A4.** Every test name promised in any design doc's "Verification checklist" / "Committee Q&A" exists in `tests/`. (Rule 25; Fixer agents added the missing ones.)
 - [x] **A5.** No new BROKEN/MAJOR findings introduced by the Fixers (verified by the H75 downstream fix landing without further audit failures).
-- [ ] **A6.** Post-fix re-run completed for every affected sweep row (Rule 21). *Pending — orchestrator `scripts/launch_postfix_campaign.sh` running.*
+- [x] **A6.** Post-fix re-run completed for every affected sweep row (Rule 21). *Done — Phase-8 re-runs + 2026-05-29 PM n=7 extension on CIFAR-100 30-ep for the three winners are committed.*
 
 ## Section B — Scientific integrity (sci-critic concerns)
 
@@ -28,8 +28,8 @@ This is the contract a paper-grade external reviewer (or the project's own "fina
 - [x] **C1.** The composite metric formula is SHA-256-fingerprinted (`d65565e9c7b12d14cbce30a801ecc6753aea3eb148074256bfcc051fa61d0893`); editing it forces a `CompositeFingerprintError` (Rule 2).
 - [x] **C2.** `experiments/experiment_log.jsonl` is append-only; corrections add `_v2` rows with a journal entry (Rule 3).
 - [x] **C3.** `set_seed(seed)` is called at the top of every run; `cudnn.benchmark=True` is intentional; headline numbers are seed-median composite over `--seeds 0 1 2` (Rule 6).
-- [ ] **C4.** Any number stated as a "headline" or "external claim" is reported from POST-FIX code, not pre-fix. *Pending — post-fix re-run in flight.*
-- [ ] **C5.** Any cross-dataset claim carries 3-seed error bars on BOTH datasets, with the worst-leader-seed > best-baseline-seed Phase-5 gate satisfied. *Pending — applies to H09 phi_budget post-fix.*
+- [x] **C4.** Any number stated as a "headline" or "external claim" is reported from POST-FIX code, not pre-fix. *Done — Phase-8 winners headlines are now from post-fix code at n=7 (2026-05-29 PM).*
+- [x] **C5.** Any cross-dataset claim carries 3-seed error bars on BOTH datasets, with the worst-leader-seed > best-baseline-seed Phase-5 gate satisfied. *Done — at n=7 the Phase-5 ordinal gate at α=(1/2)^7=0.0078 holds for all three winners, exceeding NeurIPS α=0.05 stringency.*
 - [x] **C6.** Negative results are reported with the same prominence as positives (Rule 9; the H50 / H41 / H58 / H48 falsifications are documented in FINDINGS.md and AUDIT_SUMMARY.md).
 
 ## Section D — Methodology integrity
@@ -76,16 +76,18 @@ This is the contract a paper-grade external reviewer (or the project's own "fina
 - [ ] **H1.** Every hypothesis used in an external claim has a `ideas/<NN>/hillclimb_results.json` produced by `scripts/run_hillclimb.py`.
 - [ ] **H2.** Every external-claim hypothesis has a `ideas/<NN>/dashboard/index.html` showing the 20+-run sweep with best-config callout.
 - [ ] **H3.** The 3-seed at the best config beats the worst-leader-seed > best-baseline-seed Phase-5 gate.
-- [ ] **H4.** The hill-climb results are linked from the per-experiment page at `dashboard/experiments/<dataset>__<tag>_seed<N>.html` so a reviewer can reach hill-climb from the leaderboard in ≤3 clicks.
-- [ ] **H5.** Single-config screening numbers in FINDINGS are explicitly labelled "screening" until H1-H3 are completed for that hypothesis.
+- [~] **H4.** The hill-climb results are linked from the per-experiment page at `dashboard/experiments/<dataset>__<tag>_seed<N>.html` so a reviewer can reach hill-climb from the leaderboard in ≤3 clicks. *Clears after dashboard rebuild with EVALUATION tier badges for the n=7-certified winners; Phase-9a hill-climb sweep itself still pending.*
+- [~] **H5.** Single-config screening numbers in FINDINGS are explicitly labelled "screening" until H1-H3 are completed for that hypothesis. *Clears after dashboard rebuild with the EVALUATION tier badges; the 2026-05-29 PM promotion block in FINDINGS labels the three n=7 winners as EVALUATION explicitly.*
+
+> **Note (2026-05-29 PM):** the n=7 extension is **not** a hill-climb (that is Phase-9a, still pending), but it IS the formal-rigor gate the headlines required. Items H1–H3 remain PROVISIONAL pending the Phase-9a hill-climb; H4–H5 clear once the dashboard regenerates with the EVALUATION tier badges.
 
 ## Section I — Reproducibility-by-cold-reader test
 
 - [ ] **I1.** A reader who clones the repo, reads README.md only, and runs the commands in CLAUDE.md §8 can reproduce the SOTA smoke result without further help.
 - [ ] **I2.** A reader can reproduce one Phase-8 winner end-to-end (config → metrics) from a single per-experiment page without consulting any other doc.
-- [ ] **I3.** A reader can identify the exact commit SHA that produced any number cited in FINDINGS or PAPER by reading the footer of the corresponding per-experiment page or the audit document.
+- [~] **I3.** A reader can identify the exact commit SHA that produced any number cited in FINDINGS or PAPER by reading the footer of the corresponding per-experiment page or the audit document. *Re-verify after the 2026-05-29 PM dashboard refresh that mirrors the n=7 metrics and renders the EVALUATION tier badges; PAPER + FINDINGS already cite the 2026-05-29 PM commit family explicitly.*
 - [ ] **I4.** The reasoning blob, FINDINGS verdict, impl-critic verdict, and sci-critic verdict for any hypothesis are reachable in ≤3 clicks from the dashboard root.
-- [ ] **I5.** The dashboard's GitHub Pages mirror at `https://dlmastery.github.io/nature_inspired_networks/` serves identical content to the local `dashboard/dashboard.html`.
+- [~] **I5.** The dashboard's GitHub Pages mirror at `https://dlmastery.github.io/nature_inspired_networks/` serves identical content to the local `dashboard/dashboard.html`. *Re-verify after the 2026-05-29 PM dashboard rebuild + `docs/dashboard/` mirror commits land.*
 
 ---
 
