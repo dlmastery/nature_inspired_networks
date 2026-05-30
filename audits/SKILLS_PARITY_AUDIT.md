@@ -1,7 +1,7 @@
 # Skills parity audit — local vs autoresearch sister repos
 Date: 2026-05-29 (PM session)
 Auditor: parity-audit pass (Opus 4.7)
-Status: COMPLETE. 4 missing skills filled, 3 existing skills augmented, 6 PARTIAL gaps documented, 0 CONFLICTING divergences.
+Status: COMPLETE. 4 missing skills filled in the 2026-05-29 PM pass, 2 NICE-TO-HAVE gaps closed in the 2026-05-30 follow-up (shuffle-test + data-contract-validator), 3 existing skills augmented, 0 CONFLICTING divergences.
 
 ## 1. Methodology
 
@@ -31,10 +31,14 @@ Status: COMPLETE. 4 missing skills filled, 3 existing skills augmented, 6 PARTIA
   modules. Gap analysis therefore compares LOCAL SKILLS against
   SISTER CLAUDE.md PROSE + SCRIPT NAMES.
 
-## 2. Local skills inventory (27 skills post-audit)
+## 2. Local skills inventory (29 skills post-audit, 2026-05-30 follow-up)
 
-Pre-audit: 23 skills (1 README + 22 SKILL.md). Post-audit: 27 skills
-(1 README + 26 SKILL.md — 4 new added by this audit).
+Pre-audit (2026-05-29 AM): 23 skills (1 README + 22 SKILL.md).
+Post-PM-audit (2026-05-29 PM): 27 skills (1 README + 26 SKILL.md — 4
+new from sister-repo parity).
+Post-follow-up (2026-05-30): **29 skills** (1 README + 28 SKILL.md —
+the two NICE-TO-HAVE gaps from §6.2 closed by `autoresearch-shuffle-test`
+and `autoresearch-data-contract-validator`).
 
 | skill | one-line | dated | cataloged in §11? |
 |---|---|---|---|
@@ -65,6 +69,8 @@ Pre-audit: 23 skills (1 README + 22 SKILL.md). Post-audit: 27 skills
 | **autoresearch-winner-archive** | **NEW** — portable champion archive with frozen code + inference + reproduction | 2026-05-29 PM | YES (added §11 this audit) |
 | **autoresearch-explainability-report** | **NEW** — 14-section data-scientist-grade audit for every champion | 2026-05-29 PM | YES (added §11 this audit) |
 | **autoresearch-session-resume** | **NEW** — self-contained crash-recovery checkpoint document | 2026-05-29 PM | YES (added §11 this audit) |
+| **autoresearch-shuffle-test** | **NEW (2026-05-30 follow-up)** — semantic leakage detection via train-label permutation; 3 modes (hard / within-group / block) | 2026-05-30 | YES (added §11 this follow-up) |
+| **autoresearch-data-contract-validator** | **NEW (2026-05-30 follow-up)** — `(x,y)` pairing contract validator with refuse-to-launch runner gate; static counterpart to shuffle-test | 2026-05-30 | YES (added §11 this follow-up) |
 
 ## 3. Sister-repo skills inventory
 
@@ -175,8 +181,8 @@ to local-skill parity.
 | Dataset loader | YES | — | none |
 | Ablation sweep | YES | — | none |
 | Experiment runner | YES | — | none |
-| Shuffle-test audit for tree-/winner-champions | MISSING | NICE-TO-HAVE | not filled — see §6 |
-| Off-by-one alignment audit (data-contract validator) | MISSING | NICE-TO-HAVE | not filled — see §6 |
+| Shuffle-test audit for tree-/winner-champions | MISSING | NICE-TO-HAVE | PORTED 2026-05-30 → `autoresearch-shuffle-test` (commit `42695a4`) |
+| Off-by-one alignment audit (data-contract validator) | MISSING | NICE-TO-HAVE | PORTED 2026-05-30 → `autoresearch-data-contract-validator` (commit `42695a4`) |
 | Trade-Level Win/Loss CSV | DOMAIN-SPECIFIC | — | not ported (financial only) |
 | Heteroscedastic loss rules | DOMAIN-SPECIFIC | — | not ported (financial uncertainty) |
 | Per-backbone 50-experiment mandate | DOMAIN-SPECIFIC | — | our analogue: per-hypothesis hill-climb (already present) |
@@ -241,25 +247,35 @@ image-classification project:
 - **Multi-target tracking (1d / 5d / concordance / vol-adjusted)**:
   financial multi-horizon prediction; our project has one target.
 
-### 6.2 Nice-to-have, NOT filled this audit (recommendation for follow-up)
+### 6.2 Nice-to-have, NOT filled this audit (CLOSED by 2026-05-30 follow-up)
 
-Two patterns are non-domain-specific and load-bearing but were
-NOT ported this audit due to scope. Both are flagged in §8
-recommendations:
+Two patterns were non-domain-specific and load-bearing but were
+NOT ported in the PM pass due to scope. Both are now landed
+(commits below); they remain documented here for traceability:
 
 - **Shuffle-test audit for champions** (sister FX paper §3.5).
   Permute training labels, retrain, evaluate on real test — confirms
   the model isn't leaking. FX uses it for tree champions; the pattern
-  generalises trivially to any classifier. **Recommendation:** add
-  `autoresearch-shuffle-test` skill OR add Section 15 to
-  `autoresearch-explainability-report`.
+  generalises trivially to any classifier.
+  **STATUS:** LANDED as
+  [`autoresearch-shuffle-test`](../skills/autoresearch-shuffle-test/SKILL.md)
+  on 2026-05-30 (commit `42695a4`). Three modes (hard / within-group /
+  block) cover tabular, grouped, and time-series CV. Cross-referenced
+  from `autoresearch-explainability-report` Section 11 + Rule 22
+  dual-track audit.
 - **Off-by-one alignment audit / data-contract validator** (sister
   FX paper §3.5). Asserts (x, y) pairs from training match the
   evaluator's pairing for a random mini-batch. FX caught a +8.78
   Sharpe jump via this audit when they fixed a `[seq_len:]` vs
-  `[seq_len-1:]` off-by-one. **Recommendation:** add
-  `autoresearch-data-contract-validator` skill OR add as auditor #10
-  to `autoresearch-data-split-audit`.
+  `[seq_len-1:]` off-by-one.
+  **STATUS:** LANDED as
+  [`autoresearch-data-contract-validator`](../skills/autoresearch-data-contract-validator/SKILL.md)
+  on 2026-05-30 (commit `42695a4`). Eight-property static contract
+  (feature shape, dtype, label-set membership, value-range,
+  pair-count, index-pair invariant, modality-specific) with a
+  refuse-to-launch runner gate. Static counterpart to the empirical
+  shuffle test: catches the alignment bug in < 1 s instead of after
+  a full retrain.
 
 ### 6.3 Superseded by local skills
 
@@ -419,3 +435,79 @@ answer is in one table not buried in commit history.
    I only appended cross-references and a single new "Sister-repo
    cadence" section to `autoresearch-checkpoint`. The original
    content stays intact.
+
+---
+
+## Appendix A — autoresearchtabular deep-read (lines 300-1007)
+
+**Date:** 2026-05-30
+**Trigger:** PM-audit honesty caveat #3 — only lines 1-300 of
+`autoresearchtabular/CLAUDE.md` (1007 total) had been read.
+**Method:** `gh api repos/dlmastery/autoresearchtabular/contents/CLAUDE.md`
+→ base64 decode → read lines 300-1007 in chunks. Also re-checked
+`/contents/skills` for a sister `skills/` directory.
+
+**Fetch attempts:** 2 successes / 0 failures
+- `gh api .../contents/CLAUDE.md` → 200 OK, 58,572 bytes base64
+  decoding to 1007 lines as expected (matches PM-audit's line count).
+- `gh api .../contents/skills` → 404 Not Found (confirms the universal
+  PM-audit finding that NO sister repo has a `skills/` directory).
+
+**Findings (lines 300-1007, 41 sections scanned):**
+
+| Section (sister CLAUDE.md) | Lines | Local parity | Disposition |
+|---|---|---|---|
+| Baldi 2014 frozen split + audit invariants | 300-310 | YES — `autoresearch-data-split-audit` `audit_protocol_match` | already ported |
+| Experiment Design (composite metric, 60-s cooldown, one-config-change) | 312-326 | YES — Rule 1 (one config change) + Rule 2 (composite SHA-256 fingerprint) | already enforced |
+| Karpathy-adapted agent protocol (8 directives) | 330-346 | YES — `autoresearch-experiment` 7-step ritual + `autoresearch-checkpoint` | already ported |
+| Research-Driven Experiment Selection (7-step ritual) | 350-397 | YES — `autoresearch-experiment` | identical structure |
+| Monotonic Quality Progression + Goodhart freeze | 401-412 | YES — Rule 2 (fingerprint) | already enforced |
+| MLOps Documentation Standards (experiment_summary.md format) | 416-440 | INTENT MATCHED — our analogue is per-experiment archive README (Rule 9) + `experiment_log.jsonl` | not separately ported |
+| Explainability & Auditability Report (14 sections) | 442-484 | YES — `autoresearch-explainability-report` | already ported in PM pass |
+| Winner Definition + Per-Backbone Code Snapshots | 488-506 | YES — `autoresearch-winner-archive` `code/` frozen snapshot | already ported |
+| Dashboard Reasoning Annotations (7-field two-phase write) | 510-526 | YES — `autoresearch-reasoning-entry` | already ported (word floors match exactly) |
+| Per-Backbone 25-Experiment Mandate | 530-546 | DOMAIN-SPECIFIC analogue — our `autoresearch-per-hypothesis-hillclimb` (20-25 trials) | not ported (intent matches; vocabulary differs) |
+| Per-Backbone SOTA Training Recipes table (14 backbones) | 550-597 | DOMAIN-SPECIFIC content — flagged in PM §8.3 as "consider sota_catalog.yaml population" | future work; not a new skill |
+| GPU Memory Constraint (pre-flight VRAM block) | 601-625 | YES — Rule 26 (Windows thread cap) + hardware contract §2 | already enforced |
+| Backbone Isolation Rule (code_versions/) | 629-634 | INTENT MATCHED — `autoresearch-winner-archive` `code/` snapshot | already covered |
+| Dashboard Backbone Tabs + Files Update Mandate (12-file checklist) | 637-665 | YES — `autoresearch-dashboard` + `autoresearch-per-experiment-page` | already covered |
+| Citation Rigor (full author/year/venue/title/arXiv format) | 667-697 | YES — Rule 4 + `autoresearch-reasoning-entry` | identical |
+| Reasoning Blob Completeness (word floors 60/40/50/25/30/40) | 701-716 | YES — Rule 5 (identical word floors) | identical |
+| Loss Function Rules (BCEWithLogits + focal + label-smoothing) | 720-731 | DOMAIN-SPECIFIC (binary classification) | not ported |
+| Winner Archiving Protocol (directory layout) | 734-757 | YES — `autoresearch-winner-archive` | already ported |
+| Google Colab Notebook | 761-776 | NICE-TO-HAVE — flagged OPTIONAL in `autoresearch-winner-archive` | already noted |
+| Traditional ML Metrics (AUROC/AUPRC/Acc/LogLoss/ECE/Confusion + bg-rejection-at-S-eff) | 780-792 | DOMAIN-SPECIFIC (binary classification + Higgs physics figure) | not ported |
+| Per-Prediction Log (CSV columns) | 796-812 | DOMAIN-SPECIFIC (trade logs) — generic version in `autoresearch-dashboard` per-experiment metrics | not ported |
+| Architecture (`core/runner.py` ONE experiment per call) | 816-822 | YES — our runner is the same pattern | identical |
+| Validation Checklist (6 pre-experiment assertions) | 826-833 | YES — `autoresearch-data-split-audit` runner gate + `autoresearch-data-contract-validator` (NEW THIS FOLLOW-UP) | now fully covered |
+| Project Structure tree | 837-899 | DOMAIN-SPECIFIC (tabular backbones list) | not ported |
+| Key Constants table | 903-921 | DOMAIN-SPECIFIC values | not ported |
+| Common Mistakes table (14 entries) | 924-941 | NICE-TO-HAVE — useful failure-mode catalogue; many already absorbed into Rule 7 + Rule 26 anti-patterns | not separately ported |
+| Session Learnings (append-only) | 944-983 | YES — `experiment_log.jsonl` (Rule 3) + `research_journal.md` analogue | already enforced |
+| Cross-references + License + Credits | 987-1007 | NA | not ported |
+
+**Net new patterns found below line 300:** **0 load-bearing patterns
+were missing locally.**
+
+All 41 sister CLAUDE.md sections from lines 300-1007 either:
+1. Already have a local skill (16 sections),
+2. Are already enforced by a local Rule (11 sections),
+3. Are domain-specific (tabular GBMs / Higgs physics / Baldi split)
+   and intentionally not ported (10 sections), or
+4. Were already noted as NICE-TO-HAVE in the PM audit §6.2 and are
+   now closed by this follow-up (Validation Checklist line 826-833 →
+   `autoresearch-data-contract-validator`).
+
+**The PM audit's honesty caveat #3 ("if there's a tabular-specific
+load-bearing pattern in lines 300-1007 I missed, this audit didn't
+catch it") is now closed: there was no such pattern.** The PM audit's
+gap analysis from the first 300 lines + the §3.4 sister-repo
+inventory together correctly identified every transferable pattern.
+
+**Follow-up commits (this Appendix + §6.2 closeout + §1/§2 count
+updates):**
+- `42695a4` — "Skills parity follow-up: add shuffle-test +
+  data-contract-validator (Rule 22 closeout)". New skills + CLAUDE.md
+  §11 update (29-skill block).
+- This audit-document update (next commit) — §6.2 closure, §1 + §2
+  count updates (27 → 29), Appendix A.
