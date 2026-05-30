@@ -327,33 +327,40 @@ converts H71 from "research proposal" to "we tested our best idea."
 - Add 1-D RoPE reference run (seed 0 only) ≈ 2 GPU-h.
 - **Total: 4 runs × ~2 h ≈ 8 GPU-h.**
 
-**Implementation-gap status: FUTURE_WORK / BLOCKED_ON_VIT_TINY_AND_ROTCIFAR10.**
+**Implementation-gap status: READY (2026-05-30).**
 
-Three primitives are missing:
+All three primitives have landed:
 
-1. **ViT-Tiny model** — `src/nature_inspired_networks/models.py`
-   `build_model` does not register `vit_tiny`. The H71 hybrid module
-   `hybrid_icosa_rope.py` provides the `IcosaRoPE3D` rotor but not a
-   transformer backbone. Need a minimal ViT-Tiny class (patch_embed
-   → N × {LayerNorm, MHSA-with-RoPE, MLP} → LayerNorm → head) plus a
-   `vit_tiny_icosa` variant whose MHSA calls `IcosaRoPE3D(head_dim,
-   base=PHI)`. ~120 lines of new code (vendor a stock ViT-Tiny and
-   patch the RoPE slot).
-2. **rotated-CIFAR-10 dataset loader** — `data.py` does NOT include a
-   `rotated_cifar10` variant. Need to add `RandomRotation(180)` to
-   both train and test transform pipelines (test rotations must be
-   deterministic per-image — use a fixed-seed RandomRotation or a
-   pre-computed per-image angle). 25 lines in `data.py:load_dataset`.
-3. **head_dim constraint** — `IcosaRoPE3D` requires `head_dim % 3 == 0`.
-   ViT-Tiny default head_dim = 192/3 = 64; 64 % 3 != 0. Must bump
-   head_dim to 66 (and adjust num_heads=192/66 → 2.9 → use 3 heads
-   with head_dim=63 + 3 padding = 66) OR use 6 heads with head_dim=33
-   (must be / 3 multiple → 33 % 3 = 0 ✓). The plan uses **6 heads ×
-   head_dim 33 (= dim 198)** to keep `head_dim % 3 == 0`.
+1. **ViT-Tiny model** — new file
+   `src/nature_inspired_networks/vit_tiny.py` (~330 LOC). Minimal
+   ViT-Tiny class (`patch_embed` → 12 × `{LayerNorm, MHSA-with-RoPE,
+   MLP}` → `LayerNorm` → `Linear` head). `MultiHeadSelfAttention`
+   dispatches on `rope_kind` ∈ `{"none", "rope1d", "icosa3d"}`:
+   - `"rope1d"` rotates the largest even-`D` prefix and passes the
+     odd tail (head_dim=33 → 32 rotated + 1 pass-through) — documented
+     in the helper docstring.
+   - `"icosa3d"` instantiates `IcosaRoPE3D(head_dim=33)` whose default
+     `base=PHI` matches the H71 design doc.
+   `build_vit_tiny(...)` is the factory used by `models.build_model`;
+   the runner forwards `vit_*` cfg keys via `_MODEL_BUILD_KW`.
+2. **rotated-CIFAR-10 dataset loader** — `data.py` adds
+   `rotated_cifar_loaders` and the `load_rotated_cifar10` alias.
+   Train pipeline samples uniformly over the four cardinal angles
+   `(0, 90, 180, 270)` via `T.functional.rotate`; eval pipeline
+   applies ALL four rotations as deterministic test-time augmentation
+   via `_RotatedCIFAR` (10_000 base × 4 angles = 40_000 eval items),
+   yielding the rotation-equivariance-aware top-1. `load_dataset`
+   routes `rotated_cifar10` / `rotcifar10` / `rotated_cifar100`.
+3. **head_dim constraint** — `ViTTiny.__init__` enforces
+   `head_dim % 3 == 0` unconditionally. The Control 4 cfg uses
+   `embed=198, heads=6, head_dim=33` (the choice was 6 × 33 = 198
+   per the cfg YAML, picked over the alternative 4 × 48 = 192 to
+   keep heads close to canonical; the alternative is also tested).
 
-Documented SPEC in `control4_h71_vit_tiny.yaml`. The orchestrator
-marks `--control 4 --launch` as `BLOCKED` until the three primitives
-land.
+Tests: 9 new in `tests/test_vit_tiny.py` + 8 new in
+`tests/test_data.py`.
+
+Commit: `<set4_sha>` (Set 4 — pending commit at end of this report).
 
 ---
 
@@ -376,10 +383,10 @@ alongside.
 
 | Control | Status | Blocking work |
 |---------|--------|---------------|
-| 1 | BLOCKED_ON_UNIFORM_BUDGET_AND_LINEAR_WD | (a) `phi_budget_widths(..., budget_mode="uniform")` branch, (b) `const_beta1` cfg key, (c) `linear_decay_param_groups` builder |
-| 2 | BLOCKED_ON_GENERIC_ACTIVATION_SWAP | generic `swap_relu_with(factory)` helper + `slot_activation` cfg dispatch in `runner.post_build_mutators` |
-| 3 | PARTIAL — 3a READY, 3b BLOCKED_ON_REGNETX_DISPATCH | `models.build_model` branch for `regnetx_*` that shrinks RegNetX-200MF to 270k params |
-| 4 | FUTURE_WORK — BLOCKED_ON_VIT_TINY + ROTCIFAR10 | ViT-Tiny class + rotated-CIFAR-10 loader + `head_dim % 3 == 0` head config |
+| 1 | **READY** (2026-05-30) | All three primitives landed: (a) `phi_budget_widths(..., budget_mode='uniform')`, (b) `TrainConfig.const_beta1` + `Trainer._pin_beta1`, (c) `phi_decay.linear_decay_param_groups`. Commit `2d29f18`. |
+| 2 | **READY** (2026-05-30) | Generic `activations.swap_relu_with(model, factory)` + `SLOT_ACTIVATION_FACTORIES` table + `runner.post_build_mutators` `slot_activation` dispatch. Commit `1d09411`. |
+| 3 | **READY** (2026-05-30) — 3a + 3b | `models.build_regnetx` + `width_multiplier_search` shrink RegNetX-200MF to the requested param budget within +/- 5 %. Commit `00b79e7`. |
+| 4 | **READY** (2026-05-30) | `vit_tiny.ViTTiny` (head_dim=33, embed=198, 6 heads) + `data.rotated_cifar_loaders` (4 cardinal angles, all-4 TTA on eval). Commit pending below. |
 
 ## How to run (after wiring patches land)
 

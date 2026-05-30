@@ -66,35 +66,44 @@ CONFIG_PATHS = {
 }
 
 # Per-control implementation status — kept in sync with controls/PLAN.md.
+# Updated 2026-05-30: all four control sweeps have their blocking
+# primitives landed in src/nature_inspired_networks/. See controls/PLAN.md
+# for per-control commit hashes (Set 1: 2d29f18, Set 2: 1d09411,
+# Set 3: 00b79e7, Set 4: trailing commit).
 CONTROL_STATUS = {
     1: dict(
         label="non-φ 3-axis regularizer stack",
-        status="BLOCKED_ON_UNIFORM_BUDGET_AND_LINEAR_WD",
-        blocking="(a) phi_budget_widths(..., budget_mode='uniform'); "
-                 "(b) train.TrainConfig.const_beta1 field; "
-                 "(c) phi_decay.linear_decay_param_groups builder.",
+        status="READY",
+        blocking="(landed 2026-05-30): "
+                 "(a) phi_budget_widths(..., budget_mode='uniform'); "
+                 "(b) train.TrainConfig.const_beta1 + Trainer._pin_beta1; "
+                 "(c) phi_decay.linear_decay_param_groups.",
         eta_h=2.5,
     ),
     2: dict(
         label="non-sine activation ablation",
-        status="BLOCKED_ON_GENERIC_ACTIVATION_SWAP",
-        blocking="generic swap_relu_with(factory) helper + slot_activation "
-                 "cfg dispatch in runner.post_build_mutators.",
+        status="READY",
+        blocking="(landed 2026-05-30): "
+                 "activations.swap_relu_with(model, factory) + "
+                 "SLOT_ACTIVATION_FACTORIES + runner.slot_activation dispatch.",
         eta_h=10.0,
     ),
     3: dict(
         label="tuned ResNet-20 + RegNetX-200MF baseline",
-        status="PARTIAL — 3a READY, 3b BLOCKED_ON_REGNETX_DISPATCH",
-        blocking="3b: models.build_model branch for regnetx_200mf_shrunk "
-                 "with binary-search width allocator targeting 270k params.",
+        status="READY",
+        blocking="(landed 2026-05-30): "
+                 "models.build_regnetx + width_multiplier_search "
+                 "(binary-search (w_0, w_a) scaling to the param budget "
+                 "within +/- 5 %).",
         eta_h=11.25,
     ),
     4: dict(
         label="H71 IcosaRoPE3D ViT-Tiny smoke",
-        status="FUTURE_WORK — BLOCKED_ON_VIT_TINY_AND_ROTCIFAR10",
-        blocking="(i) ViT-Tiny model in build_model; "
-                 "(ii) rotated_cifar10 dataset variant in data.load_dataset; "
-                 "(iii) head_dim % 3 == 0 (6 heads × dim 33 = 198).",
+        status="READY",
+        blocking="(landed 2026-05-30): "
+                 "vit_tiny.ViTTiny (head_dim=33, embed=198) + "
+                 "data.rotated_cifar_loaders (4 cardinal angles, "
+                 "all-4 TTA on eval).",
         eta_h=8.0,
     ),
 }
