@@ -1,26 +1,20 @@
 {
   "tag": "baseline_resnet20",
   "idea": "00_baseline_resnet20",
-  "algorithm": "coordinate",
-  "budget": 25,
+  "algorithm": "grid",
+  "budget": 16,
   "cube": {
     "lr": [
-      0.0003,
-      0.001,
-      0.003
+      0.001
     ],
     "weight_decay": [
-      0.0001,
-      0.0005,
-      0.002
+      0.0005
     ],
     "batch_size": [
-      128,
-      256
+      128
     ],
     "optimizer": [
-      "AdamW",
-      "SGD"
+      "AdamW"
     ]
   },
   "base_config": {
@@ -30,138 +24,115 @@
     "optimizer": "AdamW"
   },
   "best_config": {
-    "lr": 0.003,
+    "lr": 0.001,
     "weight_decay": 0.0005,
-    "batch_size": 256,
+    "batch_size": 128,
     "optimizer": "AdamW"
   },
-  "best_top1_median": 0.5929,
-  "best_top1_min": 0.5908,
-  "best_top1_range": 0.01770000000000005,
+  "best_top1_median": 0.5792,
+  "best_top1_min": 0.5731,
+  "best_top1_range": 0.01639999999999997,
   "seeds_confirmed": [
     0,
     1,
-    2
+    2,
+    3,
+    4,
+    5,
+    6
   ],
   "cells": [
     {
       "config": {
         "lr": 0.001,
         "weight_decay": 0.0005,
-        "batch_size": 256,
-        "optimizer": "AdamW"
-      },
-      "seed": 0,
-      "config_id": "lr1em3_wd5em4_bs256_optAdamW",
-      "top1": 0.5694,
-      "composite": 0.5390536366462622,
-      "wallclock_s": 0.0
-    },
-    {
-      "config": {
-        "lr": 0.0003,
-        "weight_decay": 0.0005,
-        "batch_size": 256,
-        "optimizer": "AdamW"
-      },
-      "seed": 0,
-      "config_id": "lr3em4_wd5em4_bs256_optAdamW",
-      "top1": 0.4651,
-      "composite": 0.4336303861505393,
-      "wallclock_s": 0.0
-    },
-    {
-      "config": {
-        "lr": 0.003,
-        "weight_decay": 0.0005,
-        "batch_size": 256,
-        "optimizer": "AdamW"
-      },
-      "seed": 0,
-      "config_id": "lr3em3_wd5em4_bs256_optAdamW",
-      "top1": 0.5929,
-      "composite": 0.5609859523835421,
-      "wallclock_s": 0.0
-    },
-    {
-      "config": {
-        "lr": 0.003,
-        "weight_decay": 0.0001,
-        "batch_size": 256,
-        "optimizer": "AdamW"
-      },
-      "seed": 0,
-      "config_id": "lr3em3_wd1em4_bs256_optAdamW",
-      "top1": 0.5883,
-      "composite": 0.5891937327106765,
-      "wallclock_s": 0.0
-    },
-    {
-      "config": {
-        "lr": 0.003,
-        "weight_decay": 0.002,
-        "batch_size": 256,
-        "optimizer": "AdamW"
-      },
-      "seed": 0,
-      "config_id": "lr3em3_wd2em3_bs256_optAdamW",
-      "top1": 0.5817,
-      "composite": 0.5794002591518433,
-      "wallclock_s": 0.0
-    },
-    {
-      "config": {
-        "lr": 0.003,
-        "weight_decay": 0.0005,
-        "batch_size": 256,
-        "optimizer": "SGD"
-      },
-      "seed": 0,
-      "config_id": "lr3em3_wd5em4_bs256_optSGD",
-      "top1": 0.5929,
-      "composite": 0.5934397945910294,
-      "wallclock_s": 0.0
-    },
-    {
-      "config": {
-        "lr": 0.003,
-        "weight_decay": 0.0005,
         "batch_size": 128,
         "optimizer": "AdamW"
       },
       "seed": 0,
-      "config_id": "lr3em3_wd5em4_bs128_optAdamW",
-      "top1": 0.583,
-      "composite": 0.5819958600878574,
+      "config_id": "lr1em3_wd5em4_bs128_optAdamW",
+      "top1": 0.5841,
+      "composite": 0.5633472432825146,
       "wallclock_s": 0.0
     },
     {
       "config": {
-        "lr": 0.003,
+        "lr": 0.001,
         "weight_decay": 0.0005,
-        "batch_size": 256,
+        "batch_size": 128,
         "optimizer": "AdamW"
       },
       "seed": 1,
-      "config_id": "lr3em3_wd5em4_bs256_optAdamW",
-      "top1": 0.5908,
-      "composite": 0.590914107855327,
+      "config_id": "lr1em3_wd5em4_bs128_optAdamW",
+      "top1": 0.5792,
+      "composite": 0.5762212456916199,
       "wallclock_s": 0.0
     },
     {
       "config": {
-        "lr": 0.003,
+        "lr": 0.001,
         "weight_decay": 0.0005,
-        "batch_size": 256,
+        "batch_size": 128,
         "optimizer": "AdamW"
       },
       "seed": 2,
-      "config_id": "lr3em3_wd5em4_bs256_optAdamW",
-      "top1": 0.6085,
-      "composite": 0.607824606707575,
+      "config_id": "lr1em3_wd5em4_bs128_optAdamW",
+      "top1": 0.5895,
+      "composite": 0.5848131211213382,
+      "wallclock_s": 0.0
+    },
+    {
+      "config": {
+        "lr": 0.001,
+        "weight_decay": 0.0005,
+        "batch_size": 128,
+        "optimizer": "AdamW"
+      },
+      "seed": 3,
+      "config_id": "lr1em3_wd5em4_bs128_optAdamW",
+      "top1": 0.5736,
+      "composite": 0.5608370017412351,
+      "wallclock_s": 0.0
+    },
+    {
+      "config": {
+        "lr": 0.001,
+        "weight_decay": 0.0005,
+        "batch_size": 128,
+        "optimizer": "AdamW"
+      },
+      "seed": 4,
+      "config_id": "lr1em3_wd5em4_bs128_optAdamW",
+      "top1": 0.5731,
+      "composite": 0.5705727895357442,
+      "wallclock_s": 0.0
+    },
+    {
+      "config": {
+        "lr": 0.001,
+        "weight_decay": 0.0005,
+        "batch_size": 128,
+        "optimizer": "AdamW"
+      },
+      "seed": 5,
+      "config_id": "lr1em3_wd5em4_bs128_optAdamW",
+      "top1": 0.5809,
+      "composite": 0.5760119138261811,
+      "wallclock_s": 0.0
+    },
+    {
+      "config": {
+        "lr": 0.001,
+        "weight_decay": 0.0005,
+        "batch_size": 128,
+        "optimizer": "AdamW"
+      },
+      "seed": 6,
+      "config_id": "lr1em3_wd5em4_bs128_optAdamW",
+      "top1": 0.5774,
+      "composite": 0.5715299295280681,
       "wallclock_s": 0.0
     }
   ],
-  "wallclock_total_s": 12216.902986100002,
-  "phase_7_diagnostic_note": "Phase-9a propagation pass (2026-05-30): all 9 cells have valid top1 in [0.46, 0.61]. The \"top1_median=0.0000\" rows referenced in the propagation brief are NOT in this JSON (verified 2026-05-30). The observed 0.0000 in the per-hypothesis dashboards is the Delta-vs-best column for single-seed cells where top1==top1_median==top1_min==top1_max, which is correct-by-construction (no ghost cells, no missing metrics.json). No pruning required."
+  "wallclock_total_s": 10926.861230600014
 }
