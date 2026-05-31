@@ -1160,6 +1160,100 @@ def _strip_blockquote_markers(text: str) -> str:
     return "\n".join(lines)
 
 
+# ---------------------------------------------------------------------------
+# Pages-link Rule 27 enforcement helpers
+# ---------------------------------------------------------------------------
+# GitHub Pages publishes ONLY ``docs/``. Any link in generated dashboard
+# HTML pointing to a repo file outside ``docs/`` must use the absolute
+# GitHub-blob URL or it 404s on Pages. Source markdown files
+# (``paper/FINDINGS.md``, ``PAPER.md``, ``paper/AUDIT_SUMMARY.md`` …)
+# legitimately use relative paths like ``../CLAUDE.md#rule-28`` because
+# they live inside ``paper/`` and the relative path resolves correctly
+# on the GitHub blob view. But once we render those markdown bodies INTO
+# ``docs/dashboard/experiments/*.html`` the same relative path becomes
+# Pages-rooted and 404s. This rewriter converts them to absolute URLs
+# before the markdown library sees them.
+_GITHUB_BLOB_PREFIX = (
+    "https://github.com/dlmastery/nature_inspired_networks/blob/main/"
+)
+# Top-level repo files / directories that are NOT served from docs/.
+# Any markdown link ``](../<NAME>...)`` where NAME matches one of these
+# stems gets rewritten to the absolute GitHub blob URL.
+_NON_DOCS_REPO_STEMS = (
+    "CLAUDE.md", "README.md", "PAPER.md", "MANIFESTO.md", "MINDMAP.md",
+    "ARCHITECTURE.md", "AUTORESEARCH_PROCESS.md", "IDEA_TABLE.md",
+    "EXPERIMENT_LOG.md", "EXPERIMENT_LEDGER.md", "PARADIGM_COMPARISON.md",
+    "NATURE_INSPIRED_NETWORKS.md", "FINDINGS.md", "RESULTS.md",
+    "SOTA_COMPARISON.md", "MEDIUM.md", "SETUP.md",
+    "RESTRUCTURE_PLAN.md", "RESTRUCTURE_PLAN_v2.md",
+    "sota_catalog.yaml", "pyproject.toml",
+    "paper/", "hypotheses/", "audits/", "scripts/", "ideas/",
+    "src/", "tests/", "configs/", "experiments/", "memory/", "skills/",
+)
+
+
+def _rewrite_rule27_links(text: str) -> str:
+    """Rewrite ``](../X)`` markdown links to absolute GitHub-blob URLs.
+
+    Per CLAUDE.md Rule 27, only ``docs/`` is published to GitHub Pages.
+    Any relative ``../<repo-root-file>`` link rendered into a
+    ``docs/dashboard/`` HTML page 404s on Pages. This helper converts
+    every such reference to the absolute GitHub-blob URL so the rendered
+    HTML is safe to mirror under ``docs/dashboard/``.
+
+    Also rewrites direct ``](paper/...)``, ``](audits/...)``, …
+    relative-from-repo-root links the same way, for any non-``docs/``
+    target stem listed in ``_NON_DOCS_REPO_STEMS``.
+    """
+    if not text or "](" not in text:
+        return text
+
+    def _is_non_docs(target: str) -> bool:
+        # Strip any leading ../ chain.
+        stripped = target
+        while stripped.startswith("../"):
+            stripped = stripped[3:]
+        # Strip leading ./
+        if stripped.startswith("./"):
+            stripped = stripped[2:]
+        # Match against non-docs repo stems.
+        for stem in _NON_DOCS_REPO_STEMS:
+            if stem.endswith("/") and stripped.startswith(stem):
+                return True
+            if stripped == stem or stripped.startswith(stem + "#"):
+                return True
+        return False
+
+    def _abs_path(target: str) -> str:
+        stripped = target
+        while stripped.startswith("../"):
+            stripped = stripped[3:]
+        if stripped.startswith("./"):
+            stripped = stripped[2:]
+        return _GITHUB_BLOB_PREFIX + stripped
+
+    def _sub(m: re.Match) -> str:
+        target = m.group(1)
+        # Skip absolute URLs, anchors, mailto, etc.
+        if target.startswith(("http://", "https://", "#", "mailto:",
+                              "tel:", "data:")):
+            return m.group(0)
+        # Skip links to the same docs/ tree (relative HTML siblings).
+        if not target.startswith(("../", "./", "paper/", "audits/",
+                                  "hypotheses/", "scripts/", "ideas/",
+                                  "src/", "tests/", "configs/",
+                                  "experiments/", "memory/", "skills/",
+                                  "CLAUDE.md", "README.md", "PAPER.md",
+                                  "MANIFESTO.md", "MINDMAP.md",
+                                  "ARCHITECTURE.md", "FINDINGS.md")):
+            return m.group(0)
+        if _is_non_docs(target):
+            return f"]({_abs_path(target)})"
+        return m.group(0)
+
+    return re.sub(r"\]\(([^)]+)\)", _sub, text)
+
+
 def _md_to_html(text: str, *, inline_only: bool = False,
                 strip_blockquote: bool = True) -> str:
     """Render a chunk of markdown text to safe HTML for inline display.
@@ -1176,9 +1270,17 @@ def _md_to_html(text: str, *, inline_only: bool = False,
     GFM tables inside an excerpted blockquote render properly (the
     ``markdown`` library's blockquote nesting does not recurse into the
     tables extension).
+
+    Per CLAUDE.md Rule 27, relative ``../<non-docs-target>`` markdown
+    links are rewritten to absolute GitHub-blob URLs BEFORE markdown
+    parsing so the resulting HTML is safe to mirror under
+    ``docs/dashboard/`` (which is the GitHub Pages root) without 404s.
     """
     if not text or not text.strip():
         return ""
+    # Rule 27 link discipline: rewrite non-docs relative paths to
+    # absolute GitHub-blob URLs.
+    text = _rewrite_rule27_links(text)
     if strip_blockquote:
         text = _strip_blockquote_markers(text)
     # Normalise stray un-paired bold/italic delimiters left over from
