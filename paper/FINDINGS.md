@@ -68,6 +68,54 @@
 > [`paper/STATISTICAL_TESTS.md`](STATISTICAL_TESTS.md) §7.
 > Splice in PAPER.md: [`§5.5.4`](../PAPER.md#554--hill-climbed-best-regime-phase-9a-2026-05-30--blocker-13-refutation).
 
+> ## 🌐 2026-05-31 — Iso-tuned-comparison closeout (Phase-9a baseline-extension, n=3)
+>
+> The Phase-9a hill-climb's Section-7 comparison used the hill-climbed
+> baseline at bs=256 vs the three leaders' hill-climbed bests at bs=128
+> — confounding "prior helps" with "bs=128 helps the baseline." The
+> 2026-05-31 baseline-extension filled out the baseline at the iso-tuned
+> cell (lr=3e-3, wd=5e-4, bs=128, AdamW) to n=3 so prior-vs-non-prior
+> can be measured at matched bs/lr/wd/optimizer.
+>
+> | tag | iso-tuned cell | n | mean | σ (pp) | Δmean vs baseline (iso-tuned) | 95% boot CI | Phase-5 gate |
+> |---|---|---:|---:|---:|---:|---|:---:|
+> | `baseline_resnet20` | lr=3e-3 wd=5e-4 bs=128 AdamW | 3 | 0.5937 | **1.14** | — (rail) | — | — |
+> | `sg_only_phi_budget` | lr=3e-3 wd=5e-4 bs=128 AdamW | 3 | 0.6053 | 0.57 | **+1.16 pp** | [−0.04, +2.30] pp **(contains 0)** | FAIL |
+> | `pair_gm_pdw` | lr=3e-3 wd=5e-4 bs=128 AdamW | 3 | 0.6096 | 0.34 | **+1.59 pp** | [+0.43, +2.62] pp | FAIL (tie 0.6057) |
+> | `slot_act_sine` | lr=3e-3 wd=2e-3 bs=128 AdamW | 3 | 0.6105 | 0.57 | **+1.68 pp** | [+0.49, +2.77] pp | FAIL |
+>
+> **Closeout verdict.** The certified-at-default-config n=7 claims
+> (banner at top of file) STAND. The default-config baseline σ at n=7
+> is small (0.453 pp), the Δs of +1.24 / +1.74 / +1.78 pp exit
+> 2σ_default = 0.91 pp, and the paired Wilcoxon n=7 floor (0.0078) clears
+> Holm-Bonferroni α'=0.0167.
+>
+> **The iso-tuned-cell extension at n=3** is a robustness check that
+> confirms directional positive Δ for all three winners across the
+> hyperparameter regime (every winner's iso-tuned mean exceeds the
+> iso-tuned baseline mean), but cannot itself re-certify at NeurIPS α
+> because (a) σ_iso = 1.14 pp at n=3 is 2.5× wider than σ_default, (b)
+> the Phase-5 ordinal gate FAILS for all three winners (max baseline =
+> 0.6057, min leaders 0.5998 / 0.6057 / 0.6039 ≤ 0.6057), and (c) the
+> n=3 Wilcoxon floor (0.125) cannot clear Holm-Bonferroni α'=0.0167.
+>
+> Phase-9f (n=7+ iso-tuned baseline-AND-leader extension) is the
+> principled re-certification path at the tuned regime. The
+> `slot_act_sine` wd=2e-3 baseline-neighbour extension is filed as
+> Phase-9e.
+>
+> Exclusion criterion (Rule 3-compatible, transparent at the analysis
+> layer): `sg_only_phi_budget__hc_lr3em3_wd5em4_bs128_optAdamW_seed3`
+> ran 2 epochs (top1=0.2148) as a diagnostic-budget hill-climb-search
+> cell, NOT a 30-ep evaluation seed; excluded from the n=3 iso-tuned
+> stats above. Underlying metrics.json is unchanged per Rule 3.
+>
+> Full Section 10 statistical analysis (Wilcoxon, bootstrap CI, Phase-5
+> ordinal gate at iso-tuned n=3, 2σ_iso vs 2σ_default comparison):
+> [`paper/STATISTICAL_TESTS.md`](STATISTICAL_TESTS.md) §10.
+> Splice in PAPER.md: §5.5 iso-tuned sub-paragraph + §7.3 limitations +
+> §7.4 future work item 12.
+
 > ## ✅ PHASE-8 FINAL VERDICT (2026-05-29 AM, n=3) — THREE replicated cross-dataset positives (now superseded by n=7 certification above)
 >
 > The audit + Fixer + post-fix re-run + 3-seed CIFAR-100 graduation cycle
