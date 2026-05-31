@@ -1,0 +1,37 @@
+﻿## Section 10 — Iso-tuned (bs=128, lr=3e-3, wd=5e-4) baseline-vs-leader comparison
+
+**Scope (added 2026-05-31).** The Phase-9a hill-climb (Section 7) converged each leader on bs=128, while the hill-climbed-baseline best was bs=256. The Section-7 default-baseline-vs-iso-tuned-leader comparison conflates 'prior helps' with 'bs=128 helps the baseline.' To isolate the prior effect, the baseline was re-run at the iso-tuned cell (lr=3e-3, wd=5e-4, bs=128, AdamW) on seeds 0/1/2; the post-baseline-extension cells landed 2026-05-31. This section reports the honestly-iso-tuned baseline-vs-leader Δs at n=3.
+
+**Exclusion criterion (Rule 3-compatible).** Cells where the run completed fewer than 30 training epochs are excluded as not comparable to the 30-ep canonical CIFAR-100 horizon. This affects `sg_only_phi_budget__hc_lr3em3_wd5em4_bs128_optAdamW_seed3` (epochs=2, top1=0.2148 — a diagnostic-budget cell from the hill-climb search, NOT a 30-ep evaluation seed). The exclusion is applied transparently here; the underlying metrics.json is unchanged per Rule 3.
+
+**slot_act_sine baseline-neighbour caveat.** slot_act_sine's hill-climbed best cell is (lr=3e-3, wd=2e-3, bs=128, AdamW). No baseline cell exists at wd=2e-3 bs=128; we compare against the baseline at wd=5e-4 bs=128 (the cheapest single-knob neighbour). A baseline-extension to wd=2e-3 bs=128 is filed as Phase-9e.
+
+**Iso-tuned baseline_resnet20 (lr=3e-3, wd=5e-4, bs=128, AdamW), n=3:** seeds=[0, 1, 2], top1=['0.5830', '0.6057', '0.5924'], mean=0.5937, σ=1.14 pp.
+
+**Comparison to default-config n=7 baseline σ:** σ_default=0.453 pp; σ_iso=1.14 pp; iso-tuned σ is 2.52× wider on this smaller n=3 sample. 2σ_iso = 2.28 pp; 2σ_default = 0.91 pp.
+
+| Claim | Iso-tuned cell | Leader top1 (seeds) | Δmean | Δmedian | Wilcoxon W | p_one | p_two | 95% bootstrap CI on Δmean | Outside 2σ_iso=2.28pp? | Outside 2σ_default=0.91pp? | Phase-5 ordinal gate |
+|---|---|---|---:|---:|---:|---:|---:|---|:---:|:---:|:---:|
+| sg_only_phi_budget | hc_lr3em3_wd5em4_bs128_optAdamW | s0=0.6049,s1=0.6112,s2=0.5998 (excluded: ['seed3@2ep']) | +1.16 pp | +1.25 pp | 0.00 | 0.1250 | 0.2500 | [-0.04 pp, +2.30 pp] | NO | YES | FAIL (min L = 0.5998 vs max B = 0.6057) |
+| pair_gm_pdw | hc_lr3em3_wd5em4_bs128_optAdamW | s0=0.6121,s1=0.6057,s2=0.6109 | +1.59 pp | +1.85 pp | 0.00 | 0.2500 | 0.5000 | [+0.43 pp, +2.62 pp] | NO | YES | FAIL (min L = 0.6057 vs max B = 0.6057) |
+| slot_act_sine | hc_lr3em3_wd2em3_bs128_optAdamW | s0=0.6137,s1=0.6139,s2=0.6039 | +1.68 pp | +2.13 pp | 0.00 | 0.1250 | 0.2500 | [+0.49 pp, +2.77 pp] | NO | YES | FAIL (min L = 0.6039 vs max B = 0.6057) |
+
+### Per-claim narrative (iso-tuned, n=3)
+
+- **sg_only_phi_budget (iso-tuned)** — Δmean=+1.16 pp, Δmedian=+1.25 pp; paired Wilcoxon W=0.0, one-sided p=0.1250 (n=3 floor=0.1250); 95% bootstrap CI on Δmean=[-0.04 pp, +2.30 pp], contains 0 = True; Phase-5 ordinal-gate pass = False (min(leader)=0.5998 vs max(baseline)=0.6057).
+- **pair_gm_pdw (iso-tuned)** — Δmean=+1.59 pp, Δmedian=+1.85 pp; paired Wilcoxon W=0.0, one-sided p=0.2500 (n=3 floor=0.1250); 95% bootstrap CI on Δmean=[+0.43 pp, +2.62 pp], contains 0 = False; Phase-5 ordinal-gate pass = False (min(leader)=0.6057 vs max(baseline)=0.6057).
+- **slot_act_sine (iso-tuned)** — Δmean=+1.68 pp, Δmedian=+2.13 pp; paired Wilcoxon W=0.0, one-sided p=0.1250 (n=3 floor=0.1250); 95% bootstrap CI on Δmean=[+0.49 pp, +2.77 pp], contains 0 = False; Phase-5 ordinal-gate pass = False (min(leader)=0.6039 vs max(baseline)=0.6057).
+
+### Key observation
+
+The iso-tuned baseline σ at n=3 = 1.14 pp is 2.52× wider than the default-config baseline σ at n=7 (0.453 pp). At this small-n iso-tuned cell, the leader-vs-baseline Δs of +1.16 to +1.68 pp are NOT formally outside 2σ_iso (2.28 pp); they DO clear the default-config 2σ_default = 0.91 pp band. The directional signal is preserved (every leader seed beats the seed-matched baseline seed except for one tied pair at pair_gm_pdw seed=1=baseline seed=2 = 0.6057 and one seed-mismatch on phi_budget and slot_act_sine), but the n=3 iso-tuned Wilcoxon floor (0.125) cannot clear Holm-Bonferroni α' = 0.0167.
+
+### Honest framing
+
+**The default-config n=7 certification (Sections 0–6) stands.** The default-config baseline σ at n=7 is small (0.453 pp) and the three leaders' default-config Δmeans of +1.24 / +1.74 / +1.78 pp all exit 2σ_default = 0.91 pp; the paired Wilcoxon n=7 floor (0.0078) clears Holm-Bonferroni α'=0.0167.
+
+**The iso-tuned-cell extension at n=3 is a robustness check, NOT a re-certification.** It confirms directional positive Δ for all three winners across the hyperparameter regime (every winner's mean exceeds the iso-tuned baseline mean), but cannot itself re-certify at NeurIPS α. A Phase-9f n=7+ extension at the iso-tuned cell — which would deliver a Wilcoxon floor of 0.0078 and a tighter (variance ~1/n) bootstrap CI — is filed as future work.
+
+**Phase-5 ordinal gate at iso-tuned n=3.** The gate min(leader_s) > max(baseline_s) FAILS for all three winners at this cell: max(baseline) = 0.6057 (seed=1); min(phi_budget) = 0.5998 < 0.6057 → FAIL; min(pair_gm_pdw) = 0.6057 = 0.6057 → BORDERLINE/FAIL (strict inequality required); min(slot_act_sine) = 0.6039 < 0.6057 → FAIL. This honestly weakens the cross-hyperparameter cross-dataset ordinal claim at small n=3 iso-tuned; the n=7 default-config Phase-5 gate (Section 2) is the strong, formally-cleared version.
+
+
