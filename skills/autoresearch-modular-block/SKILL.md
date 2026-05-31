@@ -123,3 +123,12 @@ always ask. Without it, the paper claims "our block is 30% more
 efficient"; with it, the paper claims "the fractal sub-block
 contributes X pp, the hex mask contributes Y pp, the group conv
 contributes Z pp."
+
+
+---
+
+## Cross-references to CLAUDE.md rules
+
+This skill implements Rule 14: Rule 14 (modular & reusable architecture — shared primitives live in src/nature_inspired_networks/, idea sub-projects import from there). See
+[](https://github.com/dlmastery/nature_inspired_networks/blob/main/CLAUDE.md)
+for the canonical rule statements.

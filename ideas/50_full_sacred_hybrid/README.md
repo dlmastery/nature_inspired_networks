@@ -70,7 +70,7 @@ $env:SSL_CERT_FILE = "..\..\.venv\Lib\site-packages\certifi\cacert.pem"
 ## Cross-references
 
 - Full hypothesis design doc: `../../hypotheses/g5_optimization_init_reg_nas/H50_full_sacred_hybrid.md`
-- Headline campaign verdict: `../../FINDINGS.md`
+- Headline campaign verdict: `https://github.com/dlmastery/nature_inspired_networks/blob/main/paper/FINDINGS.md`
 - Refined follow-up hypotheses:
   - **H58** — group avg-pool fix (DISCARDED — `ideas/58_group_avg_pool/`)
   - **H45** — Sacred NAS to find the right subset

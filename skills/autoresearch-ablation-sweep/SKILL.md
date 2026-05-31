@@ -105,3 +105,12 @@ Global (`<root>/`):
   break).
 - Sorting rows by accuracy and reporting "top-3" — sort by composite
   to honour the Goodhart fingerprint.
+
+
+---
+
+## Cross-references to CLAUDE.md rules
+
+This skill implements Rules 1, 6: Rule 1 (one config change per experiment) and Rule 6 (no silent randomness — seed-median composite across --seeds). See
+[](https://github.com/dlmastery/nature_inspired_networks/blob/main/CLAUDE.md)
+for the canonical rule statements.

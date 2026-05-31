@@ -130,3 +130,12 @@ Note: `T.Lambda` with a `lambda` is unpicklable; if you raise
   variance issues on the partial last batch.
 - Mixing train normalisation stats with test stats. Compute stats
   on train, apply to both.
+
+
+---
+
+## Cross-references to CLAUDE.md rules
+
+This skill implements Rule 26: Rule 26 (Windows thread-cap safety — num_workers: 0, KMP_DUPLICATE_LIB_OK=TRUE, OMP_NUM_THREADS=2, MKL_NUM_THREADS=2). See
+[](https://github.com/dlmastery/nature_inspired_networks/blob/main/CLAUDE.md)
+for the canonical rule statements.

@@ -150,3 +150,12 @@ Anything that surprised us, any caveat. Bullet list.
   multi-config"). Split them.
 - Storing best.pt in git LFS without recording its SHA in the README.
   If LFS goes away the result is unreproducible.
+
+
+---
+
+## Cross-references to CLAUDE.md rules
+
+This skill implements Rules 8, 9: Rule 8 (per-experiment archive sub-directory is mandatory) and Rule 9 (every archive has a very detailed README.md). See
+[](https://github.com/dlmastery/nature_inspired_networks/blob/main/CLAUDE.md)
+for the canonical rule statements.

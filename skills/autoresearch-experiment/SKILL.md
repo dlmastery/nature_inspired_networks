@@ -125,3 +125,12 @@ python scripts/build_report.py
   the proper evaluation tier before any external claim.
 - [`autoresearch-paper-rigor`](../autoresearch-paper-rigor/SKILL.md)
   — the statistical-rigor floor every external claim references back.
+
+
+---
+
+## Cross-references to CLAUDE.md rules
+
+This skill implements Rules 13, 19: Rule 13 (SOTA smoke first) and Rule 19 (phased CIFAR-10 -> CIFAR-100 progression). See
+[](https://github.com/dlmastery/nature_inspired_networks/blob/main/CLAUDE.md)
+for the canonical rule statements.

@@ -99,6 +99,6 @@ $env:SSL_CERT_FILE = "..\..\..\..\.venv\Lib\site-packages\certifi\cacert.pem"
   - `../../../../experiments/cifar10/sg_only_group_avg_seed0/`
   - `../../../../experiments/cifar10/sg_full_fib_avg_seed0/`
   - `../../../../experiments/cifar10/sg_only_group_seed0/` (max-pool reference)
-- Headline campaign verdict: `../../../../FINDINGS.md` § "H58 follow-up - the avg-pool fix DISCARDED"
+- Headline campaign verdict: `https://github.com/dlmastery/nature_inspired_networks/blob/main/paper/FINDINGS.md` § "H58 follow-up - the avg-pool fix DISCARDED"
 - Future direction: rotated-CIFAR-10 with max-pool (the actually-better operator) - queued under H24
 - Parent failure: `../../50_full_sacred_hybrid/` (H50 - the headline negative)

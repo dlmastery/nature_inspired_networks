@@ -77,7 +77,7 @@ From `FINDINGS.md`:
 
 ## Cross-references
 
-- Findings: `../../FINDINGS.md` § "H58 follow-up - the avg-pool fix DISCARDED"
+- Findings: `https://github.com/dlmastery/nature_inspired_networks/blob/main/paper/FINDINGS.md` § "H58 follow-up - the avg-pool fix DISCARDED"
 - Related: `ideas/50_full_sacred_hybrid/` (the parent failure mode);
   H24 (icosahedral / Platonic equivariance, the real follow-up).
 - Master experiment list: `../../EXPERIMENT_LOG.md` row T2.1

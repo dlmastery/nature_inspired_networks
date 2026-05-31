@@ -48,4 +48,4 @@ $env:SSL_CERT_FILE = "..\..\..\..\.venv\Lib\site-packages\certifi\cacert.pem"
 
 - Legacy archive: `../../../../experiments/cifar10/sg_only_toroidal_seed0/`
 - Hypothesis design doc: `../../../../hypotheses/g3_topologies_graphs/H22_toroidal_phi_closure.md`
-- Headline campaign verdict: `../../../../FINDINGS.md` row "toroidal -2.06 pp"
+- Headline campaign verdict: `https://github.com/dlmastery/nature_inspired_networks/blob/main/paper/FINDINGS.md` row "toroidal -2.06 pp"

@@ -112,3 +112,12 @@ CIFAR variant we use as the literature anchor.
 - Writing the verdict before reading the actual numbers.
 - Citing a paper you have not opened.
 - Predicting a range so wide it cannot be falsified.
+
+
+---
+
+## Cross-references to CLAUDE.md rules
+
+This skill implements Rules 4, 5: Rule 4 (citation format) and Rule 5 (reasoning-blob word-count floors). See
+[](https://github.com/dlmastery/nature_inspired_networks/blob/main/CLAUDE.md)
+for the canonical rule statements.

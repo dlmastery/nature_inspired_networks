@@ -55,6 +55,7 @@ Word-count floors per field: `diagnosis ≥ 60`, `citation ≥ 40 single
 / 80 multi`, `hypothesis ≥ 50`, `prediction ≥ 25`, `verdict ≥ 30`,
 `learning ≥ 40`. Padding to hit the floor is a defect — the floor
 exists to force substantive content.
+See also [`skills/autoresearch-reasoning-entry/`](skills/autoresearch-reasoning-entry/SKILL.md).
 
 ### Rule 6 — No silent randomness
 `set_seed(seed)` is called at the top of every run.
@@ -101,6 +102,8 @@ fix. Tests must pass before any training-loop background task is
 launched. End every test file with `"All N tests passed."` or fail
 loudly.
 See [`memory/feedback_test_discipline.md`](../.claude/projects/C--Users-evija-sacgeometry/memory/feedback_test_discipline.md).
+See also [`skills/autoresearch-experiment/`](skills/autoresearch-experiment/SKILL.md)
+(test-first-then-launch workflow).
 
 ### Rule 13 — SOTA smoke first
 Every experiment workflow on a given dataset runs a known-good
@@ -143,6 +146,9 @@ they are read in ≤ 250-line chunks with an
 [`EXPERIMENT_LEDGER.md`](experiments/EXPERIMENT_LEDGER.md) row appended after
 each chunk. No source document is treated as read-once-and-summarised
 from memory; the chunked audit is the deliverable.
+See also [`skills/autoresearch-doc-organization/`](skills/autoresearch-doc-organization/SKILL.md)
+(canonical doc-organization patterns for chunked audits and ledger
+maintenance).
 
 ### Rule 18 — Documentation must be committee-grade
 Every hypothesis file (`hypotheses/g<N>/H<NN>_*.md`), every experiment
@@ -153,6 +159,9 @@ template are MANDATORY: motivation (≥ 100w), formal hypothesis (≥ 50w,
 mechanism (CNN-track AND LLM-track), predicted Δ table, 3-part
 experimental protocol, cross-references, ≥ 4 Committee Q&A,
 verification checklist, status journal. No padding; substantive depth.
+See also [`skills/autoresearch-paper-rigor/`](skills/autoresearch-paper-rigor/SKILL.md)
+and [`skills/autoresearch-topology-metrics/`](skills/autoresearch-topology-metrics/SKILL.md)
+(committee-grade evidence sections).
 
 ### Rule 19 — Phased CIFAR-10 → CIFAR-100 progression
 Strict phase order. No hypothesis jumps phases.
@@ -177,6 +186,8 @@ The cheap broad scan precedes the expensive deep dive. CIFAR-100 GPU
 budget is too scarce to spend on hypotheses whose 12-epoch CIFAR-10
 number would have already disproved them.
 See [`memory/feedback_phased_workflow.md`](../.claude/projects/C--Users-evija-sacgeometry/memory/feedback_phased_workflow.md).
+See also [`skills/autoresearch-experiment/`](skills/autoresearch-experiment/SKILL.md)
+(end-to-end experiment workflow honouring the phased gates).
 
 ---
 
@@ -311,7 +322,7 @@ nature_inspired_networks/
 ## 7. Sister projects (cross-links, NOT dependencies)
 
 This repository is **self-contained**. The autoresearch protocol below
-(Rules 1–28) is fully specified here; nothing in this file requires
+(Rules 1–38) is fully specified here; nothing in this file requires
 reading another repo to implement. Sister repositories are listed only
 as related autoresearch projects on different domains — useful for
 cross-pollination but never as authoritative sources:
@@ -327,7 +338,7 @@ is **defined here** (Rule 2) and SHA-256-fingerprinted as
 `d65565e9c7b12d14cbce30a801ecc6753aea3eb148074256bfcc051fa61d0893`.
 A new branch / repo is required to change it — no parent-repo dependency.
 
-The 17 reusable skills in `skills/` (catalogued in §11) are also
+The 29 reusable skills in `skills/` (catalogued in §11) are also
 self-contained and content-agnostic: any future autoresearch project
 can pick them up unchanged.
 
@@ -368,7 +379,7 @@ Every rule above is enforced. There are no exceptions.
 
 ---
 
-## 10. Rules 20–28 — added 2026-05-27 / 2026-05-29 after the audit campaign
+## 10. Rules 20–38 — added 2026-05-27 / 2026-05-29 / 2026-05-30 after the audit campaign
 
 Rules 1–19 were authored before the parallel critic / sci-critic / fixer
 campaign exposed how easy it is for an implementer agent to ship code
@@ -461,6 +472,8 @@ Rule 20's auto-checkpoint loop is then sufficient to lose ≤ 1 run on
 any future crash (validated empirically on 2026-05-28; 24 of 31 runs
 preserved by auto-checkpoint, the remaining 7 resumed cleanly via
 `--skip-existing`).
+See also [`skills/autoresearch-dataset-loader/`](skills/autoresearch-dataset-loader/SKILL.md)
+(canonical DataLoader configuration for the Windows hardware contract).
 
 ### Rule 27 — Pages-link discipline (no repo-root .md hrefs in HTML)
 GitHub Pages publishes ONLY the `docs/` directory. Any link in the

@@ -153,3 +153,12 @@ across stage index.
   without centering and HSIC normalisation — meaningless.
 - Computing rotation-equivariance on the *training* set — only the
   test set matters.
+
+
+---
+
+## Cross-references to CLAUDE.md rules
+
+This skill implements Rule 18: Rule 18 (committee-grade documentation — supports paper-rigor analyses by adding rotation-equivariance / Betti / CKA evidence to verdict tables). See
+[](https://github.com/dlmastery/nature_inspired_networks/blob/main/CLAUDE.md)
+for the canonical rule statements.

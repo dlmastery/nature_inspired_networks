@@ -69,7 +69,7 @@ Wall-clock: ~8 min on RTX 4090 Laptop, 16 GB.
 
 - Legacy archive: `../../../../experiments/cifar10/sg_full_fib_seed0/`
 - Hypothesis design doc: `../../../../hypotheses/g5_optimization_init_reg_nas/H50_full_sacred_hybrid.md`
-- Headline campaign verdict: `../../../../FINDINGS.md`
+- Headline campaign verdict: `https://github.com/dlmastery/nature_inspired_networks/blob/main/paper/FINDINGS.md`
 - Refined follow-ups:
   - `../../../58_group_avg_pool/` (H58 DISCARDED — avg-pool was worse)
   - H45 Sacred NAS (queued in EXPERIMENT_LOG.md)

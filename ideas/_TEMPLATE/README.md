@@ -18,7 +18,7 @@
 | `IMPROVEMENTS.md` records the fixes | [ ] |
 | `VERIFY.md` signed with date | [ ] |
 | First experiment archived under `experiments/exp001_*/` | [ ] |
-| Row added to `../../EXPERIMENT_LOG.md` | [ ] |
+| Row added to `../../experiments/EXPERIMENT_LOG.md` | [ ] |
 | Dashboard refreshed | [ ] |
 
 ## Files in this directory
@@ -55,7 +55,8 @@ Or via the global sweep:
 
 ## Cross-references
 
-- Full hypothesis design doc: `../../hypotheses/H{{NN}}_<short>.md`
-- Master experiment list: `../../EXPERIMENT_LOG.md`
-- Manifesto: `../../MANIFESTO.md`
-- IDEA table row: `../../IDEA_TABLE.md` H{{NN}}
+- Full hypothesis design doc: `../../hypotheses/g<G>_<group>/H{{NN}}_<short>.md`
+- Master experiment list: `../../experiments/EXPERIMENT_LOG.md`
+- Manifesto: `../../paper/MANIFESTO.md`
+- IDEA table row: `../../hypotheses/IDEA_TABLE.md` H{{NN}}
+- Headline campaign verdict: [`paper/FINDINGS.md`](https://github.com/dlmastery/nature_inspired_networks/blob/main/paper/FINDINGS.md)

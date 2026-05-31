@@ -219,3 +219,12 @@ Where in `ideas/99_mix_all/` does it slot?>
   Split them; the modular contract is they must be independently
   ablatable.
 - README that doesn't link to the parent IDEA_TABLE.md row — orphan.
+
+
+---
+
+## Cross-references to CLAUDE.md rules
+
+This skill implements Rules 8, 14: Rule 8 (mandatory per-experiment archive sub-directory) and Rule 14 (modular & reusable — thin composition wrapper, no duplicated code). See
+[](https://github.com/dlmastery/nature_inspired_networks/blob/main/CLAUDE.md)
+for the canonical rule statements.
