@@ -1,0 +1,26 @@
+{
+  "tag": "baseline_resnet20__hc_lr1em3_wd5em4_bs128_optAdamW_seed3",
+  "dataset": "cifar100",
+  "seed": 3,
+  "epochs": 30,
+  "top1": 0.5736,
+  "top5": 0.8549,
+  "params": 278324,
+  "flops": 41224448.0,
+  "latency_ms": 6.467095999978483,
+  "rot_eq_err": 0.42638051758209866,
+  "composite": 0.5608370017412351,
+  "composite_fingerprint": "d65565e9c7b12d14cbce30a801ecc6753aea3eb148074256bfcc051fa61d0893",
+  "epochs_to_target": -1,
+  "train_seconds": 1268.1719084999932,
+  "train_top1": 0.649198717948718,
+  "generalization_gap": 0.07559871794871798,
+  "config_id": "lr1em3_wd5em4_bs128_optAdamW",
+  "hc_cell": {
+    "lr": 0.001,
+    "weight_decay": 0.0005,
+    "batch_size": 128,
+    "optimizer": "AdamW"
+  },
+  "hc_seed": 3
+}
