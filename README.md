@@ -189,17 +189,23 @@ nature_inspired_networks/
     └── dashboard/           ← byte-identical mirror of dashboard/ for live Pages
 ```
 
-## 4. Headline claims (CERTIFIED, n=7, 2026-05-29)
+## 4. Headline claims (CERTIFIED, n=7, 2026-05-29) + hill-climbed-best regime (Phase-9a, 2026-05-30)
 
 After the Fixer campaign (CLAUDE.md Rule 21), dual-track audit
-(CLAUDE.md Rule 22), and the 2026-05-29 PM **n=7 CIFAR-100 extension**,
-the three Phase-8 winners are now **formally certified at α=0.05 under
-Holm-Bonferroni** (paired Wilcoxon W=0, exact one-sided p=(1/2)^7
-= **0.0078** < α'=0.0167 for each winner across the k=3 family; see
-[`paper/STATISTICAL_TESTS.md`](paper/STATISTICAL_TESTS.md) §0). Per
+(CLAUDE.md Rule 22), the 2026-05-29 PM **n=7 CIFAR-100 extension**,
+and the 2026-05-30 PM **Phase-9a per-hypothesis hill-climb**, the
+three Phase-8 winners produce a positive lift in BOTH tuning regimes —
+default-config (formally certified at α=0.05 under Holm-Bonferroni)
+AND hill-climbed best-config (additive robustness check, n=3). The
+priors survive hill-climbing, qualitatively refuting BLOCKER #13's
+"any tuned baseline would close the gap" concern.
+
+**Row 1 — Default-config n=7 certification (Sections 0–6 of STATISTICAL_TESTS):**
+paired Wilcoxon W=0, exact one-sided p=(1/2)^7 = **0.0078** <
+α'_Holm=0.0167 for each winner across the k=3 family; see
+[`paper/STATISTICAL_TESTS.md`](paper/STATISTICAL_TESTS.md) §0. Per
 CLAUDE.md Rule 28 these are PROMOTED from SCREENING to EVALUATION
-tier and constitute the project's **first formally-certified empirical
-claims**.
+tier — the project's **first formally-certified empirical claims**.
 
 | Rank | Hypothesis (tag) | CIFAR-100 Δmean (n=7) | 95% bootstrap CI | Wilcoxon p | Holm-cleared? |
 |---|---|---:|---|---:|:---:|
@@ -208,6 +214,26 @@ claims**.
 | 3 | **H09 `sg_only_phi_budget`** (post-fix 1:1.623:2.629) | **+1.24 pp** | [+0.84, +1.67] pp | **0.0078** | YES |
 
 CIFAR-100 baseline reference (n=7): `baseline_resnet20` mean=0.5612, σ=0.451 pp.
+
+**Row 2 — Hill-climbed best-config (Phase-9a, n=3, 2026-05-30):** each
+tag — including the baseline — was independently hill-climbed across
+the lr × weight_decay × batch_size × optimizer cube (budget 25, see
+[`scripts/run_hillclimb.py`](scripts/run_hillclimb.py)), then re-run on
+seeds 0/1/2 at its best_config. The hill-climbed-baseline-vs-hill-
+climbed-leader Δmedian holds:
+
+| Hypothesis | Hill-climbed best_config | top1 median (n=3) | Δmedian vs hill-climbed baseline |
+|---|---|---:|---:|
+| `baseline_resnet20` | lr=3e-3 wd=5e-4 bs=256 AdamW | **0.5929** | — (rail) |
+| H09 `sg_only_phi_budget` | lr=3e-3 wd=5e-4 bs=128 AdamW | 0.6049 | **+1.20 pp** |
+| `pair_gm_pdw` | lr=3e-3 wd=5e-4 bs=128 AdamW | 0.6109 | **+1.80 pp** |
+| H81 `slot_act_sine` | lr=3e-3 wd=2e-3 bs=128 AdamW | 0.6137 | **+2.08 pp** |
+
+Sources: `ideas/00_baseline_resnet20/hillclimb_results.json`,
+`ideas/09_phi_budget/...`, `ideas/91_pair_gm_pdw/...`,
+`ideas/92_slot_act_sine/...`. Full Section-7 stat tests:
+[`paper/STATISTICAL_TESTS.md`](paper/STATISTICAL_TESTS.md) §7.
+
 CIFAR-10 12-ep screening composites (all use the SHA-256-fingerprinted
 formula `top1 − 0.05·log10(params_M) − 0.05·log10(latency_ms)`,
 fingerprint `d65565e9c7b12d14cbce30a801ecc6753aea3eb148074256bfcc051fa61d0893`)
@@ -217,10 +243,12 @@ composite; `pair_gm_pdw` 85.85 % top-1 (post-fix combo ladder winner);
 
 **Honest caveat (preserved):** the n=7 certification holds at the
 12-ep CIFAR-10 + 30-ep CIFAR-100 screening compute budget. The
-Phase-9a hill-climb at converged 164-ep training budget + tuned
-RegNetX-200MF baseline (`PAPER.md` §7.4-4) remains open. The φ-content
-vs any-three-orthogonal-axes attribution question (the non-φ control
-in §5.5.1) is also open.
+hill-climbed n=3 robustness check is ADDITIVE, not a re-certification
+(n=3 paired-Wilcoxon floor (1/2)^3=0.125 cannot clear Holm-Bonferroni
+α'=0.0167). An n=7 hill-climbed extension (Phase-9c) + converged
+164-ep training + tuned RegNetX-200MF baseline (`PAPER.md` §7.4-4)
+remain open. The φ-content vs any-three-orthogonal-axes attribution
+question (the non-φ control in §5.5.1) is also open.
 
 (The H41 `golden_adam` β-only requalification — clarified from
 −33 pp single-config to −1 pp under Reddi-2018 testing — remains a

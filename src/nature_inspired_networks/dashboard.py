@@ -2465,6 +2465,62 @@ def _render_cross_refs(run_dir_name: str, tag: str, dataset: str,
     return f"<div class='card'><h2>Cross-references</h2>{body}</div>"
 
 
+def _hillclimb_path_for_tag(repo_root: Path | None, tag: str) -> Path | None:
+    """Return ``ideas/<NN>/hillclimb_results.json`` for ``tag`` if it exists.
+
+    The mapping is discovered by reading every
+    ``ideas/*/hillclimb_results.json`` and matching the embedded ``tag``
+    field. This avoids a hard-coded TAG_TO_IDEA dict and keeps the
+    dashboard build self-discovering of new hill-climb sweeps.
+    """
+    if repo_root is None:
+        return None
+    ideas_dir = repo_root / "ideas"
+    if not ideas_dir.exists():
+        return None
+    for sub in ideas_dir.iterdir():
+        if not sub.is_dir():
+            continue
+        p = sub / "hillclimb_results.json"
+        if not p.exists():
+            continue
+        try:
+            with p.open("r", encoding="utf-8") as fh:
+                data = json.load(fh)
+        except Exception:
+            continue
+        if str(data.get("tag", "")).strip() == tag:
+            return p
+    return None
+
+
+def _render_hillclimb_pill(repo_root: Path | None, tag: str) -> str:
+    """Header pill linking to ``ideas/<NN>/dashboard/index.html`` if present.
+
+    Rendered only when a per-hypothesis hill-climb sweep has produced
+    ``ideas/<NN>/hillclimb_results.json``. Per CLAUDE.md Rule 27, the
+    link is an absolute GitHub-blob URL — the per-experiment page lives
+    under ``dashboard/experiments/`` and ``ideas/<NN>/dashboard/`` is NOT
+    mirrored into ``docs/``, so a relative ``../../ideas/...`` href would
+    404 on the GitHub Pages mirror.
+    """
+    hc_path = _hillclimb_path_for_tag(repo_root, tag)
+    if hc_path is None:
+        return ""
+    idea_dir = hc_path.parent.name
+    href = (
+        "https://github.com/dlmastery/nature_inspired_networks/blob/main/"
+        f"ideas/{idea_dir}/dashboard/index.html"
+    )
+    return (
+        f"<a class='mast-pill hillclimb' href='{_esc(href)}' "
+        "target='_blank' rel='noopener' "
+        "title='Per-hypothesis hill-climb dashboard "
+        "(Phase-9a, lr × wd × bs × optimizer cube)'>"
+        "⛰️ hill-climb</a>"
+    )
+
+
 def _render_footer(metrics: dict, run_dir: Path,
                    repo_root: Path | None = None) -> str:
     fp = metrics.get("composite_fingerprint", "")
@@ -2892,6 +2948,7 @@ def render_experiment_page(metrics: dict, history: list[dict] | None,
         "<a class='mast-pill paper' "
         "href='https://github.com/dlmastery/nature_inspired_networks/blob/main/PAPER.md' "
         "target='_blank' rel='noopener'>📄 paper</a>"
+        + _render_hillclimb_pill(repo_root, tag) +
         "<a class='live-link' href='https://dlmastery.github.io/nature_inspired_networks/' "
         "target='_blank' rel='noopener'>📡 live</a>"
         "</div>\n"
