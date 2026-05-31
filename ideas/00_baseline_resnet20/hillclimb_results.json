@@ -162,5 +162,6 @@
       "wallclock_s": 0.0
     }
   ],
-  "wallclock_total_s": 12216.902986100002
+  "wallclock_total_s": 12216.902986100002,
+  "phase_7_diagnostic_note": "Phase-9a propagation pass (2026-05-30): all 9 cells have valid top1 in [0.46, 0.61]. The \"top1_median=0.0000\" rows referenced in the propagation brief are NOT in this JSON (verified 2026-05-30). The observed 0.0000 in the per-hypothesis dashboards is the Delta-vs-best column for single-seed cells where top1==top1_median==top1_min==top1_max, which is correct-by-construction (no ghost cells, no missing metrics.json). No pruning required."
 }
