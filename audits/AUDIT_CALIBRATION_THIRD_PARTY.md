@@ -171,6 +171,53 @@ concern: **the audit team has a non-trivial false-positive rate when
 implementations make documented, intentional, defensible deviations
 from their source paper.
 
+### 4.3.1 Formal interval-and-test analysis on the 22-pp MAJOR/BROKEN excess (added 2026-05-30 per ICML R2 Q3)
+
+The MAJOR/BROKEN sub-tier comparison is the diagnostically-credible
+contrast (§4.3 above). At project n=83 with 18 MAJOR/BROKEN hits
+(15 MAJOR + 3 BROKEN) the rate is 21.7%; at calibration n=15 with
+0 MAJOR/BROKEN the rate is 0%. The observed difference is **+21.7 pp**.
+Computed via 100 000-iteration parametric binomial bootstrap and exact
+methods (rng seed 20260530, [`scripts/_compute_stat_tests.py`](../scripts/_compute_stat_tests.py) §8):
+
+| quantity | value |
+|---|---|
+| Observed difference (proj − cal) | **+21.7 pp** |
+| Bootstrap 95% CI on the difference | **[+13.3, +31.3] pp** (excludes 0) |
+| Wilson 95% CI on project rate (18/83) | [14.2%, 31.7%] |
+| Wilson 95% CI on calibration rate (0/15) | [0.0%, 20.4%] |
+| Wilson CI overlap (project lower 14.2% vs calibration upper 20.4%) | overlap on a 6.2-pp window |
+| Fisher exact, one-sided (P[proj > cal]) | **p = 0.0363** |
+| Fisher exact, two-sided | p = 0.0658 |
+| Two-proportion z-test (pooled), two-sided | z = 1.996, p = 0.0459 |
+
+**Reading.** The bootstrap CI on the difference clears 0 by ~13 pp on
+the lower bound. The one-sided Fisher exact (the conventional choice
+when the direction "real defect density should exceed false-positive
+floor" is the pre-registered alternative) clears α = 0.05. The
+two-sided Fisher exact (0.066) and the prior-reported two-sample
+chi-squared (≈ 0.22 in §4.4) do NOT clear α = 0.05; the Wilson CIs on
+the two proportions still overlap on a 6.2-pp window (project lower
+14.2% vs calibration upper 20.4%) because the calibration sample is
+small.
+
+**Honest reading (R2 Q3 response).** The 22-pp MAJOR/BROKEN excess is
+statistically significant at α = 0.05 under the one-sided Fisher exact
+test (p = 0.036) and under the pooled two-proportion z-test (p = 0.046),
+but NOT under the two-sided Fisher exact (p = 0.066). The bootstrap CI
+on the difference excludes 0 with a 13-pp lower-bound margin, which is
+the most reviewer-credible single statistic in this comparison. The
+n = 15 calibration is the limiting factor — a Phase-9b extension to
+n ≥ 50 (timm + HF Transformers + Lightning Bolts) is required before
+the comparison clears two-sided α = 0.05 unambiguously.
+
+The MAJOR/BROKEN-tier excess is therefore **directionally credible,
+one-sided-significant at α = 0.05, and bootstrap-CI-excludes-0**;
+it is NOT yet two-sided significant at α = 0.05 under the most
+conservative test. The §5 conclusion below is updated accordingly.
+
+
+
 **But the rates are not the same.** The 17-pp gap is driven entirely
 by the MAJOR/BROKEN tiers: torchvision has 0 % in those tiers vs.
 our project's 21.7 % (15 MAJOR + 3 BROKEN of 83). The MINOR tier is
@@ -239,6 +286,13 @@ treats a 4-pp MINOR-tier excess (29 % vs. 33 % calibration) the same
 as a 22-pp MAJOR/BROKEN-tier excess (22 % vs. 0 % calibration). The
 two have very different interpretations: the first is *audit
 aggressiveness*; the second is *real codebase defect density*.
+
+Per §4.3.1, the 22-pp MAJOR/BROKEN excess clears one-sided Fisher
+exact at α = 0.05 (p = 0.036) and the bootstrap 95% CI on the
+difference is [+13.3, +31.3] pp (excludes 0); it does NOT clear
+two-sided Fisher exact (p = 0.066). The signal is directionally
+credible but the conservative two-sided test does not certify it
+at α = 0.05; a Phase-9b extension to n ≥ 50 is required.
 
 For the camera-ready, **PAPER.md §5.1 should report both numbers**:
 51 % aggregate AND 22 % MAJOR/BROKEN-tier; cite this calibration file
