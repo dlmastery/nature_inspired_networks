@@ -227,10 +227,92 @@
 </div>
 <div class='kn-strip' style='--i:1'><div class='kn-tile tint-neg'><div class='kn-val'>21.48%</div><div class='kn-lbl'>top-1</div></div><div class='kn-tile tint-neu'><div class='kn-val'>0.2172</div><div class='kn-lbl'>composite</div></div><div class='kn-tile tint-neg'><div class='kn-val'>−35.04pp</div><div class='kn-lbl'>Δ vs baseline (n=1, screening)</div></div><div class='kn-tile tint-neu'><div class='kn-val'>0.268M</div><div class='kn-lbl'>params</div></div><div class='kn-tile tint-neu'><div class='kn-val'>3.35ms</div><div class='kn-lbl'>latency b=1</div></div></div>
 <section class='card' style='--i:2'><h2>Hypothesis</h2><p class='empty'>No matching hypothesis document — this row is a baseline reference run.</p></section>
-<section class='card' style='--i:3'><h2>Verdict <span class='mono' style='font-size:0.55em;letter-spacing:0.18em;color:var(--paper-dim);font-style:normal'>FINDINGS.md</span></h2><p class='empty'>No paragraph in FINDINGS.md mentions this tag yet.</p><p><a href='https://github.com/dlmastery/nature_inspired_networks/blob/main/paper/FINDINGS.md'>↗ Browse FINDINGS.md</a></p></section>
+<section class='card' style='--i:3'><h2>Verdict <span class='mono' style='font-size:0.55em;letter-spacing:0.18em;color:var(--paper-dim);font-style:normal'>FINDINGS.md</span></h2><div class='quote md-body'><h2>🌐 2026-05-31 — Iso-tuned-comparison closeout (Phase-9a baseline-extension, n=3)</h2>
+<p>The Phase-9a hill-climb&rsquo;s Section-7 comparison used the hill-climbed
+baseline at bs=256 vs the three leaders&rsquo; hill-climbed bests at bs=128
+— confounding &ldquo;prior helps&rdquo; with &ldquo;bs=128 helps the baseline.&rdquo; The
+2026-05-31 baseline-extension filled out the baseline at the iso-tuned
+cell (lr=3e-3, wd=5e-4, bs=128, AdamW) to n=3 so prior-vs-non-prior
+can be measured at matched bs/lr/wd/optimizer.</p>
+<table>
+<thead>
+<tr>
+<th>tag</th>
+<th>iso-tuned cell</th>
+<th style="text-align: right;">n</th>
+<th style="text-align: right;">mean</th>
+<th style="text-align: right;">σ (pp)</th>
+<th style="text-align: right;">Δmean vs baseline (iso-tuned)</th>
+<th>95% boot CI</th>
+<th style="text-align: center;">Phase-5 gate</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>baseline_resnet20</code></td>
+<td>lr=3e-3 wd=5e-4 bs=128 AdamW</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">0.5937</td>
+<td style="text-align: right;"><strong>1.14</strong></td>
+<td style="text-align: right;">— (rail)</td>
+<td>—</td>
+<td style="text-align: center;">—</td>
+</tr>
+<tr>
+<td><code>sg_only_phi_budget</code></td>
+<td>lr=3e-3 wd=5e-4 bs=128 AdamW</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">0.6053</td>
+<td style="text-align: right;">0.57</td>
+<td style="text-align: right;"><strong>+1.16 pp</strong></td>
+<td>[−0.04, +2.30] pp <strong>(contains 0)</strong></td>
+<td style="text-align: center;">FAIL</td>
+</tr>
+<tr>
+<td><code>pair_gm_pdw</code></td>
+<td>lr=3e-3 wd=5e-4 bs=128 AdamW</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">0.6096</td>
+<td style="text-align: right;">0.34</td>
+<td style="text-align: right;"><strong>+1.59 pp</strong></td>
+<td>[+0.43, +2.62] pp</td>
+<td style="text-align: center;">FAIL (tie 0.6057)</td>
+</tr>
+<tr>
+<td><code>slot_act_sine</code></td>
+<td>lr=3e-3 wd=2e-3 bs=128 AdamW</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">0.6105</td>
+<td style="text-align: right;">0.57</td>
+<td style="text-align: right;"><strong>+1.68 pp</strong></td>
+<td>[+0.49, +2.77] pp</td>
+<td style="text-align: center;">FAIL</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Closeout verdict.</strong> The certified-at-default-config n=7 claims
+(banner at top of file) STAND. The default-config baseline σ at n=7
+is small (0.453 pp), the Δs of +1.24 / +1.74 / +1.78 pp exit
+2σ_default = 0.91 pp, and the paired Wilcoxon n=7 floor (0.0078) clears
+Holm-Bonferroni α&rsquo;=0.0167.</p>
+<p><strong>The iso-tuned-cell extension at n=3</strong> is a robustness check that
+confirms directional positive Δ for all three winners across the
+hyperparameter regime (every winner&rsquo;s iso-tuned mean exceeds the
+iso-tuned baseline mean), but cannot itself re-certify at NeurIPS α
+because (a) σ_iso = 1.14 pp at n=3 is 2.5× wider than σ_default, (b)
+the Phase-5 ordinal gate FAILS for all three winners (max baseline =
+0.6057, min leaders 0.5998 / 0.6057 / 0.6039 ≤ 0.6057), and (c) the
+n=3 Wilcoxon floor (0.125) cannot clear Holm-Bonferroni α&rsquo;=0.0167.</p>
+<p>Phase-9f (n=7+ iso-tuned baseline-AND-leader extension) is the
+principled re-certification path at the tuned regime. The
+<code>slot_act_sine</code> wd=2e-3 baseline-neighbour extension is filed as
+Phase-9e.</p>
+<p>Exclusion criterion (Rule 3-compatible, transparent at the analysis
+layer): <code>sg_only_phi_budget__hc_lr3em3_wd5em4_bs128_optAdamW_seed3</code>
+ran 2 epochs (top1=0.2148) as a diagnostic-budget hill-climb-search</p></div><p style='margin-top:14px'><a href='https://github.com/dlmastery/nature_inspired_networks/blob/main/paper/FINDINGS.md'>↗ Full FINDINGS.md on GitHub</a></p></section>
 <section class='card' style='--i:4'><h2>Composite-score breakdown</h2><div class='comp-stack'><div class='seg pos' style='width:79.65%' title='top-1 = 0.21480'>top-1 +0.2148</div><div class='seg params' style='width:10.61%' title='-0.05·log10(params_M)'>params +0.02862</div><div class='seg lat' style='width:9.74%' title='-0.05·log10(latency_ms)'>lat −0.02626</div></div><div style='display:flex;justify-content:space-between;font-family:IBM Plex Mono,monospace;font-size:11px;color:var(--paper-dim);margin-top:6px'><span>Σ recomputed: <b style='color:var(--paper)'>0.21717</b></span><span>reported: <b style='color:var(--paper)'>0.21717</b> &nbsp;·&nbsp; Δ +0.000000</span></div><div class='formula-chip' style='margin-top:14px'>composite ≔ <code>top1 - 0.05*log10(params_M) - 0.05*log10(latency_ms)</code></div></section>
 <section class='card' style='--i:5'><h2>Per-epoch training curves</h2><div class='charts'><div><svg viewBox='0 0 460 320' preserveAspectRatio='xMinYMin meet' width='100%' height='auto' xmlns='http://www.w3.org/2000/svg' style='background:#0a0a0d;border:1px solid #1c1c20;display:block;font-family:"IBM Plex Mono",monospace'><text x='46' y='18' fill='#e6e1d6' font-size='14' font-family='Source Serif 4,Georgia,serif' font-weight='600'>Loss</text><line x1='46' y1='292.0' x2='446' y2='292.0' stroke='#1c1c20' stroke-width='1'/><text x='40' y='295.0' fill='#a89e8c' font-size='9' text-anchor='end'>3.597</text><line x1='46' y1='226.5' x2='446' y2='226.5' stroke='#1c1c20' stroke-width='1'/><text x='40' y='229.5' fill='#a89e8c' font-size='9' text-anchor='end'>3.720</text><line x1='46' y1='161.0' x2='446' y2='161.0' stroke='#1c1c20' stroke-width='1'/><text x='40' y='164.0' fill='#a89e8c' font-size='9' text-anchor='end'>3.843</text><line x1='46' y1='95.5' x2='446' y2='95.5' stroke='#1c1c20' stroke-width='1'/><text x='40' y='98.5' fill='#a89e8c' font-size='9' text-anchor='end'>3.967</text><line x1='46' y1='30.0' x2='446' y2='30.0' stroke='#1c1c20' stroke-width='1'/><text x='40' y='33.0' fill='#a89e8c' font-size='9' text-anchor='end'>4.090</text><text x='46.0' y='310' fill='#a89e8c' font-size='9' text-anchor='middle'>0</text><text x='446.0' y='310' fill='#a89e8c' font-size='9' text-anchor='middle'>1</text><text x='246.0' y='310' fill='#a89e8c' font-size='10' font-family='Source Serif 4,Georgia,serif' text-anchor='middle'>epoch →</text><text x='14' y='161.0' fill='#a89e8c' font-size='10' font-family='Source Serif 4,Georgia,serif' text-anchor='middle' transform='rotate(-90 14 161.0)'>loss →</text><polyline points='46.0,44.0 446.0,278.0' fill='none' stroke='#f85149' stroke-width='1.8'/><circle cx='446.0' cy='278.0' r='2.6' fill='#f85149'/><rect x='52' y='35' width='10' height='10' fill='#f85149'/><text x='68' y='44' fill='#e6e1d6' font-size='10' font-family='IBM Plex Mono,monospace'>train loss</text></svg></div><div><svg viewBox='0 0 460 320' preserveAspectRatio='xMinYMin meet' width='100%' height='auto' xmlns='http://www.w3.org/2000/svg' style='background:#0a0a0d;border:1px solid #1c1c20;display:block;font-family:"IBM Plex Mono",monospace'><text x='46' y='18' fill='#e6e1d6' font-size='14' font-family='Source Serif 4,Georgia,serif' font-weight='600'>Accuracy</text><line x1='46' y1='292.0' x2='446' y2='292.0' stroke='#1c1c20' stroke-width='1'/><text x='40' y='295.0' fill='#a89e8c' font-size='9' text-anchor='end'>6.4%</text><line x1='46' y1='226.5' x2='446' y2='226.5' stroke='#1c1c20' stroke-width='1'/><text x='40' y='229.5' fill='#a89e8c' font-size='9' text-anchor='end'>18.1%</text><line x1='46' y1='161.0' x2='446' y2='161.0' stroke='#1c1c20' stroke-width='1'/><text x='40' y='164.0' fill='#a89e8c' font-size='9' text-anchor='end'>29.8%</text><line x1='46' y1='95.5' x2='446' y2='95.5' stroke='#1c1c20' stroke-width='1'/><text x='40' y='98.5' fill='#a89e8c' font-size='9' text-anchor='end'>41.4%</text><line x1='46' y1='30.0' x2='446' y2='30.0' stroke='#1c1c20' stroke-width='1'/><text x='40' y='33.0' fill='#a89e8c' font-size='9' text-anchor='end'>53.1%</text><text x='46.0' y='310' fill='#a89e8c' font-size='9' text-anchor='middle'>0</text><text x='446.0' y='310' fill='#a89e8c' font-size='9' text-anchor='middle'>1</text><text x='246.0' y='310' fill='#a89e8c' font-size='10' font-family='Source Serif 4,Georgia,serif' text-anchor='middle'>epoch →</text><text x='14' y='161.0' fill='#a89e8c' font-size='10' font-family='Source Serif 4,Georgia,serif' text-anchor='middle' transform='rotate(-90 14 161.0)'>accuracy →</text><polyline points='46.0,278.0 446.0,226.1' fill='none' stroke='#d29922' stroke-width='1.8'/><circle cx='446.0' cy='226.1' r='2.6' fill='#d29922'/><rect x='52' y='35' width='10' height='10' fill='#d29922'/><text x='68' y='44' fill='#e6e1d6' font-size='10' font-family='IBM Plex Mono,monospace'>train top-1</text><polyline points='46.0,262.8 446.0,207.5' fill='none' stroke='#58a6ff' stroke-width='1.8'/><circle cx='446.0' cy='207.5' r='2.6' fill='#58a6ff'/><rect x='52' y='51' width='10' height='10' fill='#58a6ff'/><text x='68' y='60' fill='#e6e1d6' font-size='10' font-family='IBM Plex Mono,monospace'>test top-1</text><polyline points='46.0,132.9 446.0,44.0' fill='none' stroke='#3fb950' stroke-width='1.8'/><circle cx='446.0' cy='44.0' r='2.6' fill='#3fb950'/><rect x='52' y='67' width='10' height='10' fill='#3fb950'/><text x='68' y='76' fill='#e6e1d6' font-size='10' font-family='IBM Plex Mono,monospace'>test top-5</text></svg></div></div></section>
-<section class='card' style='--i:6'><h2>Deep inspection</h2><p style='color:var(--paper-dim);font-size:0.9em;margin-bottom:6px'>Audit excerpts, reasoning blob, raw configuration, and full metrics JSON — expand sections of interest.</p><details class='deep'><summary>Reasoning blob (reasoning.json)</summary><div class='body'><p class='empty'>No <code>reasoning.json</code> for this run directory.</p></div></details><details class='deep'><summary>Configuration dump</summary><div class='body'><p class='mono' style='color:var(--paper-dim);font-size:0.8em;margin-bottom:8px'>inferred from experiment_log.jsonl + metrics.json</p><pre>{
+<section class='card' style='--i:6'><h2>Deep inspection</h2><p style='color:var(--paper-dim);font-size:0.9em;margin-bottom:6px'>Audit excerpts, reasoning blob, raw configuration, and full metrics JSON — expand sections of interest.</p><details class='deep'><summary>Reasoning blob (reasoning.json)</summary><div class='body'><p class='empty'>No <code>reasoning.json</code> archived for this run directory &mdash; see the <b>Verdict</b> card above for the FINDINGS-derived verdict and the <b>Implementation-critic audit</b> accordion for the code-level diagnosis.</p></div></details><details class='deep'><summary>Configuration dump</summary><div class='body'><p class='mono' style='color:var(--paper-dim);font-size:0.8em;margin-bottom:8px'>inferred from experiment_log.jsonl + metrics.json</p><pre>{
   &quot;tag&quot;: &quot;sg_only_phi_budget__hc_lr3em3_wd5em4_bs128_optAdamW_seed3&quot;,
   &quot;model&quot;: &quot;phi_budget&quot;,
   &quot;dataset&quot;: &quot;cifar100&quot;,
