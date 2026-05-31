@@ -8,6 +8,8 @@ We introduce **`nature_inspired_networks`**, an open autoresearch repository hou
 
 We make **no SOTA accuracy claim**. We claim (1) the protocol successfully catches headline claims produced by broken code BEFORE publication; (2) the audit + fixer + re-run cycle is portable to any autoresearch campaign as seven content-agnostic skills in `skills/`; (3) the strongest defensible category across 81 hypotheses is DERIVATIVE+TESTABLE — rediscoveries of established techniques under φ-flavoured rebranding — and the protocol successfully distinguishes them from numerology.
 
+Robustness extension at the hill-climbed (bs=128, lr=3e-3) iso-tuned cell confirms directional positive Δ for all three winners; full re-certification at iso-tuned-n=7 is Phase-9f future work.
+
 **The contribution is the protocol, not the priors.** Repo: [`dlmastery/nature_inspired_networks`](https://github.com/dlmastery/nature_inspired_networks). Live dashboard: [`https://dlmastery.github.io/nature_inspired_networks/`](https://dlmastery.github.io/nature_inspired_networks/).
 
 ---
