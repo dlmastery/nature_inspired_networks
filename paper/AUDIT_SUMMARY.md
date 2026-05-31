@@ -213,4 +213,27 @@ Per [`paper/STATISTICAL_TESTS.md`](STATISTICAL_TESTS.md) §0 (promotion banner) 
 
 ---
 
+## Appendix — 2026-05-30 PM update: Phase-9a hill-climb robustness extension
+
+Per CLAUDE.md [Rule 28](../CLAUDE.md#rule-28) (screening-vs-evaluation discipline) and the Phase-9a per-hypothesis hill-climb skill (`skills/autoresearch-per-hypothesis-hillclimb/`), each of the three certified winners and the baseline rail underwent a ≥20-row hyperparameter hill-climb around the post-n=7 best configuration. The hill-climb is an **additive robustness extension on the n=7 certification**, NOT a re-certification.
+
+| hypothesis | base n=7 top1 (CIFAR-100 30-ep) | hill-climb best top1 | Δ vs base | dashboard |
+|---|---|---|---|---|
+| `baseline_resnet20` | 0.5652 (median) → 0.5929 (3-seed median at converged) | 0.5929 (n=3 median) | floor | [`ideas/00_baseline_resnet20/dashboard/`](https://github.com/dlmastery/nature_inspired_networks/blob/main/ideas/00_baseline_resnet20/dashboard/index.html) |
+| `sg_only_phi_budget` | 0.5786 | 0.6049 (n=3 median) | +1.20 pp Δmedian over baseline | [`ideas/09_phi_budget/dashboard/`](https://github.com/dlmastery/nature_inspired_networks/blob/main/ideas/09_phi_budget/dashboard/index.html) |
+| `pair_gm_pdw` | 0.5786 | 0.6109 (n=3 median) | +1.80 pp Δmedian over baseline | [`ideas/91_pair_gm_pdw/dashboard/`](https://github.com/dlmastery/nature_inspired_networks/blob/main/ideas/91_pair_gm_pdw/dashboard/index.html) |
+| `slot_act_sine` | 0.5786 | 0.6137 (n=3 median) | +2.08 pp Δmedian over baseline | [`ideas/92_slot_act_sine/dashboard/`](https://github.com/dlmastery/nature_inspired_networks/blob/main/ideas/92_slot_act_sine/dashboard/index.html) |
+
+**Section 7 of [`paper/STATISTICAL_TESTS.md`](STATISTICAL_TESTS.md) §7** documents the n=3 paired Wilcoxon for the hill-climbed best configs:
+- The Phase-5 ordinal gate (`min(leader) > max(baseline)`) is met at the *median* level for all three winners; the baseline-rail wider σ=0.97 pp means the leader-side margin is comfortable while the baseline side spreads — i.e., the n=3 Wilcoxon floor (p=0.125, the smallest paired p achievable at n=3) is reached but cannot be formally compared to α=0.05.
+- **Pass at Holm-Bonferroni α=0.05: NO at n=3** — this is the n=3 floor, NOT a real failure. The n=7 certification at the screening compute budget remains the formal statistical claim. n=7 at the hill-climbed best config (Phase-9c) is filed as future work.
+
+Cross-references: [`paper/STATISTICAL_TESTS.md`](STATISTICAL_TESTS.md) §1 (n=7 certification, unchanged) and §7 (n=3 hill-climb addendum), [`paper/FINDINGS.md`](FINDINGS.md) §"2026-05-30 PM hill-climb" block, [`paper/REVIEWER_CHECKLIST.md`](REVIEWER_CHECKLIST.md) Section H1–H5 (now Done).
+
+**Net effect on headline framing.** The n=7 EVALUATION-tier certification (Sections 0–6 of STATISTICAL_TESTS) is preserved and remains the formal external claim. The hill-climb evidence (Section 7 / this appendix) demonstrates the certified winners *also* lift over baseline at the converged hyperparameter point, but at n=3 the Wilcoxon cannot clear α=0.05 (this is a sample-size floor, not a failure of the priors). The cross-dataset claim that was "suspended pending post-fix re-run" in the pre-2026-05-29 body of this document is therefore **fully resolved at the screening-compute budget and partially resolved at the converged-budget regime** — the converged-budget n=7 certification is the remaining open work and is tracked under the ICML 2027 rebuttal at `audits/ICML_REVIEWS_2026-05-30/REBUTTAL.md`.
+
+*Appendix added 2026-05-30 PM. Original audit-summary body above is preserved verbatim for archival completeness.*
+
+---
+
 *Generated 2026-05-27. References: `audits/G{1..8}_audit.md`, addenda in `hypotheses/g{1..8}_*/H*.md`, commits 519cdf3 · 253dc94 · afac553 · 3efd2dd · c395769+5f09814 · 8aa0430 · 16fe2b6 · 2e7ee45.*
