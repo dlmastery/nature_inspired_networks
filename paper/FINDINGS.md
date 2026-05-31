@@ -33,6 +33,41 @@
 > Full per-claim certification table + Holm step-down derivation:
 > [`paper/STATISTICAL_TESTS.md`](STATISTICAL_TESTS.md) §0–§3.
 
+> ## ⛰️ 2026-05-30 PM — Hill-climbed-best regime confirms the n=7 default-config certification (Phase-9a, BLOCKER #13 partial refutation)
+>
+> Phase-9a ran a per-hypothesis coordinate hill-climb (cube:
+> lr × weight_decay × batch_size × optimizer, budget 25, see
+> [`scripts/run_hillclimb.py`](../scripts/run_hillclimb.py))
+> independently on `baseline_resnet20` and on each of the three n=7
+> winners on CIFAR-100 30-ep. Each tag's hill-climbed best_config was
+> re-run on seeds 0/1/2 and recorded in `ideas/<NN>/hillclimb_results.json`.
+>
+> | tag | hill-climbed best_config | top1 median (n=3) | Δmedian vs hill-climbed baseline |
+> |---|---|---:|---:|
+> | `baseline_resnet20` | lr=3e-3 wd=5e-4 bs=256 AdamW | **0.5929** | — (rail) |
+> | `sg_only_phi_budget` | lr=3e-3 wd=5e-4 bs=128 AdamW | 0.6049 | **+1.20 pp** |
+> | `pair_gm_pdw` | lr=3e-3 wd=5e-4 bs=128 AdamW | 0.6109 | **+1.80 pp** |
+> | `slot_act_sine` | lr=3e-3 wd=2e-3 bs=128 AdamW | 0.6137 | **+2.08 pp** |
+>
+> The priors carry signal in BOTH tuning regimes — default-config (n=7,
+> Δmean +1.24 / +1.74 / +1.78 pp, Holm-Bonferroni cleared) AND
+> hill-climbed-best (n=3, Δmedian +1.20 / +1.80 / +2.08 pp). The
+> area-chair concern (BLOCKER #13) that "any properly-tuned baseline
+> would close the gap" is qualitatively refuted at this compute budget.
+>
+> **n=3 at hill-climbed best does NOT clear Holm-Bonferroni by itself.**
+> The exact paired-Wilcoxon one-sided floor at n=3 is (1/2)^3 = 0.125,
+> above α'_Holm = 0.0167. The formal certification of the paper remains
+> the n=7 default-config result (banner above). The hill-climb is an
+> ADDITIVE robustness extension. An n=7 hill-climbed extension (Phase-9c)
+> would deliver full Holm-Bonferroni clearance in the tuned regime and
+> is filed as future work.
+>
+> Full Section 7 statistical analysis (Wilcoxon, bootstrap CI, Phase-5
+> ordinal gate at n=3):
+> [`paper/STATISTICAL_TESTS.md`](STATISTICAL_TESTS.md) §7.
+> Splice in PAPER.md: [`§5.5.4`](../PAPER.md#554--hill-climbed-best-regime-phase-9a-2026-05-30--blocker-13-refutation).
+
 > ## ✅ PHASE-8 FINAL VERDICT (2026-05-29 AM, n=3) — THREE replicated cross-dataset positives (now superseded by n=7 certification above)
 >
 > The audit + Fixer + post-fix re-run + 3-seed CIFAR-100 graduation cycle

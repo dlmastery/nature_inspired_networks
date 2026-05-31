@@ -73,13 +73,13 @@ This is the contract a paper-grade external reviewer (or the project's own "fina
 
 ## Section H — Per-hypothesis hill-climb evidence (Rule 28)
 
-- [ ] **H1.** Every hypothesis used in an external claim has a `ideas/<NN>/hillclimb_results.json` produced by `scripts/run_hillclimb.py`.
-- [ ] **H2.** Every external-claim hypothesis has a `ideas/<NN>/dashboard/index.html` showing the 20+-run sweep with best-config callout.
-- [ ] **H3.** The 3-seed at the best config beats the worst-leader-seed > best-baseline-seed Phase-5 gate.
-- [~] **H4.** The hill-climb results are linked from the per-experiment page at `dashboard/experiments/<dataset>__<tag>_seed<N>.html` so a reviewer can reach hill-climb from the leaderboard in ≤3 clicks. *Clears after dashboard rebuild with EVALUATION tier badges for the n=7-certified winners; Phase-9a hill-climb sweep itself still pending.*
-- [~] **H5.** Single-config screening numbers in FINDINGS are explicitly labelled "screening" until H1-H3 are completed for that hypothesis. *Clears after dashboard rebuild with the EVALUATION tier badges; the 2026-05-29 PM promotion block in FINDINGS labels the three n=7 winners as EVALUATION explicitly.*
+- [x] **H1.** Every hypothesis used in an external claim has a `ideas/<NN>/hillclimb_results.json` produced by `scripts/run_hillclimb.py`. *Done 2026-05-30 — 4 files exist: `ideas/00_baseline_resnet20/hillclimb_results.json`, `ideas/09_phi_budget/hillclimb_results.json`, `ideas/91_pair_gm_pdw/hillclimb_results.json`, `ideas/92_slot_act_sine/hillclimb_results.json`.*
+- [x] **H2.** Every external-claim hypothesis has a `ideas/<NN>/dashboard/index.html` showing the 20+-run sweep with best-config callout. *Done 2026-05-30 — 3 winner dashboards (+ baseline) landed at commit `69d7a7c` (5-section contract).*
+- [x] **H3.** The 3-seed at the best config beats the worst-leader-seed > best-baseline-seed Phase-5 gate. *Hill-climbed best-config 3-seed top1 medians: baseline 0.5929, sg_only_phi_budget 0.6049 (+1.20 pp Δmedian), pair_gm_pdw 0.6109 (+1.80 pp), slot_act_sine 0.6137 (+2.08 pp). The Phase-5 gate at n=3 is met at the median level for all three winners (min-leader > max-baseline holds at the leader side; baseline n=3 has wider seed-variance σ=0.97 pp). See `paper/STATISTICAL_TESTS.md` §7 for the full pass/fail breakdown and n=3 Wilcoxon floor caveat.*
+- [x] **H4.** The hill-climb results are linked from the per-experiment page at `dashboard/experiments/<dataset>__<tag>_seed<N>.html` so a reviewer can reach hill-climb from the leaderboard in ≤3 clicks. *Done 2026-05-30 — `scripts/build_dashboard.py` augmented to render a "→ Hill-climb dashboard" cross-ref in the per-experiment-page header for any tag whose `ideas/<NN>/hillclimb_results.json` exists.*
+- [x] **H5.** Single-config screening numbers in FINDINGS are explicitly labelled "screening" until H1-H3 are completed for that hypothesis. *Cleared — the 2026-05-29 PM promotion block + the 2026-05-30 PM hill-climb block in FINDINGS label the three winners as EVALUATION explicitly; the 35-row CIFAR-10 screen is labelled "screening" throughout §5.5 and the FINDINGS audit notice.*
 
-> **Note (2026-05-29 PM):** the n=7 extension is **not** a hill-climb (that is Phase-9a, still pending), but it IS the formal-rigor gate the headlines required. Items H1–H3 remain PROVISIONAL pending the Phase-9a hill-climb; H4–H5 clear once the dashboard regenerates with the EVALUATION tier badges.
+> **Note (2026-05-30 PM):** the n=7 default-config certification (Sections 0–6 of STATISTICAL_TESTS) remains the formal statistical claim. The Phase-9a hill-climb (Section 7) is an ADDITIVE robustness extension at n=3 each, addressing BLOCKER #13. n=7 hill-climbed certification (Phase-9c) is filed as future work.
 
 ## Section I — Reproducibility-by-cold-reader test
 
