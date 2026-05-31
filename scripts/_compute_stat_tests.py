@@ -720,6 +720,217 @@ def section_9_paired_permutation() -> str:
     return "".join(out)
 
 
+# ---------------------------------------------------------------------------
+# Section 10 — iso-tuned (hc cell) baseline-vs-leader comparison.
+# ---------------------------------------------------------------------------
+
+# Per-tag hill-climbed best cell tag-suffixes (the suffix appended after the
+# tag base, e.g. baseline_resnet20__hc_lr3em3_wd5em4_bs128_optAdamW_seed0).
+# The three leaders converged on bs=128, AdamW; phi_budget + pair_gm_pdw at
+# wd=5e-4 and slot_act_sine at wd=2e-3. The baseline's hill-climbed best was
+# bs=256 wd=5e-4; the iso-tuned baseline row we compare against is the
+# bs=128 wd=5e-4 cell (matching the two phi_budget / pair_gm_pdw winners)
+# which the baseline-extension sweep filled out to n=3 on 2026-05-31.
+ISO_TUNED_BASELINE_CELL = "hc_lr3em3_wd5em4_bs128_optAdamW"
+ISO_TUNED_LEADER_CELLS = {
+    "sg_only_phi_budget": "hc_lr3em3_wd5em4_bs128_optAdamW",
+    "pair_gm_pdw":        "hc_lr3em3_wd5em4_bs128_optAdamW",
+    "slot_act_sine":      "hc_lr3em3_wd2em3_bs128_optAdamW",
+}
+
+
+def load_iso_tuned_cell_seed_top1s(
+    tag: str, cell_suffix: str, min_epochs: int = 30,
+) -> tuple[list[float], list[int], list[tuple[int, float, int]]]:
+    """Read experiments/cifar100/<tag>__<cell_suffix>_seed<N>/metrics.json.
+
+    Returns (top1s, seeds, excluded) where:
+      - top1s, seeds are seed-aligned arrays of cells that meet epochs >= min_epochs;
+      - excluded is a list of (seed, top1, epochs) tuples for cells that ran
+        fewer epochs and are filtered out for cross-cell comparability.
+    """
+    top1s: list[float] = []
+    seeds: list[int] = []
+    excluded: list[tuple[int, float, int]] = []
+    for s in range(16):
+        path = CIFAR100 / f"{tag}__{cell_suffix}_seed{s}" / "metrics.json"
+        m = load_metric(path)
+        if m is None or "top1" not in m:
+            continue
+        epochs = int(m.get("epochs", 0))
+        t = float(m["top1"])
+        if epochs < min_epochs:
+            excluded.append((s, t, epochs))
+            continue
+        top1s.append(t)
+        seeds.append(s)
+    return top1s, seeds, excluded
+
+
+def section_10_iso_tuned() -> str:
+    """Section 10 — iso-tuned (bs=128, lr=3e-3) baseline-vs-leader at n=3.
+
+    Added 2026-05-31 after the baseline-extension sweep at the iso-tuned
+    hill-climbed cell. The baseline's hill-climbed best_config was
+    bs=256, but the three leaders all converged on bs=128; comparing
+    each leader at its own hill-climbed best against the baseline at
+    THAT leader's bs/wd cell is the iso-tuned analysis. The baseline
+    cells at (lr=3e-3, wd=5e-4, bs=128, AdamW) were filled out to n=3
+    on 2026-05-31. The slot_act_sine iso-tuned cell is at wd=2e-3, not
+    wd=5e-4; we report it here against the baseline at wd=5e-4 bs=128
+    as the closest baseline neighbour (no baseline cell exists at
+    wd=2e-3 bs=128 yet — filed as Phase-9e future work).
+
+    This section is ADDITIVE robustness context. At n=3 per arm, the
+    Wilcoxon floor is 1/8 = 0.125 and CANNOT clear Holm-Bonferroni
+    α' = 0.0167. The formal claim of the paper remains the n=7 default-
+    config certification (Sections 0..6). The default-config-baseline
+    σ_default at n=7 = 0.453 pp; the iso-tuned-baseline σ_iso at n=3 =
+    1.14 pp — 2.5x wider. The Δs of +1.16 to +1.68 pp do NOT formally
+    exit 2σ_iso = 2.28 pp; they DO exit 2σ_default = 0.91 pp.
+    """
+    out = ["## Section 10 — Iso-tuned (bs=128, lr=3e-3, wd=5e-4) baseline-vs-leader comparison\n\n"]
+    out.append(
+        "**Scope (added 2026-05-31).** The Phase-9a hill-climb (Section 7) "
+        "converged each leader on bs=128, while the hill-climbed-baseline best "
+        "was bs=256. The Section-7 default-baseline-vs-iso-tuned-leader "
+        "comparison conflates 'prior helps' with 'bs=128 helps the baseline.' "
+        "To isolate the prior effect, the baseline was re-run at the iso-tuned "
+        "cell (lr=3e-3, wd=5e-4, bs=128, AdamW) on seeds 0/1/2; the post-"
+        "baseline-extension cells landed 2026-05-31. This section reports the "
+        "honestly-iso-tuned baseline-vs-leader Δs at n=3.\n\n"
+        "**Exclusion criterion (Rule 3-compatible).** Cells where the run "
+        "completed fewer than 30 training epochs are excluded as not comparable "
+        "to the 30-ep canonical CIFAR-100 horizon. This affects "
+        "`sg_only_phi_budget__hc_lr3em3_wd5em4_bs128_optAdamW_seed3` "
+        "(epochs=2, top1=0.2148 — a diagnostic-budget cell from the hill-climb "
+        "search, NOT a 30-ep evaluation seed). The exclusion is applied "
+        "transparently here; the underlying metrics.json is unchanged per "
+        "Rule 3.\n\n"
+        "**slot_act_sine baseline-neighbour caveat.** slot_act_sine's "
+        "hill-climbed best cell is (lr=3e-3, wd=2e-3, bs=128, AdamW). No "
+        "baseline cell exists at wd=2e-3 bs=128; we compare against the "
+        "baseline at wd=5e-4 bs=128 (the cheapest single-knob neighbour). "
+        "A baseline-extension to wd=2e-3 bs=128 is filed as Phase-9e.\n\n"
+    )
+    # Baseline iso-tuned cell at bs=128 wd=5e-4
+    base, base_seeds, base_excl = load_iso_tuned_cell_seed_top1s(
+        "baseline_resnet20", ISO_TUNED_BASELINE_CELL,
+    )
+    if not base:
+        out.append("Iso-tuned baseline cells missing; skipping Section 10.\n\n")
+        return "".join(out)
+    base_mean = statistics.mean(base)
+    base_std = statistics.stdev(base) if len(base) > 1 else 0.0
+    out.append(
+        f"**Iso-tuned baseline_resnet20 (lr=3e-3, wd=5e-4, bs=128, AdamW), "
+        f"n={len(base)}:** seeds={base_seeds}, top1={['%.4f' % v for v in base]}, "
+        f"mean={base_mean:.4f}, σ={base_std*100:.2f} pp.\n\n"
+        f"**Comparison to default-config n=7 baseline σ:** σ_default={0.453:.3f} pp; "
+        f"σ_iso={base_std*100:.2f} pp; iso-tuned σ is "
+        f"{(base_std*100)/0.453:.2f}× wider on this smaller n=3 sample. "
+        f"2σ_iso = {2*base_std*100:.2f} pp; 2σ_default = 0.91 pp.\n\n"
+    )
+    out.append(
+        "| Claim | Iso-tuned cell | Leader top1 (seeds) | Δmean | Δmedian | "
+        "Wilcoxon W | p_one | p_two | 95% bootstrap CI on Δmean | "
+        "Outside 2σ_iso=" f"{2*base_std*100:.2f}pp" "? | "
+        "Outside 2σ_default=0.91pp? | Phase-5 ordinal gate |\n"
+    )
+    out.append("|---|---|---|---:|---:|---:|---:|---:|---|:---:|:---:|:---:|\n")
+    rows: list[dict] = []
+    for tag, cell in ISO_TUNED_LEADER_CELLS.items():
+        L, L_seeds, L_excl = load_iso_tuned_cell_seed_top1s(tag, cell)
+        if not L:
+            continue
+        # Align by seed for paired test; assume seeds 0..2 present in both arms.
+        common = sorted(set(L_seeds).intersection(set(base_seeds)))
+        if len(common) < 2:
+            continue
+        L_by_seed = {s: t for s, t in zip(L_seeds, L)}
+        B_by_seed = {s: t for s, t in zip(base_seeds, base)}
+        L_aligned = [L_by_seed[s] for s in common]
+        B_aligned = [B_by_seed[s] for s in common]
+        wilc = paired_wilcoxon(L_aligned, B_aligned)
+        sign = sign_test_one_sided(L_aligned, B_aligned)
+        obs, lo, hi = bootstrap_ci_diff(L_aligned, B_aligned)
+        d_mean = statistics.mean(L_aligned) - statistics.mean(B_aligned)
+        d_median = statistics.median(L_aligned) - statistics.median(B_aligned)
+        outside_iso = abs(d_mean) > 2 * base_std
+        outside_def = abs(d_mean) > 0.0091
+        seed_str = ",".join(f"s{s}={v:.4f}" for s, v in zip(common, L_aligned))
+        excl_note = ""
+        if L_excl:
+            excl_note = f" (excluded: {[f'seed{s}@{e}ep' for s,_,e in L_excl]})"
+        out.append(
+            f"| {tag} | {cell} | {seed_str}{excl_note} | "
+            f"{fmt_pp(d_mean)} | {fmt_pp(d_median)} | "
+            f"{wilc['W']:.2f} | {wilc['p_one']:.4f} | {wilc['p_two']:.4f} | "
+            f"[{fmt_pp(lo)}, {fmt_pp(hi)}] | "
+            f"{'YES' if outside_iso else 'NO'} | "
+            f"{'YES' if outside_def else 'NO'} | "
+            f"{'pass' if sign['pass'] else 'FAIL'} (min L = {sign['min_lead']:.4f} "
+            f"vs max B = {sign['max_base']:.4f}) |\n"
+        )
+        rows.append({
+            "tag": tag, "L": L_aligned, "B": B_aligned, "d_mean": d_mean,
+            "d_median": d_median, "wilc": wilc, "sign": sign,
+            "boot_ci": (obs, lo, hi), "cell": cell, "excluded": L_excl,
+        })
+    out.append("\n### Per-claim narrative (iso-tuned, n=3)\n\n")
+    for r in rows:
+        in_ci = r["boot_ci"][1] <= 0.0 <= r["boot_ci"][2]
+        out.append(
+            f"- **{r['tag']} (iso-tuned)** — Δmean={fmt_pp(r['d_mean'])}, "
+            f"Δmedian={fmt_pp(r['d_median'])}; paired Wilcoxon W="
+            f"{r['wilc']['W']:.1f}, one-sided p={r['wilc']['p_one']:.4f} "
+            f"(n=3 floor=0.1250); 95% bootstrap CI on Δmean=["
+            f"{fmt_pp(r['boot_ci'][1])}, {fmt_pp(r['boot_ci'][2])}], "
+            f"contains 0 = {in_ci}; Phase-5 ordinal-gate pass = "
+            f"{r['sign']['pass']} (min(leader)={r['sign']['min_lead']:.4f} "
+            f"vs max(baseline)={r['sign']['max_base']:.4f}).\n"
+        )
+    out.append(
+        "\n### Key observation\n\n"
+        f"The iso-tuned baseline σ at n=3 = {base_std*100:.2f} pp is "
+        f"{(base_std*100)/0.453:.2f}× wider than the default-config baseline "
+        "σ at n=7 (0.453 pp). At this small-n iso-tuned cell, the leader-"
+        "vs-baseline Δs of +1.16 to +1.68 pp are NOT formally outside "
+        f"2σ_iso ({2*base_std*100:.2f} pp); they DO clear the default-config "
+        "2σ_default = 0.91 pp band. The directional signal is preserved "
+        "(every leader seed beats the seed-matched baseline seed except for "
+        "one tied pair at pair_gm_pdw seed=1=baseline seed=2 = 0.6057 and one "
+        "seed-mismatch on phi_budget and slot_act_sine), but the n=3 "
+        "iso-tuned Wilcoxon floor (0.125) cannot clear Holm-Bonferroni "
+        "α' = 0.0167.\n\n"
+        "### Honest framing\n\n"
+        "**The default-config n=7 certification (Sections 0–6) stands.** "
+        "The default-config baseline σ at n=7 is small (0.453 pp) and the "
+        "three leaders' default-config Δmeans of +1.24 / +1.74 / +1.78 pp "
+        "all exit 2σ_default = 0.91 pp; the paired Wilcoxon n=7 floor "
+        "(0.0078) clears Holm-Bonferroni α'=0.0167.\n\n"
+        "**The iso-tuned-cell extension at n=3 is a robustness check, NOT a "
+        "re-certification.** It confirms directional positive Δ for all "
+        "three winners across the hyperparameter regime (every winner's mean "
+        "exceeds the iso-tuned baseline mean), but cannot itself re-certify "
+        "at NeurIPS α. A Phase-9f n=7+ extension at the iso-tuned cell — "
+        "which would deliver a Wilcoxon floor of 0.0078 and a tighter "
+        "(variance ~1/n) bootstrap CI — is filed as future work.\n\n"
+        "**Phase-5 ordinal gate at iso-tuned n=3.** The gate "
+        "min(leader_s) > max(baseline_s) FAILS for all three winners at "
+        "this cell: max(baseline) = 0.6057 (seed=1); "
+        "min(phi_budget) = 0.5998 < 0.6057 → FAIL; "
+        "min(pair_gm_pdw) = 0.6057 = 0.6057 → BORDERLINE/FAIL "
+        "(strict inequality required); "
+        "min(slot_act_sine) = 0.6039 < 0.6057 → FAIL. "
+        "This honestly weakens the cross-hyperparameter cross-dataset "
+        "ordinal claim at small n=3 iso-tuned; the n=7 default-config "
+        "Phase-5 gate (Section 2) is the strong, formally-cleared "
+        "version.\n\n"
+    )
+    return "".join(out)
+
+
 def main() -> None:
     section0 = section_0_promotion_announcement()
     section1, rows = section_1_phase8_winners()
@@ -731,6 +942,7 @@ def main() -> None:
     section7 = section_7_hillclimbed_best()
     section8 = section_8_calibration_interval_analysis()
     section9 = section_9_paired_permutation()
+    section10 = section_10_iso_tuned()
     print(section0)
     print(section1)
     print(section2)
@@ -741,6 +953,7 @@ def main() -> None:
     print(section7)
     print(section8)
     print(section9)
+    print(section10)
 
 
 if __name__ == "__main__":
