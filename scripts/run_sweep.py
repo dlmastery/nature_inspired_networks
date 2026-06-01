@@ -611,6 +611,77 @@ def build_matrix(curated: bool = True) -> list[dict]:
                                     flags=base_flags.copy()
                                           | dict(fractal_filter=True,
                                                  fractal_filter_kernels=[3, 5, 8]))))
+
+    # ---------------------------------------------------------------
+    # Phase-9e Wave-1 — G9 combo winners (H87 / H88 / H91).
+    # Three new orthogonal-axis stacks proposed by Phase-9d R-D
+    # synthesis (commit c3b01c2) on top of the two project-certified
+    # winners (pair_gm_pdw + slot_act_sine). Each composes priors on
+    # DISJOINT training-stack axes (Rule 23). Wave-1 launch follows
+    # Phase-9f completion; estimated total budget ~11.1 GPU-h at
+    # 3 seeds x 30 epochs CIFAR-100 (CIFAR-10 for screening).
+    # ---------------------------------------------------------------
+
+    # H87 combo_n4_pair_slot — N=4 stack: pair_gm_pdw + slot_act_sine.
+    # Joins the 2 best-performing certified winners on orthogonal axes:
+    #   A7  channel  ← phi_budget (PB)
+    #   A15 momentum ← momentum_schedule="golden"
+    #   A12 wd       ← phi_decay_wd + phi_decay_base=5e-4
+    #   A8  activation ← sine_activation + omega_init=1.0
+    # Caveat: SIREN init (H81) needs Sitzmann-2020 prescribed init, NOT
+    # phi_init. At pre-sub init scheme: standard Kaiming on conv stems
+    # + Sitzmann SIREN scaling on the sine-activation taps. All four
+    # component override keys are already plumbed in runner.run_one
+    # (momentum_schedule, phi_decay_wd, sine_activation handled by
+    # post_build_mutators + TrainConfig). READY.
+    rows.append(dict(tag="combo_n4_pair_slot",
+                     overrides=dict(**PB, momentum_schedule="golden",
+                                    phi_decay_wd=True, phi_decay_base=5e-4,
+                                    sine_activation=True, omega_init=1.0)))
+
+    # H88 combo_novelty_betti_torus — 3 novelty-pocket priors stacked.
+    # Tests the no-mainstream-analog design space:
+    #   A7  channel        ← phi_budget (PB, H09)
+    #   A3  boundary       ← toroidal=True (H22) — NaturePrior flag
+    #   A16 PH regulariser ← betti_loss_weight=0.01 (H51)
+    #
+    # WIRING GAP: model="phi_budget" does NOT use NaturePrior flags
+    # (toroidal is only honoured under model="NaturePrior"); the
+    # betti_loss_weight key is NOT plumbed in TrainConfig / Trainer
+    # at all (the betti_loss module exists but has no runner
+    # callback). Therefore this row is documented for tracking but
+    # the launch will SKIP it until two minimal additive patches land:
+    #   1. runner.run_one — when model="phi_budget" and any
+    #      flag-bearing key is present, route through a phi_budget +
+    #      NaturePrior-flag-overlay path (or build phi_budget then
+    #      apply toroidal_pad as a post-build mutator).
+    #   2. train.TrainConfig — add ``betti_loss_weight: float = 0.0``
+    #      and Trainer._epoch_loop call into ph_reg / betti_loss for
+    #      auxiliary loss. Mirrors the existing prh_loss callback.
+    rows.append(dict(tag="combo_novelty_betti_torus",
+                     overrides=dict(**PB, toroidal=True,
+                                    betti_loss_weight=0.01)))
+
+    # H91 combo_domain_icosa_rotation — icosa-equivariant + IcosaRoPE3D
+    # on rotated-CIFAR-100 (the natural-fit testbed for H71).
+    #   model = vit_tiny_icosa (built-in dispatch; rope_kind=icosa3d
+    #           default for this model name)
+    #   dataset = rotated_cifar100 (load_dataset routes via
+    #           rotated_cifar_loaders, train applies stochastic 4-angle
+    #           rotation, eval is 4-rotation TTA)
+    # `icosa_active=True` is informational only — the icosa rotation
+    # is engaged by selecting vit_tiny_icosa (which defaults
+    # rope_kind="icosa3d"); the flag is recorded in the row overrides
+    # so the runner config dump reflects the intent. The
+    # vit_tiny family overrides the standard NaturePrior batch_size /
+    # lr / wd config, so launch via dataset-specific config carrying
+    # AdamW base recipe (cifar100_phase4.yaml) is appropriate.
+    # READY.
+    rows.append(dict(tag="combo_domain_icosa_rotation",
+                     overrides=dict(model="vit_tiny_icosa",
+                                    dataset="rotated_cifar100",
+                                    icosa_active=True)))
+
     return rows
 
 
