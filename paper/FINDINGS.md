@@ -32,6 +32,30 @@
 >
 > Full per-claim certification table + Holm step-down derivation:
 > [`paper/STATISTICAL_TESTS.md`](STATISTICAL_TESTS.md) §0–§3.
+>
+> ### 🔬 2026-06-01 update — Phase-9f n=7 iso-tuned extension complete (cert STANDS at default-config; iso-tuned regime NOT re-certified)
+>
+> Phase-9f n=7 iso-tuned extension complete. The iso-tuned cell
+> (lr=3e-3, wd=5e-4, bs=128, AdamW; `slot_act_sine` at wd=2e-3) was
+> extended to n=7 seeds on both the baseline and the three leaders.
+> **Iso-tuned-cell Δ shrinks to +0.54 to +0.79 pp** (Δmean_unpaired
+> vs default-config Δmean +1.24 to +1.78 pp). Paired Wilcoxon at
+> iso-tuned n=7: `pair_gm_pdw` W=4.0 p_one=0.1094 (4/7 positive
+> deltas), `sg_only_phi_budget` W=3.0 p_one=0.0781 (n=6 after seed-3
+> exclusion as <30 ep), `slot_act_sine` W=2.0 p_one=0.3750 (n=4 at
+> wd=5e-4 baseline neighbour). **Phase-5 ordinal gate FAILS at
+> iso-tuned n=7 for all three winners** (max iso-tuned baseline =
+> 0.6075 at seed=3; min iso-tuned leader seeds 0.5998 / 0.6049 /
+> 0.6057 all ≤ 0.6075). **The default-config n=7 cert STANDS as the
+> formal claim of the paper**, but the iso-tuned-regime equivalent
+> CANNOT be certified at NeurIPS-α with this sample size. **R2
+> BLOCKER #13 concern partially validated** — at iso-tuned bs=128
+> lr=3e-3 the baseline gets the same tuning love and the relative
+> lift shrinks substantially. Phase-9g (n=15+ iso-tuned extension)
+> is the principled re-certification path; Phase-9e (wd=2e-3
+> baseline neighbour for `slot_act_sine`) is the related closure.
+> Full Phase-9f closeout table:
+> [`paper/STATISTICAL_TESTS.md`](STATISTICAL_TESTS.md) §10.
 
 > ## ⛰️ 2026-05-30 PM — Hill-climbed-best regime confirms the n=7 default-config certification (Phase-9a, BLOCKER #13 partial refutation)
 >
@@ -68,7 +92,7 @@
 > [`paper/STATISTICAL_TESTS.md`](STATISTICAL_TESTS.md) §7.
 > Splice in PAPER.md: [`§5.5.4`](../PAPER.md#554--hill-climbed-best-regime-phase-9a-2026-05-30--blocker-13-refutation).
 
-> ## 🌐 2026-05-31 — Iso-tuned-comparison closeout (Phase-9a baseline-extension, n=3)
+> ## 🌐 2026-05-31 — Iso-tuned-comparison closeout (Phase-9a baseline-extension, n=3) — SUPERSEDED by Phase-9f n=7 (see 2026-06-01 update in the PROMOTION block above)
 >
 > The Phase-9a hill-climb's Section-7 comparison used the hill-climbed
 > baseline at bs=256 vs the three leaders' hill-climbed bests at bs=128
