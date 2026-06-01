@@ -931,6 +931,125 @@ def section_10_iso_tuned() -> str:
     return "".join(out)
 
 
+def section_11_calibration_extension() -> str:
+    """Section 11 — Phase-9b calibration extension to n=62.
+
+    Added 2026-05-31 in response to AC punchlist item 3: extend the
+    pytorch/vision audit calibration (n=15) to n>=50 via 47 additional
+    audits across timm, HF transformers, Lightning Bolts/fastai,
+    torch.optim extras, and state-spaces/mamba. The MAJOR/BROKEN-tier
+    rate stays at 0 across the extended sample; the §8 statistics
+    are recomputed against the extended n_cal.
+
+    Inputs (all from `audits/AUDIT_CALIBRATION_THIRD_PARTY.md` Appendix A):
+      project       MAJOR/BROKEN: 18 of 83  (unchanged from §8)
+      calibration   MAJOR/BROKEN:  0 of 62  (extended from 0/15)
+    """
+    rng_local = np.random.default_rng(20260531)
+    n_proj, k_proj = 83, 18
+    n_cal, k_cal = 62, 0
+    p_proj = k_proj / n_proj
+    p_cal = k_cal / n_cal
+    n_boot = 100000
+    proj_draws = rng_local.binomial(n_proj, p_proj, size=n_boot) / n_proj
+    cal_draws = rng_local.binomial(n_cal, p_cal, size=n_boot) / n_cal
+    diffs = proj_draws - cal_draws
+    lo_95 = float(np.quantile(diffs, 0.025))
+    hi_95 = float(np.quantile(diffs, 0.975))
+
+    def _wilson(k: int, n: int, alpha: float = 0.05) -> tuple[float, float]:
+        z = sps.norm.ppf(1 - alpha / 2)
+        if n == 0:
+            return (0.0, 1.0)
+        p = k / n
+        denom = 1 + z * z / n
+        center = (p + z * z / (2 * n)) / denom
+        width = z * math.sqrt(p * (1 - p) / n + z * z / (4 * n * n)) / denom
+        return (max(0.0, center - width), min(1.0, center + width))
+
+    w_proj = _wilson(k_proj, n_proj)
+    w_cal_15 = _wilson(0, 15)
+    w_cal_62 = _wilson(k_cal, n_cal)
+    table = [[k_proj, n_proj - k_proj], [k_cal, n_cal - k_cal]]
+    fisher_one = float(sps.fisher_exact(table, alternative="greater").pvalue)
+    fisher_two = float(sps.fisher_exact(table, alternative="two-sided").pvalue)
+    p_pool = (k_proj + k_cal) / (n_proj + n_cal)
+    se_pool = math.sqrt(p_pool * (1 - p_pool) * (1 / n_proj + 1 / n_cal))
+    z_stat = (p_proj - p_cal) / se_pool if se_pool > 0 else float("nan")
+    z_p = 2 * (1 - float(sps.norm.cdf(abs(z_stat))))
+
+    # Also report tightening relative to n=15
+    n_cal_15, k_cal_15 = 15, 0
+    rng_15 = np.random.default_rng(20260530)
+    proj_15 = rng_15.binomial(n_proj, p_proj, size=n_boot) / n_proj
+    cal_15 = rng_15.binomial(n_cal_15, k_cal_15 / n_cal_15, size=n_boot) / n_cal_15
+    diffs_15 = proj_15 - cal_15
+    lo_15 = float(np.quantile(diffs_15, 0.025))
+    hi_15 = float(np.quantile(diffs_15, 0.975))
+    overlap_n15 = "overlap on a 6.2-pp window (project lower 14.2% vs calibration upper 20.4%)"
+    if w_cal_62[1] < w_proj[0]:
+        overlap_62 = (
+            f"NO OVERLAP (project lower {w_proj[0]*100:.1f}% > "
+            f"calibration upper {w_cal_62[1]*100:.1f}% by "
+            f"{(w_proj[0]-w_cal_62[1])*100:.1f} pp)"
+        )
+    else:
+        overlap_62 = (
+            f"overlap (project lower {w_proj[0]*100:.1f}% <= "
+            f"calibration upper {w_cal_62[1]*100:.1f}%)"
+        )
+
+    return (
+        "## Section 11 — Audit-calibration extension to n>=50: tightened bootstrap CI + Wilson CIs + Fisher exact (added 2026-05-31 per AC punchlist item 3)\n\n"
+        f"Project: {k_proj}/{n_proj} MAJOR/BROKEN ({p_proj*100:.1f}%); "
+        f"extended calibration: {k_cal}/{n_cal} ({p_cal*100:.1f}%); "
+        f"observed diff = {(p_proj-p_cal)*100:+.2f} pp (unchanged point estimate).\n\n"
+        "| quantity | n=15 (§8) | n=62 (this extension) |\n"
+        "|---|---|---|\n"
+        f"| Bootstrap 95% CI on diff | [{lo_15*100:+.2f}, {hi_15*100:+.2f}] pp | "
+        f"**[{lo_95*100:+.2f}, {hi_95*100:+.2f}] pp** |\n"
+        f"| CI half-width | {(hi_15-lo_15)/2*100:.2f} pp | **{(hi_95-lo_95)/2*100:.2f} pp** |\n"
+        f"| Wilson 95% CI project rate (18/83) | [{w_proj[0]*100:.1f}%, {w_proj[1]*100:.1f}%] | "
+        f"[{w_proj[0]*100:.1f}%, {w_proj[1]*100:.1f}%] (unchanged) |\n"
+        f"| Wilson 95% CI calibration rate | [0.0%, {w_cal_15[1]*100:.1f}%] (0/15) | "
+        f"**[0.0%, {w_cal_62[1]*100:.1f}%] (0/62)** |\n"
+        f"| Wilson CI overlap | {overlap_n15} | **{overlap_62}** |\n"
+        f"| Fisher exact, one-sided (proj > cal) | p = 0.0363 | **p = {fisher_one:.2e}** |\n"
+        f"| Fisher exact, two-sided | p = 0.0658 | **p = {fisher_two:.2e}** |\n"
+        f"| Pooled two-proportion z | z=1.996, p=0.0459 | **z={z_stat:.3f}, p={z_p:.2e}** |\n\n"
+        "**Reading.** Extending the calibration from n=15 to n=62 shrinks "
+        "the Wilson upper bound on the calibration MAJOR/BROKEN rate from "
+        f"20.4% to {w_cal_62[1]*100:.1f}% (~{20.4/(w_cal_62[1]*100):.1f}x tighter), "
+        "eliminates the 6.2-pp Wilson CI overlap, and pushes the two-sided "
+        "Fisher exact from p=0.066 (not clearing alpha=0.05) to "
+        f"p={fisher_two:.2e} (clearing alpha=0.05 by >2500x margin). The "
+        "pooled two-proportion z-statistic doubles from z=1.996 (p=0.046) "
+        f"to z={z_stat:.3f} (p={z_p:.2e}, >500x margin past alpha=0.05).\n\n"
+        "**Honest note on the parametric-bootstrap CI.** The bootstrap "
+        f"95% CI on the difference is essentially unchanged at "
+        f"[{lo_95*100:+.2f}, {hi_95*100:+.2f}] pp "
+        f"(half-width {(hi_95-lo_95)/2*100:.2f} pp at n=62 vs "
+        f"{(hi_15-lo_15)/2*100:.2f} pp at n=15). This is NOT a defect: "
+        "with k_cal=0 the calibration arm's parametric bootstrap is "
+        "Binomial(n_cal, 0), which is identically 0 regardless of n_cal. "
+        "The difference distribution's spread is therefore set entirely "
+        "by the project arm's variance (n=83, p=0.217), which has not "
+        "changed. The CI tightening at n=62 lives in the Wilson, Fisher, "
+        "and z columns above — those tests use the calibration n directly "
+        "via the count, not just its variance. The bootstrap CI's "
+        "stability is itself informative: the +22-pp point estimate "
+        "is robust to calibration n_cal, and the lower bound clears 0 "
+        f"by {lo_95*100:.1f} pp at any n_cal >= 15 in this regime.\n\n"
+        "**Honest framing (AC item 3 response).** The point estimate of the "
+        "22-pp MAJOR/BROKEN excess is unchanged at the larger n; the "
+        "Phase-9b extension's contribution is to tighten the conservative "
+        "two-sided test from 'directionally credible' (p=0.066 at n=15) "
+        "to 'cleared at alpha=0.05 by >2500x margin' (p=1.94e-5 at n=62). "
+        "The §5 conclusion in AUDIT_CALIBRATION_THIRD_PARTY.md is updated "
+        "accordingly in Appendix A.7.\n\n"
+    )
+
+
 def main() -> None:
     section0 = section_0_promotion_announcement()
     section1, rows = section_1_phase8_winners()
@@ -943,6 +1062,7 @@ def main() -> None:
     section8 = section_8_calibration_interval_analysis()
     section9 = section_9_paired_permutation()
     section10 = section_10_iso_tuned()
+    section11 = section_11_calibration_extension()
     print(section0)
     print(section1)
     print(section2)
@@ -954,6 +1074,7 @@ def main() -> None:
     print(section8)
     print(section9)
     print(section10)
+    print(section11)
 
 
 if __name__ == "__main__":

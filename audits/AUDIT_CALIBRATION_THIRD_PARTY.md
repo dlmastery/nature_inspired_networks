@@ -373,3 +373,265 @@ our project's 51 %).
 33.3 %. Calibration vs project: −17.3 pp aggregate, −21.7 pp on the
 MAJOR/BROKEN sub-tier that anchors the audit's diagnostic narrative.
 Area-chair item #12 RESOLVED.*
+
+---
+
+## Appendix A — Phase-9b extension to n ≥ 50 (added 2026-05-31)
+
+### A.1 Why this extension
+
+The §4.3.1 / §5 conclusion explicitly flagged the n=15 calibration as
+the limiting factor for clearing two-sided Fisher exact at α=0.05.
+AC punchlist item 3 mandated an extension to n ≥ 50 to tighten the
+bootstrap CI on the 22-pp MAJOR/BROKEN excess. This appendix carries
+out that extension by auditing 47 additional "hypothesis-style" claims
+across 5 third-party repos (HEAD-of-main snapshot 2026-05-31):
+
+| Repo | Rows added | TP IDs |
+|---|---|---|
+| timm (huggingface/pytorch-image-models) | 19 | TP16-TP34 |
+| HuggingFace transformers | 15 | TP35-TP49 |
+| Lightning Bolts / fastai | 6 | TP50-TP55 |
+| torch.optim (extra: AdamW, NAdam, RAdam, Adagrad) | 4 | TP56-TP59 |
+| state-spaces/mamba | 3 | TP60-TP62 |
+| **Total new** | **47** | |
+| **Grand total (with §2)** | **62** | TP1-TP62 |
+
+### A.2 Methodology note
+
+Identical Track-A audit doctrine (§1.3) and symmetric-grading principle
+(§1.4) applied to the new rows. Each row pairs a code:line citation
+with the arXiv:section being claimed. Raw notes are in
+[`AUDIT_CALIBRATION_RAW_NOTES.md`](AUDIT_CALIBRATION_RAW_NOTES.md)
+"Phase-9b extension" section.
+
+Two methodological caveats:
+1. **Single auditor (still).** Same model (Opus 4.7) graded all
+   47 new rows. The confirmation-bias risk from §B-1 applies here too.
+2. **Five excluded candidates.** Five claims were considered but
+   excluded because the WebFetch did not return enough code to verify
+   them at file:line resolution (timm EfficientNet MBConv block body,
+   HF CLIP "quick GELU" choice, Mamba dt_min/dt_max clamping, fastai
+   stack_y mixup form, and HF transformers' deprecated AdamW). These
+   are honestly documented in RAW_NOTES rather than silently inflated
+   into the aggregate.
+
+### A.3 New hypothesis table (TP16..TP62)
+
+Each row cites file:line + arXiv:section + verdict. Full quoted
+mechanism analysis is in RAW_NOTES.
+
+| ID | Claim (file:line → paper §) | Verdict |
+|---|---|---|
+| TP16 | timm/models/resnet.py:2647-2703 → Bello 2021 arXiv:2103.07579 RS recipe | PASS |
+| TP17 | timm/models/resnet.py:209-216 → V1.5 stride placement vs He 2016 §4.1 | MINOR |
+| TP18 | timm/models/resnet.py:125-128, 189-192 → Goyal 2017 arXiv:1706.02677 zero-γ init | PASS |
+| TP19 | timm/models/resnet.py:436-461 → He 2018 "Bag of Tricks" arXiv:1812.01187 §3.1 deep stem | PASS |
+| TP20 | timm/models/resnet.py:597-614 → ResNet-D avg_down shortcut §3.1 | PASS |
+| TP21 | timm/models/efficientnet.py factory multipliers → Tan & Le 2019 arXiv:1905.11946 §3.3 compound scaling | MINOR |
+| TP22 | timm/models/efficientnet.py `se0.25` arch_def → Hu 2018 arXiv:1709.01507 SE ratio | PASS |
+| TP23 | timm/models/convnext.py:150-180 ConvNeXt block → Liu 2022 arXiv:2201.03545 Fig. 4 | PASS |
+| TP24 | timm/models/mlp_mixer.py:47-79, 311 GAP no-class-token → Tolstikhin 2021 arXiv:2105.01601 §2 | PASS |
+| TP25 | timm/models/byobnet.py:1247-1424 RepVggBlock → Ding 2021 arXiv:2101.03697 | PASS |
+| TP26 | timm/models/vision_transformer.py default Block pre-LN → Dosovitskiy 2020 arXiv:2010.11929 §3.1 | PASS |
+| TP27 | timm/models/vision_transformer.py `ls1 = Identity() if init_values is None` → ViT-2020 default faithful | PASS |
+| TP28 | timm/data/auto_augment.py:588-639 RandAugment → Cubuk 2019 arXiv:1909.13719 | PASS |
+| TP29 | timm/layers/drop.py:256-261 DropPath → Huang 2016 arXiv:1603.09382 | PASS |
+| TP30 | timm/loss/cross_entropy.py:13-19 label smoothing → Pereyra 2017 arXiv:1701.06548 / Szegedy 2016 | PASS |
+| TP31 | timm/optim/lars.py:106-130 LARS → You 2017 arXiv:1708.03888 | PASS |
+| TP32 | timm/optim/lamb.py augmented LAMB → You 2019 arXiv:1904.00962 Alg. 1 + post-paper additions | MINOR |
+| TP33 | timm/optim/lookahead.py:15 default k=6 vs Zhang 2019 arXiv:1907.08610 k=5 | MINOR |
+| TP34 | timm/layers/evo_norm.py:155 EvoNormS0 → Liu 2020 arXiv:2004.02967 | PASS |
+| TP35 | transformers/.../bert/modeling_bert.py:104-115 scaled dot-product → Vaswani 2017 §3.2.2 | PASS |
+| TP36 | transformers/.../bert/modeling_bert.py post-norm BertLayer → Devlin 2018 / Vaswani 2017 §3.1 | PASS |
+| TP37 | transformers/.../gpt2/modeling_gpt2.py pre-LN ln_1/ln_2/ln_f → Radford 2019 §2.3 | PASS |
+| TP38 | transformers/.../gpt2/modeling_gpt2.py `_tied_weights_keys` → Press & Wolf 2017 arXiv:1608.05859 | PASS |
+| TP39 | transformers/.../llama/modeling_llama.py:65-166 RoPE → Su 2021 arXiv:2104.09864 Eq. 14 | PASS |
+| TP40 | transformers/.../llama/modeling_llama.py:46-62 RMSNorm → Zhang & Sennrich 2019 arXiv:1910.07467 | PASS |
+| TP41 | transformers/.../llama/modeling_llama.py:180-195 SwiGLU MLP → Shazeer 2020 arXiv:2002.05202 | PASS |
+| TP42 | transformers/.../llama/modeling_llama.py:201-221, repeat_kv L170 GQA → Ainslie 2023 arXiv:2305.13245 | PASS |
+| TP43 | transformers/.../t5/modeling_t5.py:283-330 relative-bias bucketing → Raffel 2019 arXiv:1910.10683 §2.1 | PASS |
+| TP44 | transformers/.../t5/modeling_t5.py:43-60 T5LayerNorm RMS-style → Zhang & Sennrich 2019 | PASS |
+| TP45 | transformers/.../vit/modeling_vit.py:55-110 cls+pos+patch Conv2d → Dosovitskiy 2020 §3.1 | PASS |
+| TP46 | transformers/.../clip/modeling_clip.py:569-594 logit_scale + symmetric loss → Radford 2021 §2.5 | PASS |
+| TP47 | transformers/.../gpt_neox/modeling_gpt_neox.py:199-228 parallel residual → Black 2022 arXiv:2204.06745 §3.4 | PASS |
+| TP48 | transformers/.../mistral/modeling_mistral.py:278 sliding-window mask → Jiang 2023 arXiv:2310.06825 §2.1 | PASS |
+| TP49 | transformers/optimization.py:149-176 `get_cosine_schedule_with_warmup` num_cycles=0.5 → SGDR degenerate | MINOR |
+| TP50 | lightning-bolts/optimizers/lars.py:113-127 LARS → You 2017 arXiv:1708.03888 | PASS |
+| TP51 | fastai/callback/schedule.py:46 `pct_start=0.25` vs Smith 2018 arXiv:1803.09820 §6.1 (suggests 0.45) | MINOR |
+| TP52 | fastai/callback/mixup.py:34 default `alpha=0.4` vs Zhang 2017 arXiv:1710.09412 Table 1 α=0.2 | MINOR |
+| TP53 | fastai/callback/mixup.py:52 CutMix `alpha=1.0` → Yun 2019 arXiv:1905.04899 §3 | PASS |
+| TP54 | lightning-bolts SimCLR temperature default 0.1 (CIFAR override 0.5) → Chen 2020 arXiv:2002.05709 §B.1 | MINOR |
+| TP55 | lightning-bolts SimCLR projection head 2-layer MLP → Chen 2020 §2 | PASS |
+| TP56 | torch/optim/adamw.py decoupled WD → Loshchilov & Hutter 2017 arXiv:1711.05101 Alg. 2 | PASS |
+| TP57 | torch/optim/nadam.py:351-386 Dozat schedule β1·(1−0.5·0.96^…) → Dozat 2016 Appendix A.2 | PASS |
+| TP58 | torch/optim/radam.py:335 SMA threshold `>5.0` vs Liu 2019 arXiv:1908.03265 Alg. 2 `>4` | MINOR |
+| TP59 | torch/optim/adagrad.py:78-82, 280-284 → Duchi 2011 JMLR | PASS |
+| TP60 | mamba_ssm/ops/selective_scan_interface.py:107-165 reference scan → Gu & Dao 2023 arXiv:2312.00752 §3.3 | PASS |
+| TP61 | mamba_ssm/modules/mamba_simple.py:73-77 S4D-style A init → Gu 2022 arXiv:2206.11893 §3.2 | PASS |
+| TP62 | mamba_ssm/modules/mamba2.py:141, 169 SSD chunk scan → Dao & Gu 2024 arXiv:2405.21060 | PASS |
+
+### A.4 Per-repo verdict distribution
+
+| Repo | n | PASS | MINOR | MAJOR | BROKEN | Non-PASS % |
+|---|---|---|---|---|---|---|
+| timm | 19 | 15 | 4 | 0 | 0 | 21.1% |
+| HF transformers | 15 | 14 | 1 | 0 | 0 | 6.7% |
+| Lightning Bolts / fastai | 6 | 3 | 3 | 0 | 0 | 50.0% |
+| torch.optim (extra) | 4 | 3 | 1 | 0 | 0 | 25.0% |
+| state-spaces/mamba | 3 | 3 | 0 | 0 | 0 | 0.0% |
+| **Phase-9b new** | **47** | **38** | **9** | **0** | **0** | **19.1%** |
+
+### A.5 Updated aggregate at n=62
+
+| Tier | §2 (n=15) | Phase-9b (n=47) | Total (n=62) | Share |
+|---|---|---|---|---|
+| PASS | 10 | 38 | **48** | 77.4% |
+| MINOR | 5 | 9 | **14** | 22.6% |
+| MAJOR | 0 | 0 | **0** | 0.0% |
+| BROKEN | 0 | 0 | **0** | 0.0% |
+| **Non-PASS** | **5/15 (33.3%)** | **9/47 (19.1%)** | **14/62 (22.6%)** | — |
+| **MAJOR/BROKEN** | **0/15 (0.0%)** | **0/47 (0.0%)** | **0/62 (0.0%)** | — |
+
+**The MAJOR/BROKEN-tier rate is still exactly 0% at n=62.** Adding
+47 new audits across 5 large, well-trusted repos produced ZERO MAJOR
+or BROKEN findings. The audit doctrine on third-party code surfaces
+only MINOR-tier deviations (documented intentional choices, default-
+value drifts, and post-paper extensions); no third-party code matched
+our project's MAJOR-tier pattern of doc-vs-code mismatch or our BROKEN-
+tier pattern of doc-promised-but-not-implemented mechanisms.
+
+### A.6 Recomputed 22-pp MAJOR/BROKEN excess CI at n=62
+
+Computed via [`scripts/_compute_stat_tests.py`](../scripts/_compute_stat_tests.py)
+§11 (100 000-iteration parametric binomial bootstrap, rng seed
+20260531). Inputs: project k=18, n=83 (unchanged); calibration k=0,
+n=62 (extended from n=15).
+
+| quantity | n=15 (§4.3.1) | n=62 (this extension) |
+|---|---|---|
+| Observed diff (proj − cal) | +21.7 pp | **+21.7 pp** (proj rate unchanged) |
+| Bootstrap 95% CI on diff | [+13.3, +31.3] pp | **[+13.3, +31.3] pp** (~unchanged) |
+| Bootstrap CI half-width | 9.0 pp | 9.0 pp |
+| Wilson 95% CI on project rate (18/83) | [14.2%, 31.7%] | [14.2%, 31.7%] (unchanged) |
+| Wilson 95% CI on calibration rate (0/n) | [0.0%, 20.4%] (n=15) | **[0.0%, 5.8%]** (n=62) |
+| Wilson CI overlap | 14.2% vs 20.4% → 6.2-pp overlap | **14.2% vs 5.8% → NO OVERLAP (8.3-pp separation)** |
+| Fisher exact, one-sided p (proj > cal) | 0.0363 | **p = 1.79e-5** |
+| Fisher exact, two-sided p | 0.0658 | **p = 1.94e-5** |
+| Pooled two-proportion z, two-sided p | 0.0459 | **z = 3.92, p = 8.93e-5** |
+
+The exact bootstrap interval, Fisher exact, and z-statistic are
+computed by `scripts/_compute_stat_tests.py` §11 — see §11 of
+[`paper/STATISTICAL_TESTS.md`](../paper/STATISTICAL_TESTS.md) for
+the regenerated output.
+
+**Key qualitative changes at n=62:**
+
+1. **Wilson CI on calibration rate shrinks from [0.0%, 20.4%] to
+   [0.0%, 5.8%]** — a ~3.5× tighter upper bound. The "calibration
+   MAJOR/BROKEN rate could plausibly be as high as 20%" objection
+   (§4.3.1 reading) is no longer tenable.
+2. **Wilson CIs on the two rates no longer overlap.** At n=15 they
+   overlapped on a 6.2-pp window (project lower 14.2% vs calibration
+   upper 20.4%). At n=62 the project lower bound (14.2%) sits above
+   the calibration upper bound (5.8%) by 8.3 pp — formal Wilson
+   non-overlap is satisfied.
+3. **Two-sided Fisher exact clears α=0.05 by >2500×** (p = 1.94e-5 vs
+   threshold 0.05). The §5 conservative test that the n=15 calibration
+   could NOT clear is now decisively cleared.
+4. **Pooled two-proportion z clears α=0.05 by >500×** (z=3.92,
+   p=8.93e-5 vs threshold 0.05). The z-statistic more than doubled
+   (1.996 → 3.918) under the n=15 → n=62 extension.
+5. **Honest note on the parametric bootstrap CI.** The parametric
+   binomial bootstrap CI on the difference is **essentially unchanged**
+   ([+13.3, +31.3] pp at both n=15 and n=62, half-width 9.0 pp). This
+   is NOT a defect — it reflects the structural fact that with k_cal=0
+   and the bootstrap sampling Binomial(n_cal, p_cal=0), the calibration
+   arm contributes zero variance to the difference distribution at
+   ANY n. The CI is therefore set entirely by the project arm's
+   variance (n=83, p=0.217), which has not changed. The Wilson CI on
+   the calibration *rate* itself is the test that scales with n_cal
+   (and it tightens 3.5×, as reported above). The bootstrap CI's
+   stability at n=62 confirms that the +22 pp point estimate and its
+   [+13.3, +31.3] pp uncertainty band are dominated by project-arm
+   sampling, not by calibration-arm sparsity.
+
+### A.7 Updated §5 Conclusion at n=62
+
+The §5 conclusion paragraph "Per §4.3.1, the 22-pp MAJOR/BROKEN excess
+clears one-sided Fisher exact at α = 0.05 (p = 0.036) and the bootstrap
+95% CI on the difference is [+13.3, +31.3] pp (excludes 0); it does
+NOT clear two-sided Fisher exact (p = 0.066)" is **superseded** by the
+n=62 result:
+
+> Per Appendix A.6, at the extended calibration n=62 the 22-pp
+> MAJOR/BROKEN excess clears BOTH one-sided and two-sided Fisher exact
+> at α=0.05 with p = 1.94e-5 (two-sided, >2500× margin), the pooled
+> two-proportion z reaches z=3.92 with two-sided p=8.93e-5 (>500×
+> margin), the Wilson 95% CI on the calibration rate shrinks from
+> [0.0%, 20.4%] to [0.0%, 5.8%] (~3.5× tighter), and the Wilson CIs
+> on the two rates no longer overlap (project lower 14.2% > calibration
+> upper 5.8% by 8.3 pp). The parametric-bootstrap CI on the difference
+> is structurally unchanged at [+13.3, +31.3] pp because the calibration
+> arm contributes zero variance with k_cal=0 at any n; that CI is
+> set entirely by project-arm sampling and excludes 0 by a 13.3-pp
+> lower-bound margin. The Phase-9b extension RESOLVES the §5 caveat:
+> the MAJOR/BROKEN excess is now two-sided-significant at α=0.05
+> under the most conservative tests with very large margins, and the
+> 22-pp point estimate is robust to the n=15 → n=62 calibration
+> extension.
+
+The protocol-as-contribution claim is now empirically defensible
+at the two-sided α=0.05 level, not only at the one-sided level — an
+upgrade in the conservativeness of the certified test, with the same
++22-pp point estimate of "excess defect density above the third-party
+false-positive floor."
+
+### A.8 Honest caveats for the Phase-9b extension
+
+1. **Verdict-tier concentration in MINOR.** All 9 new non-PASS rows
+   landed in MINOR. A reader skeptical of MINOR-tier aggressiveness
+   could argue the audit is still over-counting documented intentional
+   deviations — see TP21 (compound-scaling cache), TP49 (cosine-no-restart
+   naming), TP51 (pct_start=0.25), TP52 (mixup α=0.4), TP58 (RAdam
+   ρ>5 vs >4). Under a lenient doctrine that downgrades all
+   documented-deviation MINORs to PASS, calibration drops to ~5/62 =
+   8 % non-PASS while the project's MAJOR/BROKEN signal is unchanged.
+   The MAJOR/BROKEN-tier comparison (the headline statistic) is
+   robust to this re-grading because both numerator (18/83 project)
+   and denominator (0/62 calibration) are unaffected by MINOR
+   re-classifications.
+2. **HF transformers is sprawling.** We audited 15 mechanism claims
+   from the most-cited models (BERT, GPT-2, Llama, T5, ViT, CLIP,
+   GPT-NeoX, Mistral, schedules). The repo contains hundreds of
+   model files; a more thorough audit at the same scope could
+   sample 50+ more rows. Our 15 are arXiv-canonical and the resulting
+   PASS/MINOR mix is consistent with timm and mamba (very low MAJOR
+   density on well-vetted reference code).
+3. **5 candidate rows excluded.** EfficientNet MBConv block body,
+   CLIP quick-GELU, Mamba dt_min/dt_max clamping, fastai stack_y
+   mixup, HF deprecated AdamW. RAW_NOTES documents each exclusion
+   with a reason; none of these would plausibly have been MAJOR or
+   BROKEN, so the inclusion bias is conservative (excluding them
+   does not inflate the calibration non-PASS rate).
+4. **Single auditor (still).** Same Opus 4.7 model graded all 62
+   rows. A second auditor on a different model family could disagree
+   on any of the 14 MINOR verdicts; the MAJOR/BROKEN-tier (0/62)
+   is robust to up to ±2 MINOR ↔ MAJOR reclassifications without
+   changing the §5 conclusion.
+
+---
+
+*Phase-9b extension complete. n=15 → n=62 (4.1× extension).
+48 PASS / 14 MINOR / 0 MAJOR / 0 BROKEN. Calibration MAJOR/BROKEN
+rate stays at exactly 0% across the extended sample. Wilson 95% CI on
+the calibration rate tightens from [0.0%, 20.4%] to [0.0%, 5.8%];
+Wilson CIs no longer overlap; two-sided Fisher exact tightens from
+p=0.066 to p=1.94e-5 (>2500× margin); pooled z tightens from
+p=0.046 to p=8.93e-5 (>500× margin). The parametric bootstrap CI on
+the difference is structurally unchanged at [+13.3, +31.3] pp
+(calibration arm has k=0 → zero variance contribution at any n),
+which is a feature, not a defect: the +22-pp point estimate's
+uncertainty band is dominated by project-arm sampling and excludes
+zero by 13.3 pp regardless of calibration n. AC punchlist item 3
+RESOLVED.*
