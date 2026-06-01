@@ -470,7 +470,7 @@ correct. <code>c_in/PHI</code> for c_in=64 → 39.55 → round8=40. ✓ But the
 inverted ratio mismatch is the headline issue.</p>
 <p><strong>Test rigor:</strong> <code>test_h06_inverted_branch_expands_then_contracts</code>
 asserts <code>c_mid == 104</code> for c_in=64 inverted (test_phi_scaling.py:54).
-<code>64 * PHI = 103.55 → round8 = 104</code> matches the <strong>code</strong>&rsquo;s ratio of
+<code>64 * PHI = 103.55 → round8 = 104</code> matches the <strong>code</strong>&lsquo;s ratio of
 phi. <strong>The test bakes in the wrong ratio</strong> — it codifies the
 divergence rather than catching it. A reviewer reading the test will
 conclude &ldquo;code matches doc&rdquo;; both reviewer and committee would be
@@ -494,7 +494,7 @@ assertion is just <code>&lt;</code>. Inconsistency between comment and assertion
    expansion-ratio phi (1.618) instead of phi<strong>2 (2.618). The doc
    actually walks through phi</strong>2 = 2.618 = 6/phi^0.5… so the code
    change is the more honest fix.
-2. Replace <code>test_h06_inverted_branch_expands_then_contracts</code>&rsquo;s
+2. Replace <code>test_h06_inverted_branch_expands_then_contracts</code>&lsquo;s
    hard-coded <code>104</code> with <code>expected = _round8(int(round(c_in * PHI**2)))</code>
    so the test re-derives the doc&rsquo;s ratio rather than baking in the
    bug.
