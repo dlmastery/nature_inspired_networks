@@ -1,0 +1,70 @@
+% icml2027.sty — PLACEHOLDER ICML 2027 stylesheet
+%
+% TODO: replace with official icml2027.sty from icml.cc when available.
+%
+% This placeholder provides ICML-2024-flavoured formatting so that
+% main.tex compiles to a near-camera-ready approximation. The real
+% icml2027.sty will be drop-in compatible — the document body and
+% \icmltitle / \icmlauthor / \icmlcorrespondingauthor / \icmlkeywords
+% / \icmlaffiliation macros below match the ICML author kit API.
+%
+% Authors: replace this file with the official one before submission.
+
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{icml2027}[2026/05/31 v0.1 Placeholder ICML 2027 style]
+
+\newif\if@icmlsubmission
+\@icmlsubmissionfalse
+\DeclareOption{accepted}{\@icmlsubmissionfalse}
+\DeclareOption{nohyperref}{}
+\ProcessOptions\relax
+
+\RequirePackage{times}
+\RequirePackage{fancyhdr}
+\RequirePackage{color}
+\RequirePackage{algorithm}
+\RequirePackage{algorithmic}
+\RequirePackage{natbib}
+\RequirePackage{eso-pic}
+\RequirePackage{forloop}
+
+% Page geometry — ICML letter, 8 pages main + unlimited refs/appendix
+\RequirePackage[letterpaper,
+                left=0.75in, right=0.75in,
+                top=1.0in, bottom=1.0in,
+                headheight=14pt, headsep=10pt]{geometry}
+
+\setlength{\columnsep}{0.25in}
+\setlength{\parindent}{1em}
+\setlength{\parskip}{0pt}
+
+% Title and author macros — ICML kit API
+\newcommand{\icmltitle}[1]{%
+  \title{#1}%
+}
+
+\newcommand{\icmlauthor}[2]{#1\textsuperscript{#2}}
+\newcommand{\icmlaffiliation}[2]{}
+\newcommand{\icmlcorrespondingauthor}[2]{}
+\newcommand{\icmlkeywords}[1]{}
+
+% Anonymous-submission banner (since we are blind)
+\newcommand{\icmlSubmissionBanner}{%
+  \begin{center}
+    \large\bfseries
+    Under review at the International Conference on Machine Learning 2027.\\
+    Do not distribute.
+  \end{center}
+  \vspace{0.5em}
+}
+
+% Standard ICML environments
+\renewcommand{\abstractname}{Abstract}
+
+% Compact lists
+\RequirePackage{enumitem}
+\setlist{nosep, leftmargin=1.25em}
+
+% Hyperref last (per ICML convention)
+\RequirePackage[colorlinks=true, allcolors=blue]{hyperref}
+\RequirePackage{url}

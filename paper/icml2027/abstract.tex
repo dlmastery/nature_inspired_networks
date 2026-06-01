@@ -1,0 +1,31 @@
+% abstract.tex — separate abstract file (~199 words)
+% Lifted from paper_abstract.md, compressed for the 200-word ICML cap.
+
+\begin{abstract}
+We present a dual-track skeptical audit + Fixer + per-experiment-page
+protocol for autoresearch campaigns that propose large families of
+architectural priors. Two independent 8-agent expert teams attack
+orthogonal failure modes: an \emph{implementation-critic} team grades
+code-vs-doc fidelity with mechanism-pinning tests, and a
+\emph{research-scientist-critic} team challenges scientific merit
+independent of code, followed by a Fixer campaign whose patches each
+ship with a regression test that would have caught the original bug.
+The protocol is operationalised as CLAUDE.md Rules~20--28 and packaged
+as seven content-agnostic skills. Its signature catch on the
+calibration substrate---an 84-hypothesis nature-inspired neural-prior
+design space on CIFAR-10/-100---is \emph{H09 phi\_budget}: an
+unaudited pipeline would have published a CIFAR-100 $+1.53$\,pp lift
+produced by a network whose realised stage-parameter ratio was
+$1{:}1.41{:}2.45$, not the doc-claimed $1{:}\varphi{:}\varphi^2$; the
+protocol detected the $12.6\%$ drift and the Fixer corrected it with a
+mechanism-pinning test (commit \texttt{519cdf3}). On the corrected
+codebase, three post-fix candidates pass a $7$-seed CIFAR-100 paired
+Wilcoxon at $\alpha{=}0.05$ under Holm--Bonferroni across a $k{=}3$
+confirmatory family ($p{=}0.0078$ each). Hill-climbed and iso-tuned
+robustness extensions confirm directional positive $\Delta$ for all
+three winners; full re-certification at iso-tuned $n{=}7$ is Phase-9f
+future work. We report these as illustrative protocol output with
+three caveats: the baseline sits $6.5$\,pp below 164-ep SOTA; most
+single-prior rows remain $n{=}1$; all agents share a model family
+(Claude Opus 4.7).
+\end{abstract}
