@@ -189,7 +189,9 @@ nature_inspired_networks/
     └── dashboard/           ← byte-identical mirror of dashboard/ for live Pages
 ```
 
-## 4. Headline claims (CERTIFIED, n=7, 2026-05-29) + hill-climbed-best regime (Phase-9a, 2026-05-30)
+## 4. Headline claims (CERTIFIED, n=7, 2026-05-29)[^iso-tuned] + hill-climbed-best regime (Phase-9a, 2026-05-30)
+
+[^iso-tuned]: **iso-tuned n=7 (Phase-9f, 2026-06-01)** shows Δ-shrinkage; default-config cert stands; iso-tuned regime not re-certified. Concretely, at the iso-tuned cell (lr=3e-3, wd=5e-4, bs=128, AdamW for baseline / `pair_gm_pdw` / `sg_only_phi_budget`; wd=2e-3 for `slot_act_sine`) the paired Δmean shrinks to +0.79 / +0.66 / +0.25 pp (vs default-config +1.74 / +1.24 / +1.78 pp), paired Wilcoxon p_one ∈ {0.0781, 0.1094, 0.3750} — none clears α=0.05 — and the Phase-5 ordinal gate FAILS for all three winners at iso-tuned n=7 (max iso-tuned baseline = 0.6075). R2 BLOCKER #13 partially validated. The default-config n=7 certification (paired Wilcoxon p=0.0078 < Holm α'=0.0167) REMAINS the formal claim of the paper; the iso-tuned regime is reported with full Δ-shrinkage transparency. Phase-9g (n=15+ iso-tuned extension) is the principled re-certification path. Full closeout: [`paper/STATISTICAL_TESTS.md`](paper/STATISTICAL_TESTS.md) §10.
 
 After the Fixer campaign (CLAUDE.md Rule 21), dual-track audit
 (CLAUDE.md Rule 22), the 2026-05-29 PM **n=7 CIFAR-100 extension**,
