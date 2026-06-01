@@ -1,0 +1,18 @@
+{
+  "tag": "slot_act_tanh",
+  "dataset": "cifar100",
+  "seed": 0,
+  "epochs": 30,
+  "top1": 0.588,
+  "top5": 0.8603,
+  "params": 267658,
+  "flops": 80816212.0,
+  "latency_ms": 3.8423550000879914,
+  "rot_eq_err": 0.3985441153248151,
+  "composite": 0.5873911142052958,
+  "composite_fingerprint": "d65565e9c7b12d14cbce30a801ecc6753aea3eb148074256bfcc051fa61d0893",
+  "epochs_to_target": -1,
+  "train_seconds": 1094.3534280000022,
+  "train_top1": 0.6596554487179487,
+  "generalization_gap": 0.07165544871794871
+}
