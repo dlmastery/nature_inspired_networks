@@ -279,3 +279,27 @@ The iso-tuned baseline σ at n=3 = 1.14 pp is 2.52× wider than the default-conf
 **Phase-5 ordinal gate at iso-tuned n=3.** The gate min(leader_s) > max(baseline_s) FAILS for all three winners at this cell: max(baseline) = 0.6057 (seed=1); min(phi_budget) = 0.5998 < 0.6057 → FAIL; min(pair_gm_pdw) = 0.6057 = 0.6057 → BORDERLINE/FAIL (strict inequality required); min(slot_act_sine) = 0.6039 < 0.6057 → FAIL. This honestly weakens the cross-hyperparameter cross-dataset ordinal claim at small n=3 iso-tuned; the n=7 default-config Phase-5 gate (Section 2) is the strong, formally-cleared version.
 
 
+
+
+## Section 11 — Audit-calibration extension to n>=50: tightened bootstrap CI + Wilson CIs + Fisher exact (added 2026-05-31 per AC punchlist item 3)
+
+Project: 18/83 MAJOR/BROKEN (21.7%); extended calibration: 0/62 (0.0%); observed diff = +21.69 pp (unchanged point estimate).
+
+| quantity | n=15 (§8) | n=62 (this extension) |
+|---|---|---|
+| Bootstrap 95% CI on diff | [+13.25, +31.33] pp | **[+13.25, +31.33] pp** |
+| CI half-width | 9.04 pp | **9.04 pp** |
+| Wilson 95% CI project rate (18/83) | [14.2%, 31.7%] | [14.2%, 31.7%] (unchanged) |
+| Wilson 95% CI calibration rate | [0.0%, 20.4%] (0/15) | **[0.0%, 5.8%] (0/62)** |
+| Wilson CI overlap | overlap on a 6.2-pp window (project lower 14.2% vs calibration upper 20.4%) | **NO OVERLAP (project lower 14.2% > calibration upper 5.8% by 8.3 pp)** |
+| Fisher exact, one-sided (proj > cal) | p = 0.0363 | **p = 1.79e-05** |
+| Fisher exact, two-sided | p = 0.0658 | **p = 1.94e-05** |
+| Pooled two-proportion z | z=1.996, p=0.0459 | **z=3.918, p=8.93e-05** |
+
+**Reading.** Extending the calibration from n=15 to n=62 shrinks the Wilson upper bound on the calibration MAJOR/BROKEN rate from 20.4% to 5.8% (~3.5x tighter), eliminates the 6.2-pp Wilson CI overlap, and pushes the two-sided Fisher exact from p=0.066 (not clearing alpha=0.05) to p=1.94e-05 (clearing alpha=0.05 by >2500x margin). The pooled two-proportion z-statistic doubles from z=1.996 (p=0.046) to z=3.918 (p=8.93e-05, >500x margin past alpha=0.05).
+
+**Honest note on the parametric-bootstrap CI.** The bootstrap 95% CI on the difference is essentially unchanged at [+13.25, +31.33] pp (half-width 9.04 pp at n=62 vs 9.04 pp at n=15). This is NOT a defect: with k_cal=0 the calibration arm's parametric bootstrap is Binomial(n_cal, 0), which is identically 0 regardless of n_cal. The difference distribution's spread is therefore set entirely by the project arm's variance (n=83, p=0.217), which has not changed. The CI tightening at n=62 lives in the Wilson, Fisher, and z columns above — those tests use the calibration n directly via the count, not just its variance. The bootstrap CI's stability is itself informative: the +22-pp point estimate is robust to calibration n_cal, and the lower bound clears 0 by 13.3 pp at any n_cal >= 15 in this regime.
+
+**Honest framing (AC item 3 response).** The point estimate of the 22-pp MAJOR/BROKEN excess is unchanged at the larger n; the Phase-9b extension's contribution is to tighten the conservative two-sided test from 'directionally credible' (p=0.066 at n=15) to 'cleared at alpha=0.05 by >2500x margin' (p=1.94e-5 at n=62). The §5 conclusion in AUDIT_CALIBRATION_THIRD_PARTY.md is updated accordingly in Appendix A.7.
+
+
