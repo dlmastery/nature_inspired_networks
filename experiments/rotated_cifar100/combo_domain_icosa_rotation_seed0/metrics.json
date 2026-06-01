@@ -1,0 +1,18 @@
+{
+  "tag": "combo_domain_icosa_rotation",
+  "dataset": "rotated_cifar100",
+  "seed": 0,
+  "epochs": 30,
+  "top1": 0.4018,
+  "top5": 0.670625,
+  "params": 5719330,
+  "flops": 389263446.0,
+  "latency_ms": 28.21575000009034,
+  "rot_eq_err": 0.316172839452823,
+  "composite": 0.2914081622822857,
+  "composite_fingerprint": "d65565e9c7b12d14cbce30a801ecc6753aea3eb148074256bfcc051fa61d0893",
+  "epochs_to_target": -1,
+  "train_seconds": 1989.1188911999925,
+  "train_top1": 0.9262820512820513,
+  "generalization_gap": 0.5244820512820514
+}
