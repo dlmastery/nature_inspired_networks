@@ -768,26 +768,26 @@ def load_iso_tuned_cell_seed_top1s(
 
 
 def section_10_iso_tuned() -> str:
-    """Section 10 — iso-tuned (bs=128, lr=3e-3) baseline-vs-leader at n=3.
+    """Section 10 — iso-tuned (bs=128, lr=3e-3) baseline-vs-leader at n=7 (Phase-9f).
 
-    Added 2026-05-31 after the baseline-extension sweep at the iso-tuned
-    hill-climbed cell. The baseline's hill-climbed best_config was
-    bs=256, but the three leaders all converged on bs=128; comparing
-    each leader at its own hill-climbed best against the baseline at
-    THAT leader's bs/wd cell is the iso-tuned analysis. The baseline
-    cells at (lr=3e-3, wd=5e-4, bs=128, AdamW) were filled out to n=3
-    on 2026-05-31. The slot_act_sine iso-tuned cell is at wd=2e-3, not
-    wd=5e-4; we report it here against the baseline at wd=5e-4 bs=128
-    as the closest baseline neighbour (no baseline cell exists at
-    wd=2e-3 bs=128 yet — filed as Phase-9e future work).
+    Rewritten 2026-06-01 for the Phase-9f n=7 iso-tuned extension. The
+    baseline AND the three leaders were extended to n=7 seeds at the
+    iso-tuned cell (lr=3e-3, wd=5e-4, bs=128, AdamW for baseline /
+    pair_gm_pdw / sg_only_phi_budget; wd=2e-3 for slot_act_sine but
+    still compared here against the wd=5e-4 baseline neighbour). The
+    n_eff varies per leader because (a) sg_only_phi_budget seed=3 ran
+    only 2 epochs and is excluded (n_eff=6) and (b) slot_act_sine's
+    iso-tuned cells at wd=5e-4 only cover seeds 3..6 at Phase-9f close
+    (n_eff=4).
 
-    This section is ADDITIVE robustness context. At n=3 per arm, the
-    Wilcoxon floor is 1/8 = 0.125 and CANNOT clear Holm-Bonferroni
-    α' = 0.0167. The formal claim of the paper remains the n=7 default-
-    config certification (Sections 0..6). The default-config-baseline
-    σ_default at n=7 = 0.453 pp; the iso-tuned-baseline σ_iso at n=3 =
-    1.14 pp — 2.5x wider. The Δs of +1.16 to +1.68 pp do NOT formally
-    exit 2σ_iso = 2.28 pp; they DO exit 2σ_default = 0.91 pp.
+    This section is ADDITIVE robustness context. The formal claim of
+    the paper remains the n=7 default-config certification
+    (Sections 0..6). The iso-tuned regime shows substantial Δ-shrinkage
+    relative to the default-config regime (Δmean +1.24/+1.74/+1.78 pp
+    → +0.66/+0.79/+0.25 pp paired) and the Phase-5 ordinal gate FAILS
+    at iso-tuned n=7 for all three winners. This is consistent with
+    R2 BLOCKER #13's concern that mixed-bs hill-climbed comparison
+    overstated lifts — partially validated at the iso-tuned cell.
     """
     out = ["## Section 10 — Iso-tuned (bs=128, lr=3e-3, wd=5e-4) baseline-vs-leader comparison\n\n"]
     out.append(
