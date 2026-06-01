@@ -1,0 +1,18 @@
+{
+  "tag": "combo_n4_pair_slot",
+  "dataset": "cifar100",
+  "seed": 2,
+  "epochs": 30,
+  "top1": 0.5836,
+  "top5": 0.862,
+  "params": 267659,
+  "flops": 80816212.0,
+  "latency_ms": 3.934513999847695,
+  "rot_eq_err": 0.3922860932846864,
+  "composite": 0.5824763526988005,
+  "composite_fingerprint": "d65565e9c7b12d14cbce30a801ecc6753aea3eb148074256bfcc051fa61d0893",
+  "epochs_to_target": -1,
+  "train_seconds": 838.9286815000232,
+  "train_top1": 0.6606570512820513,
+  "generalization_gap": 0.07705705128205131
+}
