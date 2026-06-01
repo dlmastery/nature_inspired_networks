@@ -1,0 +1,18 @@
+{
+  "tag": "baseline_resnet20_tuned_lr0.01_wd0.0005",
+  "dataset": "cifar100",
+  "seed": 0,
+  "epochs": 30,
+  "top1": 0.5984,
+  "top5": 0.8635,
+  "params": 278324,
+  "flops": 41224448.0,
+  "latency_ms": 4.169150000088848,
+  "rot_eq_err": 0.5353755665322145,
+  "composite": 0.5951700910971586,
+  "composite_fingerprint": "d65565e9c7b12d14cbce30a801ecc6753aea3eb148074256bfcc051fa61d0893",
+  "epochs_to_target": -1,
+  "train_seconds": 818.2121896999888,
+  "train_top1": 0.6996394230769231,
+  "generalization_gap": 0.10123942307692302
+}
