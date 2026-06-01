@@ -1,0 +1,26 @@
+{
+  "tag": "slot_act_sine__hc_lr3em3_wd5em4_bs128_optAdamW_seed5",
+  "dataset": "cifar100",
+  "seed": 5,
+  "epochs": 30,
+  "top1": 0.6066,
+  "top5": 0.8686,
+  "params": 267659,
+  "flops": 80816212.0,
+  "latency_ms": 3.227780000306666,
+  "rot_eq_err": 0.41090036804477376,
+  "composite": 0.6097757111305968,
+  "composite_fingerprint": "d65565e9c7b12d14cbce30a801ecc6753aea3eb148074256bfcc051fa61d0893",
+  "epochs_to_target": 25,
+  "train_seconds": 958.060668799968,
+  "train_top1": 0.7035857371794871,
+  "generalization_gap": 0.09698573717948711,
+  "config_id": "lr3em3_wd5em4_bs128_optAdamW",
+  "hc_cell": {
+    "lr": 0.003,
+    "weight_decay": 0.0005,
+    "batch_size": 128,
+    "optimizer": "AdamW"
+  },
+  "hc_seed": 5
+}
