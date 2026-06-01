@@ -317,3 +317,59 @@ Project: 18/83 MAJOR/BROKEN (21.7%); extended calibration: 0/62 (0.0%); observed
 **Honest framing (AC item 3 response).** The point estimate of the 22-pp MAJOR/BROKEN excess is unchanged at the larger n; the Phase-9b extension's contribution is to tighten the conservative two-sided test from 'directionally credible' (p=0.066 at n=15) to 'cleared at alpha=0.05 by >2500x margin' (p=1.94e-5 at n=62). The §5 conclusion in AUDIT_CALIBRATION_THIRD_PARTY.md is updated accordingly in Appendix A.7.
 
 
+## Section 12 — Phase-9e Wave-1 combo hypothesis results (added 2026-06-01)
+
+Wave-1 of the Phase-9e combo-hypothesis sweep extended three R-D-synthesis combo hypotheses (H87, H88, H91) to n=3 seeds each at the project's default-config training recipe (AdamW lr=1e-3 wd=5e-4 bs=256 30 epochs, the same recipe used for the n=7 baseline_resnet20 reference). H87 / H88 ran on CIFAR-100; H91 ran on rotated_CIFAR-100 (4 cardinal angles, all-4 TTA on eval).
+
+### Per-tag table
+
+| tag | dataset | seeds (top1) | n | mean | std (ddof=1) | Δ vs baseline default (0.5612, n=7) |
+|---|---|---|---:|---:|---:|---:|
+| `combo_n4_pair_slot` (H87) | CIFAR-100 | 0.5835 / 0.5802 / 0.5836 | 3 | 0.5824 | 0.0019 | **+2.12 pp** |
+| `combo_novelty_betti_torus` (H88) | CIFAR-100 | 0.5353 / 0.5221 / 0.5307 | 3 | 0.5294 | 0.0067 | **−3.18 pp** |
+| `combo_domain_icosa_rotation` (H91) | rotated_CIFAR-100 | 0.4018 / 0.4025 / 0.4059 | 3 | 0.4034 | 0.0022 | (no rotated_CIFAR-100 ResNet-20 baseline yet) |
+| `baseline_resnet20` (rail, default) | CIFAR-100 | 7 seeds in [0.5535, 0.5662] | 7 | 0.5612 | 0.0045 | — |
+
+### Wilcoxon / Mann–Whitney + bootstrap CI
+
+For H87 and H88 (CIFAR-100, comparable to the n=7 baseline), the n=3 vs n=7 comparison is necessarily unpaired (seeds 0/1/2 of the combo are not paired with seeds 0/1/2 of the baseline at the per-batch level — different model runs). The principled non-parametric tests are:
+
+- Two-sided **Mann–Whitney U** vs the n=7 baseline (rank-sum on top1).
+- A **20 000-iteration unpaired bootstrap** on Δmean = mean(combo) − mean(baseline), rng=20260601, 2.5/97.5 percentile for the 95 % CI.
+
+| tag | Δmean | 95 % unpaired-bootstrap CI on Δmean | Mann–Whitney U p_two | CI excludes 0? |
+|---|---:|---:|---:|:---:|
+| `combo_n4_pair_slot` (H87) | +2.12 pp | [+1.78, +2.49] pp | 0.0167 | **YES (positive)** |
+| `combo_novelty_betti_torus` (H88) | −3.18 pp | [−3.89, −2.53] pp | 0.0167 | **YES (NEGATIVE)** |
+
+Mann–Whitney U at n_a=3, n_b=7 has minimum two-sided p=2/C(10,3)=2/120=0.0167, achieved when all combo seeds are strictly above (H87) or strictly below (H88) all 7 baseline seeds. Both H87 and H88 attain the floor — H87 because all 3 combo seeds (0.5802–0.5836) are above all 7 baseline seeds (≤ 0.5662), H88 because all 3 combo seeds (0.5221–0.5353) are below all 7 baseline seeds (≥ 0.5535).
+
+### H87 sub-additivity diagnostic (paired vs `pair_gm_pdw`)
+
+The headline question for H87 is not "does H87 beat baseline?" (it does, by +2.12 pp) but "does H87 beat the best certified single winner?" That comparison is **paired across matched seeds** (combo seed N vs `pair_gm_pdw` seed N for N ∈ {0, 1, 2}):
+
+| seed | `pair_gm_pdw` top1 | `combo_n4_pair_slot` top1 | paired Δ |
+|---:|---:|---:|---:|
+| 0 | 0.5786 | 0.5835 | +0.49 pp |
+| 1 | 0.5789 | 0.5802 | +0.13 pp |
+| 2 | 0.5761 | 0.5836 | +0.75 pp |
+
+- Paired Δmean (n=3 paired) = **+0.46 pp**
+- 3/3 positive paired deltas
+- Exact paired Wilcoxon W=6, p_one = (1/2)^3 = **0.125** (at the n=3 floor; does NOT clear α=0.05)
+- vs the full n=7 `pair_gm_pdw` mean (0.5786): Δmean_unpaired = **+0.38 pp**
+
+The N=4 stack lift over the better solo winner is sub-additive: the N=3 → N=4 increment (+0.38 to +0.46 pp depending on paired-vs-unpaired framing) is small in magnitude and at the n=3 Wilcoxon floor.
+
+### Per-claim narrative (Wave-1 honest)
+
+- **H87 `combo_n4_pair_slot` — VERDICT: SUB-ADDITIVE.** N=4 stack outperforms baseline (+2.12 pp, Mann–Whitney clears) but adds only ~0.4 pp on top of the better solo winner `pair_gm_pdw`. The Rule-23 prediction that "three axes good, four axes also good" is empirically NOT supported at n=3. Re-running at n=7 to break the Wilcoxon floor is filed as Phase-9e Wave-2.
+- **H88 `combo_novelty_betti_torus` — VERDICT: EMPIRICALLY FALSIFIED.** Three novelty-pocket priors (H09 phi_budget + H22 toroidal + H51 Betti) stack DESTRUCTIVELY: Δmean = −3.18 pp, 95 % CI [−3.89, −2.53] pp excludes 0 on the negative side, Mann–Whitney p=0.0167. Theoretical-orthogonality predictions over forward-path layers were insufficient; empirical compounding requires certified solo signal per axis. Consistent with §7.2.1 `sg_full_fib` data point.
+- **H91 `combo_domain_icosa_rotation` — VERDICT: NOT EVALUABLE YET.** Absolute top1 0.4034 on rotated_CIFAR-100 at 30 ep is consistent with the dataset's known difficulty without rotation-equivariant priors, but no fair Δ is computable until a rotated_CIFAR-100 ResNet-20 baseline runs at the matched recipe (Phase-9h future work).
+
+### Honest framing
+
+Wave-1 is one of the cleanest pieces of internal-replication negative evidence in the campaign: a doctrine derived from n=1 screening data (Rule 23 "orthogonal axes compound") FAILED to extend from 3 axes to 4 axes (H87 sub-additive) and FAILED CATASTROPHICALLY when the stack mixed novelty-pocket priors with no certified solo baseline (H88 −3.18 pp). The certified Phase-8 winners remain the strongest empirical evidence the project carries.
+
+n=3 is at the Wilcoxon-floor regime; the H87 sub-additivity diagnostic specifically cannot clear α=0.05 paired (floor p=0.125) at this sample size. A Wave-2 extension to n=7 paired against `pair_gm_pdw` would resolve whether the +0.38–+0.46 pp increment is real or noise. Future combo hypotheses should be **gated on a certified solo winner per axis** rather than on theoretical orthogonality alone.
+

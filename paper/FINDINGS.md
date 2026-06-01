@@ -57,6 +57,45 @@
 > Full Phase-9f closeout table:
 > [`paper/STATISTICAL_TESTS.md`](STATISTICAL_TESTS.md) §10.
 
+> ### 🌪️ 2026-06-01 PM PROMOTION update — Phase-9e Wave-1 combo hypotheses land HONEST results (R-D synthesis falsified for novelty-pocket combos)
+>
+> Wave-1 of the Phase-9e combo-hypothesis sweep (three R-D-synthesis
+> combos at n=3 each on CIFAR-100 30-ep / rotated_CIFAR-100 30-ep)
+> completed 2026-06-01. **Results are reported honestly regardless of
+> direction:**
+>
+> | tag | dataset | n | mean | Δ vs baseline default (0.5612) | Δ vs `pair_gm_pdw` default (0.5786) | verdict |
+> |---|---|---:|---:|---:|---:|:---|
+> | `combo_n4_pair_slot` (H87) | CIFAR-100 | 3 | 0.5824 | **+2.12 pp** | **only +0.38 pp — sub-additive** | N=4 stack adds nothing meaningful over single best winner |
+> | `combo_novelty_betti_torus` (H88) | CIFAR-100 | 3 | 0.5294 | **−3.18 pp NEGATIVE** | — | novelty-pocket stack FAILS; theoretical orthogonality not sufficient |
+> | `combo_domain_icosa_rotation` (H91) | rotated_CIFAR-100 | 3 | 0.4034 | (rotated task — no rotated_CIFAR-100 baseline yet) | — | not evaluable until Phase-9h adds the rotated baseline |
+> | `baseline_resnet20` (rail, default) | CIFAR-100 | 7 | 0.5612 | — | — | reference |
+>
+> **Honest reading.** The R-D combo synthesis (which used a theoretical
+> orthogonality matrix over forward-path layers to predict that novelty-
+> pocket priors would compose productively) is **empirically falsified for
+> the novelty-pocket combos** at the screening compute budget. H88's
+> three-prior stack (H09 phi_budget + H22 toroidal + H51 Betti) drops
+> **3.18 pp below baseline** — consistent with the §7.2.1 `sg_full_fib`
+> catastrophic data point on CIFAR-10. H87's N=4 stack (the two best
+> certified winners stacked) yields only a **+0.38 pp lift** vs the better
+> solo winner `pair_gm_pdw` — sub-additive, with the n=3 paired Wilcoxon
+> at its floor of 0.125 (3/3 positive vs `pair_gm_pdw` seeds 0/1/2 but
+> magnitude trivial). H91 is not evaluable until the rotated_CIFAR-100
+> ResNet-20 baseline is added at the matched recipe.
+>
+> **The certified Phase-8 winners (single-prior `slot_act_sine`,
+> `sg_only_phi_budget`, three-axis stack `pair_gm_pdw`) remain the
+> strongest empirical evidence the project carries.** Future combo
+> hypotheses should be gated on a **certified solo winner per axis**
+> rather than on theoretical orthogonality alone — the Wave-1 evidence
+> is the cleanest internal-replication negative test of the Rule-23
+> "orthogonal axes compound" doctrine the campaign has produced.
+>
+> Full Wave-1 numbers + per-tag bootstrap CIs + Mann–Whitney p-values:
+> [`paper/STATISTICAL_TESTS.md`](STATISTICAL_TESTS.md) §12.
+> Splice in PAPER.md: §5.5 "Phase-9e Wave-1 honest results" paragraph.
+
 > ## ⛰️ 2026-05-30 PM — Hill-climbed-best regime confirms the n=7 default-config certification (Phase-9a, BLOCKER #13 partial refutation)
 >
 > Phase-9a ran a per-hypothesis coordinate hill-climb (cube:
