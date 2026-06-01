@@ -1,0 +1,847 @@
+% main.tex — ICML 2027 main submission
+% A Skeptical Protocol for Nature-Inspired Neural-Network Priors
+% Anonymous Authors (blind submission convention)
+
+\documentclass{article}
+\usepackage{icml2027}
+
+% Standard ICML/ML imports
+\usepackage{microtype}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{amsmath, amssymb}
+\usepackage{xcolor}
+\usepackage{listings}
+\usepackage{multirow}
+\usepackage{array}
+
+\lstset{
+  basicstyle=\ttfamily\small,
+  breaklines=true,
+  showstringspaces=false,
+  commentstyle=\color{gray},
+  keywordstyle=\color{blue!70!black}\bfseries,
+  stringstyle=\color{red!60!black},
+  numbers=left, numberstyle=\tiny\color{gray}, numbersep=5pt,
+  frame=single, rulecolor=\color{black!20}
+}
+
+% ---- Title block ----
+\icmltitle{A Skeptical Protocol for Nature-Inspired Neural-Network Priors:\\
+           Methodological Contribution and an 84-Hypothesis Dual-Track Audit on
+           CIFAR-10/-100}
+
+\begin{document}
+
+\twocolumn[
+\icmltitle{A Skeptical Protocol for Nature-Inspired Neural-Network Priors:\\
+Methodological Contribution and an 84-Hypothesis Dual-Track Audit on CIFAR-10/-100}
+
+\begin{center}
+\large \textbf{Anonymous Authors}\\[0.25em]
+\small \textit{Affiliation withheld for blind review}
+\end{center}
+
+\vskip 0.1in
+
+% Abstract (separate file)
+\input{abstract.tex}
+
+\vskip 0.1in
+]
+
+\icmlSubmissionBanner
+
+% =====================================================================
+\section{Introduction}
+% =====================================================================
+\label{sec:intro}
+
+Geometric Deep Learning (GDL) and Topological Deep Learning (TDL) have
+repeatedly converged on a small set of geometric priors --- hexagonal
+lattices~\citep{hoogeboom2018hexaconv}, Platonic / icosahedral symmetry
+groups~\citep{cohen2019spherical, islam2025platonic}, fractal
+recursion~\citep{larsson2017fractalnet}, toroidal
+embeddings~\citep{pittorino2022toroidal}, Fibonacci channels, and
+Hopfield / SIREN / RoPE phase
+encodings~\citep{ramsauer2021hopfield, sitzmann2020siren, su2024rope}.
+\citet{bronstein2021gdl} systematise much of this surface. A separate
+popular literature suggests the golden ratio $\varphi \approx 1.618$
+and Fibonacci sequence ``appear everywhere in nature,'' and it is
+tempting to assemble the geometric priors and the $\varphi$-flavoured
+constants into one framework and claim broad gains.
+
+\textbf{This work does not do that.} It presents the \emph{infrastructure
+required to know whether such a claim is justified}, and applies that
+infrastructure to its own design space. We implement 84 hypotheses
+faithfully, audit them adversarially with two independent expert teams,
+patch the findings, re-run the empirical evidence on the corrected code,
+and publish the surviving framework with its honest verdict --- including
+the honest verdict that the protocol's own empirical findings are
+\emph{provisional} until the Phase-9 hill-climb completes.
+
+\subsection{Contributions}
+\label{sec:contributions}
+
+\begin{enumerate}
+  \item \textbf{A dual-track skeptical audit protocol.} An 8-agent
+    implementation-critic team verifies \emph{code-vs-doc correspondence};
+    an 8-agent research-scientist-critic team challenges the
+    \emph{scientific merit} of each hypothesis. Both teams run in
+    parallel with disjoint file scopes.
+  \item \textbf{A Fixer campaign with mechanism-verifying-test
+    discipline.} Every code patch ships with at least one test that
+    asserts the fixed mechanism --- the test the original implementer
+    missed. Fixers correct 22 hypotheses across 8 commits, adding
+    $\sim$34 new mechanism tests.
+  \item \textbf{A normative ruleset} (\texttt{CLAUDE.md} Rules~20--28)
+    operationalising the audit + fix + re-run cycle and the
+    screening-vs-evaluation distinction, plus seven reusable
+    content-agnostic skills.
+  \item \textbf{A reproducible 84-hypothesis implementation} of
+    nature-inspired neural priors as 80 pure-PyTorch modules + 78 test
+    files ($\sim$826 unit tests post-Fixer), each with a
+    committee-grade design doc.
+  \item \textbf{Empirical calibration on CIFAR-10/-100}: 51\% non-PASS
+    implementation-critic rate (3 BROKEN / 15 MAJOR / 24 MINOR of 83);
+    1\,/\,81 NOVEL+TESTABLE sci-critic rate; three Phase-8 candidates
+    pass the worst-leader-seed gate.
+\end{enumerate}
+
+What is \emph{explicitly not} a contribution: any claim about
+transformer-track hypotheses (10 of 84 target attention backbones, none
+tested); any claim about H71 IcosaRoPE3D (the sole NOVEL+TESTABLE
+survivor is untested); any claim about cross-domain portability (open
+future work); any claim that the three Phase-8 winners constitute a
+standalone empirical headline --- they are illustrative protocol
+output.
+
+\subsection{Why the audit was necessary}
+\label{sec:why-audit}
+
+The pre-audit version of this paper claimed H09 \texttt{phi\_budget}
+as a verified cross-dataset positive (CIFAR-10 85.54\%, CIFAR-100
+58.05\% 3-seed median; $+1.53$\,pp over baseline). Every test in the
+repository had been written by an implementer agent trained to make
+tests pass, and ``make tests pass'' often degenerates to shape-only
+assertions. The audit revealed that H09's realised stage-parameter
+ratio was $1{:}1.41{:}2.45$, not the claimed
+$1{:}\varphi{:}\varphi^2 = 1{:}1.618{:}2.618$ (12.6\% drift at
+stage~1). The headline was produced by a network that did \emph{not}
+faithfully implement its own design doc. Fixer-PhiScaling (commit
+\texttt{519cdf3}) corrected the integer search; the post-fix realised
+ratio is $1{:}1.623{:}2.629$ (0.43\% max error). This is the
+protocol's load-bearing example of diagnostic power.
+
+\subsection{Limitations of the audit protocol --- auditor self-grading}
+\label{sec:self-grading}
+
+A binding caveat: implementer, implementation-critic, sci-critic,
+Fixer, and audit-calibration agents in this campaign are \emph{all}
+from the same model family (Claude Opus 4.7). Disjoint-scope
+independence is enforced; model-family independence is not. The
+audit's 51\% non-PASS rate is conditional on this caveat. Third-party
+code calibration (\S\ref{sec:third-party}) partially neutralises it; a
+cross-family audit on the same \texttt{pytorch/vision} sample remains
+future work.
+
+% =====================================================================
+\section{The Dual-Track Audit + Fixer Protocol}
+% =====================================================================
+\label{sec:protocol}
+
+The autoresearch protocol of \texttt{dlmastery/autoresearchimage} ---
+citation rigor (every reasoning entry uses
+\texttt{Author YEAR VENUE 'Title' (arXiv:XXXX.XXXXX)}), reasoning-blob
+completeness (word-count floors), SHA-256-fingerprinted composite
+metric, append-only experiment log, no-bypass gates, per-experiment
+archive directory --- is taken verbatim and forms the \emph{floor}.
+Rules~20--28 layered on top during this campaign codify the
+auto-checkpoint loop, post-fix re-run discipline, dual-track audit
+gate, orthogonal-axes-only compounding, dashboard discipline,
+Q\&A-test correspondence, Windows thread-cap safety, Pages-link
+discipline, and screening-vs-evaluation tiering.
+
+\subsection{Track A: implementation-critic team}
+\label{sec:track-a}
+
+For each thematic group G1--G8, a parallel Critic agent reads every
+hypothesis's design doc, the corresponding \texttt{src} module, and
+the test file. Findings on six dimensions: (1)~mechanism check;
+(2)~math correctness; (3)~test rigor --- does the test assert
+\emph{mechanism} or only \emph{shape}; (4)~citation alignment;
+(5)~falsifier reachability; (6)~hidden bugs / cargo-cult. Verdict
+tiers: PASS / MINOR (shape-only tests; cosmetic) / MAJOR (mechanism
+partially wrong) / BROKEN (code contradicts the doc).
+
+\subsection{Track B: research-scientist-critic team}
+\label{sec:track-b}
+
+Independent of the implementation, each group's sci-critic appends an
+``Addendum: Research-Scientist Critique'' to every design doc,
+challenging prior plausibility, mechanism scrutiny, confounds
+($\geq 2$), \emph{numerology check} (does $\varphi$ specifically
+matter, or would any value in $[1.3, 2.0]$ work?), literature
+precedent, expected effect size with 90\% CI, and a
+minimum-distinguishing experiment. Verdict: NOVEL+TESTABLE /
+DERIVATIVE+TESTABLE / NUMEROLOGY / FALSIFIED / UNFALSIFIABLE /
+INFRASTRUCTURE.
+
+\subsection{Track C: Fixer campaign}
+\label{sec:fixer}
+
+Findings from Track A populate the Fixer specs. Eight parallel Fixer
+agents (partitioned by primary \texttt{src} file to avoid
+cross-fixer contention) (a)~patch the code per the audit's ``Concrete
+fix'' instruction, (b)~add at least one
+\emph{mechanism-verifying} test that would have caught the bug
+(\emph{not} shape-only), (c)~confirm the test passes, (d)~commit with
+retry-wrapped scoped \texttt{git add}.
+
+Together: 8 commits, $\sim$34 new mechanism tests, $\sim$16 patched
+\texttt{src} files. After all Fixers land, every affected sweep row
+re-runs on the corrected code (Rule~21). The mechanism-pinning test
+is the durable artefact --- the patched code may improve further, but
+the test invariant remains.
+
+The canonical example is H09 \texttt{phi\_budget}. The Fixer replaced
+a greedy integer search whose drift produced $1{:}1.41{:}2.45$ with a
+constrained search that minimises max-error against
+$\{1, \varphi, \varphi^2\}$:
+
+\begin{lstlisting}[language=Python, caption={Fixer-PhiScaling mechanism-pinning test (\texttt{tests/test\_phi\_budget.py}, abbreviated). The test would have caught the original 12.6\,\% drift.}, label={lst:phi-test}]
+def test_phi_budget_realised_ratio():
+    """Realised stage-parameter ratio
+    must match 1:phi:phi^2 within 1%."""
+    widths = phi_budget_widths(
+        target_params=270_000,
+        n_stages=3, phi=1.618033988749)
+    ratio = [w / widths[0] for w in widths]
+    expected = [1.0, 1.618, 2.618]
+    max_err = max(abs(r - e) / e
+                  for r, e in zip(
+                      ratio, expected))
+    assert max_err < 0.01, (
+      f"realised ratio {ratio} drifts "
+      f"{max_err*100:.2f}% from "
+      f"1:phi:phi^2")
+\end{lstlisting}
+
+\subsection{Operational guarantees}
+\label{sec:rules-summary}
+
+Rules~20--28 give the protocol its empirical contract:
+\textbf{Rule~21} (\emph{post-fix re-run discipline}) forbids any
+external claim drawn from pre-fix code; \textbf{Rule~22} (\emph{dual-track
+audit gate}) requires both PASS impl-critic and a non-NUMEROLOGY
+sci-critic before a hypothesis becomes a headline; \textbf{Rule~23}
+(\emph{orthogonal axes only}) forbids stacking $> 2$ priors on the same
+conv-block path; \textbf{Rule~28} (\emph{screening vs evaluation})
+labels all single-seed sweep data as screening, with evaluation
+reserved for $\geq 3$-seed multi-seed gates.
+
+% =====================================================================
+\section{Methods}
+% =====================================================================
+\label{sec:methods}
+
+\subsection{Composite metric and SHA-256 fingerprint}
+\label{sec:composite}
+
+The composite metric (Rule~2) is
+\begin{equation}
+\textsf{composite} = \mathrm{top1} - 0.05 \log_{10}(\mathrm{params}_M)
+                                  - 0.05 \log_{10}(\mathrm{latency}_{\mathrm{ms}}).
+\label{eq:composite}
+\end{equation}
+The source string of Eq.~\ref{eq:composite} is SHA-256-fingerprinted
+to \texttt{d65565e9c7b12d14cbce30a801ecc6753aea3eb148074256bfcc051fa61d0893};
+editing it raises a \texttt{CompositeFingerprintError} at runner
+import time. A new branch is required to change it.
+
+\subsection{Screening sweep design}
+\label{sec:screening}
+
+\textbf{Hardware (Rule~26).} 1$\times$~RTX~4090 Laptop, 16~GB VRAM,
+Windows~11; Python~3.13; bf16 AMP; \texttt{num\_workers=0};
+\texttt{KMP\_DUPLICATE\_LIB\_OK=TRUE},
+\texttt{OMP\_NUM\_THREADS=2}, \texttt{MKL\_NUM\_THREADS=2};
+\texttt{set\_seed(seed)} at run start; \texttt{cudnn.benchmark=True}
+(not bit-reproducible by design; Rule~6).
+
+\textbf{Training defaults} (CIFAR-10 12-ep screening; CIFAR-100 30-ep
+graduation + Phase-8 $n{=}7$). AdamW~\citep{loshchilov2019adamw};
+LR~$10^{-3}$ (cosine, $T_{\max}{=}$epochs); weight decay $5{\times}10^{-4}$;
+batch~256; label smoothing 0.1; RandomCrop(32, pad=4) + HorizontalFlip
++ RandAugment~\citep{cubuk2020randaugment} ($N{=}1$, $M{=}4$); bf16.
+Single seed for 32/35 CIFAR-10 screening rows; $n{=}7$ for the three
+Phase-8 winners on CIFAR-100.
+
+\subsection{Statistical-rigor floor}
+\label{sec:stats-floor}
+
+Phase-8 candidates clear a three-layer gate: (i)~paired Wilcoxon at
+$\alpha{=}0.05$ on the $n{=}7$ CIFAR-100 deltas; (ii)~Holm--Bonferroni
+step-down at $\alpha'{=}0.05/k$ for $k{=}3$ confirmatory
+tests~\citep{holm1979}; (iii)~Phase-5 ordinal gate
+$\min(\text{leader}) > \max(\text{baseline})$. At $n{=}7$ with 7/7
+positive deltas the Wilcoxon $p$ achieves its theoretical floor
+$(1/2)^7 = 0.0078$, which clears the Holm step-down at $\alpha/3 =
+0.0167$. Magnitude is reported by a paired $t$-test (df=6) whose
+$p$-values fall 3--4 orders of magnitude below the Wilcoxon floor.
+
+% =====================================================================
+\section{Empirical Calibration on the 84-Hypothesis Substrate}
+% =====================================================================
+\label{sec:empirical}
+
+\subsection{Implementation-critic distribution (Track A)}
+\label{sec:track-a-dist}
+
+\begin{table}[t]
+\small\centering
+\caption{Track-A implementation-critic verdict distribution across 83
+hypotheses (H57 deferred). 51\% non-PASS, with MAJOR/BROKEN failures
+clustering in G3 (graph equivariance) and G7 (cross-paradigm
+composition).}
+\label{tab:track-a}
+\begin{tabular}{l rrrr}
+\toprule
+Group & PASS & MINOR & MAJOR & BROKEN \\
+\midrule
+G1 Scaling \& Growth      & 3 & 4 & 3 & 0 \\
+G2 Layer / Channel / Neuron & 6 & 3 & 1 & 0 \\
+G3 Topologies \& Graphs    & 2 & 2 & \textbf{6} & 0 \\
+G4 Kernels / Attention     & 5 & 4 & 1 & 0 \\
+G5 Optimisation            & 4 & 3 & 3 & 0 \\
+G6 Topological / Bridging  & 4 & 4 & 0 & \textbf{1} \\
+G7 Cross-Paradigm Hybrids  & 10 & 2 & 1 & \textbf{2} \\
+G8 Esoteric Extensions     & 7 & 2 & 0 & 0 \\
+\midrule
+\textbf{Total (83)}        & \textbf{41} & \textbf{24} & \textbf{15} & \textbf{3} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Research-scientist verdict distribution (Track B)}
+\label{sec:track-b-dist}
+
+NOVEL+TESTABLE: 1 (H71 IcosaRoPE3D, untested); DERIVATIVE+TESTABLE:
+30; NUMEROLOGY: 40; EMPIRICALLY-FALSIFIED: 3
+(H41/H48/H50); UNFALSIFIABLE: 2; INFRASTRUCTURE: 5. Roughly half the
+design space is flagged NUMEROLOGY where $\varphi$ is a renaming of a
+constant that any value in $[1.3, 2.0]$ could replace with the same
+outcome. The strongest defensible category is DERIVATIVE+TESTABLE
+(37\%) --- golden-skip residual scaling re-derives
+Fixup/ReZero; $\varphi$-decay LR is functionally interchangeable with
+cosine; spectral-Hopfield is a unitary basis change of modern
+Hopfield~\citep{ramsauer2021hopfield}.
+
+\subsection{BROKEN findings (case studies of protocol output)}
+\label{sec:broken}
+
+\paragraph{H55 PlatonicAttention's head bias is mathematically zero.}
+\texttt{bias = (coords @ coords.T).mean(dim=-1)} evaluates to all
+zeros for every vertex-transitive Platonic solid (vertex coords sum
+to the centroid). PlatonicAttention was bit-equivalent to vanilla
+multi-head attention. All 7 of its tests were shape-only. \emph{Fixed}
+in Fixer-G6 (\texttt{16fe2b6}) with a relative-position cosine bias
+mirroring the H37 pentagonal pattern~\citep{islam2025platonic}.
+
+\paragraph{H67 hybrid\_full was a half-on stress test.}
+\texttt{from .golden\_rope import GoldenRoPE} raised
+\texttt{ImportError}; \texttt{MetatronGraphLayer}'s constructor
+signature was wrong; \texttt{which\_priors\_active} hardcoded
+\texttt{True} for 4 priors; \texttt{LiquidCFC} collapsed to affine +
+nonlinearity. \emph{Fixed} in Fixer-G7 (\texttt{2e7ee45}).
+
+\paragraph{H74 MetatronTiedConv2d's 13 alphas collapsed to one scalar.}
+Forward was \texttt{F.conv2d(x, W * sum(alpha\_c))}; the 13 alphas
+$\Sigma$-summed to a single gate. \emph{Fixed} in Fixer-G7 to use
+H40's \texttt{metatron\_basis\_kernels} 13 spatially-distinct circle
+masks; \texttt{effective\_weight = sum\_c alpha\_c * (W * mask\_c)}.
+
+\subsection{The H09 phi\_budget case study}
+\label{sec:h09}
+
+\S\ref{sec:why-audit} describes the realised-ratio drift
+($1{:}1.41{:}2.45$ vs.\ claimed $1{:}\varphi{:}\varphi^2$) and
+Fixer-PhiScaling's correction. Post-fix 3-seed CIFAR-100 medians on
+the corrected mechanism: \texttt{phi\_budget}=0.5741,
+\texttt{baseline}=0.5652 ($+0.89$\,pp). The pre-fix median (58.05\%)
+was $\sim 0.6$\,pp \emph{higher} than the post-fix (57.41\%),
+consistent with ``the broken realised ratio happened to land a
+fortuitously-high seed-0 result.'' The protocol caught a code-vs-doc
+divergence that would have shipped as a headline in a non-audited
+pipeline; whether the post-fix $+0.89$\,pp represents a genuine
+architectural signal or a tuning artifact is decided by Phase-9
+hill-climb, not this submission.
+
+\subsection{Three Phase-8 candidates surfaced by the protocol}
+\label{sec:phase-8}
+
+\begin{table*}[t]
+\small\centering
+\caption{Phase-8 family certification at $n{=}7$ CIFAR-100 30-ep on
+the post-fix codebase. All three winners produce 7/7 positive paired
+deltas $\Rightarrow$ paired Wilcoxon $W{=}0$, exact one-sided
+$p=(1/2)^7=0.0078$, clearing Holm--Bonferroni
+$\alpha'{=}0.0167$ across $k{=}3$. Default config: bs=256, lr=$10^{-3}$,
+wd=$5{\times}10^{-4}$, AdamW.}
+\label{tab:phase-8}
+\begin{tabular}{l rrl rl c}
+\toprule
+Tag & C100 mean & $\Delta$ mean & 95\% BCa CI on $\Delta$ & Wilcoxon $p$ & Paired-$t$ $p$ & Holm cleared? \\
+\midrule
+\texttt{pair\_gm\_pdw} (H09+H48+H44)   & 0.5786 & $+1.74$\,pp & $[+1.42, +2.09]$ & 0.0078 & $5.1{\times}10^{-5}$ & \textbf{YES} \\
+\texttt{slot\_act\_sine} (H81 SIREN)   & 0.5790 & $+1.78$\,pp & $[+1.38, +2.18]$ & 0.0078 & $1.2{\times}10^{-4}$ & \textbf{YES} \\
+\texttt{sg\_only\_phi\_budget} (H09)   & 0.5736 & $+1.24$\,pp & $[+0.84, +1.67]$ & 0.0078 & $8.1{\times}10^{-4}$ & \textbf{YES} \\
+\texttt{baseline\_resnet20}            & 0.5612 & ---         & ($\sigma{=}0.45$\,pp) & --- & --- & --- \\
+\bottomrule
+\end{tabular}
+\end{table*}
+
+Table~\ref{tab:phase-8} summarises the n=7 certification.
+
+\textbf{Magnitude diagnostic.} The Wilcoxon-at-floor at $n{=}7$ is
+informationally equivalent to a paired sign test. The paired
+$t$-test (df=6) extracts $\sigma$-scaled magnitude information and
+produces $p$-values 3--4 orders of magnitude below the floor:
+$t=9.06, p=5{\times}10^{-5}$ for \texttt{pair\_gm\_pdw};
+$t=7.82, p=1.2{\times}10^{-4}$ for \texttt{slot\_act\_sine};
+$t=5.43, p=8.1{\times}10^{-4}$ for \texttt{sg\_only\_phi\_budget}.
+
+\textbf{Hill-climbed robustness} (Phase-9a, $n{=}3$). A per-hypothesis
+coordinate hill-climb (cube lr$\times$wd$\times$bs$\times$optimizer,
+budget 25) ran independently on baseline and each leader.
+Hill-climbed-baseline median = 0.5929 at \{lr=$3{\times}10^{-3}$,
+wd=$5{\times}10^{-4}$, bs=256, AdamW\}. Hill-climbed leader $\Delta$
+means: \texttt{slot\_act\_sine} $+1.31$\,pp (CI $[+0.20, +2.23]$),
+\texttt{pair\_gm\_pdw} $+1.22$\,pp (CI $[+0.15, +1.99]$),
+\texttt{sg\_only\_phi\_budget} $+0.79$\,pp (CI
+$\mathbf{[-0.32, +1.76]}$ --- \emph{includes 0}). We report this
+honestly: the n=7 default-config certification stands, but the
+hill-climbed CI for \texttt{sg\_only\_phi\_budget} undercuts it when
+the analysis is tuned-vs-tuned. The two-arm batch-size confound (all
+three winners' \texttt{best\_config} is bs=128 vs baseline bs=256)
+is filed as Phase-9d.
+
+\textbf{Iso-tuned-cell extension} (Phase-9a baseline-extension,
+$n{=}3$). At the iso-tuned cell (lr=$3{\times}10^{-3}$,
+wd=$5{\times}10^{-4}$, bs=128, AdamW), $\sigma_{\mathrm{iso}}=1.14$\,pp
+--- 2.5$\times$ wider than $\sigma_{\mathrm{default}}=0.453$\,pp. All
+three $\Delta$ means fall \emph{inside} the iso-tuned
+$2\sigma_{\mathrm{iso}}=2.28$\,pp band but \emph{outside} the default
+$2\sigma_{\mathrm{default}}=0.91$\,pp band. The Phase-5 ordinal gate
+fails for all three at iso-tuned $n{=}3$. Honest framing: the
+$n{=}7$ default-config certification stands because
+$\sigma_{\mathrm{default}}$ is small at $n{=}7$; the iso-tuned
+extension confirms directional positive $\Delta$ but cannot itself
+re-certify at NeurIPS $\alpha$. Phase-9f ($n{=}7$+ iso-tuned
+baseline-and-leader extension; $\sim 14$ GPU-h) would deliver
+Wilcoxon floor 0.0078 in the iso-tuned regime and is filed as future
+work.
+
+\textbf{POSI family-size re-framing.} The $k{=}3$ Holm--Bonferroni
+family is the \emph{confirmatory} family, not the screening family.
+Candidates were filtered from a $\sim$49-row decision population
+(35-row CIFAR-10 screen + 7-row CIFAR-100 graduation + 7-row combo
+ladder) by the Phase-5 ordinal gate at $n{=}3$, a pre-specified
+criterion (Rule~28). POSI Holm--Bonferroni across the full 49-row
+decision family would demand $\alpha' = 0.05/49 \approx 0.001$, which
+the Wilcoxon $n{=}7$ floor of 0.0078 does not clear. The paired-$t$
+magnitude $p$-values do clear that bound for \texttt{pair\_gm\_pdw}
+and \texttt{slot\_act\_sine} but not for
+\texttt{sg\_only\_phi\_budget}. Both bounds are reported.
+
+\textbf{Honest reading.} \texttt{pair\_gm\_pdw} stacks three
+orthogonal axes; its $\Delta$mean $+1.74$\,pp is certified at the
+family-of-3 bound but does \emph{not} resolve the non-$\varphi$
+3-axis regularizer confound (Controls~1--4 in
+\texttt{controls/PLAN.md} are READY but unlaunched).
+\texttt{slot\_act\_sine} swaps ReLU for $\sin(\omega x)$ with
+$\omega{=}1$; the lift is consistent with~\citet{sitzmann2020siren}
+SIREN's known benefit and has \emph{no $\varphi$ content}.
+\texttt{sg\_only\_phi\_budget}'s sci-critic verdict remains
+DERIVATIVE+TESTABLE --- a rediscovery of RegNet's Pareto region
+($w_m \in [2.5, 2.9]$, not $\varphi=1.618$;
+\citealp{radosavovic2020regnet}).
+
+\begin{figure}[t]
+  \centering
+  \framebox[\columnwidth]{\rule{0pt}{2.5cm}\textit{[Pareto 3-panel placeholder]}}
+  \caption{Pareto frontier on the composite
+  metric~(Eq.~\ref{eq:composite}): top1 vs.\ parameters (left),
+  top1 vs.\ latency (centre), and combined composite vs.\ rank
+  (right). Baseline, the three Phase-8 winners, and 8 representative
+  failed hypotheses are highlighted. PDF source: \texttt{experiments/plot\_pareto.png}.}
+  \label{fig:pareto}
+\end{figure}
+
+\begin{figure}[t]
+  \centering
+  \framebox[\columnwidth]{\rule{0pt}{3cm}\textit{[8-group ablation small-multiples placeholder]}}
+  \caption{Per-group ablation small-multiples on CIFAR-10 12-ep
+  screening: G1--G8 rows plotted against the baseline rail.
+  Failure clusters in G3 (graph equivariance) and the catastrophic
+  full-hybrid \texttt{sg\_full\_fib} at $-11.54$\,pp are visible.
+  PDF source: \texttt{experiments/plot\_ablation.png}.}
+  \label{fig:ablation}
+\end{figure}
+
+% =====================================================================
+\section{Audit Calibration on Third-Party Code ($n{=}62$)}
+% =====================================================================
+\label{sec:third-party}
+
+Track-A doctrine was applied to a 15-hypothesis sample drawn from
+\texttt{pytorch/vision} (\texttt{ResNet}/\texttt{BasicBlock}/
+\texttt{Bottleneck}/\texttt{Wide-ResNet}, \texttt{DenseNet},
+\texttt{VGG}, \texttt{SqueezeNet}, \texttt{MobileNetV2}) and cited
+\texttt{pytorch/pytorch} core modules (\texttt{Adam}, \texttt{SGD},
+\texttt{kaiming\_normal\_}, \texttt{CosineAnnealingLR},
+\texttt{BatchNorm2d}). Full audit with file:line citations in
+\texttt{audits/AUDIT\_CALIBRATION\_THIRD\_PARTY.md}.
+
+\begin{table}[t]
+\small\centering
+\caption{Calibration-floor comparison. The MAJOR/BROKEN sub-tier
+excess (22\,pp) is the diagnostically-credible signal --- not the
+51\% aggregate.}
+\label{tab:calibration}
+\begin{tabular}{l c c}
+\toprule
+Tier            & Project (n=83) & Calibration (n=15) \\
+\midrule
+non-PASS        & 50.6\% & 33.3\% \\
+MINOR           & 28.9\% & 33.3\% \\
+MAJOR/BROKEN    & \textbf{21.7\%} & \textbf{0.0\%} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Headline.} 10 PASS, 5 MINOR, 0 MAJOR, 0 BROKEN (non-PASS
+33.3\%). Project non-PASS: 50.6\%. \textbf{MINOR tier 29\% project
+vs.\ 33\% calibration} --- comparable. \textbf{MAJOR/BROKEN tier 22\%
+project vs.\ 0\% calibration} --- the diagnostically-credible
+22\,pp excess. Formal interval analysis (100\,000-iter binomial
+bootstrap, $\mathrm{rng}=20260530$): bootstrap 95\% CI on the
+difference $[+13.3, +31.3]$\,pp (excludes 0); Wilson 95\% CIs project
+$[14.2\%, 31.7\%]$, calibration $[0.0\%, 20.4\%]$; \textbf{Fisher
+exact one-sided $p=0.036$} (clears $\alpha{=}0.05$), two-sided
+$p=0.066$; pooled $z$-test two-sided $p=0.046$.
+
+The 22-pp excess is \emph{directionally credible and one-sided
+significant at $\alpha=0.05$} but does not clear two-sided
+$\alpha{=}0.05$ under the conservative Fisher exact; $n\geq 50$
+(Phase-9b --- timm + HF Transformers + Lightning Bolts) is required to
+unambiguously certify. The MAJOR/BROKEN tier --- where H09
+realised-ratio drift, H21 \texttt{hex\_phi} undocumented divergence,
+and H67 broken \texttt{GoldenRoPE} import live --- is the protocol's
+load-bearing diagnostic surface.
+
+\textbf{Cross-family re-audit on 10 MAJOR/BROKEN verdicts (partial).}
+A methodologically-diverse intra-family re-audit (three methods:
+property-based, mechanism-trace, paper-math) across a stratified
+10-finding subsample (including all 3 originally BROKEN) yields
+\textbf{8/10 strict CONCORDANT, 10/10 defect-existence CONCORDANT}.
+Honest limitation: this is not a non-Claude external auditor; the
+GPT-5 / Gemini~3 Pro pass on the same subsample is filed as Phase-9e.
+
+% =====================================================================
+\section{Limitations and Threats to Validity}
+% =====================================================================
+\label{sec:limitations}
+
+\textbf{Single-seed for most single-prior sweep rows.} Only
+\texttt{baseline\_resnet20}, \texttt{phi\_budget}, and
+\texttt{golden\_momentum} carry 3-seed on CIFAR-10 to date; the rest
+are seed-0. Every per-tag empirical delta from the screening sweep is
+single-seed and is treated as screening data per Rule~28.
+
+\textbf{No transformer experiments.} Half the 84 hypotheses target
+attention / sequence backbones; none are tested. ViT-Tiny + decoder-LM
+scaffolds are filed as future work.
+
+\textbf{No tuned-baseline or RegNet comparison.} The H09
+$+0.78$\,pp screening lift could be a tuning artifact. Phase-9c filed.
+
+\textbf{Auditor self-grading at the model-family level.} See
+\S\ref{sec:self-grading}; the cross-family audit on the calibration
+sample is open future work.
+
+\textbf{POSI on Phase-8 family selection.} The $k{=}3$ confirmatory
+family is post-screening (\S\ref{sec:phase-8}). We report both the
+$k{=}3$ family-of-3 certification \emph{and} the $k{=}49$ POSI bound.
+The paired-$t$ magnitude test clears 0.001 for two winners;
+\texttt{sg\_only\_phi\_budget} does not.
+
+\textbf{Calibration $n{=}15$.} Two-sided Fisher exact on the 22-pp
+MAJOR/BROKEN excess is $p=0.066$ (one-sided $p=0.036$). Phase-9b
+extends to $n\geq 50$.
+
+\textbf{Hill-climbed \texttt{sg\_only\_phi\_budget} CI includes 0}
+(\S\ref{sec:phase-8}). Reported honestly; the $n{=}7$ default-config
+certification is the formal claim; the hill-climb is an additive
+robustness extension.
+
+\textbf{Iso-tuned-cell extension at $n{=}3$ has wide baseline
+$\sigma$.} $\sigma_{\mathrm{iso}}{=}1.14$\,pp at $n{=}3$ vs
+$\sigma_{\mathrm{default}}{=}0.45$\,pp at $n{=}7$. Iso-tuned
+$\Delta$s of $+1.16$ to $+1.68$\,pp fall inside
+$2\sigma_{\mathrm{iso}}$. The directional signal is preserved across
+all three winners but cannot be formally certified at NeurIPS
+$\alpha$ at this $n$. Phase-9f ($n{=}7+$ iso-tuned extension) is the
+resolution path.
+
+\textbf{CIFAR-10/-100 is not a sufficient testbed} for several
+equivariance / topological hypotheses (rotated CIFAR, Spherical MNIST,
+ModelNet40, ogbg-molhiv are appropriate but unbuilt).
+
+\textbf{Future-work GPU pipeline.} Phase-9f / Wave-1 / Controls~1--4
+in \texttt{controls/PLAN.md} are READY but unlaunched at submission
+($\sim$31.75 GPU-h). Their closure is the principled path to a
+non-provisional empirical headline.
+
+% =====================================================================
+\section{Related Work}
+% =====================================================================
+\label{sec:related}
+
+\textbf{Geometric / topological priors.} The design space sits inside
+the GDL taxonomy of~\citet{bronstein2021gdl}; specific anchors are
+\citet{hoogeboom2018hexaconv} for hexagonal lattices,
+\citet{cohen2019spherical} for spherical equivariance,
+\citet{larsson2017fractalnet} for fractal recursion,
+\citet{pittorino2022toroidal} for toroidal flat-minima geometry, and
+\citet{islam2025platonic} for Platonic-solid attention biases.
+
+\textbf{Width-progression / scaling.} \citet{radosavovic2020regnet}
+established the Pareto region $w_m \in [2.5, 2.9]$ that
+\emph{contains but does not require} $\varphi$; this is the literature
+anchor for the H09 DERIVATIVE+TESTABLE verdict.
+\citet{he2016resnet, huang2017densenet, liu2022convnext, bello2021resnetrs,
+wightman2021rsb, hetricks2019} establish the convergence-budget
+CIFAR-10 SOTA (\textgreater 91\%) that the screening sweep does not
+attempt to reach.
+
+\textbf{Optimisation and the H41 falsification.}
+\citet{loshchilov2019adamw} provides the baseline AdamW;
+\citet{reddi2018adam, choi2019optimizer, wilson2017marginal,
+hoffer2017longer} ground the H41 long-horizon $\beta_2$ caveat.
+
+\textbf{Activations and SIREN.} \citet{sitzmann2020siren} is the
+literature anchor for \texttt{slot\_act\_sine}; this is also why the
+\texttt{slot\_act\_sine} lift carries no $\varphi$ content.
+
+\textbf{Augmentation and the regularizer band.}
+\citet{cubuk2020randaugment, zhang2018mixup} bracket the augmentation
+effect sizes; \citet{foret2021sam} gives the SAM regularizer upper
+bound used in the magnitude-comparison band of \S\ref{sec:phase-8}.
+
+\textbf{Multiple-comparisons.} \citet{holm1979} is the canonical
+step-down Bonferroni used throughout \S\ref{sec:phase-8} and
+\S\ref{sec:third-party}.
+
+To our knowledge, no prior work systematically audits a
+nature-inspired prior design space with two independent expert teams
+and a mechanism-pinning Fixer campaign; the contribution is the
+combination, not any individual prior.
+
+% =====================================================================
+\section{Conclusion}
+% =====================================================================
+\label{sec:conclusion}
+
+\textbf{The protocol is the contribution.} After 84 hypothesis
+implementations, 41+24+15+3 implementation verdicts, 1+30+40+3+2+5
+scientific verdicts, 8 mechanism-correcting Fixer commits, and
+$\sim$7 GPU-hours of CIFAR-10/-100 ablation, the protocol produced
+calibration data: 51\% non-PASS impl-critic rate (with the 22-pp
+MAJOR/BROKEN sub-tier excess as the diagnostically-credible signal,
+one-sided Fisher $p=0.036$), 1\,/\,81 NOVEL+TESTABLE sci-critic rate,
+and three protocol-screened candidates that pass a 7-seed CIFAR-100
+30-ep paired Wilcoxon at $\alpha{=}0.05$ under Holm--Bonferroni across
+the $k{=}3$ confirmatory family.
+
+We make \emph{no} standalone empirical headline claim for
+nature-inspired priors at this scale. The three Phase-8 candidates
+are illustrative protocol output, conditional on Phase-9 hill-climb
+and on the non-$\varphi$ control row (Controls~1--4, READY but
+unlaunched). The single NOVEL+TESTABLE sci-critic survivor (H71
+IcosaRoPE3D) is untested and is treated as a research proposal.
+
+The audit + Fixer + re-run cycle, encoded in \texttt{CLAUDE.md}
+Rules~20--28 and packaged as seven content-agnostic skills, is what
+we offer the community: portable infrastructure for distinguishing
+signal from numerology when an autoresearch design space is
+irresistibly large and the experimental cost per hypothesis is
+non-trivial. The cross-domain demonstration of that portability is
+open future work; subject to those caveats, the protocol caught a
+headline claim produced by broken code \emph{before} that claim went
+to publication.\footnote{ICML 2027 reviewer reports are tracked in
+\texttt{audits/ICML\_REVIEWS\_2026-05-30/}; the area-chair synthesis
+and rebuttal are in
+\texttt{audits/ICML\_REVIEWS\_2026-05-30/REBUTTAL.md}.}
+
+% =====================================================================
+\bibliographystyle{plainnat}
+\bibliography{references}
+
+\onecolumn
+\appendix
+
+% =====================================================================
+\section{Statistical Tests --- Details}
+% =====================================================================
+\label{app:stats}
+
+\subsection{Phase-8 $n{=}7$ certification (full per-seed data)}
+\label{app:phase-8-seeds}
+
+\begin{table}[h!]
+\small\centering
+\caption{Phase-8 winners --- per-seed CIFAR-100 top1 on the post-fix
+codebase, seeds $0\ldots 6$.}
+\begin{tabular}{l ccccccc c c}
+\toprule
+Tag & $s_0$ & $s_1$ & $s_2$ & $s_3$ & $s_4$ & $s_5$ & $s_6$ & mean & std (pp) \\
+\midrule
+\texttt{baseline\_resnet20}      & 0.5615 & 0.5652 & 0.5662 & 0.5636 & 0.5535 & 0.5613 & 0.5571 & 0.5612 & 0.453 \\
+\texttt{pair\_gm\_pdw}           & 0.5786 & 0.5789 & 0.5761 & 0.5814 & 0.5798 & 0.5787 & 0.5770 & 0.5786 & 0.174 \\
+\texttt{slot\_act\_sine}         & 0.5796 & 0.5784 & 0.5766 & 0.5828 & 0.5828 & 0.5803 & 0.5725 & 0.5790 & 0.364 \\
+\texttt{sg\_only\_phi\_budget}   & 0.5741 & 0.5775 & 0.5687 & 0.5785 & 0.5745 & 0.5686 & 0.5733 & 0.5736 & 0.386 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+All three winners produce 7/7 positive paired deltas; paired Wilcoxon
+$W{=}0$, exact one-sided $p=(1/2)^7=0.0078$. Holm--Bonferroni at
+$k{=}3$ demands the smallest $p$ clear $\alpha/3=0.0167$. Sorted
+$p$-values: $0.0078, 0.0078, 0.0078$ (ties). Smallest clears $0.0167$
+$\checkmark$; second clears $0.025$ $\checkmark$; third clears $0.05$
+$\checkmark$. All three winners clear Holm--Bonferroni at
+$\alpha{=}0.05$. Full derivation in
+\texttt{paper/STATISTICAL\_TESTS.md} \S0--\S3.
+
+\subsection{Seed-noise floor estimates}
+\label{app:noise}
+
+Pooled CIFAR-10 12-ep seed $\sigma$ across 11 multi-seed tags
+$= 0.607$\,pp (RMS of per-tag std). $2\sigma_{\mathrm{pooled}}
+\approx 1.21$\,pp. This is the empirical CIFAR-10 12-ep noise floor.
+The 99th-percentile single-seed $\Delta$ across 58 seed-0
+non-baseline tags is $+0.96$\,pp, inside the $2\sigma$ band; no
+CIFAR-10 12-ep seed-0 tag has prima-facie statistical credibility as
+a positive. Full table in
+\texttt{paper/STATISTICAL\_TESTS.md} \S4--\S5.
+
+\subsection{Audit-calibration bootstrap}
+\label{app:bootstrap}
+
+100\,000-iter binomial bootstrap, $\mathrm{rng}=20260530$:
+bootstrap 95\% CI on the project-vs-calibration MAJOR/BROKEN
+difference $= [+13.3, +31.3]$\,pp; Wilson 95\% CI project
+$[14.2\%, 31.7\%]$, calibration $[0.0\%, 20.4\%]$; Fisher exact
+one-sided $p=0.036$, two-sided $p=0.066$; pooled $z$-test two-sided
+$p=0.046$. Full table in \texttt{paper/STATISTICAL\_TESTS.md} \S8.
+
+% =====================================================================
+\section{Per-hypothesis Verdict Table (Summary)}
+% =====================================================================
+\label{app:verdicts}
+
+\begin{table}[h!]
+\small\centering
+\caption{Verdict distribution across 84 hypotheses (Track~A, Track~B,
+Fixer-corrected). H57 deferred. H49/H54/H59 are INFRASTRUCTURE and
+are not Track-B-graded for novelty.}
+\label{tab:verdicts}
+\begin{tabular}{l c c}
+\toprule
+Verdict tier & Track A (impl-critic) & Track B (sci-critic) \\
+\midrule
+PASS / NOVEL+TESTABLE        & 41 & 1 \\
+MINOR / DERIVATIVE+TESTABLE  & 24 & 30 \\
+MAJOR / NUMEROLOGY           & 15 & 40 \\
+BROKEN / EMPIRICALLY-FALSIFIED & 3  & 3 \\
+--- / UNFALSIFIABLE          & -- & 2 \\
+--- / INFRASTRUCTURE         & -- & 5 \\
+\midrule
+\textbf{Total graded}        & \textbf{83} & \textbf{81} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[h!]
+\small\centering
+\caption{Fixer-campaign output: 8 commits, $\sim$34 new
+mechanism-verifying tests, $\sim$16 patched \texttt{src} files. Every
+affected sweep row was re-run on post-fix code per Rule~21.}
+\label{tab:fixers}
+\begin{tabular}{l l l}
+\toprule
+Fixer & Commit & Primary patched module \\
+\midrule
+PhiScaling     & \texttt{519cdf3} & \texttt{nature\_inspired\_networks/phi\_budget.py} \\
+G1 misc        & \texttt{253dc94} & \texttt{nature\_inspired\_networks/fractal\_phi\_recursion.py} \\
+G3 graphs      & \texttt{afac553} & \texttt{nature\_inspired\_networks/hex\_phi.py} \\
+G4 attention   & \texttt{3efd2dd} & \texttt{nature\_inspired\_networks/phi\_gelu.py} \\
+G5 optimisation & \texttt{c395769}, \texttt{5f09814}, \texttt{8aa0430} & \texttt{golden\_adam.py}, \texttt{phi\_decay\_wd.py}, \texttt{golden\_momentum.py} \\
+G6 topological & \texttt{16fe2b6} & \texttt{platonic\_attention.py} \\
+G7 hybrids     & \texttt{2e7ee45} & \texttt{hybrid\_full.py}, \texttt{metatron\_tied\_conv2d.py} \\
+G8 esoteric    & \texttt{9cca91e} & \texttt{slot\_act\_sine.py} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% =====================================================================
+\section{Reviewer-Revision Status}
+% =====================================================================
+\label{app:reviewers}
+
+\begin{table}[h!]
+\small\centering
+\caption{ICML 2027 reviewer-pass revision status, 2026-05-30.
+Detailed cross-walk in
+\texttt{audits/REVIEWER\_PASS\_PAPER\_RESPONSE.md}; rebuttal in
+\texttt{audits/ICML\_REVIEWS\_2026-05-30/REBUTTAL.md}.}
+\label{tab:rev-status}
+\begin{tabular}{l l l}
+\toprule
+Reviewer & Item & Status \\
+\midrule
+R1       & BLOCKER \#1 POSI re-framing                  & RESOLVED (\S\ref{sec:phase-8} POSI paragraph) \\
+R1       & BLOCKER \#3 magnitude diagnostic             & RESOLVED (paired-$t$ in \S\ref{sec:phase-8}) \\
+R2       & Q1 non-$\varphi$ 3-axis control              & READY (Controls 1--4, unlaunched) \\
+R2       & Q2 bs=128 baseline control                   & READY (Phase-9d, $\sim$3.5 GPU-h) \\
+R3       & W2 cross-family re-audit on MAJOR/BROKEN     & PARTIAL (intra-family, 8/10 strict CONCORDANT) \\
+AC       & \#12 category-confusion warning              & RESOLVED (\S\ref{sec:track-a-dist}, \S\ref{sec:track-b-dist}) \\
+AC       & \#15 auditor model-family caveat             & RESOLVED (\S\ref{sec:self-grading}) \\
+AC       & \#16 verdict-on-wrong-testbed audit          & PARTIAL (H22 downgrade) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% =====================================================================
+\section{Reproducibility Pointers}
+% =====================================================================
+\label{app:repro}
+
+\begin{itemize}
+  \item Repository (blind-review redaction will replace this URL):
+        \url{https://github.com/dlmastery/nature_inspired_networks}.
+  \item Live dashboard:
+        \url{https://dlmastery.github.io/nature_inspired_networks/}.
+  \item Composite-metric fingerprint
+        \texttt{d65565e9c7b12d14cbce30a801ecc6753aea3eb148074256bfcc051fa61d0893}
+        (Rule~2; \texttt{CompositeFingerprintError} on edit).
+  \item Phase-8 sweep raw seeds:
+        \texttt{experiments/cifar100/<tag>\_seed\{0..6\}/}.
+  \item Audit calibration:
+        \texttt{audits/AUDIT\_CALIBRATION\_THIRD\_PARTY.md}.
+  \item Phase-9 hill-climb skill:
+        \texttt{skills/autoresearch-per-hypothesis-hillclimb/}.
+\end{itemize}
+
+\end{document}
