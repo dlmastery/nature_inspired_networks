@@ -1,26 +1,20 @@
 {
   "tag": "pair_gm_pdw",
   "idea": "91_pair_gm_pdw",
-  "algorithm": "coordinate",
-  "budget": 25,
+  "algorithm": "grid",
+  "budget": 4,
   "cube": {
     "lr": [
-      0.0003,
-      0.001,
       0.003
     ],
     "weight_decay": [
-      0.0001,
-      0.0005,
-      0.002
+      0.0005
     ],
     "batch_size": [
-      128,
-      256
+      128
     ],
     "optimizer": [
-      "AdamW",
-      "SGD"
+      "AdamW"
     ]
   },
   "base_config": {
@@ -35,91 +29,27 @@
     "batch_size": 128,
     "optimizer": "AdamW"
   },
-  "best_top1_median": 0.6109,
-  "best_top1_min": 0.6057,
-  "best_top1_range": 0.006399999999999961,
+  "best_top1_median": 0.6071,
+  "best_top1_min": 0.6049,
+  "best_top1_range": 0.0029000000000000137,
   "seeds_confirmed": [
-    0,
-    1,
-    2
+    3,
+    4,
+    5,
+    6
   ],
   "cells": [
     {
       "config": {
-        "lr": 0.001,
-        "weight_decay": 0.0005,
-        "batch_size": 256,
-        "optimizer": "AdamW"
-      },
-      "seed": 0,
-      "config_id": "lr1em3_wd5em4_bs256_optAdamW",
-      "top1": 0.5747,
-      "composite": 0.5769664506919225,
-      "wallclock_s": 0.0
-    },
-    {
-      "config": {
-        "lr": 0.0003,
-        "weight_decay": 0.0005,
-        "batch_size": 256,
-        "optimizer": "AdamW"
-      },
-      "seed": 0,
-      "config_id": "lr3em4_wd5em4_bs256_optAdamW",
-      "top1": 0.4914,
-      "composite": 0.48474536992508416,
-      "wallclock_s": 0.0
-    },
-    {
-      "config": {
         "lr": 0.003,
         "weight_decay": 0.0005,
-        "batch_size": 256,
+        "batch_size": 128,
         "optimizer": "AdamW"
       },
-      "seed": 0,
-      "config_id": "lr3em3_wd5em4_bs256_optAdamW",
-      "top1": 0.6043,
-      "composite": 0.60382509778712,
-      "wallclock_s": 0.0
-    },
-    {
-      "config": {
-        "lr": 0.003,
-        "weight_decay": 0.0001,
-        "batch_size": 256,
-        "optimizer": "AdamW"
-      },
-      "seed": 0,
-      "config_id": "lr3em3_wd1em4_bs256_optAdamW",
-      "top1": 0.6043,
-      "composite": 0.6043301684541793,
-      "wallclock_s": 0.0
-    },
-    {
-      "config": {
-        "lr": 0.003,
-        "weight_decay": 0.002,
-        "batch_size": 256,
-        "optimizer": "AdamW"
-      },
-      "seed": 0,
-      "config_id": "lr3em3_wd2em3_bs256_optAdamW",
-      "top1": 0.6043,
-      "composite": 0.6094532270798737,
-      "wallclock_s": 0.0
-    },
-    {
-      "config": {
-        "lr": 0.003,
-        "weight_decay": 0.0005,
-        "batch_size": 256,
-        "optimizer": "SGD"
-      },
-      "seed": 0,
-      "config_id": "lr3em3_wd5em4_bs256_optSGD",
-      "top1": 0.6043,
-      "composite": 0.606246328722026,
+      "seed": 3,
+      "config_id": "lr3em3_wd5em4_bs128_optAdamW",
+      "top1": 0.6074,
+      "composite": 0.6094869258465946,
       "wallclock_s": 0.0
     },
     {
@@ -129,10 +59,10 @@
         "batch_size": 128,
         "optimizer": "AdamW"
       },
-      "seed": 0,
+      "seed": 4,
       "config_id": "lr3em3_wd5em4_bs128_optAdamW",
-      "top1": 0.6121,
-      "composite": 0.6148130259322794,
+      "top1": 0.6078,
+      "composite": 0.6129690979900728,
       "wallclock_s": 0.0
     },
     {
@@ -142,10 +72,10 @@
         "batch_size": 128,
         "optimizer": "AdamW"
       },
-      "seed": 1,
+      "seed": 5,
       "config_id": "lr3em3_wd5em4_bs128_optAdamW",
-      "top1": 0.6057,
-      "composite": 0.6085655360391834,
+      "top1": 0.6068,
+      "composite": 0.6121956542552772,
       "wallclock_s": 0.0
     },
     {
@@ -155,12 +85,12 @@
         "batch_size": 128,
         "optimizer": "AdamW"
       },
-      "seed": 2,
+      "seed": 6,
       "config_id": "lr3em3_wd5em4_bs128_optAdamW",
-      "top1": 0.6109,
-      "composite": 0.611978935022687,
+      "top1": 0.6049,
+      "composite": 0.6045749095045523,
       "wallclock_s": 0.0
     }
   ],
-  "wallclock_total_s": 9445.793307899992
+  "wallclock_total_s": 3863.951777899987
 }
