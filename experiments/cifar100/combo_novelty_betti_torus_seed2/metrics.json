@@ -1,0 +1,18 @@
+{
+  "tag": "combo_novelty_betti_torus",
+  "dataset": "cifar100",
+  "seed": 2,
+  "epochs": 30,
+  "top1": 0.5307,
+  "top5": 0.8196,
+  "params": 267658,
+  "flops": 80816212.0,
+  "latency_ms": 5.4804190003778785,
+  "rot_eq_err": 0.4369148351252079,
+  "composite": 0.5223803004084903,
+  "composite_fingerprint": "d65565e9c7b12d14cbce30a801ecc6753aea3eb148074256bfcc051fa61d0893",
+  "epochs_to_target": -1,
+  "train_seconds": 850.9821402999805,
+  "train_top1": 0.6222556089743589,
+  "generalization_gap": 0.09155560897435899
+}
