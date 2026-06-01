@@ -1,0 +1,18 @@
+{
+  "tag": "h71_icosa_rope3d_vit_tiny_rotcifar10",
+  "dataset": "rotated_cifar10",
+  "seed": 2,
+  "epochs": 30,
+  "top1": 0.655525,
+  "top5": 0.9674,
+  "params": 5701420,
+  "flops": 389245626.0,
+  "latency_ms": 24.15358699974604,
+  "rot_eq_err": 0.3455091652770837,
+  "composite": 0.5485767664540095,
+  "composite_fingerprint": "d65565e9c7b12d14cbce30a801ecc6753aea3eb148074256bfcc051fa61d0893",
+  "epochs_to_target": 8,
+  "train_seconds": 1982.9300621000002,
+  "train_top1": 0.6943509615384615,
+  "generalization_gap": 0.03882596153846152
+}
