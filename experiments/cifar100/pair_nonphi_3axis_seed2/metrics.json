@@ -1,0 +1,18 @@
+{
+  "tag": "pair_nonphi_3axis",
+  "dataset": "cifar100",
+  "seed": 2,
+  "epochs": 30,
+  "top1": 0.5785,
+  "top5": 0.8538,
+  "params": 271903,
+  "flops": 118959652.0,
+  "latency_ms": 2.640936000389047,
+  "rot_eq_err": 0.3755533918738365,
+  "composite": 0.5856914061942889,
+  "composite_fingerprint": "d65565e9c7b12d14cbce30a801ecc6753aea3eb148074256bfcc051fa61d0893",
+  "epochs_to_target": -1,
+  "train_seconds": 1078.6626535999821,
+  "train_top1": 0.6436899038461539,
+  "generalization_gap": 0.06518990384615386
+}
