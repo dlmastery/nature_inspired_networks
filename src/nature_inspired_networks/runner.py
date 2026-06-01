@@ -72,6 +72,23 @@ _MODEL_BUILD_KW: tuple[str, ...] = (
 )
 
 
+def _phi_budget_build_kwargs(cfg: dict) -> dict:
+    """Return phi_budget-only build kwargs derived from cfg.
+
+    Phase-9e Wave-1 H88 wiring fix: when ``model=phi_budget`` the
+    ``toroidal`` top-level cfg key (previously honoured only under
+    ``model=NaturePrior`` via ``flags.toroidal``) is forwarded to the
+    phi_budget factory so the H22 boundary mechanism stacks with the
+    H09 channel mechanism. Default behaviour preserves legacy phi_budget
+    rows: when the key is absent the kwarg is omitted and the factory
+    defaults to ``toroidal=False``.
+    """
+    out: dict = {}
+    if "toroidal" in cfg:
+        out["toroidal"] = bool(cfg["toroidal"])
+    return out
+
+
 def post_build_mutators(model, cfg: dict):
     """Apply optional post-construction model mutators in a fixed order.
 
@@ -249,6 +266,11 @@ def run_one(cfg: dict, tag: str, seed: int, root: str = "experiments") -> Path:
     # Pluck out model-build-only override keys (Phase A) into a sidecar
     # dict so the legacy build_model paths receive them as **kwargs.
     build_kwargs = {k: cfg[k] for k in _MODEL_BUILD_KW if k in cfg}
+    # Phase-9e Wave-1 H88 wiring fix: forward ``toroidal`` from cfg to
+    # the phi_budget factory (only — NaturePrior consumes toroidal via
+    # ``flags.toroidal``, RegNet / ViT do not have a boundary axis).
+    if model_name.lower() == "phi_budget":
+        build_kwargs.update(_phi_budget_build_kwargs(cfg))
     # Resolve build_model fresh from the models module so the H13/H18/
     # H19 self-registration wrappers (installed at import time) are
     # picked up regardless of import order.
@@ -287,6 +309,13 @@ def run_one(cfg: dict, tag: str, seed: int, root: str = "experiments") -> Path:
         # Control 1 (reviewer-flagged) — pin β1 to a constant value,
         # bypassing the H48 schedule. None preserves legacy behaviour.
         const_beta1=cfg.get("const_beta1", None),
+        # H51 — Topological Betti Loss (Phase-9e Wave-1 H88 wiring).
+        # Default 0.0 preserves legacy training byte-for-byte; positive
+        # values add a BettiLoss(features) surrogate to the per-step CE
+        # loss. See ``train.Trainer._step`` for the integration point.
+        betti_loss_weight=float(cfg.get("betti_loss_weight", 0.0)),
+        betti_persistence_threshold=float(cfg.get("betti_persistence_threshold", 0.1)),
+        betti_max_pts=int(cfg.get("betti_max_pts", 64)),
     )
     tr = Trainer(model, tr_loader, te_loader, n_cls, train_cfg, device=device)
     fit_info = tr.fit()

@@ -403,6 +403,13 @@ def build_model(name: str, num_classes: int, flags: NaturePriorFlags | None = No
                 phi_kw["budget_mode"] = str(kwargs["phi_budget_mode"])
             if "phi_budget_blocks_per_stage" in kwargs:
                 phi_kw["blocks_per_stage"] = int(kwargs["phi_budget_blocks_per_stage"])
+            # Phase-9e Wave-1 H88 wiring fix — toroidal boundary support
+            # for the phi_budget factory (was previously NaturePrior-only).
+            # Accept either the kwarg ``toroidal`` (forwarded from
+            # runner.run_one) or the keyword default False so the legacy
+            # phi_budget rows remain byte-for-byte identical.
+            if "toroidal" in kwargs:
+                phi_kw["toroidal"] = bool(kwargs["toroidal"])
         elif n == "golden_skip":
             if "phi_skip_init" in kwargs:
                 init_val = kwargs["phi_skip_init"]

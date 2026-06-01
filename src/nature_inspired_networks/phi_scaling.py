@@ -41,7 +41,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from .priors import PHI
+from .priors import PHI, toroidal_pad
 
 
 # ---------------------------------------------------------------------------
@@ -466,14 +466,29 @@ def phi_budget_widths(B_total: int, n_stages: int, c_in: int = 3,
 
 
 class _ConvBlock(nn.Module):
-    """Tiny double-conv block for PhiBudgetNet (BasicBlock-shaped)."""
+    """Tiny double-conv block for PhiBudgetNet (BasicBlock-shaped).
 
-    def __init__(self, c_in: int, c_out: int, stride: int = 1) -> None:
+    Phase-9e Wave-1 wiring fix (H88 ``combo_novelty_betti_torus``): when
+    ``toroidal=True`` the two interior 3x3 convs replace their stock
+    zero-padding with circular (toroidal) padding via
+    :func:`priors.toroidal_pad`, matching the boundary mechanism used by
+    ``NaturePriorBlock`` when ``flags.toroidal`` is on. The 1x1 skip
+    projection is untouched (padding-free). Default ``toroidal=False``
+    preserves the legacy phi_budget behaviour byte-for-byte.
+    """
+
+    def __init__(self, c_in: int, c_out: int, stride: int = 1,
+                 toroidal: bool = False) -> None:
         super().__init__()
+        self.toroidal = bool(toroidal)
+        # When toroidal=True we wrap the input ourselves via
+        # ``toroidal_pad`` before each conv, so the conv itself must use
+        # padding=0 (otherwise we'd zero-pad on top of the circular wrap).
+        pad = 0 if self.toroidal else 1
         self.conv1 = nn.Conv2d(c_in, c_out, 3, stride=stride,
-                               padding=1, bias=False)
+                               padding=pad, bias=False)
         self.bn1 = nn.BatchNorm2d(c_out)
-        self.conv2 = nn.Conv2d(c_out, c_out, 3, padding=1, bias=False)
+        self.conv2 = nn.Conv2d(c_out, c_out, 3, padding=pad, bias=False)
         self.bn2 = nn.BatchNorm2d(c_out)
         if stride != 1 or c_in != c_out:
             self.skip = nn.Sequential(
@@ -484,8 +499,12 @@ class _ConvBlock(nn.Module):
             self.skip = nn.Identity()
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        y = F.relu(self.bn1(self.conv1(x)), inplace=True)
-        y = self.bn2(self.conv2(y))
+        if self.toroidal:
+            y = F.relu(self.bn1(self.conv1(toroidal_pad(x, 1))), inplace=True)
+            y = self.bn2(self.conv2(toroidal_pad(y, 1)))
+        else:
+            y = F.relu(self.bn1(self.conv1(x)), inplace=True)
+            y = self.bn2(self.conv2(y))
         return F.relu(y + self.skip(x), inplace=True)
 
 
@@ -504,30 +523,45 @@ class PhiBudgetNet(nn.Module):
 
     def __init__(self, num_classes: int = 10, B_total: int = 270_000,
                  n_stages: int = 3, blocks_per_stage: int = 2,
-                 budget_mode: str = "phi") -> None:
+                 budget_mode: str = "phi",
+                 toroidal: bool = False) -> None:
         super().__init__()
         assert budget_mode in {"phi", "uniform"}, budget_mode
         self.budget_mode = budget_mode
         self.B_total = B_total
         self.n_stages = n_stages
+        # H22 boundary mechanism (Phase-9e Wave-1 H88 wiring): when True,
+        # both stem and every interior ``_ConvBlock`` use circular
+        # (toroidal) padding. The stem is implemented inline (rather than
+        # via ``_ConvBlock``) so its forward must be a small custom
+        # nn.Module — see ``_ToroidalStem`` below. Default False keeps
+        # the legacy phi_budget byte-for-byte.
+        self.toroidal = bool(toroidal)
         widths = phi_budget_widths(
             B_total, n_stages,
             blocks_per_stage=blocks_per_stage,
             budget_mode=budget_mode,
         )
         self.widths = widths
-        self.stem = nn.Sequential(
-            nn.Conv2d(3, widths[0], 3, padding=1, bias=False),
-            nn.BatchNorm2d(widths[0]),
-            nn.ReLU(inplace=True),
-        )
+        if self.toroidal:
+            self.stem = _ToroidalStem(3, widths[0])
+        else:
+            self.stem = nn.Sequential(
+                nn.Conv2d(3, widths[0], 3, padding=1, bias=False),
+                nn.BatchNorm2d(widths[0]),
+                nn.ReLU(inplace=True),
+            )
         stages: list[nn.Module] = []
         c_prev = widths[0]
         for i, c_out in enumerate(widths):
             stride = 1 if i == 0 else 2
-            blocks: list[nn.Module] = [_ConvBlock(c_prev, c_out, stride=stride)]
+            blocks: list[nn.Module] = [
+                _ConvBlock(c_prev, c_out, stride=stride,
+                           toroidal=self.toroidal)
+            ]
             for _ in range(blocks_per_stage - 1):
-                blocks.append(_ConvBlock(c_out, c_out, stride=1))
+                blocks.append(_ConvBlock(c_out, c_out, stride=1,
+                                         toroidal=self.toroidal))
             stages.append(nn.Sequential(*blocks))
             c_prev = c_out
         self.stages = nn.ModuleList(stages)
@@ -540,6 +574,25 @@ class PhiBudgetNet(nn.Module):
             x = s(x)
         x = self.pool(x).flatten(1)
         return self.fc(x)
+
+
+class _ToroidalStem(nn.Module):
+    """3x3 stem conv with circular padding (H22 boundary mechanism).
+
+    Lives next to ``_ConvBlock`` so the toroidal-vs-stock distinction
+    stays local to phi_scaling. Equivalent to
+    ``nn.Sequential(Conv2d(3, c_out, 3, padding=1), BN, ReLU)`` in shape
+    output and parameter count; only the boundary mechanism differs.
+    """
+
+    def __init__(self, c_in: int, c_out: int) -> None:
+        super().__init__()
+        self.conv = nn.Conv2d(c_in, c_out, 3, padding=0, bias=False)
+        self.bn = nn.BatchNorm2d(c_out)
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        x = toroidal_pad(x, 1)
+        return F.relu(self.bn(self.conv(x)), inplace=True)
 
 
 # ---------------------------------------------------------------------------
@@ -734,7 +787,8 @@ def build_phi_model(name: str, num_classes: int = 10, **kw) -> nn.Module:
                             B_total=int(kw.get("B_total", 270_000)),
                             n_stages=int(kw.get("n_stages", 3)),
                             blocks_per_stage=int(kw.get("blocks_per_stage", 2)),
-                            budget_mode=str(kw.get("budget_mode", "phi")))
+                            budget_mode=str(kw.get("budget_mode", "phi")),
+                            toroidal=bool(kw.get("toroidal", False)))
     if n == "golden_skip":
         return GoldenSkipResNet(
             num_classes=num_classes,

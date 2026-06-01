@@ -130,6 +130,92 @@ def test_build_model_rejects_unknown_name():
     raise AssertionError("expected ValueError on unknown model name")
 
 
+# ---------------------------------------------------------------------------
+# Phase-9e Wave-1 H88 wiring — phi_budget toroidal boundary support.
+#
+# Gap closed (Tag-Adder finding): ``toroidal=True`` was previously only
+# honoured under model="NaturePrior" via flags.toroidal. The H88 combo
+# stack (toroidal × phi_budget × betti_loss) needs the boundary mech to
+# stack with the H09 channel mech. These tests verify that:
+#   (a) ``build_model('phi_budget', toroidal=True)`` accepts the kwarg
+#       without raising;
+#   (b) the produced PhiBudgetNet routes its convs through
+#       ``priors.toroidal_pad`` (verified by inspecting the per-stage
+#       ``_ConvBlock.toroidal`` attribute, with a forward-pass spot
+#       check that exercises the circular-padding code path).
+# ---------------------------------------------------------------------------
+def test_phi_budget_accepts_toroidal_kwarg():
+    """build_model('phi_budget', toroidal=True) must accept the kwarg
+    and produce a model with a 32x32 forward shape (B, num_classes)."""
+    m = build_model("phi_budget", num_classes=100, channel_mode="fib",
+                    toroidal=True)
+    # PhiBudgetNet must expose the toroidal flag for downstream introspection.
+    assert getattr(m, "toroidal", False) is True
+    y = m(torch.randn(2, 3, 32, 32))
+    assert y.shape == (2, 100), f"unexpected output shape {y.shape}"
+
+
+def test_phi_budget_with_toroidal_uses_toroidal_pad():
+    """Every interior _ConvBlock in a toroidal PhiBudgetNet must have
+    ``toroidal=True`` (so the inner 3x3 convs use circular padding) AND
+    a stem that uses a _ToroidalStem. Regression guard against silent
+    fallback to legacy zero-padding when the kwarg is forwarded.
+    """
+    from nature_inspired_networks.phi_scaling import (
+        PhiBudgetNet,
+        _ConvBlock,
+        _ToroidalStem,
+    )
+
+    m = build_model("phi_budget", num_classes=100, channel_mode="fib",
+                    toroidal=True)
+    assert isinstance(m, PhiBudgetNet)
+    # Stem is the toroidal variant.
+    assert isinstance(m.stem, _ToroidalStem), (
+        f"toroidal phi_budget stem should be _ToroidalStem, got {type(m.stem).__name__}"
+    )
+    # Every _ConvBlock inside the stages has toroidal=True.
+    conv_blocks = [mod for mod in m.modules() if isinstance(mod, _ConvBlock)]
+    assert len(conv_blocks) > 0, "no _ConvBlock found in phi_budget stages"
+    for cb in conv_blocks:
+        assert cb.toroidal is True, (
+            "phi_budget(toroidal=True) produced a _ConvBlock with "
+            "toroidal=False — toroidal kwarg not threaded into stages"
+        )
+        # Interior 3x3 convs must use padding=0 (we wrap manually).
+        assert cb.conv1.padding == (0, 0), cb.conv1.padding
+        assert cb.conv2.padding == (0, 0), cb.conv2.padding
+
+    # Regression contrast: the default (toroidal=False) phi_budget must
+    # NOT route through the toroidal stem and the conv blocks keep
+    # padding=1.
+    m_baseline = build_model("phi_budget", num_classes=100, channel_mode="fib")
+    assert getattr(m_baseline, "toroidal", False) is False
+    assert not isinstance(m_baseline.stem, _ToroidalStem)
+    conv_blocks_b = [mod for mod in m_baseline.modules()
+                     if isinstance(mod, _ConvBlock)]
+    for cb in conv_blocks_b:
+        assert cb.toroidal is False
+        assert cb.conv1.padding == (1, 1)
+
+
+def test_phi_budget_toroidal_param_count_matches_baseline():
+    """toroidal=True must NOT inflate the param count vs. the legacy
+    phi_budget — circular padding is data-flow only, no extra weights.
+    Regression guard against accidental introduction of learnable
+    padding modules.
+    """
+    m_t = build_model("phi_budget", num_classes=100, channel_mode="fib",
+                      toroidal=True)
+    m_b = build_model("phi_budget", num_classes=100, channel_mode="fib")
+    n_t = sum(p.numel() for p in m_t.parameters())
+    n_b = sum(p.numel() for p in m_b.parameters())
+    assert n_t == n_b, (
+        f"toroidal phi_budget should match baseline param count, got "
+        f"{n_t} vs {n_b}"
+    )
+
+
 def test_width_multiplier_search_rejects_invalid_target():
     """Defensive guard: target_params <= 0 is a hard error."""
     if not _torchvision_regnet_available():

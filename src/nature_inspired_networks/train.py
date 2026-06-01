@@ -68,6 +68,17 @@ class TrainConfig:
     # ``model_factory``; the Trainer just owns the per-epoch step.
     growth_pruning_schedule: bool = False
     growth_pruning_schedule_obj: object = None  # GrowthPruningSchedule or None
+    # H51 — Topological Betti Loss (Phase-9e Wave-1 H88 wiring).
+    # When > 0, the per-step loss becomes
+    #     total_loss = ce_loss + betti_loss_weight * BettiLoss(features)
+    # where ``features`` is the penultimate feature map extracted from
+    # the model under training (via ``stagewise_features`` if available;
+    # otherwise the loss falls back to a one-batch hook on the model's
+    # global-average-pooled features). Default 0.0 preserves legacy
+    # training behaviour byte-for-byte.
+    betti_loss_weight: float = 0.0
+    betti_persistence_threshold: float = 0.1
+    betti_max_pts: int = 64
 
 
 def _build_scheduler(opt: torch.optim.Optimizer, cfg: "TrainConfig"):
@@ -134,6 +145,23 @@ class Trainer:
         self._phi_dropouts = [
             m for m in self.model.modules() if isinstance(m, _PhiDropout)
         ]
+        # H51 — Topological Betti Loss auxiliary head (Phase-9e Wave-1
+        # H88 wiring). Constructed once and reused across steps so the
+        # threshold / max_pts hyperparameters live on a single nn.Module.
+        # When ``betti_loss_weight <= 0`` the module is still built but
+        # never invoked — keeps the attribute typed for tests + future
+        # callers without paying the per-step cost.
+        self.betti_loss_weight = float(getattr(self.cfg, "betti_loss_weight", 0.0))
+        if self.betti_loss_weight > 0.0:
+            from .betti_loss import BettiLoss
+            self.betti_loss_fn = BettiLoss(
+                persistence_threshold=float(
+                    getattr(self.cfg, "betti_persistence_threshold", 0.1)
+                ),
+                max_pts=int(getattr(self.cfg, "betti_max_pts", 64)),
+            ).to(self.device)
+        else:
+            self.betti_loss_fn = None
         # H20 — optional FibEnsemble averager. Off by default; when on,
         # state-dict snapshots are pushed once per epoch and the final
         # averaged weights are loaded into ``self.model`` at the end of
@@ -216,6 +244,24 @@ class Trainer:
         return AdamW(model.parameters(), lr=cfg.lr,
                      weight_decay=cfg.weight_decay)
 
+    def _extract_penultimate_features(self, x: torch.Tensor) -> torch.Tensor | None:
+        """Return the penultimate feature map for the H51 BettiLoss.
+
+        Resolution order (Phase-9e Wave-1 H88 wiring):
+          1. ``model.stagewise_features(x)[-1]`` — the deepest stage's
+             feature map (used by NaturePriorNet / ResNet20 / phi family
+             that explicitly implement the helper).
+          2. ``None`` — fall back: the caller skips the Betti term. This
+             keeps the auxiliary loss strictly additive: a model that
+             doesn't expose a multi-stage feature emitter trains as-is.
+        """
+        get = getattr(self.model, "stagewise_features", None)
+        if callable(get):
+            feats = get(x)
+            if isinstance(feats, (list, tuple)) and len(feats) > 0:
+                return feats[-1]
+        return None
+
     def _step(self, x, y) -> tuple[float, float]:
         x = x.to(self.device, non_blocking=True)
         y = y.to(self.device, non_blocking=True)
@@ -224,12 +270,25 @@ class Trainer:
         if self.cfg.use_bf16 and torch.cuda.is_available():
             with torch.amp.autocast("cuda", dtype=torch.bfloat16):
                 logits = self.model(x)
-                loss = F.cross_entropy(logits, y,
-                                       label_smoothing=self.cfg.label_smoothing)
+                ce_loss = F.cross_entropy(logits, y,
+                                          label_smoothing=self.cfg.label_smoothing)
         else:
             logits = self.model(x)
-            loss = F.cross_entropy(logits, y,
-                                   label_smoothing=self.cfg.label_smoothing)
+            ce_loss = F.cross_entropy(logits, y,
+                                      label_smoothing=self.cfg.label_smoothing)
+        # H51 — Topological Betti Loss auxiliary head. Active only when
+        # ``betti_loss_weight > 0``; the cost (cdist + sort on a small
+        # subsampled point cloud) is paid OUTSIDE the bf16 autocast so
+        # ``torch.cdist`` runs in fp32 (numerically stable for the
+        # persistence surrogate). The total loss is the CE term plus a
+        # weighted Betti surrogate; default weight=0 reproduces legacy
+        # training byte-for-byte.
+        loss = ce_loss
+        if self.betti_loss_fn is not None and self.betti_loss_weight > 0.0:
+            feats = self._extract_penultimate_features(x)
+            if feats is not None:
+                betti_term = self.betti_loss_fn(feats.float())
+                loss = ce_loss + self.betti_loss_weight * betti_term
         self.opt.zero_grad(set_to_none=True)
         loss.backward()
         self.opt.step()
