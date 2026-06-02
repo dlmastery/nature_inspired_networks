@@ -56,12 +56,36 @@ class ModelEMA:
         EMA decay coefficient. Standard values: 0.999 (fast), 0.9999
         (slow, Bello 2021), 0.99999 (very slow, large-batch). Must be
         in ``[0, 1)``.
+    warmup : bool
+        Apply the timm/TF-style step-adjusted decay
+        ``d_t = min(decay, (1 + step) / (10 + step))`` so the shadow
+        actually tracks the live model during the first ~1/(1-decay)
+        steps. Without warmup, at decay=0.9999 the shadow takes ~10000
+        steps to escape its init and any short (≤ 50-epoch) sweep
+        evaluates an essentially random-init shadow. See timm's
+        ``ModelEmaV2`` and TensorFlow's
+        ``tf.train.ExponentialMovingAverage(num_updates=step)`` for the
+        canonical formula. Default ``True`` — the prior default of
+        ``False`` was the modern-recipe smoke-collapse bug (2026-06-02).
+
+    Notes
+    -----
+    The step counter is owned by :class:`ModelEMA` itself, incremented
+    once per :meth:`update` call. Callers that want a fixed decay
+    (legacy behaviour, or tests) can pass ``warmup=False``.
     """
 
-    def __init__(self, model: nn.Module, decay: float = 0.9999) -> None:
+    def __init__(
+        self, model: nn.Module, decay: float = 0.9999, warmup: bool = True,
+    ) -> None:
         if not 0.0 <= decay < 1.0:
             raise ValueError(f"ema decay must be in [0, 1); got {decay}")
         self.decay = float(decay)
+        self.warmup = bool(warmup)
+        # Step counter for the warmup schedule (timm convention). Incremented
+        # once per ``update``. Persisted via state_dict so a resumed run
+        # picks up the warmup schedule where it left off.
+        self._step = 0
         # Snapshot the live model. eval() so any dropout/batchnorm-in-train
         # quirks in the shadow are deterministic; the caller switches the
         # SHADOW into eval() at evaluation time anyway.
@@ -69,14 +93,34 @@ class ModelEMA:
         for p in self.module.parameters():
             p.requires_grad_(False)
 
+    def _current_decay(self) -> float:
+        """Return the effective decay for the current step.
+
+        With ``warmup=True`` we follow timm/TF and use
+        ``min(decay, (1 + step) / (10 + step))`` so the shadow tracks the
+        live model closely while ``step`` is small. With ``warmup=False``
+        we return the configured decay unchanged (legacy behaviour).
+        """
+        if not self.warmup:
+            return self.decay
+        s = float(self._step)
+        warm = (1.0 + s) / (10.0 + s)
+        return min(self.decay, warm)
+
     @torch.no_grad()
     def update(self, model: nn.Module) -> None:
         """Blend ``model``'s parameters into the EMA shadow.
 
         Buffers are COPIED, not blended (see class docstring).
         """
-        d = self.decay
+        self._step += 1
+        d = self._current_decay()
         msd = model.state_dict()
+        # Cache the parameter-name set once per call (the dict(named_
+        # parameters()) idiom rebuilds the entire mapping every call,
+        # but a frozenset of names is sufficient for the membership test
+        # and avoids any per-key dict allocation hot spot).
+        param_names = {n for n, _ in model.named_parameters()}
         for k, v in self.module.state_dict().items():
             if not torch.is_floating_point(v):
                 # Integer buffers (num_batches_tracked, etc.) — straight copy.
@@ -84,7 +128,7 @@ class ModelEMA:
                 continue
             # Float param / buffer.
             new = msd[k].detach()
-            if k in dict(model.named_parameters()):
+            if k in param_names:
                 # Learnable parameter — blend.
                 v.mul_(d).add_(new, alpha=1.0 - d)
             else:

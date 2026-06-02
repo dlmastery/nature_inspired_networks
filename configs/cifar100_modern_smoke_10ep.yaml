@@ -1,0 +1,42 @@
+# CIFAR-100 modern-recipe 10-EPOCH SMOKE (fast post-fix verification).
+#
+# Purpose: confirm the EMA-warmup fix (2026-06-02) trains cleanly under
+# the full 11-trick recipe. 10 ep is too short for the recipe to reach
+# its 50-ep band (~0.62-0.68); we only assert top1 >= 0.35 here.
+#
+# This file is the post-fix re-test config for the modern-recipe smoke
+# bug — see commit history for context. The 50-ep / 200-ep configs are
+# unchanged.
+
+dataset: cifar100
+data_root: ./data
+batch_size: 256
+num_workers: 0
+epochs: 10
+
+lr: 1.0e-3
+weight_decay: 5.0e-4
+label_smoothing: 0.1
+warmup_epochs: 2
+use_bf16: true
+optimizer: adamw
+scheduler: cosine
+target_top1: 0.35
+
+mixup_alpha: 0.2
+cutmix_alpha: 1.0
+mixup_cutmix_prob: 0.5
+randaugment_n: 2
+randaugment_m: 14
+random_erasing_p: 0.25
+ema_decay: 0.9999
+
+model: resnet20
+channel_mode: linear
+flags:
+  hex: false
+  group: false
+  fractal: false
+  toroidal: false
+  cymatic_init: false
+  golden_modulate: false

@@ -115,10 +115,15 @@ def test_ema_tracks_weights_over_steps():
     Starting from identical weights, after a single update at decay=0.5
     the EMA must equal the midpoint of the original and the perturbed
     parameter. After many updates with a fresh (rapidly diverging) live
-    model, the EMA must move monotonically toward the live model."""
+    model, the EMA must move monotonically toward the live model.
+
+    Uses ``warmup=False`` so the closed-form ``d·p_ema + (1-d)·p_live``
+    blend is the literal update — the warmup schedule is tested
+    separately in :func:`test_ema_warmup_tracks_live_at_low_step_count`.
+    """
     torch.manual_seed(0)
     live = nn.Linear(4, 4, bias=False)
-    ema = ModelEMA(live, decay=0.5)
+    ema = ModelEMA(live, decay=0.5, warmup=False)
     # Initial: EMA == live.
     assert torch.equal(ema.module.weight, live.weight)
     # Perturb live by a known amount.
@@ -138,6 +143,75 @@ def test_ema_tracks_weights_over_steps():
         assert b <= a + 1e-9, f"EMA diverged: {a} -> {b}"
     # And final distance is small.
     assert distances[-1] < distances[0] / 10.0
+
+
+def test_ema_warmup_tracks_live_at_low_step_count():
+    """Regression for the 2026-06-02 modern-recipe smoke-collapse bug.
+
+    With ``decay=0.9999`` and only ~9800 optimisation steps (50 epochs,
+    batch 256, CIFAR-100 train set ~50k), the un-warmed-up ModelEMA
+    leaves the shadow ≈ 37 % init + 63 % live_avg by the end of training.
+    Empirically that shadow gives near-random predictions; the trainer
+    then loads it onto the live model at the end of ``fit()`` and the
+    reported top-1 collapses to 1/100 ≈ 0.01.
+
+    The fix is the timm/TF step-adjusted decay
+    ``d_t = min(decay, (1 + step) / (10 + step))``. This test asserts
+    that, with the warmup ON (the new default), the shadow closes
+    most of the gap to the live model within a few hundred steps even
+    at the Bello-2021 target decay of 0.9999.
+    """
+    torch.manual_seed(0)
+    live = nn.Linear(4, 4, bias=False)
+    # Identical init for both.
+    ema = ModelEMA(live, decay=0.9999, warmup=True)
+    # Drift the live weights by a fixed perturbation EACH step so the
+    # gap between EMA and live can be measured cleanly.
+    target = torch.full_like(live.weight, 10.0)
+    with torch.no_grad():
+        live.weight.copy_(target)
+    # After 200 update calls the warmup ratio (1+200)/(10+200) ≈ 0.957
+    # caps the effective decay way below 0.9999, so the shadow should
+    # be most of the way to ``target``.
+    for _ in range(200):
+        ema.update(live)
+    # Sanity: EMA is within 10 % of target.
+    err = (ema.module.weight - target).abs().mean().item()
+    rel = err / target.abs().mean().item()
+    assert rel < 0.10, (
+        f"EMA warmup did not catch up after 200 steps (rel err={rel:.3f}); "
+        "the timm step-adjusted decay is broken"
+    )
+
+    # Without warmup at the same step count, the shadow should be
+    # essentially STUCK at the init — this is the bug we are guarding
+    # against. The relative error stays >90 %.
+    torch.manual_seed(0)
+    live2 = nn.Linear(4, 4, bias=False)
+    ema2 = ModelEMA(live2, decay=0.9999, warmup=False)
+    with torch.no_grad():
+        live2.weight.copy_(target)
+    for _ in range(200):
+        ema2.update(live2)
+    err2 = (ema2.module.weight - target).abs().mean().item()
+    rel2 = err2 / target.abs().mean().item()
+    assert rel2 > 0.90, (
+        f"Test invariant broken: at decay=0.9999 + warmup=False the "
+        f"shadow should still be ≈ init after 200 steps; got rel err={rel2:.3f}"
+    )
+
+
+def test_ema_warmup_is_default_on():
+    """The 2026-06-02 fix flips the default to ``warmup=True``. A run
+    that never passes ``warmup=False`` (every Trainer-created EMA falls
+    in this bucket) MUST get the warmup schedule. Guard the default."""
+    live = nn.Linear(4, 4, bias=False)
+    ema = ModelEMA(live, decay=0.9999)
+    assert ema.warmup is True, (
+        "EMA warmup default flipped — the modern-recipe smoke will "
+        "collapse again. Re-read tests/test_modern_recipe.py::"
+        "test_ema_warmup_tracks_live_at_low_step_count for context."
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -271,5 +345,5 @@ if __name__ == "__main__":
 
     rc = subprocess.call([sys.executable, "-m", "pytest", __file__, "-v"])
     if rc == 0:
-        print("All 8 tests passed.")
+        print("All 10 tests passed.")
     sys.exit(rc)
