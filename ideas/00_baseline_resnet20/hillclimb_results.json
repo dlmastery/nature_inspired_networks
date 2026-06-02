@@ -5,13 +5,13 @@
   "budget": 4,
   "cube": {
     "lr": [
-      0.003
+      0.01
     ],
     "weight_decay": [
       0.0005
     ],
     "batch_size": [
-      128
+      256
     ],
     "optimizer": [
       "AdamW"
@@ -24,73 +24,45 @@
     "optimizer": "AdamW"
   },
   "best_config": {
-    "lr": 0.003,
+    "lr": 0.01,
     "weight_decay": 0.0005,
-    "batch_size": 128,
+    "batch_size": 256,
     "optimizer": "AdamW"
   },
-  "best_top1_median": 0.606,
-  "best_top1_min": 0.5997,
-  "best_top1_range": 0.007800000000000029,
+  "best_top1_median": 0.6033,
+  "best_top1_min": 0.602,
+  "best_top1_range": 0.0026000000000000467,
   "seeds_confirmed": [
-    3,
-    4,
-    5,
-    6
+    1,
+    2
   ],
   "cells": [
     {
       "config": {
-        "lr": 0.003,
+        "lr": 0.01,
         "weight_decay": 0.0005,
-        "batch_size": 128,
+        "batch_size": 256,
         "optimizer": "AdamW"
       },
-      "seed": 3,
-      "config_id": "lr3em3_wd5em4_bs128_optAdamW",
-      "top1": 0.6075,
-      "composite": 0.5918032881877641,
+      "seed": 1,
+      "config_id": "lr1em2_wd5em4_bs256_optAdamW",
+      "top1": 0.6046,
+      "composite": 0.5984023397871335,
       "wallclock_s": 0.0
     },
     {
       "config": {
-        "lr": 0.003,
+        "lr": 0.01,
         "weight_decay": 0.0005,
-        "batch_size": 128,
+        "batch_size": 256,
         "optimizer": "AdamW"
       },
-      "seed": 4,
-      "config_id": "lr3em3_wd5em4_bs128_optAdamW",
-      "top1": 0.5997,
-      "composite": 0.5974214006674127,
-      "wallclock_s": 0.0
-    },
-    {
-      "config": {
-        "lr": 0.003,
-        "weight_decay": 0.0005,
-        "batch_size": 128,
-        "optimizer": "AdamW"
-      },
-      "seed": 5,
-      "config_id": "lr3em3_wd5em4_bs128_optAdamW",
-      "top1": 0.6063,
-      "composite": 0.60017321858036,
-      "wallclock_s": 0.0
-    },
-    {
-      "config": {
-        "lr": 0.003,
-        "weight_decay": 0.0005,
-        "batch_size": 128,
-        "optimizer": "AdamW"
-      },
-      "seed": 6,
-      "config_id": "lr3em3_wd5em4_bs128_optAdamW",
-      "top1": 0.6057,
-      "composite": 0.6026282257009032,
+      "seed": 2,
+      "config_id": "lr1em2_wd5em4_bs256_optAdamW",
+      "top1": 0.602,
+      "composite": 0.6002881259375406,
       "wallclock_s": 0.0
     }
   ],
-  "wallclock_total_s": 6249.529796200048
+  "wallclock_total_s": 2047.1198917000438
 }
