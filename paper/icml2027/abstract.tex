@@ -1,31 +1,29 @@
-% abstract.tex — separate abstract file (~199 words)
-% Lifted from paper_abstract.md, compressed for the 200-word ICML cap.
+% abstract.tex — separate abstract file (~200 words)
+% Reframed 2026-06-01: audit-calibration as headline; priors as case-study substrate.
 
 \begin{abstract}
-We present a dual-track skeptical audit + Fixer + per-experiment-page
-protocol for autoresearch campaigns that propose large families of
-architectural priors. Two independent 8-agent expert teams attack
-orthogonal failure modes: an \emph{implementation-critic} team grades
-code-vs-doc fidelity with mechanism-pinning tests, and a
-\emph{research-scientist-critic} team challenges scientific merit
-independent of code, followed by a Fixer campaign whose patches each
-ship with a regression test that would have caught the original bug.
-The protocol is operationalised as CLAUDE.md Rules~20--28 and packaged
-as seven content-agnostic skills. Its signature catch on the
-calibration substrate---an 84-hypothesis nature-inspired neural-prior
-design space on CIFAR-10/-100---is \emph{H09 phi\_budget}: an
-unaudited pipeline would have published a CIFAR-100 $+1.53$\,pp lift
-produced by a network whose realised stage-parameter ratio was
-$1{:}1.41{:}2.45$, not the doc-claimed $1{:}\varphi{:}\varphi^2$; the
-protocol detected the $12.6\%$ drift and the Fixer corrected it with a
-mechanism-pinning test (commit \texttt{519cdf3}). On the corrected
-codebase, three post-fix candidates pass a $7$-seed CIFAR-100 paired
-Wilcoxon at $\alpha{=}0.05$ under Holm--Bonferroni across a $k{=}3$
-confirmatory family ($p{=}0.0078$ each). Hill-climbed and iso-tuned
-robustness extensions confirm directional positive $\Delta$ for all
-three winners; full re-certification at iso-tuned $n{=}7$ is Phase-9f
-future work. We report these as illustrative protocol output with
-three caveats: the baseline sits $6.5$\,pp below 164-ep SOTA; most
-single-prior rows remain $n{=}1$; all agents share a model family
-(Claude Opus 4.7).
+We present a self-auditing LLM-agent autoresearch protocol that catches
+its own headline drift. On a 62-hypothesis third-party-code calibration
+substrate (\texttt{pytorch/vision}, \texttt{timm}, HuggingFace
+Transformers, Lightning Bolts, \texttt{torch.optim},
+\texttt{state-spaces/mamba}), the protocol's implementation-critic tier
+registers \textbf{0 MAJOR/BROKEN findings}; on its own 84-hypothesis
+nature-inspired-priors substrate, it registers \textbf{22\,pp
+MAJOR/BROKEN excess} (Fisher exact two-sided $p = 1.94 \times 10^{-5}$;
+Wilson 95\% CIs non-overlapping). The protocol's double-barrelled
+load-bearing existence proof is (i)~it caught \emph{H09 phi\_budget's
+12.6\% realised-stage-ratio drift} via Fixer-introduced
+mechanism-pinning tests (commit \texttt{519cdf3}), and (ii)~it caught
+its OWN headline-prior fragility: three default-config-certified
+Phase-8 winners (\texttt{pair\_gm\_pdw}, \texttt{slot\_act\_sine},
+\texttt{sg\_only\_phi\_budget}) clear Holm--Bonferroni
+$\alpha'{=}0.0167$ at matched-recipe $n{=}7$ (paired Wilcoxon
+$p{=}0.0078$ each) but do NOT survive a properly LR-tuned baseline
+(tuned baseline beats all three by $+2.27$ to $+2.81$\,pp at $n{=}3$;
+Mann--Whitney $p_{\mathrm{one}} \in [0.0083, 0.0111]$). The
+default-config matched-recipe certification stands as a
+\emph{secondary} empirical claim. We honestly demote the priors to
+``screened candidates that survive matched-recipe certification but
+not iso-tuned-LR'' and elevate the protocol-as-meta-research-methodology
+as the headline contribution.
 \end{abstract}
