@@ -59,7 +59,7 @@
 1. [What this is](#1-what-this-is)
 2. [Quick start (clone → SOTA smoke in 4 commands)](#2-quick-start-clone--sota-smoke-in-4-commands)
 3. [What's in this repo](#3-whats-in-this-repo)
-4. [Headline claims (post-fix)](#4-headline-claims-post-fix)
+4. [Headline claims — audit-calibration leads; priors are secondary](#4-headline-claims--2026-06-01-reframe-audit-calibration-leads-priors-are-secondary)
 5. [Negative results (first-class citizens)](#5-negative-results-first-class-citizens)
 6. [Methodological notes — screening vs evaluation](#6-methodological-notes--screening-vs-evaluation)
 7. [The 8 hypothesis groups (g1–g8)](#7-the-8-hypothesis-groups-g1g8)
@@ -189,13 +189,43 @@ nature_inspired_networks/
     └── dashboard/           ← byte-identical mirror of dashboard/ for live Pages
 ```
 
-## 4. Headline claims — **2026-06-01 LATE EVENING honest update**: protocol-as-contribution; priors honestly demoted
+## 4. Headline claims — **2026-06-01 reframe: audit-calibration leads; priors are secondary**
 
-> **🔬 Phase-9h tuned-baseline n=3 binding (2026-06-01 late evening).** The most consequential honest finding of the campaign landed today. A 3-seed re-run of `baseline_resnet20_tuned_lr0.01_wd0.0005` at CIFAR-100 30 ep (AdamW, bs=256 — the hill-climb-best tuned-baseline cell from Phase-9g §13.3) returned **mean = 0.6017 (n=3, σ = 0.31 pp)**. At iso-tuned conditions where the vanilla `baseline_resnet20` receives the same LR-tuning love (lr=0.01) that the three winners' hill-climbs gave their priors, **the tuned baseline BEATS all three Phase-8 winners' default-config n=7 means by +2.27 to +2.81 pp** (unpaired Mann–Whitney U p_one ∈ {0.0083, 0.0111, 0.0083}; 95 % unpaired-bootstrap CIs exclude 0 by ≥ +1.90 pp on the lower bound; min(tuned) > max(leader) for all three winners — no rank overlap). The default-config n=7 cert (table below) STILL STANDS as a **matched-recipe vs matched-recipe** formal statistical claim, but **the priors do NOT robustly survive a properly-LR-tuned baseline at NeurIPS-α.** R2 BLOCKER #13 substantively validated. **Headline contribution shifts to the protocol-as-meta-research-methodology** — the dual-track audit + Fixer + per-experiment-page + auto-checkpoint loop is what the paper offers the community; the three priors are honestly demoted to "screened candidates that do not robustly survive a properly-LR-tuned baseline." The protocol's value is precisely that it caught its own at-risk-of-publication headline-interpretation drift before any external "priors help" claim shipped — an unaudited / un-iso-tuned-tested pipeline would have published the default-config n=7 cert as "the priors help" and stopped there. Full Phase-9h numbers + Mann–Whitney + bootstrap CIs: [`paper/STATISTICAL_TESTS.md`](paper/STATISTICAL_TESTS.md) §14. Splice in PAPER.md §5.0; full honest block in [`paper/FINDINGS.md`](paper/FINDINGS.md) 2026-06-01 LATE EVENING. Pipeline-close marker: [`audits/PIPELINE_COMPLETE_2026-06-01.md`](audits/PIPELINE_COMPLETE_2026-06-01.md).
+### 4.1 · PRIMARY headline — audit-calibration on 62 third-party hypotheses (Fisher p = 1.94×10⁻⁵)
+
+**The strongest empirical claim of this project is that the protocol's audit doctrine is statistically distinguishable from a clean-code floor by ≈ 2500× past α=0.05.** Same Track-A doctrine applied to 62 hypotheses drawn from production-quality third-party codebases (`pytorch/vision` n=15 + `timm` n=19 + HuggingFace Transformers n=15 + Lightning Bolts/fastai n=6 + `torch.optim` extra n=4 + `state-spaces/mamba` n=3) returns **0/62 MAJOR/BROKEN**; the project's 84-hypothesis substrate returns **18/83 MAJOR/BROKEN** — a **22-pp tier-separated excess**.
+
+| metric | project (n=83) | third-party calibration (n=62) |
+|---|---:|---:|
+| MAJOR/BROKEN rate | **21.7 %** | **0.0 %** |
+| Wilson 95 % CI | [14.2 %, 31.7 %] | [0.0 %, 5.8 %] |
+| Fisher exact two-sided | **p = 1.94 × 10⁻⁵** (clears α=0.05 by >2500×) | — |
+| Pooled-z two-sided | z = 3.918, **p = 8.93 × 10⁻⁵** | — |
+| Wilson CIs overlap? | **NO** (8.3-pp separation) | — |
+
+Full audit: [`audits/AUDIT_CALIBRATION_THIRD_PARTY.md`](audits/AUDIT_CALIBRATION_THIRD_PARTY.md) Appendix A; statistical derivation: [`paper/STATISTICAL_TESTS.md`](paper/STATISTICAL_TESTS.md) §11; commit `e6f1f18`. Cross-family methodologically-diverse re-audit (Closure B; commit `8f0f431`) on 10 of 18 MAJOR/BROKEN findings: **8/10 strict CONCORDANT, 10/10 defect-existence CONCORDANT**.
+
+### 4.2 · METHODOLOGICAL headline — self-falsification existence proof
+
+The protocol catches its **own** bullshit. Double-barrelled load-bearing existence proof:
+
+**Catch (a) — H09 phi_budget's 12.6% realised-stage-ratio drift.** An unaudited pipeline would have published H09's CIFAR-100 +1.53 pp lift, produced by a network whose realised stage-parameter ratio was **1:1.41:2.45**, not the doc-claimed **1:φ:φ² = 1:1.618:2.618**. Fixer-PhiScaling (commit `519cdf3`) corrected this and added a mechanism-pinning test that would have caught the bug if written first.
+
+**Catch (b) — the protocol's own three-prior headline collapses under iso-tuned-LR.** A 3-seed re-run of `baseline_resnet20_tuned_lr0.01_wd0.0005` at CIFAR-100 30 ep (the hill-climb-best tuned-baseline cell from Phase-9g) returned mean = **0.6017 (n=3, σ = 0.31 pp)**. At iso-tuned conditions where the vanilla baseline receives the same LR-tuning love that the three winners' hill-climbs gave their priors, the **tuned baseline BEATS all three default-config-certified Phase-8 winners by +2.27 to +2.81 pp**:
+
+| comparison | Δmean | 95 % unpaired-bootstrap CI | Mann–Whitney p_one | min(tuned) > max(leader) |
+|---|---:|---|---:|:---:|
+| tuned (n=3, 0.6017) − `pair_gm_pdw` (n=7, 0.5786) | **+2.30 pp** | [+1.99, +2.60] | **0.0083** | **YES** |
+| tuned (n=3, 0.6017) − `slot_act_sine` (n=7, 0.5790) | **+2.27 pp** | [+1.90, +2.64] | **0.0111** | **YES** |
+| tuned (n=3, 0.6017) − `sg_only_phi_budget` (n=7, 0.5736) | **+2.81 pp** | [+2.42, +3.19] | **0.0083** | **YES** |
+
+**The priors do NOT robustly survive a properly-LR-tuned baseline at NeurIPS-α.** R2 BLOCKER #13 substantively validated. **The protocol caught its own headline drift before any external "priors help" claim shipped** — an unaudited / un-iso-tuned-tested pipeline would have published the default-config n=7 cert as "the priors help" and stopped there. Full numbers: [`paper/STATISTICAL_TESTS.md`](paper/STATISTICAL_TESTS.md) §14; pipeline-close marker: [`audits/PIPELINE_COMPLETE_2026-06-01.md`](audits/PIPELINE_COMPLETE_2026-06-01.md).
+
+### 4.3 · SECONDARY claims — matched-recipe certifications (worked example of protocol output)
 
 The Phase-8 winners' default-config n=7 cert is retained below as a worked example of the protocol's output and as a formally-correct matched-recipe statement. **It is no longer the paper's empirical headline.**
 
-### 4.1 · Default-config n=7 cert (matched-recipe; STILL STANDS as a formal statistical statement)[^iso-tuned]
+#### 4.3.1 · Default-config n=7 cert (matched-recipe; STILL STANDS as a formal statistical statement)[^iso-tuned]
 
 [^iso-tuned]: **iso-tuned n=7 (Phase-9f, 2026-06-01)** shows Δ-shrinkage; **Phase-9h tuned-baseline n=3 (2026-06-01 late evening)** shows the tuned baseline BEATS all three priors. Concretely, at the iso-tuned cell (lr=3e-3, wd=5e-4, bs=128, AdamW for baseline / `pair_gm_pdw` / `sg_only_phi_budget`; wd=2e-3 for `slot_act_sine`) the paired Δmean shrinks to +0.79 / +0.66 / +0.25 pp (vs default-config +1.74 / +1.24 / +1.78 pp), paired Wilcoxon p_one ∈ {0.0781, 0.1094, 0.3750} — none clears α=0.05 — and the Phase-5 ordinal gate FAILS for all three winners at iso-tuned n=7 (max iso-tuned baseline = 0.6075). At the Phase-9h tuned-baseline cell (lr=0.01, wd=5e-4, bs=256, AdamW), the tuned baseline n=3 mean = 0.6017 BEATS all three winners' default-config n=7 means by +2.27 to +2.81 pp (Mann–Whitney p_one ∈ {0.0083, 0.0111, 0.0083}). The default-config n=7 cert remains a formally-correct matched-recipe statement; the priors do NOT robustly survive a properly-LR-tuned baseline at NeurIPS-α. Full closeout: [`paper/STATISTICAL_TESTS.md`](paper/STATISTICAL_TESTS.md) §10 (iso-tuned) + §14 (Phase-9h tuned-baseline binding).
 
