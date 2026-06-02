@@ -1,0 +1,102 @@
+[
+  {
+    "epoch": 0,
+    "train_loss": 4.467153495397323,
+    "train_top1": 0.03257211538461539,
+    "test_top1": 0.0724,
+    "test_top5": 0.2397,
+    "lr": 0.00075,
+    "test_top1_ema": 0.0769,
+    "test_top5_ema": 0.2591
+  },
+  {
+    "epoch": 1,
+    "train_loss": 4.240387672033066,
+    "train_top1": 0.05841346153846154,
+    "test_top1": 0.094,
+    "test_top5": 0.301,
+    "lr": 0.001,
+    "test_top1_ema": 0.1126,
+    "test_top5_ema": 0.3295
+  },
+  {
+    "epoch": 2,
+    "train_loss": 4.110058793043479,
+    "train_top1": 0.08335336538461538,
+    "test_top1": 0.1099,
+    "test_top5": 0.3381,
+    "lr": 0.0009755282581475768,
+    "test_top1_ema": 0.1315,
+    "test_top5_ema": 0.3644
+  },
+  {
+    "epoch": 3,
+    "train_loss": 3.9642906274551,
+    "train_top1": 0.11009615384615384,
+    "test_top1": 0.1915,
+    "test_top5": 0.4743,
+    "lr": 0.0009045084971874736,
+    "test_top1_ema": 0.1944,
+    "test_top5_ema": 0.4899
+  },
+  {
+    "epoch": 4,
+    "train_loss": 3.840012942827665,
+    "train_top1": 0.13557692307692307,
+    "test_top1": 0.1949,
+    "test_top5": 0.493,
+    "lr": 0.0007938926261462366,
+    "test_top1_ema": 0.2046,
+    "test_top5_ema": 0.5024
+  },
+  {
+    "epoch": 5,
+    "train_loss": 3.733467950576391,
+    "train_top1": 0.15174278846153846,
+    "test_top1": 0.2284,
+    "test_top5": 0.536,
+    "lr": 0.0006545084971874737,
+    "test_top1_ema": 0.2567,
+    "test_top5_ema": 0.5747
+  },
+  {
+    "epoch": 6,
+    "train_loss": 3.6321567853291827,
+    "train_top1": 0.175400641025641,
+    "test_top1": 0.2669,
+    "test_top5": 0.5847,
+    "lr": 0.0005,
+    "test_top1_ema": 0.2907,
+    "test_top5_ema": 0.6164
+  },
+  {
+    "epoch": 7,
+    "train_loss": 3.541231709260207,
+    "train_top1": 0.19344951923076922,
+    "test_top1": 0.3137,
+    "test_top5": 0.6449,
+    "lr": 0.00034549150281252633,
+    "test_top1_ema": 0.3149,
+    "test_top5_ema": 0.6456
+  },
+  {
+    "epoch": 8,
+    "train_loss": 3.486372584563035,
+    "train_top1": 0.2048477564102564,
+    "test_top1": 0.3321,
+    "test_top5": 0.6504,
+    "lr": 0.0002061073738537635,
+    "test_top1_ema": 0.3335,
+    "test_top5_ema": 0.6669
+  },
+  {
+    "epoch": 9,
+    "train_loss": 3.4198566779112203,
+    "train_top1": 0.2220352564102564,
+    "test_top1": 0.3546,
+    "test_top5": 0.6853,
+    "lr": 9.549150281252634e-05,
+    "test_top1_ema": 0.3448,
+    "test_top5_ema": 0.6811
+  }
+]
