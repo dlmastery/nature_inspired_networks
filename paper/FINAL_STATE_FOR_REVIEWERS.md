@@ -14,41 +14,109 @@ Read time: ~10 minutes
 
 ---
 
-## TL;DR (~200 words) — **2026-06-01 LATE EVENING honest update**
+## TL;DR (~200 words) — **2026-06-01 LATE EVENING honest update (audit-calibration-centric reframe)**
 
-We submit a **methodological contribution**: a dual-track skeptical audit
-+ Fixer-with-mechanism-verifying-test + per-experiment-page protocol for
-LLM-agent-implemented autoresearch campaigns, codified as 28 normative
-rules and seven content-agnostic skills. The protocol's **double-barrelled
-load-bearing existence proof**: (a) the protocol caught **H09 phi_budget's
-realised-ratio drift** — an unaudited pipeline would have published a
-CIFAR-100 +1.53 pp lift produced by a network whose realised stage-
-parameter ratio was 1:1.41:2.45, not the doc-claimed 1:φ:φ² (commit
-`519cdf3`); (b) the protocol caught **its own headline-interpretation
-drift** in Phase-9h.
+We submit a **methodological contribution**: a self-auditing LLM-agent
+autoresearch protocol that catches its own headline drift. The
+empirical headline is the **audit-calibration result**: on a
+**62-hypothesis third-party-code substrate** (`pytorch/vision`, `timm`,
+HF Transformers, Lightning Bolts, `torch.optim`, `state-spaces/mamba`),
+the protocol's Track-A doctrine registers **0/62 MAJOR/BROKEN**; on
+its own 84-hypothesis nature-inspired-priors substrate, it registers
+**18/83 MAJOR/BROKEN** — a **22-pp tier-separated excess** with
+**Fisher exact two-sided p = 1.94 × 10⁻⁵** (clears α=0.05 by ≈ 2500×),
+Wilson 95% CIs non-overlapping by an 8.3-pp window (`paper/STATISTICAL_TESTS.md`
+§11; commit `e6f1f18`).
 
-**Honest empirical envelope (post Phase-9h tuned-baseline n=3 binding,
-2026-06-01 late evening).** Three Phase-8 candidates — `pair_gm_pdw`,
-`slot_act_sine`, `sg_only_phi_budget` — pass paired Wilcoxon p=0.0078
-under Holm-Bonferroni α'=0.0167 at the matched-recipe default-config
-slice (lr=1e-3 wd=5e-4 bs=256 AdamW). **BUT** at the iso-tuned cell
-(lr=0.01) where the baseline gets the same LR-tuning love, the **tuned
-vanilla `baseline_resnet20` n=3 mean = 0.6017 BEATS all three priors'
-default-config n=7 means by +2.27 to +2.81 pp** (unpaired Mann–Whitney
-p_one ∈ {0.0083, 0.0111, 0.0083}; 95 % unpaired-bootstrap CI lower
-bound ≥ +1.90 pp; min(tuned) > max(leader) for all three winners — no
-rank overlap; `paper/STATISTICAL_TESTS.md` §14). **The priors do NOT
-robustly survive a properly-LR-tuned baseline.** R2 BLOCKER #13
-substantively validated. The three priors are honestly demoted to
-**screened candidates**; the default-config cert is preserved as a
-worked example of protocol output and a formally-correct matched-
-recipe statement, but is no longer the paper's empirical headline.
+**Double-barrelled self-falsification existence proof:** (a) the protocol
+caught **H09 phi_budget's 12.6% realised-stage-ratio drift** before any
+external claim shipped (commit `519cdf3`); (b) the protocol caught its
+**own three-prior default-config headline** collapsing under iso-tuned-LR.
+At the Phase-9h tuned-baseline n=3 binding cell (lr=0.01 wd=5e-4 bs=256
+AdamW), **tuned vanilla `baseline_resnet20` n=3 mean = 0.6017 BEATS all
+three Phase-8 priors' default-config n=7 means by +2.27 to +2.81 pp**
+(unpaired Mann–Whitney p_one ∈ {0.0083, 0.0111, 0.0083}; no rank
+overlap; `paper/STATISTICAL_TESTS.md` §14). **The priors do NOT robustly
+survive a properly-LR-tuned baseline.**
 
-**The protocol-as-meta-research-methodology IS the paper's headline.**
+**The protocol-as-meta-research-methodology IS the headline.** The
+three Phase-8 priors are honestly demoted to **screened candidates that
+survive matched-recipe certification but not iso-tuned-LR**; the
+default-config cert is preserved as a worked example of protocol output
+and a formally-correct matched-recipe statement, but it is the
+**secondary** empirical claim.
 
 ---
 
-## 1. The default-config n=7 cert (preserved as matched-recipe worked example; no longer the headline)
+## 1. Audit calibration on n=62 third-party hypotheses — the empirical headline
+
+**Closure A — third-party-code calibration extended to n=62**
+([`audits/AUDIT_CALIBRATION_THIRD_PARTY.md`](../audits/AUDIT_CALIBRATION_THIRD_PARTY.md)
+Appendix A; `paper/STATISTICAL_TESTS.md` §11; commit `e6f1f18`).
+Same Track-A doctrine applied to mechanism claims from
+`pytorch/vision` (n=15) + `timm` (n=19) + HuggingFace Transformers
+(n=15) + Lightning Bolts / fastai (n=6) + `torch.optim` extra (n=4) +
+`state-spaces/mamba` (n=3) = **n=62**. Headline:
+
+| metric | n=15 (§4.3.1) | n=62 (Appendix A) |
+|---|---|---|
+| Calibration MAJOR/BROKEN rate | 0/15 (0 %) | **0/62 (0 %)** |
+| Wilson 95 % CI calibration | [0.0 %, 20.4 %] | **[0.0 %, 5.8 %]** (3.5× tighter) |
+| Wilson CIs overlap with project [14.2 %, 31.7 %]? | YES (6.2-pp window) | **NO** (8.3-pp separation) |
+| Fisher exact two-sided | p = 0.066 (does NOT clear α=0.05) | **p = 1.94 × 10⁻⁵** (clears by >2500×) |
+| Pooled two-proportion z | z = 1.996, p = 0.046 | **z = 3.918, p = 8.93 × 10⁻⁵** |
+
+**The 22-pp MAJOR/BROKEN-tier excess is the diagnostically credible
+signal — NOT the 51% aggregate non-PASS rate.** MINOR-tier rates 29%
+project vs 34% calibration are comparable, confirming audit
+aggressiveness is calibrated. The MAJOR/BROKEN tier is where real
+defects live (H09 realised-ratio drift, H21 hex_phi divergence, H67
+broken GoldenRoPE import, H55 zero-bias, H74 alpha-collapse).
+
+**Closure B — cross-family methodologically-diverse re-audit**
+([`audits/CROSS_FAMILY_HONEST_REAUDIT.md`](../audits/CROSS_FAMILY_HONEST_REAUDIT.md);
+commit `8f0f431`). 10 of the 18 MAJOR/BROKEN findings re-audited
+across 3 distinct methods (property-based / mechanism-trace /
+paper-math), stratified across G1–G8 with all 3 originally BROKEN
+included. **8/10 strict CONCORDANT, 10/10 defect-existence CONCORDANT**.
+The 2 partial-discordances are *finding-additions* (H47 wrap-mod-5,
+H67 1024→13 adaptive-pool), NOT finding-revocations. **Honest gap**:
+this is NOT a non-Claude external auditor; that remains Phase-9e
+future work.
+
+## 2. The self-falsification existence proof — the methodological headline
+
+**Catch (a): H09 phi_budget's 12.6% realised-stage-ratio drift.** The
+pre-audit version of this paper claimed H09 as a verified cross-dataset
+positive (CIFAR-100 58.05% 3-seed median; +1.53 pp). Track-A revealed
+H09's realised stage-parameter ratio was 1:1.41:2.45, not the
+doc-claimed 1:φ:φ² = 1:1.618:2.618 (12.6% drift at stage 1). **An
+unaudited pipeline would have published a network that did NOT
+faithfully implement its own design doc.** Fixer-PhiScaling (commit
+`519cdf3`) corrected the integer search; post-fix realised ratio is
+1:1.623:2.629 (0.43% max error); the Fixer added a mechanism-pinning
+test that would have caught the bug if written first.
+
+**Catch (b): the protocol's own three-prior headline collapses under
+iso-tuned-LR.** After Phase-8 surfaced three candidates that clear
+paired Wilcoxon at α'_Holm=0.0167 on n=7 default-config seeds, a
+Phase-9h 3-seed re-run of `baseline_resnet20_tuned_lr0.01_wd0.0005`
+landed (`paper/STATISTICAL_TESTS.md` §14):
+
+| comparison | Δmean | 95% unpaired-bootstrap CI | Mann–Whitney p_one | min(tuned) > max(leader) |
+|---|---:|---|---:|:---:|
+| tuned (n=3, 0.6017) − `pair_gm_pdw` (n=7, 0.5786) | **+2.30 pp** | [+1.99, +2.60] | **0.0083** | **YES (no overlap)** |
+| tuned (n=3, 0.6017) − `slot_act_sine` (n=7, 0.5790) | **+2.27 pp** | [+1.90, +2.64] | **0.0111** | **YES (no overlap)** |
+| tuned (n=3, 0.6017) − `sg_only_phi_budget` (n=7, 0.5736) | **+2.81 pp** | [+2.42, +3.19] | **0.0083** | **YES (no overlap)** |
+
+Tuned-baseline n=3 σ = 0.31 pp — *tighter* than the default-config
+baseline σ (0.453 pp at n=7), so the diagnostic is not noise-bound.
+**The protocol caught its own headline drift before any external
+"priors help" claim shipped.** An unaudited / un-iso-tuned-tested
+pipeline would have published the default-config n=7 cert as "the
+priors help" and stopped there.
+
+## 3. The default-config n=7 cert (preserved as matched-recipe worked example; SECONDARY empirical claim)
 
 Baseline CIFAR-100 seeds 0..6, mean 0.5612, σ = 0.453 pp (n=7).
 Source: `paper/STATISTICAL_TESTS.md` §1, commit `8e1fdab` family.
@@ -71,7 +139,7 @@ protocol output, but the priors are honestly demoted to "screened
 candidates" — they do NOT robustly survive a properly-LR-tuned
 baseline at NeurIPS-α.**
 
-## 2. Statistical envelope across 4 regimes (honest)
+## 4. Statistical envelope across 4 regimes (honest)
 
 `paper/STATISTICAL_TESTS.md` §§1 (default n=7), §7 (hill-climbed n=3),
 §10 (iso-tuned n=7, Phase-9f closeout), §14 (Phase-9h tuned-baseline n=3
@@ -93,7 +161,7 @@ as-meta-research-methodology.** A Phase-9i symmetric n=7 paired close-out
 at the tuned cell (~5 GPU-h) would tighten the Phase-9h binding at
 NeurIPS-α.
 
-## 3. The methodological contribution
+## 5. The methodological contribution
 
 The protocol is the deliverable. Encoded as **CLAUDE.md Rules 20–28**
 (28 normative rules total) plus seven content-agnostic skills in
@@ -116,45 +184,7 @@ non-UNFALSIFIABLE bar. The 84-hypothesis design space is the
 portability is **claimed by construction**, not demonstrated (open
 future work, see §6).
 
-## 4. Auditor self-grading concern + closure
-
-The §1.3 caveat: all auditors share model family (Opus 4.7). Two
-complementary closures land along orthogonal axes.
-
-**Closure A — third-party-code calibration extended to n=62**
-([`audits/AUDIT_CALIBRATION_THIRD_PARTY.md`](../audits/AUDIT_CALIBRATION_THIRD_PARTY.md)
-Appendix A; `paper/STATISTICAL_TESTS.md` §11; commit `e6f1f18`).
-Same Track-A doctrine applied to mechanism claims from
-`pytorch/vision` (n=15) + `timm` (n=19) + HuggingFace Transformers
-(n=15) + Lightning Bolts / fastai (n=6) + `torch.optim` extra (n=4) +
-`state-spaces/mamba` (n=3) = **n=62**. Headline:
-
-| metric | n=15 (§4.3.1) | n=62 (Appendix A) |
-|---|---|---|
-| Calibration MAJOR/BROKEN rate | 0/15 (0 %) | **0/62 (0 %)** |
-| Wilson 95 % CI calibration | [0.0 %, 20.4 %] | **[0.0 %, 5.8 %]** (3.5× tighter) |
-| Wilson CIs overlap with project [14.2 %, 31.7 %]? | YES (6.2-pp window) | **NO** (8.3-pp separation) |
-| Fisher exact two-sided | p = 0.066 (does NOT clear α=0.05) | **p = 1.94 × 10⁻⁵** (clears by >2500×) |
-| Pooled two-proportion z | z = 1.996, p = 0.046 | **z = 3.918, p = 8.93 × 10⁻⁵** |
-
-The 22-pp MAJOR/BROKEN-tier excess is now two-sided significant at
-α=0.05 by a very large margin; point estimate is robust to calibration
-n.
-
-**Closure B — cross-family methodologically-diverse re-audit**
-([`audits/CROSS_FAMILY_HONEST_REAUDIT.md`](../audits/CROSS_FAMILY_HONEST_REAUDIT.md);
-commit `8f0f431`). 10 of the 18 MAJOR/BROKEN findings re-audited
-across 3 distinct methods (property-based / mechanism-trace /
-paper-math), stratified across G1–G8 with all 3 originally BROKEN
-included. **8/10 strict CONCORDANT, 10/10 defect-existence CONCORDANT**.
-The 2 partial-discordances are *finding-additions* (H47 wrap-mod-5,
-H67 1024→13 adaptive-pool), NOT finding-revocations — the
-methodological-diversity probe surfaces NEW concerns the original
-audit missed. **Honest gap**: this is NOT a non-Claude external
-auditor; that remains Phase-9e future work (no API access in current
-execution environment).
-
-## 5. Negative results (equal prominence per Rule 9)
+## 6. Negative results (equal prominence per Rule 9)
 
 - **H50 `sg_full_fib` — −11.54 pp** below ResNet-20 baseline at 12-ep
   CIFAR-10 (all six priors stacked on the same conv-block forward
@@ -174,9 +204,19 @@ execution environment).
   width 3×3 conv mask is too aggressive on the small kernels. Given
   equal billing to H50 in `paper/FINDINGS.md`.
 
-## 6. Honest limitations
+## 7. Honest limitations (with structural limits leading)
 
-The seven explicit limitations enumerated in `PAPER.md` §7.3:
+**Leading structural limits** (per the reframe):
+
+1. **Single-LLM-family auditor.** All auditors share model family
+   (Claude Opus 4.7). Partial closures along orthogonal axes
+   (§1 Closure A + B); true non-Claude external auditor (GPT-5 /
+   Gemini 3 Pro) is open Phase-9e work.
+2. **CIFAR-only scale.** All experiments are CIFAR-10 12 ep /
+   CIFAR-100 30 ep on ResNet-20-class scaffolds; baseline sits 6.5 pp
+   below 164-ep SOTA; no ImageNet-scale or transformer-track training.
+
+The seven additional limitations enumerated in `PAPER.md` §7:
 
 1. **Single-seed for most screening rows** — only baseline / phi_budget
    / golden_momentum carry 3-seed on CIFAR-10; rest are n=1.
@@ -210,7 +250,7 @@ Plus (added 2026-05-31):
     distinction (`PAPER.md` §7.3.1). Rule 28 codifies the discipline
     prospectively.
 
-## 7. ICML reviewer reception (transparent)
+## 8. ICML reviewer reception (transparent)
 
 Four-reviewer simulated ICML 2027 main-track pass
 ([`audits/ICML_REVIEWS_2026-05-30/`](../audits/ICML_REVIEWS_2026-05-30/),
@@ -244,7 +284,7 @@ R3, R4 (16 of 16 items in the aggregate fix table); GPU-side filings
 (Controls 1–4, Phase-9b/c/d/e/f) are held until explicit user
 authorisation and tracked in §8.
 
-## 8. Pending GPU work (in-flight, 2026-05-31)
+## 9. Pending GPU work (in-flight, 2026-05-31)
 
 | Pipeline | Status | What it delivers | GPU-h |
 |---|---|---|---:|
@@ -261,7 +301,7 @@ folds Phase-9f + Wave-1 + Controls 1–4 outcomes into PAPER + dashboard
 changes the formal claim** — the default-config n=7 cert + protocol-
 as-contribution claim are pre-pipeline.
 
-## 9. The 8 NEW combo hypotheses (R-D synthesis)
+## 10. The 8 NEW combo hypotheses (R-D synthesis)
 
 `audits/COMBINATIONS_RESEARCH/D_new_hypotheses.md` (commit `c3b01c2`),
 synthesising Agents A (empirical stackability) + B (theoretical 20-axis
@@ -282,7 +322,7 @@ Wave-1 (H87+H88+H91) is the **minimum viable Phase-9d**, 11.1 GPU-h,
 running now. The 5 future-work proposals carry full design docs with
 falsifiers + GPU costs in `audits/COMBINATIONS_RESEARCH/D_new_hypotheses.md`.
 
-## 10. Navigation pointers
+## 11. Navigation pointers
 
 | Artifact | Path | Commit (representative) |
 |---|---|---|
@@ -304,7 +344,7 @@ falsifiers + GPU costs in `audits/COMBINATIONS_RESEARCH/D_new_hypotheses.md`.
 | Composite-formula fingerprint | `src/nature_inspired_networks/eval.py:COMPOSITE_FORMULA` SHA-256 `d65565e9c7b12d14cbce30a801ecc6753aea3eb148074256bfcc051fa61d0893` | (Rule 2) |
 | Live dashboard | https://dlmastery.github.io/nature_inspired_networks/ | latest |
 
-## 11. Frequently asked questions (FAQ for area chairs)
+## 12. Frequently asked questions (FAQ for area chairs)
 
 **Q1. Is the n=7 cert robust to multiple-comparisons?**
 A1. **Family-of-3 confirmatory family**: YES. Paired Wilcoxon
@@ -415,6 +455,25 @@ run `autoresearch-critic-team` against the sister-repo
 verdict distribution. If the tabular replication produces an
 analogous distribution AND surfaces at least one defect, the
 content-agnostic claim is empirically supported.
+
+**Q11. Why isn't the headline a positive accuracy result?**
+A11. **Because at iso-tuned-LR the priors don't beat baseline.** A
+3-seed re-run of `baseline_resnet20_tuned_lr0.01_wd0.0005` returned
+n=3 mean 0.6017, **beating all three default-config-certified Phase-8
+priors by +2.27 to +2.81 pp** (Mann-Whitney p_one ∈ [0.0083, 0.0111];
+no rank overlap; `paper/STATISTICAL_TESTS.md` §14). The default-config
+matched-recipe cert (paired Wilcoxon p=0.0078 < Holm α'=0.0167 for all
+three winners at n=7) STILL STANDS as a formally-correct statement —
+but it is **conditional on the baseline NOT receiving the same
+LR-tuning love the leaders received**. The honest reading is that
+the priors' lift is substantially explained by baseline-LR-tuning
+artifact. **The protocol's value is catching that, not the priors
+themselves.** We chose to report the audit-calibration result (Fisher
+p=1.94×10⁻⁵ at n=62, §1) as the headline because it is the strongest
+empirical claim the project can defend: the audit doctrine is
+statistically distinguishable from a clean-code floor by ≈ 2500× past
+α=0.05. The priors are the case-study substrate on which the protocol
+is calibrated.
 
 ---
 
