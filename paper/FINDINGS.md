@@ -1,6 +1,93 @@
 ﻿# FINDINGS — nature_inspired_networks curated CIFAR-10 sweep (seed 0, 12 epochs)
 
-> ## 🏆 2026-05-29 PM PROMOTION — Phase-8 winners → EVALUATION tier (CERTIFIED at α=0.05 Holm-Bonferroni, n=7)
+> ## 🔬 2026-06-01 LATE EVENING — Phase-9h TUNED-BASELINE BINDING — protocol catches its own headline drift; priors honestly demoted to screened candidates
+>
+> Phase-9h closed the binding diagnostic for Control 3a: a **3-seed
+> re-run of `baseline_resnet20_tuned_lr0.01_wd0.0005`** at CIFAR-100
+> 30 ep (AdamW, bs=256, the hill-climb-best tuned-baseline cell from
+> Phase-9g §13.3). The result is the most consequential honest finding
+> of the entire campaign.
+>
+> | seed | top1 |
+> |---:|---:|
+> | 0 | 0.5984 |
+> | 1 | 0.6046 |
+> | 2 | 0.6020 |
+> | **mean** | **0.6017** |
+> | median | 0.6020 |
+> | std (pp, ddof=1) | 0.31 |
+>
+> **Tuned-baseline n=3 vs winners' default-config n=7 (unpaired
+> Mann–Whitney U + 20 000-iter bootstrap, rng=20260601):**
+>
+> | comparison | Δmean | 95 % unpaired bootstrap CI | Mann–Whitney U | p_two | p_one (tuned > leader) | min(tuned) > max(leader) |
+> |---|---:|---|---:|---:|---:|:---:|
+> | tuned (n=3, 0.6017) − `pair_gm_pdw` (n=7, 0.5786) | **+2.30 pp** | [+1.99, +2.60] pp | 21.0 | **0.0167** | **0.0083** | **YES** |
+> | tuned (n=3, 0.6017) − `slot_act_sine` (n=7, 0.5790) | **+2.27 pp** | [+1.90, +2.64] pp | 21.0 | **0.0222** | **0.0111** | **YES** |
+> | tuned (n=3, 0.6017) − `sg_only_phi_budget` (n=7, 0.5736) | **+2.81 pp** | [+2.42, +3.19] pp | 21.0 | **0.0167** | **0.0083** | **YES** |
+>
+> **Honest reading.** The default-config n=7 cert (banner below) STILL
+> STANDS as a **matched-recipe vs matched-recipe** formal claim: at the
+> SAME lr=1e-3, wd=5e-4, bs=256, AdamW recipe, the three priors DO
+> clear paired Wilcoxon p=0.0078 under Holm-Bonferroni α'=0.0167. **But
+> at iso-tuned conditions where the baseline gets the same LR-tuning
+> love (lr=0.01) that the leaders' hill-climbs gave their priors, the
+> tuned vanilla baseline OUTPERFORMS all 3 priors by ~+2.3 pp.** All
+> three Mann–Whitney one-sided comparisons clear α=0.05; bootstrap CI
+> lower bounds exceed +1.9 pp; min(tuned) strictly exceeds max(leader)
+> for all three winners — no rank overlap.
+>
+> **Narrative shift.** The HEADLINE CLAIM of the paper now reads:
+>
+> > "The dual-track audit + Fixer protocol correctly caught H09's
+> > realised-ratio drift (the load-bearing existence proof). The 3
+> > default-config-certified priors do NOT robustly outperform a
+> > properly-LR-tuned baseline; the priors' lift is partially
+> > LR-tuning artifact. The protocol's value is the meta-research
+> > methodology, not the specific priors."
+>
+> The three Phase-8 winners are **honestly demoted from "winners" to
+> "screened candidates that do not robustly survive a properly-LR-tuned
+> baseline at NeurIPS-α."** The default-config cert is preserved as a
+> worked example of protocol output and as a formally-correct
+> matched-recipe statement, but it is no longer the paper's empirical
+> headline. The protocol-as-contribution is. **R2 BLOCKER #13
+> substantively validated.**
+>
+> **The protocol caught its own at-risk-of-publication headline-
+> interpretation drift** — exactly the kind of catch the audit
+> protocol was designed to surface. An unaudited / un-iso-tuned-tested
+> pipeline would have published the default-config n=7 cert as "the
+> priors help" and stopped there.
+>
+> Caveat (preserved): the Phase-9h n=3 vs winners' n=7 comparison is
+> *unpaired* and at *different (lr, wd) cells*. A symmetric Phase-9i
+> n=7 paired close-out at the tuned cell is the principled main-track
+> finalisation (~5 GPU-h; filed). The tuned-baseline n=3 σ (0.31 pp)
+> is tighter than the default-config baseline σ at n=7 (0.453 pp), so
+> the binding is not noise-bound.
+>
+> Full numbers + Mann–Whitney + bootstrap CIs + verdict:
+> [`paper/STATISTICAL_TESTS.md`](STATISTICAL_TESTS.md) §14.
+> Splice in PAPER.md: §5.0 + new abstract first sentence + §8
+> conclusion + §1.1 contributions framing.
+> Pipeline-close marker: [`audits/PIPELINE_COMPLETE_2026-06-01.md`](../audits/PIPELINE_COMPLETE_2026-06-01.md).
+
+> ## 🏆 2026-05-29 PM PROMOTION — Phase-8 winners → EVALUATION tier (CERTIFIED at α=0.05 Holm-Bonferroni, n=7) — preserved with Phase-9h honest demotion above
+>
+> **2026-06-01 LATE EVENING NOTE.** The block immediately below
+> certifies the three Phase-8 winners at α=0.05 under Holm-Bonferroni
+> at the **default-config matched-recipe** cell. That certification
+> STILL STANDS as a formal statistical statement at that cell. The
+> Phase-9h block above (2026-06-01 late evening) shows that at
+> iso-tuned conditions where the baseline gets the same LR-tuning
+> love as the leaders, the tuned baseline BEATS all 3 priors by ~+2.3
+> pp. The headline interpretation of the paper has therefore shifted
+> from "priors help" to "protocol caught its own headline-drift
+> risk" — see the Phase-9h block above. The default-config cert is
+> retained below as a worked example of protocol output and as a
+> formally-correct matched-recipe statement.
+>
 >
 > The Phase-8 family was extended from n=3 to **n=7 seeds** on CIFAR-100
 > 30-ep. All three winners produced 7/7 positive paired deltas against

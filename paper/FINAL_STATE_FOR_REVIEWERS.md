@@ -14,67 +14,84 @@ Read time: ~10 minutes
 
 ---
 
-## TL;DR (~200 words)
+## TL;DR (~200 words) — **2026-06-01 LATE EVENING honest update**
 
 We submit a **methodological contribution**: a dual-track skeptical audit
 + Fixer-with-mechanism-verifying-test + per-experiment-page protocol for
 LLM-agent-implemented autoresearch campaigns, codified as 28 normative
-rules and seven content-agnostic skills. The protocol's signature catch
-on its 84-hypothesis nature-inspired-priors calibration substrate is
-**H09 phi_budget**: an unaudited pipeline would have published a
-CIFAR-100 +1.53 pp lift produced by a network whose realised
-stage-parameter ratio was 1:1.41:2.45, not the doc-claimed 1:φ:φ²
-(commit `519cdf3`).
+rules and seven content-agnostic skills. The protocol's **double-barrelled
+load-bearing existence proof**: (a) the protocol caught **H09 phi_budget's
+realised-ratio drift** — an unaudited pipeline would have published a
+CIFAR-100 +1.53 pp lift produced by a network whose realised stage-
+parameter ratio was 1:1.41:2.45, not the doc-claimed 1:φ:φ² (commit
+`519cdf3`); (b) the protocol caught **its own headline-interpretation
+drift** in Phase-9h.
 
-**Certified empirical claims** (CIFAR-100 30-ep, post-fix code, n=7
-default-config, 2026-05-29 PM): three Phase-8 candidates — `pair_gm_pdw`,
+**Honest empirical envelope (post Phase-9h tuned-baseline n=3 binding,
+2026-06-01 late evening).** Three Phase-8 candidates — `pair_gm_pdw`,
 `slot_act_sine`, `sg_only_phi_budget` — pass paired Wilcoxon p=0.0078
-under Holm-Bonferroni α'=0.0167 across the k=3 confirmatory family,
-with paired-t p ∈ [5×10⁻⁵, 8×10⁻⁴] confirming magnitude. Three honest
-caveats: (a) the iso-tuned-cell extension at n=3 cannot itself
-re-certify and the Phase-5 ordinal gate fails there for all three;
-(b) one of the three (`sg_only_phi_budget`) does NOT clear strict
-POSI k=49; (c) all auditors are Claude Opus 4.7.
+under Holm-Bonferroni α'=0.0167 at the matched-recipe default-config
+slice (lr=1e-3 wd=5e-4 bs=256 AdamW). **BUT** at the iso-tuned cell
+(lr=0.01) where the baseline gets the same LR-tuning love, the **tuned
+vanilla `baseline_resnet20` n=3 mean = 0.6017 BEATS all three priors'
+default-config n=7 means by +2.27 to +2.81 pp** (unpaired Mann–Whitney
+p_one ∈ {0.0083, 0.0111, 0.0083}; 95 % unpaired-bootstrap CI lower
+bound ≥ +1.90 pp; min(tuned) > max(leader) for all three winners — no
+rank overlap; `paper/STATISTICAL_TESTS.md` §14). **The priors do NOT
+robustly survive a properly-LR-tuned baseline.** R2 BLOCKER #13
+substantively validated. The three priors are honestly demoted to
+**screened candidates**; the default-config cert is preserved as a
+worked example of protocol output and a formally-correct matched-
+recipe statement, but is no longer the paper's empirical headline.
 
-**Pending GPU work in flight at submission**: Phase-9f iso-tuned n=7
-extension, Wave-1 combos H87/H88/H91 (~11 GPU-h), Controls 1–4
-(~31.75 GPU-h). The headline and the protocol-as-contribution claim
-are independent of these.
+**The protocol-as-meta-research-methodology IS the paper's headline.**
 
 ---
 
-## 1. The certified empirical claims (n=7 default-config CIFAR-100 30-ep)
+## 1. The default-config n=7 cert (preserved as matched-recipe worked example; no longer the headline)
 
 Baseline CIFAR-100 seeds 0..6, mean 0.5612, σ = 0.453 pp (n=7).
 Source: `paper/STATISTICAL_TESTS.md` §1, commit `8e1fdab` family.
 
-| tag | Δmean | Wilcoxon p_one | 95 % bootstrap CI on Δmean | Holm-Bonferroni α'=0.0167 | Paired-t p_one (df=6) | POSI k=49 (paired-t < 0.001) | Iso-tuned n=3 status |
-|---|---:|---:|---|:---:|---:|:---:|:---:|
-| `pair_gm_pdw` (H09+H48+H44) | **+1.74 pp** | 0.0078 | [+1.42, +2.09] pp | **YES** | 5.1 × 10⁻⁵ | **YES** | Δmean +1.59 pp; CI [+0.43, +2.62]; ordinal gate FAIL (tied 0.6057) |
-| `slot_act_sine` (H81 SIREN) | **+1.78 pp** | 0.0078 | [+1.38, +2.18] pp | **YES** | 1.2 × 10⁻⁴ | **YES** | Δmean +1.68 pp; CI [+0.49, +2.77]; ordinal gate FAIL |
-| `sg_only_phi_budget` (H09 post-fix) | **+1.24 pp** | 0.0078 | [+0.84, +1.67] pp | **YES** | 8.1 × 10⁻⁴ | **NO** (POSI-uncertified) | Δmean +1.16 pp; CI [−0.04, +2.30] **contains 0**; ordinal gate FAIL |
+| tag | Δmean | Wilcoxon p_one | 95 % bootstrap CI on Δmean | Holm-Bonferroni α'=0.0167 | Paired-t p_one (df=6) | Phase-9h binding: tuned-baseline n=3 vs this leader |
+|---|---:|---:|---|:---:|---:|---|
+| `pair_gm_pdw` (H09+H48+H44) | +1.74 pp | 0.0078 | [+1.42, +2.09] pp | YES | 5.1 × 10⁻⁵ | **Tuned beats leader by +2.30 pp; Mann–Whitney p_one = 0.0083; NO rank overlap** |
+| `slot_act_sine` (H81 SIREN) | +1.78 pp | 0.0078 | [+1.38, +2.18] pp | YES | 1.2 × 10⁻⁴ | **Tuned beats leader by +2.27 pp; Mann–Whitney p_one = 0.0111; NO rank overlap** |
+| `sg_only_phi_budget` (H09 post-fix) | +1.24 pp | 0.0078 | [+0.84, +1.67] pp | YES | 8.1 × 10⁻⁴ | **Tuned beats leader by +2.81 pp; Mann–Whitney p_one = 0.0083; NO rank overlap** |
 
-All three winners produced 7/7 positive paired deltas → Wilcoxon W=0,
-floor (1/2)⁷ = 0.0078 attained. Paired-t magnitude tests
-(`paper/STATISTICAL_TESTS.md` §9; commit `3f501a3`) sit 3–4 orders
-below the Wilcoxon floor, confirming the lift is many σ above zero.
+All three winners produced 7/7 positive paired deltas at the matched-
+recipe default-config slice → Wilcoxon W=0, floor (1/2)⁷ = 0.0078
+attained. **However**, at iso-tuned conditions (lr=0.01 wd=5e-4 bs=256
+AdamW), the tuned vanilla `baseline_resnet20` n=3 mean = 0.6017 BEATS
+all three winners' default-config n=7 means by +2.27 to +2.81 pp
+(`paper/STATISTICAL_TESTS.md` §14, Phase-9h binding diagnostic landed
+2026-06-01 late evening). **The default-config cert is preserved as a
+formally-correct matched-recipe statement and as a worked example of
+protocol output, but the priors are honestly demoted to "screened
+candidates" — they do NOT robustly survive a properly-LR-tuned
+baseline at NeurIPS-α.**
 
-## 2. Statistical envelope across 3 regimes
+## 2. Statistical envelope across 4 regimes (honest)
 
 `paper/STATISTICAL_TESTS.md` §§1 (default n=7), §7 (hill-climbed n=3),
-§10 (iso-tuned n=3 baseline-extension, 2026-05-31, commit `d6d4739`).
+§10 (iso-tuned n=7, Phase-9f closeout), §14 (Phase-9h tuned-baseline n=3
+binding).
 
-| regime | n | baseline mean (top1) | σ_baseline (pp) | Outside 2σ_baseline? | Holm-Bonferroni floor cleared? | Phase-5 ordinal gate |
-|---|---:|---:|---:|:---:|:---:|:---:|
-| Default-config (lr=1e-3, wd=5e-4, bs=256, AdamW) | 7 | 0.5612 | 0.453 | **YES — all three Δs (+1.24/+1.74/+1.78) clear 2σ=0.91 pp** | **YES (0.0078 < 0.0167)** | **PASS** for all 3 |
-| Hill-climbed best (Phase-9a, BLOCKER #13 refutation) | 3 | 0.5929 (bs=256) | 0.967 | Borderline (Δmean +0.79 / +1.22 / +1.31 vs 2σ=1.93) | NO (n=3 floor 0.125 > 0.0167) | Median-level pass; formal Wilcoxon at floor |
-| Iso-tuned cell (Phase-9f Section 10; baseline at bs=128) | 3 | 0.5937 | **1.14** (2.5× wider) | NO (2σ_iso = 2.28; Δs +1.16/+1.59/+1.68) but **YES** vs 2σ_default = 0.91 pp | NO (n=3 floor 0.125 > 0.0167) | **FAIL** for all 3 (max baseline 0.6057 ≥ min leader) |
+| regime | n | baseline mean (top1) | leader Δmean range | Holm-cleared / α=0.05 cleared? | Phase-5 ordinal gate | Comparator strictly above? |
+|---|---:|---:|---|:---:|:---:|:---:|
+| Default-config matched-recipe (lr=1e-3 wd=5e-4 bs=256 AdamW) | 7 | 0.5612 | +1.24 / +1.74 / +1.78 pp | **YES (0.0078 < 0.0167)** | **PASS** for all 3 | Leaders > baseline |
+| Hill-climbed-best (Phase-9a) | 3 | 0.5929 (bs=256) | +0.79 / +1.22 / +1.31 pp | NO (n=3 floor 0.125 > 0.0167) | mixed-bs; partial | Leaders > baseline |
+| Iso-tuned cell n=7 (Phase-9f closeout, bs=128 lr=3e-3) | 7 | 0.6000 | +0.25 / +0.66 / +0.79 pp (paired n_eff varies) | NO (p_one ∈ {0.0781, 0.1094, 0.3750}) | **FAIL** for all 3 (max base 0.6075) | mixed |
+| **Phase-9h tuned-baseline n=3 (lr=0.01 wd=5e-4 bs=256 AdamW)** | 3 | **0.6017** | tuned − leader = **+2.30 / +2.27 / +2.81 pp** | **YES — tuned > all 3 leaders at α=0.05 Mann–Whitney p_one ∈ {0.0083, 0.0111, 0.0083}** | n/a (unpaired) | **Tuned baseline > all 3 leaders; NO rank overlap** |
 
-Directional positive Δ is preserved across all three regimes for all
-three winners. The **default-config n=7 result is the formal claim**;
-the iso-tuned n=3 extension is a robustness check that cannot itself
-re-certify at NeurIPS α. **Phase-9f is the re-certification path**
-(n=7+ extension at iso-tuned cell — see §8).
+Directional positive Δ is preserved at default-config and hill-climbed-
+best. **It REVERSES at iso-tuned conditions (Phase-9f) and at the Phase-9h
+tuned-baseline cell: a properly-LR-tuned vanilla baseline OUTPERFORMS the
+priors by ~+2.3 pp.** The default-config n=7 cert is a formally-correct
+matched-recipe statement; **the paper's headline shifts to the protocol-
+as-meta-research-methodology.** A Phase-9i symmetric n=7 paired close-out
+at the tuned cell (~5 GPU-h) would tighten the Phase-9h binding at
+NeurIPS-α.
 
 ## 3. The methodological contribution
 

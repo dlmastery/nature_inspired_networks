@@ -1,6 +1,6 @@
-# PIPELINE COMPLETE — 2026-06-01
+# PIPELINE COMPLETE — 2026-06-01 (Phase-9h binding closed late evening)
 
-> **Status: GPU PIPELINE CLOSED.** Phases 9a, 9b, 9c, 9d, 9e, 9f, 9g are all complete. Phase-9h items are filed but unlaunched (workshop / D&B-track submission is unblocked; main-track conditional on Phase-9h closure of Control 3a + Control 2 tanh extension).
+> **Status: GPU PIPELINE CLOSED + Phase-9h HEADLINE BINDING CLOSED.** Phases 9a, 9b, 9c, 9d, 9e, 9f, 9g, and **the binding 9h diagnostic** are all complete. The honest empirical headline of the paper has now shifted: **the priors do NOT robustly survive a properly-LR-tuned baseline** (Phase-9h tuned-baseline n=3 mean = 0.6017 BEATS all three winners' default-config n=7 means by +2.27 to +2.81 pp at Mann–Whitney one-sided p ∈ {0.0083, 0.0111, 0.0083}). The default-config n=7 cert is preserved as a formally-correct matched-recipe statement; the priors are honestly demoted to "screened candidates"; **the protocol-as-meta-research-methodology IS the paper's headline contribution.** The remaining Phase-9h items (3b RegNetX, n=7 tanh-vs-sine closure, rotated baseline for H91, n=15 iso-tuned, n=7 1D-RoPE comparator) are filed as Phase-9i+ future work and are NOT required for the workshop / D&B-track submission.
 
 This marker documents the final-state defensibility envelope of the `nature_inspired_networks` repository as of 2026-06-01 17:02 (PT) when the last Phase-9g control sweep finished. Per CLAUDE.md Rule 11, every prior Phase-9 sub-phase's commit history is preserved; this file is the **closure narrative**, not a re-litigation of prior phases.
 
@@ -17,8 +17,38 @@ This marker documents the final-state defensibility envelope of the `nature_insp
 | **9e** | 2026-06-01 AM | 2026-06-01 morning | Wave-1 of combo sweep: n=3 each on the three R-D-synthesis combos. | [`paper/STATISTICAL_TESTS.md`](../paper/STATISTICAL_TESTS.md) §12; cells under `experiments/{cifar100,rotated_cifar100}/combo_*_seed*/`. |
 | **9f** | 2026-06-01 morning | 2026-06-01 afternoon | n=7 iso-tuned (lr=3e-3 wd=5e-4 bs=128 AdamW) extension of baseline + 3 leaders at the hill-climbed cell (R2 BLOCKER #13 closure path). | [`paper/STATISTICAL_TESTS.md`](../paper/STATISTICAL_TESTS.md) §10; Phase-5 ordinal gate FAIL for all three winners at iso-tuned n=7. |
 | **9g** | 2026-06-01 07:29 PT | 2026-06-01 17:02 PT | Reviewer-flagged controls (C1 non-φ 3-axis / C2 activation ablation / C3a tuned baseline hill-climb / C4 H71 IcosaRoPE3D ablation). | [`paper/STATISTICAL_TESTS.md`](../paper/STATISTICAL_TESTS.md) §13; cells under `experiments/{cifar100,rotated_cifar10}/*`; this closure marker. |
+| **9h (binding)** | 2026-06-01 ~18:30 PT | 2026-06-01 ~22:00 PT | **3-seed re-run of `baseline_resnet20_tuned_lr0.01_wd0.0005`** at CIFAR-100 30 ep (AdamW, bs=256) — the headline-binding diagnostic for the n=1 vs n=7 asymmetry left by Phase-9g §13.3. | [`paper/STATISTICAL_TESTS.md`](../paper/STATISTICAL_TESTS.md) §14; per-seed cells at `experiments/cifar100/baseline_resnet20{_tuned_lr0.01_wd0.0005_seed0, __hc_lr1em2_wd5em4_bs256_optAdamW_seed{1,2}}/`. **n=3 mean = 0.6017 (σ = 0.31 pp); tuned baseline BEATS all 3 priors' default-config n=7 means by +2.27 to +2.81 pp; unpaired Mann–Whitney p_one ∈ {0.0083, 0.0111, 0.0083}; min(tuned) > max(leader) for all three.** |
 
-**Total Phase-9 elapsed GPU-time:** ~35–40 h on the single RTX 4090 Laptop, distributed across the 7 sub-phases above (≈ 9.5 h for Phase-9g alone; the rest accumulated across 9a–9f). The auto-checkpoint loop (Rule 20) preserved every intermediate output across the campaign.
+**Total Phase-9 elapsed GPU-time:** ~36–41 h on the single RTX 4090 Laptop, distributed across the 8 sub-phases above (≈ 9.5 h for Phase-9g, ≈ 0.85 h for Phase-9h, rest accumulated across 9a–9f). The auto-checkpoint loop (Rule 20) preserved every intermediate output across the campaign.
+
+---
+
+## 1.5 Phase-9h closeout (added 2026-06-01 late evening)
+
+The Phase-9h binding diagnostic is the most consequential honest finding of the entire campaign. It executed the 3-seed re-run of the Phase-9g Control 3a hill-climb winner cell (`baseline_resnet20_tuned_lr0.01_wd0.0005`) at CIFAR-100 30 ep AdamW bs=256.
+
+**Tuned-baseline n=3 cell:**
+
+| seed | top1 | source |
+|---:|---:|---|
+| 0 | 0.5984 | `experiments/cifar100/baseline_resnet20_tuned_lr0.01_wd0.0005_seed0/metrics.json` |
+| 1 | 0.6046 | `experiments/cifar100/baseline_resnet20__hc_lr1em2_wd5em4_bs256_optAdamW_seed1/metrics.json` |
+| 2 | 0.6020 | `experiments/cifar100/baseline_resnet20__hc_lr1em2_wd5em4_bs256_optAdamW_seed2/metrics.json` |
+| **mean** | **0.6017** | n=3 |
+| median | 0.6020 | |
+| σ (ddof=1, pp) | 0.31 | tighter than σ_default at n=7 = 0.453 pp |
+
+**Tuned-baseline (n=3) vs winners' default-config (n=7) — unpaired Mann–Whitney U + 20 000-iter bootstrap (rng=20260601):**
+
+| comparison | Δmean | 95 % unpaired-bootstrap CI | Mann–Whitney U | p_two | p_one (tuned > leader) | min(tuned) > max(leader) |
+|---|---:|---|---:|---:|---:|:---:|
+| tuned − `pair_gm_pdw` | **+2.30 pp** | [+1.99, +2.60] pp | 21.0 | **0.0167** | **0.0083** | **YES (no overlap)** |
+| tuned − `slot_act_sine` | **+2.27 pp** | [+1.90, +2.64] pp | 21.0 | **0.0222** | **0.0111** | **YES (no overlap)** |
+| tuned − `sg_only_phi_budget` | **+2.81 pp** | [+2.42, +3.19] pp | 21.0 | **0.0167** | **0.0083** | **YES (no overlap)** |
+
+**Reading.** The default-config n=7 cert (table in §3.1 below) STILL STANDS as a **matched-recipe vs matched-recipe** formal statistical statement at lr=1e-3 wd=5e-4 bs=256 AdamW. **BUT** at iso-tuned conditions where the baseline gets the same LR-tuning love (lr=0.01) that the leaders' hill-climbs gave their priors, the tuned vanilla baseline OUTPERFORMS all three priors by ~+2.3 pp. Combined with Phase-9f n=7 iso-tuned Δ-shrinkage and Phase-9g Controls 1 / 2 partial-/-full-refutation of the φ-specific and SIREN-specific interpretations, the Phase-9h evidence converges on a single picture: **the priors' lift in the default-config cert is substantially explained by baseline-LR-tuning artifact. R2 BLOCKER #13 is substantively validated.**
+
+**The protocol caught its own at-risk-of-publication headline-interpretation drift.** An unaudited / un-iso-tuned-tested pipeline would have published the default-config n=7 cert as "the priors help" and stopped there. The protocol's value is precisely that it caught this drift before any external claim shipped.
 
 ---
 
@@ -133,3 +163,29 @@ The following items are **filed but unlaunched** as Phase-9h; none is required f
 ---
 
 *Generated 2026-06-01 evening. The GPU pipeline is closed at Phase-9g; Phase-9h is filed and ready to launch when the operator decides. Workshop / D&B-track defensibility: clearly held. Main-track defensibility: conditional on Phase-9h, with the Phase-9g controls reinforcing the WEAK_REJECT status by partially refuting specific-mechanism interpretations while leaving the default-config formal cert intact.*
+
+---
+
+## 7. FINAL HEADLINE — the honest reading after Phase-9h (added 2026-06-01 late evening)
+
+The Phase-9h binding diagnostic landed late evening 2026-06-01. The honest empirical envelope of the paper is now as follows.
+
+**What STANDS (formal statistical statements that survive Phase-9h).**
+
+1. The **default-config n=7 paired Wilcoxon cert** (`paper/STATISTICAL_TESTS.md` §§1–6): at lr=1e-3, wd=5e-4, bs=256, AdamW, the three Phase-8 candidates clear paired Wilcoxon p = 0.0078 < Holm-Bonferroni α' = 0.0167 against the matched-recipe baseline. This is a **formally-correct matched-recipe statement** and a worked example of protocol output.
+2. The **dual-track audit + Fixer protocol** (CLAUDE.md Rules 20–28; 17 content-agnostic skills under `skills/`).
+3. The **22-pp MAJOR/BROKEN excess** at n=62 third-party calibration (Fisher exact two-sided p = 1.94 × 10⁻⁵; `paper/STATISTICAL_TESTS.md` §11). The protocol's audit-aggressiveness is calibrated against real third-party code.
+4. The **H09 phi_budget realised-ratio drift case study** (1:1.41:2.45 → 1:1.623:2.629 after Fixer-PhiScaling at commit `519cdf3`). The load-bearing existence proof for the protocol's diagnostic power on real defects.
+5. The **cross-family re-audit** (8/10 strict concordant, 10/10 defect-existence concordant; `audits/CROSS_FAMILY_HONEST_REAUDIT.md`), with the honest caveat that all passes remain Opus 4.7.
+
+**What changes (the headline-interpretation shift the Phase-9h binding forces).**
+
+1. **The three Phase-8 candidates are honestly demoted from "winners" to "screened candidates that do not robustly survive a properly-LR-tuned baseline at NeurIPS-α."** At iso-tuned conditions (lr=0.01), the tuned vanilla `baseline_resnet20` n=3 mean = 0.6017 BEATS all three priors' default-config n=7 means by +2.27 to +2.81 pp (Mann–Whitney one-sided p ∈ {0.0083, 0.0111, 0.0083}; no rank overlap; `paper/STATISTICAL_TESTS.md` §14).
+2. **The paper's empirical headline shifts to the protocol-as-meta-research-methodology.** The protocol's value is the meta-research methodology, not the specific priors. The default-config cert is preserved as a worked example of protocol output, but is no longer the paper's empirical headline.
+3. **R2 BLOCKER #13 is substantively validated** — at iso-tuned baseline conditions, the priors' default-config lift is substantially LR-tuning artifact. The Phase-9f n=7 iso-tuned Δ-shrinkage, Phase-9g Control 3a n=1 tuned-baseline numerical superiority, and Phase-9h n=3 tuned-baseline binding converge on this single conclusion.
+
+**The honest punchline.** The protocol caught its own at-risk-of-publication headline-interpretation drift. An unaudited / un-iso-tuned-tested pipeline would have published the default-config n=7 cert as "nature-inspired priors help by +1.24 to +1.78 pp" and stopped there. **The protocol's value is precisely that it can correct its own conclusions when an iso-tuned diagnostic is finally run.** The double-barrelled existence proof — the audit caught H09's implementation drift; the iso-tuned binding caught the headline-interpretation drift — is the paper's empirical headline. The three priors that survived n=7 paired Wilcoxon at the default-config slice but failed against an LR-tuned baseline are reported in honest detail as the worked example, not as the empirical contribution.
+
+**Workshop / D&B-track defensibility:** clearly held (the methodology + calibration data are unaffected; the H09 case study + the Phase-9h self-catch are positive empirical evidence for the protocol's value).
+
+**Main-track defensibility:** conditional on a symmetric Phase-9i n=7 paired close-out at the tuned cell (~5 GPU-h; would tighten the Phase-9h binding at NeurIPS-α). At the current Phase-9h evidence level, the main-track conclusion is "the protocol caught its own headline drift; the priors are honestly demoted; the headline contribution is the methodology."
