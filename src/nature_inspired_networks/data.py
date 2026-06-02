@@ -19,19 +19,42 @@ CIFAR100_MEAN = (0.5071, 0.4865, 0.4409)
 CIFAR100_STD = (0.2673, 0.2564, 0.2762)
 
 
-def _cifar_tfs(mean, std, train: bool):
+def _cifar_tfs(mean, std, train: bool,
+               randaugment_n: int = 0, randaugment_m: int = 14,
+               random_erasing_p: float = 0.0):
+    """Build the CIFAR train/test transform pipeline.
+
+    The default ``randaugment_n=0`` / ``random_erasing_p=0.0`` reproduce
+    the legacy pipeline byte-for-byte. Setting ``randaugment_n>0`` adds
+    a :class:`torchvision.transforms.RandAugment` between the crop/flip
+    and ToTensor; setting ``random_erasing_p>0`` appends a
+    :class:`torchvision.transforms.RandomErasing` after Normalize.
+
+    These two arguments are the only modern-recipe entry points that
+    touch the DataLoader pipeline; Mixup / CutMix / EMA live in the
+    Trainer (per-batch / per-step) and need no pipeline change.
+    """
     if train:
-        return T.Compose([
+        steps: list = [
             T.RandomCrop(32, padding=4),
             T.RandomHorizontalFlip(),
-            T.ToTensor(),
-            T.Normalize(mean, std),
-        ])
+        ]
+        if randaugment_n and randaugment_n > 0:
+            from .randaugment import build_randaugment
+            steps.append(build_randaugment(num_ops=int(randaugment_n),
+                                           magnitude=int(randaugment_m)))
+        steps.extend([T.ToTensor(), T.Normalize(mean, std)])
+        if random_erasing_p and random_erasing_p > 0.0:
+            from .random_erasing import build_random_erasing
+            steps.append(build_random_erasing(p=float(random_erasing_p)))
+        return T.Compose(steps)
     return T.Compose([T.ToTensor(), T.Normalize(mean, std)])
 
 
 def cifar_loaders(root: str = "./data", batch_size: int = 256, num_workers: int = 4,
-                  variant: str = "cifar10"):
+                  variant: str = "cifar10",
+                  randaugment_n: int = 0, randaugment_m: int = 14,
+                  random_erasing_p: float = 0.0):
     root = Path(root)
     if variant == "cifar10":
         Ds = CIFAR10
@@ -44,7 +67,10 @@ def cifar_loaders(root: str = "./data", batch_size: int = 256, num_workers: int 
     else:
         raise ValueError(variant)
     tr = Ds(root=str(root), train=True, download=True,
-            transform=_cifar_tfs(mean, std, train=True))
+            transform=_cifar_tfs(mean, std, train=True,
+                                 randaugment_n=randaugment_n,
+                                 randaugment_m=randaugment_m,
+                                 random_erasing_p=random_erasing_p))
     te = Ds(root=str(root), train=False, download=True,
             transform=_cifar_tfs(mean, std, train=False))
     tr_loader = DataLoader(tr, batch_size=batch_size, shuffle=True,
@@ -199,11 +225,16 @@ def load_rotated_cifar10(root: str = "./data", batch_size: int = 256,
 
 
 def load_dataset(name: str, root: str = "./data", batch_size: int = 256,
-                 num_workers: int = 4):
+                 num_workers: int = 4,
+                 randaugment_n: int = 0, randaugment_m: int = 14,
+                 random_erasing_p: float = 0.0):
     name = name.lower()
     if name in {"cifar10", "cifar100"}:
         return cifar_loaders(root=root, batch_size=batch_size,
-                             num_workers=num_workers, variant=name)
+                             num_workers=num_workers, variant=name,
+                             randaugment_n=randaugment_n,
+                             randaugment_m=randaugment_m,
+                             random_erasing_p=random_erasing_p)
     if name in {"rotated_cifar10", "rotcifar10"}:
         return rotated_cifar_loaders(
             root=root, batch_size=batch_size,

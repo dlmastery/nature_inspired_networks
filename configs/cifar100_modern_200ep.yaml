@@ -1,0 +1,108 @@
+# CIFAR-100 modern-recipe CONVERGENCE-REGIME config (200 epochs).
+#
+# Purpose: address PhD-critique items B and 2 -- give the modern 11-trick
+# baseline AND the three winners (pair_gm_pdw, slot_act_sine,
+# sg_only_phi_budget) a fair, convergence-regime comparison. The
+# previous 30-epoch screenings were too short for AdamW + cosine +
+# heavy-augmentation to fully converge -- Bello 2021 shows 80-95% of
+# the absolute lift from these tricks is unlocked between 100 and 200
+# epochs.
+#
+# Hardware contract (CLAUDE.md §2):
+#   * RTX 4090 Laptop, 16 GB VRAM, Windows 11
+#   * bf16 AMP, batch 256, num_workers 0
+#   * OMP/MKL caps applied at launch (Rule 26)
+#
+# Wall-clock estimate per seed: ~2 GPU h (ResNet-20). The 11-trick recipe
+# adds ~12% over the legacy pipeline; 200 ep at bf16 is ~115 s/epoch on
+# the 4090 Laptop.
+#
+# The 11 tricks (Bello 2021 / Wightman 2021 / He 2019):
+#   1. AdamW                                  optimizer: adamw
+#   2. Cosine LR                              scheduler: cosine
+#   3. Linear LR warmup (5 ep)                warmup_epochs: 5
+#   4. Weight decay (5e-4)                    weight_decay: 5.0e-4
+#   5. Label smoothing 0.1                    label_smoothing: 0.1 (auto-off w/ mix)
+#   6. Stochastic depth / Drop-Path           (H52 module, already wired)
+#   7. Mixup α=0.2                            mixup_alpha: 0.2
+#   8. CutMix α=1.0, 50/50 alternate          cutmix_alpha: 1.0
+#   9. RandAugment (N=2, M=14)                randaugment_n: 2, randaugment_m: 14
+#  10. Random Erasing p=0.25                  random_erasing_p: 0.25
+#  11. EMA decay 0.9999                       ema_decay: 0.9999
+#
+# Expected pass band on CIFAR-100 with ResNet-20 at 200 ep:
+#   baseline_resnet20_modern_200ep top1 ∈ [0.68, 0.72] median
+#   (legacy 30-ep baseline lands ~0.60-0.66; the 11-trick recipe
+#   recovers the ~6-10 pp gap that critique item B identified).
+#
+# Launch (per seed, single tag at a time):
+#   .\.venv\Scripts\python -m nature_inspired_networks.runner `
+#     --config configs\cifar100_modern_200ep.yaml `
+#     --tag baseline_resnet20_modern_200ep --seed 0 `
+#     --root experiments
+#
+# See convergence/PLAN.md for the full Wave-A/B/C/D matrix and CLI list.
+
+dataset: cifar100
+data_root: ./data
+batch_size: 256
+num_workers: 0           # Windows-safe (CLAUDE.md §2)
+epochs: 200
+
+# Base optimisation (tricks 1, 2, 3, 4, 5).
+lr: 1.0e-3
+weight_decay: 5.0e-4
+label_smoothing: 0.1     # auto-dropped to 0 when mixup/cutmix is on
+warmup_epochs: 5
+use_bf16: true
+optimizer: adamw
+scheduler: cosine
+target_top1: 0.68        # convergence-regime acceptance lower bound
+
+# Modern-recipe knobs (tricks 7-11).
+mixup_alpha: 0.2
+cutmix_alpha: 1.0
+mixup_cutmix_prob: 0.5
+randaugment_n: 2
+randaugment_m: 14
+random_erasing_p: 0.25
+ema_decay: 0.9999
+
+# Baseline model. Variants reuse this config and override `model`,
+# `channel_mode`, and the phi_budget / slot_activation knobs:
+#
+#   pair_gm_pdw_modern_200ep:
+#     model: NaturePrior
+#     channel_mode: fib
+#     momentum_schedule: golden
+#     phi_decay_wd: true
+#     phi_decay_base: 5.0e-4
+#     flags: {hex: false, group: false, fractal: false, toroidal: false,
+#             cymatic_init: false, golden_modulate: false}
+#
+#   slot_act_sine_modern_200ep:
+#     model: resnet20
+#     channel_mode: linear
+#     slot_activation: sine
+#     omega_init: 1.0
+#     flags: {all false}
+#
+#   sg_only_phi_budget_modern_200ep:
+#     model: phi_budget
+#     channel_mode: phi
+#     phi_budget_total: 16
+#     phi_budget_n_stages: 4
+#     phi_budget_mode: float
+#     flags: {all false}
+#
+# These three variant snippets are appended via per-tag overrides in
+# convergence/PLAN.md.
+model: resnet20
+channel_mode: linear     # ResNet-20 uses 16-32-64 widths
+flags:
+  hex: false
+  group: false
+  fractal: false
+  toroidal: false
+  cymatic_init: false
+  golden_modulate: false

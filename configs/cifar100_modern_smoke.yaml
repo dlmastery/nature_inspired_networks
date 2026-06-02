@@ -1,0 +1,65 @@
+# CIFAR-100 modern-recipe SMOKE config (50 epochs).
+#
+# Purpose: verify the 11-trick recipe wires correctly end-to-end on a
+# ~30-minute laptop run (RTX 4090 Laptop, bf16, batch 256). NOT a
+# convergence-regime run -- use cifar100_modern_200ep.yaml for that.
+#
+# The 11 tricks (Bello 2021 / Wightman 2021 / He 2019):
+#   1. AdamW                                  optimizer: adamw
+#   2. Cosine LR                              scheduler: cosine
+#   3. Linear LR warmup (5 ep)                warmup_epochs: 5
+#   4. Weight decay (5e-4)                    weight_decay: 5.0e-4
+#   5. Label smoothing 0.1                    label_smoothing: 0.1 (auto-off w/ mix)
+#   6. Stochastic depth / Drop-Path           (already-wired H52 module)
+#   7. Mixup α=0.2                            mixup_alpha: 0.2
+#   8. CutMix α=1.0, 50/50 alternate          cutmix_alpha: 1.0
+#   9. RandAugment (N=2, M=14)                randaugment_n: 2, randaugment_m: 14
+#  10. Random Erasing p=0.25                  random_erasing_p: 0.25
+#  11. EMA decay 0.9999                       ema_decay: 0.9999
+#
+# Expected smoke pass band at 50 ep on CIFAR-100 with ResNet-20:
+#   top1 in [0.62, 0.68] for the baseline. Below 0.62 -> wiring bug;
+#   above 0.68 -> excellent (and a hint the 200-ep run will land ~0.71).
+#
+# Launch (single seed, batch 256, ~30 minutes on a 4090 Laptop):
+#   .\.venv\Scripts\python -m nature_inspired_networks.runner `
+#     --config configs\cifar100_modern_smoke.yaml `
+#     --tag baseline_resnet20_modern_smoke --seed 0 `
+#     --root experiments
+
+dataset: cifar100
+data_root: ./data
+batch_size: 256
+num_workers: 0           # Windows-safe (CLAUDE.md §2)
+epochs: 50
+
+# Base optimisation (tricks 1, 2, 3, 4, 5).
+lr: 1.0e-3
+weight_decay: 5.0e-4
+label_smoothing: 0.1     # auto-dropped to 0 when mixup/cutmix is on
+warmup_epochs: 5
+use_bf16: true
+optimizer: adamw
+scheduler: cosine
+target_top1: 0.62        # smoke acceptance lower bound
+
+# Modern-recipe knobs (tricks 7-11).
+mixup_alpha: 0.2
+cutmix_alpha: 1.0
+mixup_cutmix_prob: 0.5
+randaugment_n: 2
+randaugment_m: 14
+random_erasing_p: 0.25
+ema_decay: 0.9999
+
+# Baseline model. Variants reuse this config and override `model`,
+# `channel_mode`, and the phi_budget / slot_activation knobs.
+model: resnet20
+channel_mode: linear     # ResNet-20 uses 16-32-64 widths
+flags:
+  hex: false
+  group: false
+  fractal: false
+  toroidal: false
+  cymatic_init: false
+  golden_modulate: false

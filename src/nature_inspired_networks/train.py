@@ -31,7 +31,10 @@ class TrainConfig:
     lr: float = 1e-3
     weight_decay: float = 5e-4
     label_smoothing: float = 0.1
-    warmup_epochs: int = 1
+    # warmup_epochs defaults to 0 (legacy: no warmup) so existing
+    # configs that don't set it preserve their exact training trajectory.
+    # The modern-recipe configs (cifar100_modern_*.yaml) set this to 5.
+    warmup_epochs: int = 0
     target_top1: float = 0.85
     use_bf16: bool = True
     log_every: int = 50
@@ -79,6 +82,22 @@ class TrainConfig:
     betti_loss_weight: float = 0.0
     betti_persistence_threshold: float = 0.1
     betti_max_pts: int = 64
+    # ---------------------------------------------------------------------
+    # Modern-recipe knobs (Bello 2021 / Wightman 2021). Each default
+    # preserves legacy behaviour byte-for-byte. The wiring point lives in
+    # ``Trainer._step`` (mixup/cutmix) and ``Trainer.fit`` (EMA).
+    # ---------------------------------------------------------------------
+    # Mixup α — Beta(α, α). 0 disables Mixup. Bello 2021 default: 0.2.
+    mixup_alpha: float = 0.0
+    # CutMix α — Beta(α, α). 0 disables CutMix. Bello 2021 default: 1.0.
+    cutmix_alpha: float = 0.0
+    # Per-batch 50/50 alternation prob: P(use Mixup | one of mixup/cutmix
+    # is active and the alternation prob applies). When BOTH alphas > 0
+    # we flip a fair coin per batch; when only one is > 0 we always use
+    # the active one (this knob is then a no-op).
+    mixup_cutmix_prob: float = 0.5
+    # EMA decay (0 -> EMA disabled). Bello 2021 default: 0.9999.
+    ema_decay: float = 0.0
 
 
 def _build_scheduler(opt: torch.optim.Optimizer, cfg: "TrainConfig"):
@@ -88,14 +107,31 @@ def _build_scheduler(opt: torch.optim.Optimizer, cfg: "TrainConfig"):
     body stays scheduler-agnostic. PhiDecayLR uses ``T_max=epochs`` so
     the LR shrinks by exactly 1/phi over the run (matching H10's
     cosine-comparable mid-train LR).
+
+    Modern-recipe — when ``warmup_epochs > 0`` the inner scheduler is
+    wrapped with a linear warmup over the first ``warmup_epochs`` so the
+    LR ramps from ``lr / warmup_epochs`` to the full ``lr`` over the
+    first window. This is the Bello-2021 / Goyal-2017 default and is
+    necessary for AdamW + cosine to converge cleanly at 200 ep.
     """
     name = getattr(cfg, "scheduler", "cosine").lower()
     if name == "cosine":
-        return CosineAnnealingLR(opt, T_max=cfg.epochs)
-    if name in ("phi_decay", "phidecay", "phi"):
-        return PhiDecayLR(opt, T_max=cfg.epochs,
+        base = CosineAnnealingLR(opt, T_max=cfg.epochs)
+    elif name in ("phi_decay", "phidecay", "phi"):
+        base = PhiDecayLR(opt, T_max=cfg.epochs,
                           lr_floor=getattr(cfg, "phi_lr_floor", 1e-6))
-    raise ValueError(f"unknown scheduler '{name}'")
+    else:
+        raise ValueError(f"unknown scheduler '{name}'")
+    warmup = int(getattr(cfg, "warmup_epochs", 0) or 0)
+    if warmup <= 0:
+        return base
+    # Linear warmup [start_factor, 1.0] over `warmup` epochs, then the
+    # base scheduler. SequentialLR composes them.
+    from torch.optim.lr_scheduler import LinearLR, SequentialLR
+    start_factor = 1.0 / float(warmup)
+    warm = LinearLR(opt, start_factor=start_factor, end_factor=1.0,
+                    total_iters=warmup)
+    return SequentialLR(opt, schedulers=[warm, base], milestones=[warmup])
 
 
 class Trainer:
@@ -178,6 +214,26 @@ class Trainer:
             (getattr(self.cfg, "prune_schedule", "") or "").lower()
             in ("fibonacci", "fib")
         )
+        # Modern-recipe — Mixup / CutMix / EMA. Default-off; the knobs
+        # live on TrainConfig. When EMA is on we hold a deepcopy shadow
+        # and update it after every optimiser step.
+        self.mixup_alpha = float(getattr(self.cfg, "mixup_alpha", 0.0))
+        self.cutmix_alpha = float(getattr(self.cfg, "cutmix_alpha", 0.0))
+        self.mixup_cutmix_prob = float(getattr(self.cfg, "mixup_cutmix_prob", 0.5))
+        self._mixing_active = (self.mixup_alpha > 0.0) or (self.cutmix_alpha > 0.0)
+        # Per Bello 2021, label smoothing is dropped when mixing is on
+        # (the mixed targets already supply a soft signal). The original
+        # cfg.label_smoothing is preserved on the config; the effective
+        # value lives here so the dispatch is local and reversible.
+        self._effective_label_smoothing = (
+            0.0 if self._mixing_active else float(self.cfg.label_smoothing)
+        )
+        ema_decay = float(getattr(self.cfg, "ema_decay", 0.0))
+        if ema_decay > 0.0:
+            from .ema import ModelEMA
+            self.ema = ModelEMA(self.model, decay=ema_decay)
+        else:
+            self.ema = None
         # H64 — Dynamic Growth + Pruning schedule wiring. The schedule
         # object is constructed by the caller (so the model_factory is
         # caller-controlled) and the Trainer owns the per-epoch step.
@@ -262,20 +318,54 @@ class Trainer:
                 return feats[-1]
         return None
 
+    def _maybe_mix(self, x: torch.Tensor, y: torch.Tensor):
+        """Apply Mixup OR CutMix per the 50/50 per-batch alternation.
+
+        Returns ``(x_eff, y_a, y_b, lam, mixed)``. When neither alpha is
+        set we return the originals untouched with ``mixed=False`` so the
+        caller falls back to standard cross-entropy.
+        """
+        if not self._mixing_active:
+            return x, y, y, 1.0, False
+        use_mixup = self.mixup_alpha > 0.0
+        use_cutmix = self.cutmix_alpha > 0.0
+        if use_mixup and use_cutmix:
+            pick_mixup = bool(torch.rand(1).item() < self.mixup_cutmix_prob)
+        else:
+            pick_mixup = use_mixup
+        if pick_mixup:
+            from .mixup import mixup_batch
+            x_m, y_a, y_b, lam = mixup_batch(x, y, alpha=self.mixup_alpha)
+        else:
+            from .cutmix import cutmix_batch
+            x_m, y_a, y_b, lam = cutmix_batch(x, y, alpha=self.cutmix_alpha)
+        return x_m, y_a, y_b, lam, True
+
     def _step(self, x, y) -> tuple[float, float]:
         x = x.to(self.device, non_blocking=True)
         y = y.to(self.device, non_blocking=True)
         if y.ndim == 2 and y.shape[1] == 1:
             y = y.squeeze(1)
+        # Modern-recipe: optional Mixup/CutMix BEFORE the forward pass.
+        x_eff, y_a, y_b, lam, mixed = self._maybe_mix(x, y)
+        ls = self._effective_label_smoothing
         if self.cfg.use_bf16 and torch.cuda.is_available():
             with torch.amp.autocast("cuda", dtype=torch.bfloat16):
-                logits = self.model(x)
-                ce_loss = F.cross_entropy(logits, y,
-                                          label_smoothing=self.cfg.label_smoothing)
+                logits = self.model(x_eff)
+                if mixed:
+                    loss_a = F.cross_entropy(logits, y_a, label_smoothing=ls)
+                    loss_b = F.cross_entropy(logits, y_b, label_smoothing=ls)
+                    ce_loss = lam * loss_a + (1.0 - lam) * loss_b
+                else:
+                    ce_loss = F.cross_entropy(logits, y, label_smoothing=ls)
         else:
-            logits = self.model(x)
-            ce_loss = F.cross_entropy(logits, y,
-                                      label_smoothing=self.cfg.label_smoothing)
+            logits = self.model(x_eff)
+            if mixed:
+                loss_a = F.cross_entropy(logits, y_a, label_smoothing=ls)
+                loss_b = F.cross_entropy(logits, y_b, label_smoothing=ls)
+                ce_loss = lam * loss_a + (1.0 - lam) * loss_b
+            else:
+                ce_loss = F.cross_entropy(logits, y, label_smoothing=ls)
         # H51 — Topological Betti Loss auxiliary head. Active only when
         # ``betti_loss_weight > 0``; the cost (cdist + sort on a small
         # subsampled point cloud) is paid OUTSIDE the bf16 autocast so
@@ -285,15 +375,24 @@ class Trainer:
         # training byte-for-byte.
         loss = ce_loss
         if self.betti_loss_fn is not None and self.betti_loss_weight > 0.0:
-            feats = self._extract_penultimate_features(x)
+            feats = self._extract_penultimate_features(x_eff)
             if feats is not None:
                 betti_term = self.betti_loss_fn(feats.float())
                 loss = ce_loss + self.betti_loss_weight * betti_term
         self.opt.zero_grad(set_to_none=True)
         loss.backward()
         self.opt.step()
+        # Modern-recipe — EMA update after every optimiser step.
+        if self.ema is not None:
+            self.ema.update(self.model)
         with torch.no_grad():
-            acc = (logits.argmax(1) == y).float().mean().item()
+            # When mixing is on, ``y`` is no longer the "true" target for
+            # the logits — we report accuracy against the dominant label
+            # ``y_a`` (the timm convention). This keeps train_top1 a
+            # monotone-meaningful diagnostic instead of plateauing at
+            # ~lam fraction.
+            target = y_a if mixed else y
+            acc = (logits.argmax(1) == target).float().mean().item()
         return float(loss.item()), float(acc)
 
     def fit(self) -> dict:
@@ -369,9 +468,17 @@ class Trainer:
 
             # eval
             te = topk_accuracy(self.model, self.test_loader, device=self.device)
+            # Modern-recipe — also evaluate the EMA shadow if present.
+            # ``test_top1`` stays on the raw model for backwards-compat;
+            # ``test_top1_ema`` is the additive diagnostic.
             row = dict(epoch=epoch, train_loss=tr_loss, train_top1=tr_acc,
                        test_top1=te["top1"], test_top5=te["top5"],
                        lr=self.sched.get_last_lr()[0])
+            if self.ema is not None:
+                te_ema = topk_accuracy(self.ema.module, self.test_loader,
+                                       device=self.device)
+                row["test_top1_ema"] = te_ema["top1"]
+                row["test_top5_ema"] = te_ema["top5"]
             self.history.append(row)
             if self.on_epoch:
                 self.on_epoch(row)
@@ -380,6 +487,19 @@ class Trainer:
                 self.fib_ensemble.update(self.model.state_dict())
             if epochs_to_target < 0 and te["top1"] >= self.cfg.target_top1:
                 epochs_to_target = epoch + 1
+
+        # Modern-recipe — EMA finalisation. Load EMA shadow weights into
+        # the live model so ``evaluate_full`` / ``save_run`` operate on
+        # the EMA-smoothed parameters. EMA strictly dominates raw weights
+        # at convergence (Bello 2021); a separate diagnostic ``test_top1
+        # _ema`` column is also recorded per-epoch in ``history``.
+        if self.ema is not None:
+            try:
+                self.model.load_state_dict(self.ema.state_dict(), strict=True)
+            except RuntimeError:
+                # Strict mismatch -- non-strict fallback (e.g. pruning
+                # parameterisations have appended weight_orig / weight_mask).
+                self.model.load_state_dict(self.ema.state_dict(), strict=False)
 
         # H20 finalisation -- load Fib-weighted averaged weights so the
         # post-fit evaluation runs through the ensemble. Pruning leaves

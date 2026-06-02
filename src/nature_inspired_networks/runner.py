@@ -249,6 +249,10 @@ def run_one(cfg: dict, tag: str, seed: int, root: str = "experiments") -> Path:
         ds_name, root=cfg.get("data_root", "./data"),
         batch_size=cfg.get("batch_size", 256),
         num_workers=cfg.get("num_workers", 4),
+        # Modern-recipe DataLoader knobs (default 0 -> legacy pipeline).
+        randaugment_n=int(cfg.get("randaugment_n", 0)),
+        randaugment_m=int(cfg.get("randaugment_m", 14)),
+        random_erasing_p=float(cfg.get("random_erasing_p", 0.0)),
     )
 
     model_name = cfg["model"]
@@ -293,6 +297,7 @@ def run_one(cfg: dict, tag: str, seed: int, root: str = "experiments") -> Path:
         lr=cfg.get("lr", 1e-3),
         weight_decay=cfg.get("weight_decay", 5e-4),
         label_smoothing=cfg.get("label_smoothing", 0.1),
+        warmup_epochs=int(cfg.get("warmup_epochs", 0)),
         target_top1=cfg.get("target_top1", 0.85),
         use_bf16=cfg.get("use_bf16", True),
         scheduler=cfg.get("scheduler", "cosine"),       # H10
@@ -316,6 +321,15 @@ def run_one(cfg: dict, tag: str, seed: int, root: str = "experiments") -> Path:
         betti_loss_weight=float(cfg.get("betti_loss_weight", 0.0)),
         betti_persistence_threshold=float(cfg.get("betti_persistence_threshold", 0.1)),
         betti_max_pts=int(cfg.get("betti_max_pts", 64)),
+        # Modern-recipe knobs — Mixup, CutMix, EMA. Default 0 preserves
+        # legacy training byte-for-byte. See train.Trainer._step / fit
+        # for the wiring points; RandAugment + RandomErasing live on the
+        # DataLoader pipeline (load_dataset above) and are not part of
+        # TrainConfig.
+        mixup_alpha=float(cfg.get("mixup_alpha", 0.0)),
+        cutmix_alpha=float(cfg.get("cutmix_alpha", 0.0)),
+        mixup_cutmix_prob=float(cfg.get("mixup_cutmix_prob", 0.5)),
+        ema_decay=float(cfg.get("ema_decay", 0.0)),
     )
     tr = Trainer(model, tr_loader, te_loader, n_cls, train_cfg, device=device)
     fit_info = tr.fit()

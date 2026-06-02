@@ -742,6 +742,9 @@ deep-read** (closing the two NICE-TO-HAVE gaps deferred in
 - [`autoresearch-shuffle-test`](skills/autoresearch-shuffle-test/) — semantic leakage detection by permuting `y_train`, refitting, and asserting the validation metric collapses to the chance baseline; three modes (hard / within-group / block) covering tabular, grouped, and time-series CV. Catches the bug class the structural data-split audit cannot see (target-encoded features, label-conditional augmentation, off-by-one alignment). Ported from `autoresearch` (FX) §3.5 shuffle audit where a +8.78-Sharpe alignment bug had a green structural audit for three weeks before this test caught it.
 - [`autoresearch-data-contract-validator`](skills/autoresearch-data-contract-validator/) — `(x, y)` pairing contract validator: asserts feature shape / dtype / label-set / value-range / pair-count / index-pair invariant match between training and evaluator loaders. Static counterpart to the shuffle test — catches the off-by-one alignment in < 1 second instead of after a full retrain. Refuse-to-launch at runner pre-flight, no `--skip-contract` flag. Ported from the same FX §3.5 retrospective.
 
-*Last updated: 2026-05-30. Rules 1–38 are normative invariants. CLAUDE.md
+**Added 2026-06-01 to address PhD-critique items B + 2 (convergence-regime re-test of winners):**
+- `autoresearch-convergence-regime-recipe` — laptop-realistic modern 11-trick CIFAR recipe (AdamW + cosine + linear warmup + WD + label-smoothing + stochastic depth + Mixup α=0.2 + CutMix α=1.0 50/50 alternation + RandAugment N=2 M=14 + Random Erasing p=0.25 + EMA decay 0.9999) wired in `src/nature_inspired_networks/{mixup,cutmix,random_erasing,randaugment,ema}.py`, configs in `configs/cifar100_modern_{smoke,200ep}.yaml`, Wave-A/B/C/D sweep matrix and decision tree in `convergence/PLAN.md` (~42 GPU h total on a 4090 Laptop, 3 overnight sessions).
+
+*Last updated: 2026-06-01. Rules 1–38 are normative invariants. CLAUDE.md
 is self-contained: no parent-repo dependency required to implement the
-protocol. The 29 skills in `skills/` are content-agnostic.*
+protocol. The 30 skills in `skills/` are content-agnostic.*
