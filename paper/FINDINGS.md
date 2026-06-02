@@ -96,6 +96,46 @@
 > [`paper/STATISTICAL_TESTS.md`](STATISTICAL_TESTS.md) §12.
 > Splice in PAPER.md: §5.5 "Phase-9e Wave-1 honest results" paragraph.
 
+> ### 🧪 2026-06-01 evening PROMOTION — Phase-9g Controls 1–4 complete (the GPU pipeline closes here)
+>
+> The four reviewer-flagged controls in [`controls/PLAN.md`](../controls/PLAN.md)
+> executed under [`scripts/run_control_sweeps.py`](../scripts/run_control_sweeps.py)
+> on 2026-06-01 (07:29 → 17:02, ~9.5 GPU-h). 31 cells landed; 2 sub-
+> controls (Control 3a's 3-seed final and Control 3b's RegNetX-200MF
+> comparator) were refused by the launch allowlist and are filed as
+> Phase-9h work. **Results reported honestly regardless of direction:**
+>
+> | control | tag(s) | n | mean | Δ vs reference | honest verdict |
+> |---|---|---:|---:|---:|:---|
+> | C1 non-φ 3-axis | `pair_nonphi_3axis` | 3 | 0.5718 | **−0.68 pp** vs `pair_gm_pdw` n=7 (0.5786); +0.61 pp paired with 2/3 positive, p_one=0.25 | **φ-specific story partially refuted** — 3-axis structure carries ~61 % of the lift; φ residual not statistically certified at n=3 |
+> | C2 non-sine activation | `slot_act_tanh` | 3 | **0.5830** | **+0.40 pp UNPAIRED, +0.48 pp PAIRED 3/3 positive** vs `slot_act_sine` n=7 (0.5790) | **SIREN-specific story REFUTED** — tanh beats sine; cert is generic activation engineering, not Sitzmann-style SIREN |
+> | C2 alternatives | `slot_act_softplus / gelu / swish` | 3 ea | 0.5756 / 0.5738 / 0.5739 | −0.34 / −0.52 / −0.51 pp vs sine | sine outperforms 3 of 4 alternatives — but the one that beats it (tanh) is decisive |
+> | C3a tuned baseline | `baseline_resnet20_tuned_lr0.01_wd0.0005` | **1** | **0.5984** | **+1.94 to +2.48 pp vs all three winners' default-config n=7 means; +3.72 pp vs default baseline** | **PROVISIONAL: tuned vanilla ResNet-20 BEATS all three priors' default-config means at n=1.** 3-seed extension is the binding Phase-9h diagnostic. |
+> | C3 (refused) | 3a_final 3-seed + 3b RegNetX-200MF | 0 | — | — | refused by launch allowlist `{'3a_hillclimb'}`; filed Phase-9h |
+> | C4 H71 IcosaRoPE3D | `h71_icosa_rope3d_vit_tiny_rotcifar10` | 3 | 0.6525 | **+0.18 pp** vs `vit_tiny_1d_rope_rotcifar10` (n=**1**) | **INCONCLUSIVE** — small positive trend, comparator at n=1, n=3 σ band of IcosaRoPE3D contains the 1D-RoPE point |
+>
+> **The single most important Phase-9g finding** is Control 3a's tuned-
+> baseline numerical superiority at n=1. Combined with Phase-9f's
+> iso-tuned n=7 Δ-shrinkage (above), the two converge on a single
+> picture: **the certified default-config Δ is real at the default
+> slice but does NOT robustly transfer to any properly-tuned baseline
+> regime tested so far.** The default-config n=7 cert REMAINS VALID
+> as a formal statistical statement (matched-config baseline at lr=1e-3
+> wd=5e-4 bs=256 AdamW), but its *interpretation* tilts increasingly
+> toward "tuning artifact" rather than "robust architectural signal"
+> as Phase-9f + Phase-9g evidence accumulates.
+>
+> **Closure status:** the GPU pipeline closes here (Phase-9a/b/c/d/e/f/g
+> all complete); a 3-seed re-run of `baseline_resnet20_tuned_lr0.01_wd
+> 0.0005` is the cheapest single experiment that resolves the C3a
+> n=1-vs-n=7 asymmetry and is filed as Phase-9h headline. The pipeline-
+> close marker is [`audits/PIPELINE_COMPLETE_2026-06-01.md`](../audits/PIPELINE_COMPLETE_2026-06-01.md).
+>
+> Full Phase-9g closeout table + per-control paired Wilcoxon p-values
+> + cell-inventory provenance:
+> [`paper/STATISTICAL_TESTS.md`](STATISTICAL_TESTS.md) §13.
+> Splice in PAPER.md: §5.5.6 "Phase-9g Controls 1–4 honest results" paragraph.
+
 > ## ⛰️ 2026-05-30 PM — Hill-climbed-best regime confirms the n=7 default-config certification (Phase-9a, BLOCKER #13 partial refutation)
 >
 > Phase-9a ran a per-hypothesis coordinate hill-climb (cube:
