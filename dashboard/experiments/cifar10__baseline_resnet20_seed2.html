@@ -227,79 +227,106 @@
 </div>
 <div class='kn-strip' style='--i:1'><div class='kn-tile tint-neg'><div class='kn-val'>83.46%</div><div class='kn-lbl'>top-1</div></div><div class='kn-tile tint-neu'><div class='kn-val'>0.8331</div><div class='kn-lbl'>composite</div></div><div class='kn-tile tint-neg'><div class='kn-val'>−1.32pp</div><div class='kn-lbl'>Δ vs baseline (n=3, screening)</div></div><div class='kn-tile tint-neu'><div class='kn-val'>0.272M</div><div class='kn-lbl'>params</div></div><div class='kn-tile tint-neu'><div class='kn-val'>3.94ms</div><div class='kn-lbl'>latency b=1</div></div></div>
 <section class='card' style='--i:2'><h2>Hypothesis</h2><p class='empty'>No matching hypothesis document — this row is a baseline reference run.</p></section>
-<section class='card' style='--i:3'><h2>Verdict <span class='mono' style='font-size:0.55em;letter-spacing:0.18em;color:var(--paper-dim);font-style:normal'>FINDINGS.md</span></h2><div class='quote md-body'><h2>🏆 2026-05-29 PM PROMOTION — Phase-8 winners → EVALUATION tier (CERTIFIED at α=0.05 Holm-Bonferroni, n=7)</h2>
-<p>The Phase-8 family was extended from n=3 to <strong>n=7 seeds</strong> on CIFAR-100
-30-ep. All three winners produced 7/7 positive paired deltas against
-baseline, yielding paired Wilcoxon W=0 with exact one-sided p=(1/2)^7
-= <strong>0.0078</strong> — below the Holm-Bonferroni-corrected per-test α&rsquo;=0.05/3
-= 0.0167 demanded for the k=3 simultaneous-test family. <strong>All three
-winners CLEAR α=0.05 under Holm-Bonferroni step-down.</strong></p>
+<section class='card' style='--i:3'><h2>Verdict <span class='mono' style='font-size:0.55em;letter-spacing:0.18em;color:var(--paper-dim);font-style:normal'>FINDINGS.md</span></h2><div class='quote md-body'><h2>🔬 2026-06-01 LATE EVENING — Phase-9h TUNED-BASELINE BINDING — protocol catches its own headline drift; priors honestly demoted to screened candidates</h2>
+<p>Phase-9h closed the binding diagnostic for Control 3a: a <strong>3-seed
+re-run of <code>baseline_resnet20_tuned_lr0.01_wd0.0005</code></strong> at CIFAR-100
+30 ep (AdamW, bs=256, the hill-climb-best tuned-baseline cell from
+Phase-9g §13.3). The result is the most consequential honest finding
+of the entire campaign.</p>
 <table>
 <thead>
 <tr>
-<th>tag</th>
-<th style="text-align: right;">C100 mean (n=7)</th>
-<th style="text-align: right;">Δmean</th>
-<th style="text-align: right;">95% bootstrap CI</th>
-<th style="text-align: right;">Wilcoxon p</th>
-<th style="text-align: center;">Holm cleared?</th>
+<th style="text-align: right;">seed</th>
+<th style="text-align: right;">top1</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><code>pair_gm_pdw</code> (H09+H48+H44)</td>
-<td style="text-align: right;"><strong>0.5786</strong></td>
-<td style="text-align: right;"><strong>+1.74 pp</strong></td>
-<td style="text-align: right;">[+1.42, +2.09] pp</td>
-<td style="text-align: right;">0.0078</td>
-<td style="text-align: center;"><strong>YES</strong></td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0.5984</td>
 </tr>
 <tr>
-<td><code>slot_act_sine</code> (H81 SIREN)</td>
-<td style="text-align: right;"><strong>0.5790</strong></td>
-<td style="text-align: right;"><strong>+1.78 pp</strong></td>
-<td style="text-align: right;">[+1.38, +2.18] pp</td>
-<td style="text-align: right;">0.0078</td>
-<td style="text-align: center;"><strong>YES</strong></td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.6046</td>
 </tr>
 <tr>
-<td><code>sg_only_phi_budget</code> (H09 post-fix)</td>
-<td style="text-align: right;"><strong>0.5736</strong></td>
-<td style="text-align: right;"><strong>+1.24 pp</strong></td>
-<td style="text-align: right;">[+0.84, +1.67] pp</td>
-<td style="text-align: right;">0.0078</td>
-<td style="text-align: center;"><strong>YES</strong></td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">0.6020</td>
 </tr>
 <tr>
-<td><code>baseline_resnet20</code> (rail, n=7)</td>
-<td style="text-align: right;">0.5612</td>
-<td style="text-align: right;">—</td>
-<td style="text-align: right;">—</td>
-<td style="text-align: right;">—</td>
-<td style="text-align: center;">—</td>
+<td style="text-align: right;"><strong>mean</strong></td>
+<td style="text-align: right;"><strong>0.6017</strong></td>
+</tr>
+<tr>
+<td style="text-align: right;">median</td>
+<td style="text-align: right;">0.6020</td>
+</tr>
+<tr>
+<td style="text-align: right;">std (pp, ddof=1)</td>
+<td style="text-align: right;">0.31</td>
 </tr>
 </tbody>
 </table>
-<p>Per CLAUDE.md <a href="https://github.com/dlmastery/nature_inspired_networks/blob/main/CLAUDE.md#rule-28">Rule 28</a>, the three winners are
-<strong>PROMOTED from SCREENING to EVALUATION tier</strong> on 2026-05-29 PM. These
-are the project&rsquo;s <strong>first formally-certified empirical claims at
-NeurIPS-standard α=0.05</strong>.</p>
-<p><strong>Honest caveat (preserved):</strong> 12-ep CIFAR-10 and 30-ep CIFAR-100 are
-still NOT the convergence regime. The certification holds AT THIS
-COMPUTE BUDGET. Whether the lift survives at the literature-canonical
-164-ep training + tuned RegNetX-200MF baseline (Phase-9a hill-climb)
-is open. The case-study framing of PAPER.md §5.5 is unchanged: the
-protocol&rsquo;s screen + n=7 evaluation surfaced three candidates that
-pass formal rigor at the screening budget; the φ-content vs
-any-three-orthogonal-axes attribution question remains.</p>
-<p>Full per-claim certification table + Holm step-down derivation:
-<a href="STATISTICAL_TESTS.md"><code>paper/STATISTICAL_TESTS.md</code></a> §0–§3.</p>
-<h3>🔬 2026-06-01 update — Phase-9f n=7 iso-tuned extension complete (cert STANDS at default-config; iso-tuned regime NOT re-certified)</h3>
-<p>Phase-9f n=7 iso-tuned extension complete. The iso-tuned cell
-(lr=3e-3, wd=5e-4, bs=128, AdamW; <code>slot_act_sine</code> at wd=2e-3) was
-extended to n=7 seeds on both the baseline and the three leaders.
-<strong>Iso-tuned-cell Δ shrinks to +0.54 to +0.79 pp</strong> (Δmean_unpaired
-vs default-config Δmean +1.24 to +1.78 pp). Paired Wi</p></div><p style='margin-top:14px'><a href='https://github.com/dlmastery/nature_inspired_networks/blob/main/paper/FINDINGS.md'>↗ Full FINDINGS.md on GitHub</a></p></section>
+<p><strong>Tuned-baseline n=3 vs winners&rsquo; default-config n=7 (unpaired
+Mann–Whitney U + 20 000-iter bootstrap, rng=20260601):</strong></p>
+<table>
+<thead>
+<tr>
+<th>comparison</th>
+<th style="text-align: right;">Δmean</th>
+<th>95 % unpaired bootstrap CI</th>
+<th style="text-align: right;">Mann–Whitney U</th>
+<th style="text-align: right;">p_two</th>
+<th style="text-align: right;">p_one (tuned &gt; leader)</th>
+<th style="text-align: center;">min(tuned) &gt; max(leader)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>tuned (n=3, 0.6017) − <code>pair_gm_pdw</code> (n=7, 0.5786)</td>
+<td style="text-align: right;"><strong>+2.30 pp</strong></td>
+<td>[+1.99, +2.60] pp</td>
+<td style="text-align: right;">21.0</td>
+<td style="text-align: right;"><strong>0.0167</strong></td>
+<td style="text-align: right;"><strong>0.0083</strong></td>
+<td style="text-align: center;"><strong>YES</strong></td>
+</tr>
+<tr>
+<td>tuned (n=3, 0.6017) − <code>slot_act_sine</code> (n=7, 0.5790)</td>
+<td style="text-align: right;"><strong>+2.27 pp</strong></td>
+<td>[+1.90, +2.64] pp</td>
+<td style="text-align: right;">21.0</td>
+<td style="text-align: right;"><strong>0.0222</strong></td>
+<td style="text-align: right;"><strong>0.0111</strong></td>
+<td style="text-align: center;"><strong>YES</strong></td>
+</tr>
+<tr>
+<td>tuned (n=3, 0.6017) − <code>sg_only_phi_budget</code> (n=7, 0.5736)</td>
+<td style="text-align: right;"><strong>+2.81 pp</strong></td>
+<td>[+2.42, +3.19] pp</td>
+<td style="text-align: right;">21.0</td>
+<td style="text-align: right;"><strong>0.0167</strong></td>
+<td style="text-align: right;"><strong>0.0083</strong></td>
+<td style="text-align: center;"><strong>YES</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Honest reading.</strong> The default-config n=7 cert (banner below) STILL
+STANDS as a <strong>matched-recipe vs matched-recipe</strong> formal claim: at the
+SAME lr=1e-3, wd=5e-4, bs=256, AdamW recipe, the three priors DO
+clear paired Wilcoxon p=0.0078 under Holm-Bonferroni α&rsquo;=0.0167. <strong>But
+at iso-tuned conditions where the baseline gets the same LR-tuning
+love (lr=0.01) that the leaders&rsquo; hill-climbs gave their priors, the
+tuned vanilla baseline OUTPERFORMS all 3 priors by ~+2.3 pp.</strong> All
+three Mann–Whitney one-sided comparisons clear α=0.05; bootstrap CI
+lower bounds exceed +1.9 pp; min(tuned) strictly exceeds max(leader)
+for all three winners — no rank overlap.</p>
+<p><strong>Narrative shift.</strong> The HEADLINE CLAIM of the paper now reads:</p>
+<p>&ldquo;The dual-track audit + Fixer protocol correctly caught H09&rsquo;s
+realised-ratio drift (the load-bearing existence proof). The 3
+default-config-certified priors do NOT robustly outperform a
+properly-LR-tuned baseline; the priors&rsquo; lift is partially
+LR-tuning artifact. The protocol&rsquo;s value is the meta-resea</p></div><p style='margin-top:14px'><a href='https://github.com/dlmastery/nature_inspired_networks/blob/main/paper/FINDINGS.md'>↗ Full FINDINGS.md on GitHub</a></p></section>
 <section class='card' style='--i:4'><h2>Composite-score breakdown</h2><div class='comp-stack'><div class='seg pos' style='width:93.50%' title='top-1 = 0.83460'>top-1 +0.8346</div><div class='seg params' style='width:3.16%' title='-0.05·log10(params_M)'>params +0.02823</div><div class='seg lat' style='width:3.33%' title='-0.05·log10(latency_ms)'>lat −0.02975</div></div><div style='display:flex;justify-content:space-between;font-family:IBM Plex Mono,monospace;font-size:11px;color:var(--paper-dim);margin-top:6px'><span>Σ recomputed: <b style='color:var(--paper)'>0.83308</b></span><span>reported: <b style='color:var(--paper)'>0.83308</b> &nbsp;·&nbsp; Δ +0.000000</span></div><div class='formula-chip' style='margin-top:14px'>composite ≔ <code>top1 - 0.05*log10(params_M) - 0.05*log10(latency_ms)</code></div></section>
 <section class='card' style='--i:5'><h2>Per-epoch training curves</h2><div class='charts'><div><svg viewBox='0 0 460 320' preserveAspectRatio='xMinYMin meet' width='100%' height='auto' xmlns='http://www.w3.org/2000/svg' style='background:#0a0a0d;border:1px solid #1c1c20;display:block;font-family:"IBM Plex Mono",monospace'><text x='46' y='18' fill='#e6e1d6' font-size='14' font-family='Source Serif 4,Georgia,serif' font-weight='600'>Loss</text><line x1='46' y1='292.0' x2='446' y2='292.0' stroke='#1c1c20' stroke-width='1'/><text x='40' y='295.0' fill='#a89e8c' font-size='9' text-anchor='end'>0.799</text><line x1='46' y1='226.5' x2='446' y2='226.5' stroke='#1c1c20' stroke-width='1'/><text x='40' y='229.5' fill='#a89e8c' font-size='9' text-anchor='end'>1.023</text><line x1='46' y1='161.0' x2='446' y2='161.0' stroke='#1c1c20' stroke-width='1'/><text x='40' y='164.0' fill='#a89e8c' font-size='9' text-anchor='end'>1.247</text><line x1='46' y1='95.5' x2='446' y2='95.5' stroke='#1c1c20' stroke-width='1'/><text x='40' y='98.5' fill='#a89e8c' font-size='9' text-anchor='end'>1.471</text><line x1='46' y1='30.0' x2='446' y2='30.0' stroke='#1c1c20' stroke-width='1'/><text x='40' y='33.0' fill='#a89e8c' font-size='9' text-anchor='end'>1.695</text><text x='46.0' y='310' fill='#a89e8c' font-size='9' text-anchor='middle'>0</text><text x='446.0' y='310' fill='#a89e8c' font-size='9' text-anchor='middle'>11</text><text x='246.0' y='310' fill='#a89e8c' font-size='10' font-family='Source Serif 4,Georgia,serif' text-anchor='middle'>epoch →</text><text x='14' y='161.0' fill='#a89e8c' font-size='10' font-family='Source Serif 4,Georgia,serif' text-anchor='middle' transform='rotate(-90 14 161.0)'>loss →</text><polyline points='46.0,44.0 82.4,139.5 118.7,176.4 155.1,201.2 191.5,219.7 227.8,234.8 264.2,245.4 300.5,255.8 336.9,264.5 373.3,270.4 409.6,275.2 446.0,278.0' fill='none' stroke='#f85149' stroke-width='1.8'/><circle cx='446.0' cy='278.0' r='2.6' fill='#f85149'/><rect x='52' y='35' width='10' height='10' fill='#f85149'/><text x='68' y='44' fill='#e6e1d6' font-size='10' font-family='IBM Plex Mono,monospace'>train loss</text></svg></div><div><svg viewBox='0 0 460 320' preserveAspectRatio='xMinYMin meet' width='100%' height='auto' xmlns='http://www.w3.org/2000/svg' style='background:#0a0a0d;border:1px solid #1c1c20;display:block;font-family:"IBM Plex Mono",monospace'><text x='46' y='18' fill='#e6e1d6' font-size='14' font-family='Source Serif 4,Georgia,serif' font-weight='600'>Accuracy</text><line x1='46' y1='292.0' x2='446' y2='292.0' stroke='#1c1c20' stroke-width='1'/><text x='40' y='295.0' fill='#a89e8c' font-size='9' text-anchor='end'>42.9%</text><line x1='46' y1='226.5' x2='446' y2='226.5' stroke='#1c1c20' stroke-width='1'/><text x='40' y='229.5' fill='#a89e8c' font-size='9' text-anchor='end'>57.8%</text><line x1='46' y1='161.0' x2='446' y2='161.0' stroke='#1c1c20' stroke-width='1'/><text x='40' y='164.0' fill='#a89e8c' font-size='9' text-anchor='end'>72.6%</text><line x1='46' y1='95.5' x2='446' y2='95.5' stroke='#1c1c20' stroke-width='1'/><text x='40' y='98.5' fill='#a89e8c' font-size='9' text-anchor='end'>87.5%</text><line x1='46' y1='30.0' x2='446' y2='30.0' stroke='#1c1c20' stroke-width='1'/><text x='40' y='33.0' fill='#a89e8c' font-size='9' text-anchor='end'>102.3%</text><text x='46.0' y='310' fill='#a89e8c' font-size='9' text-anchor='middle'>0</text><text x='446.0' y='310' fill='#a89e8c' font-size='9' text-anchor='middle'>11</text><text x='246.0' y='310' fill='#a89e8c' font-size='10' font-family='Source Serif 4,Georgia,serif' text-anchor='middle'>epoch →</text><text x='14' y='161.0' fill='#a89e8c' font-size='10' font-family='Source Serif 4,Georgia,serif' text-anchor='middle' transform='rotate(-90 14 161.0)'>accuracy →</text><polyline points='46.0,278.0 82.4,204.0 118.7,176.1 155.1,158.5 191.5,144.4 227.8,135.2 264.2,127.3 300.5,120.4 336.9,114.0 373.3,109.2 409.6,105.9 446.0,103.8' fill='none' stroke='#d29922' stroke-width='1.8'/><circle cx='446.0' cy='103.8' r='2.6' fill='#d29922'/><rect x='52' y='35' width='10' height='10' fill='#d29922'/><text x='68' y='44' fill='#e6e1d6' font-size='10' font-family='IBM Plex Mono,monospace'>train top-1</text><polyline points='46.0,243.1 82.4,217.1 118.7,191.9 155.1,162.7 191.5,170.7 227.8,147.2 264.2,128.2 300.5,127.6 336.9,123.8 373.3,118.6 409.6,113.7 446.0,113.2' fill='none' stroke='#58a6ff' stroke-width='1.8'/><circle cx='446.0' cy='113.2' r='2.6' fill='#58a6ff'/><rect x='52' y='51' width='10' height='10' fill='#58a6ff'/><text x='68' y='60' fill='#e6e1d6' font-size='10' font-family='IBM Plex Mono,monospace'>test top-1</text><polyline points='46.0,64.5 82.4,57.2 118.7,51.5 155.1,49.9 191.5,49.9 227.8,46.6 264.2,45.0 300.5,45.2 336.9,44.5 373.3,44.2 409.6,44.0 446.0,44.1' fill='none' stroke='#3fb950' stroke-width='1.8'/><circle cx='446.0' cy='44.1' r='2.6' fill='#3fb950'/><rect x='52' y='67' width='10' height='10' fill='#3fb950'/><text x='68' y='76' fill='#e6e1d6' font-size='10' font-family='IBM Plex Mono,monospace'>test top-5</text></svg></div></div></section>
 <section class='card' style='--i:6'><h2>Deep inspection</h2><p style='color:var(--paper-dim);font-size:0.9em;margin-bottom:6px'>Audit excerpts, reasoning blob, raw configuration, and full metrics JSON — expand sections of interest.</p><details class='deep'><summary>Reasoning blob (reasoning.json)</summary><div class='body'><p class='empty'>No <code>reasoning.json</code> archived for this run directory &mdash; see the <b>Verdict</b> card above for the FINDINGS-derived verdict and the <b>Implementation-critic audit</b> accordion for the code-level diagnosis.</p></div></details><details class='deep'><summary>Configuration dump</summary><div class='body'><p class='mono' style='color:var(--paper-dim);font-size:0.8em;margin-bottom:8px'>inferred from experiment_log.jsonl + metrics.json</p><pre>{

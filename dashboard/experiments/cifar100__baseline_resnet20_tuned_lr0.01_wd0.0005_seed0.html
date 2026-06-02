@@ -227,79 +227,106 @@
 </div>
 <div class='kn-strip' style='--i:1'><div class='kn-tile tint-pos'><div class='kn-val'>59.84%</div><div class='kn-lbl'>top-1</div></div><div class='kn-tile tint-neu'><div class='kn-val'>0.5952</div><div class='kn-lbl'>composite</div></div><div class='kn-tile tint-pos'><div class='kn-val'>+3.32pp</div><div class='kn-lbl'>Δ vs baseline (n=1, screening)</div></div><div class='kn-tile tint-neu'><div class='kn-val'>0.278M</div><div class='kn-lbl'>params</div></div><div class='kn-tile tint-neu'><div class='kn-val'>4.17ms</div><div class='kn-lbl'>latency b=1</div></div></div>
 <section class='card' style='--i:2'><h2>Hypothesis</h2><p class='empty'>No matching hypothesis document — this row is a baseline reference run.</p></section>
-<section class='card' style='--i:3'><h2>Verdict <span class='mono' style='font-size:0.55em;letter-spacing:0.18em;color:var(--paper-dim);font-style:normal'>FINDINGS.md</span></h2><div class='quote md-body'><h3>🧪 2026-06-01 evening PROMOTION — Phase-9g Controls 1–4 complete (the GPU pipeline closes here)</h3>
-<p>The four reviewer-flagged controls in <a href="../controls/PLAN.md"><code>controls/PLAN.md</code></a>
-executed under <a href="https://github.com/dlmastery/nature_inspired_networks/blob/main/scripts/run_control_sweeps.py"><code>scripts/run_control_sweeps.py</code></a>
-on 2026-06-01 (07:29 → 17:02, ~9.5 GPU-h). 31 cells landed; 2 sub-
-controls (Control 3a&rsquo;s 3-seed final and Control 3b&rsquo;s RegNetX-200MF
-comparator) were refused by the launch allowlist and are filed as
-Phase-9h work. <strong>Results reported honestly regardless of direction:</strong></p>
+<section class='card' style='--i:3'><h2>Verdict <span class='mono' style='font-size:0.55em;letter-spacing:0.18em;color:var(--paper-dim);font-style:normal'>FINDINGS.md</span></h2><div class='quote md-body'><h2>🔬 2026-06-01 LATE EVENING — Phase-9h TUNED-BASELINE BINDING — protocol catches its own headline drift; priors honestly demoted to screened candidates</h2>
+<p>Phase-9h closed the binding diagnostic for Control 3a: a <strong>3-seed
+re-run of <code>baseline_resnet20_tuned_lr0.01_wd0.0005</code></strong> at CIFAR-100
+30 ep (AdamW, bs=256, the hill-climb-best tuned-baseline cell from
+Phase-9g §13.3). The result is the most consequential honest finding
+of the entire campaign.</p>
 <table>
 <thead>
 <tr>
-<th>control</th>
-<th>tag(s)</th>
-<th style="text-align: right;">n</th>
-<th style="text-align: right;">mean</th>
-<th style="text-align: right;">Δ vs reference</th>
-<th style="text-align: left;">honest verdict</th>
+<th style="text-align: right;">seed</th>
+<th style="text-align: right;">top1</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>C1 non-φ 3-axis</td>
-<td><code>pair_nonphi_3axis</code></td>
-<td style="text-align: right;">3</td>
-<td style="text-align: right;">0.5718</td>
-<td style="text-align: right;"><strong>−0.68 pp</strong> vs <code>pair_gm_pdw</code> n=7 (0.5786); +0.61 pp paired with 2/3 positive, p_one=0.25</td>
-<td style="text-align: left;"><strong>φ-specific story partially refuted</strong> — 3-axis structure carries ~61 % of the lift; φ residual not statistically certified at n=3</td>
-</tr>
-<tr>
-<td>C2 non-sine activation</td>
-<td><code>slot_act_tanh</code></td>
-<td style="text-align: right;">3</td>
-<td style="text-align: right;"><strong>0.5830</strong></td>
-<td style="text-align: right;"><strong>+0.40 pp UNPAIRED, +0.48 pp PAIRED 3/3 positive</strong> vs <code>slot_act_sine</code> n=7 (0.5790)</td>
-<td style="text-align: left;"><strong>SIREN-specific story REFUTED</strong> — tanh beats sine; cert is generic activation engineering, not Sitzmann-style SIREN</td>
-</tr>
-<tr>
-<td>C2 alternatives</td>
-<td><code>slot_act_softplus / gelu / swish</code></td>
-<td style="text-align: right;">3 ea</td>
-<td style="text-align: right;">0.5756 / 0.5738 / 0.5739</td>
-<td style="text-align: right;">−0.34 / −0.52 / −0.51 pp vs sine</td>
-<td style="text-align: left;">sine outperforms 3 of 4 alternatives — but the one that beats it (tanh) is decisive</td>
-</tr>
-<tr>
-<td>C3a tuned baseline</td>
-<td><code>baseline_resnet20_tuned_lr0.01_wd0.0005</code></td>
-<td style="text-align: right;"><strong>1</strong></td>
-<td style="text-align: right;"><strong>0.5984</strong></td>
-<td style="text-align: right;"><strong>+1.94 to +2.48 pp vs all three winners&rsquo; default-config n=7 means; +3.72 pp vs default baseline</strong></td>
-<td style="text-align: left;"><strong>PROVISIONAL: tuned vanilla ResNet-20 BEATS all three priors&rsquo; default-config means at n=1.</strong> 3-seed extension is the binding Phase-9h diagnostic.</td>
-</tr>
-<tr>
-<td>C3 (refused)</td>
-<td>3a_final 3-seed + 3b RegNetX-200MF</td>
 <td style="text-align: right;">0</td>
-<td style="text-align: right;">—</td>
-<td style="text-align: right;">—</td>
-<td style="text-align: left;">refused by launch allowlist <code>{'3a_hillclimb'}</code>; filed Phase-9h</td>
+<td style="text-align: right;">0.5984</td>
 </tr>
 <tr>
-<td>C4 H71 IcosaRoPE3D</td>
-<td><code>h71_icosa_rope3d_vit_tiny_rotcifar10</code></td>
-<td style="text-align: right;">3</td>
-<td style="text-align: right;">0.6525</td>
-<td style="text-align: right;"><strong>+0.18 pp</strong> vs <code>vit_tiny_1d_rope_rotcifar10</code> (n=<strong>1</strong>)</td>
-<td style="text-align: left;"><strong>INCONCLUSIVE</strong> — small positive trend, comparator at n=1, n=3 σ band of IcosaRoPE3D contains the 1D-RoPE point</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.6046</td>
+</tr>
+<tr>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">0.6020</td>
+</tr>
+<tr>
+<td style="text-align: right;"><strong>mean</strong></td>
+<td style="text-align: right;"><strong>0.6017</strong></td>
+</tr>
+<tr>
+<td style="text-align: right;">median</td>
+<td style="text-align: right;">0.6020</td>
+</tr>
+<tr>
+<td style="text-align: right;">std (pp, ddof=1)</td>
+<td style="text-align: right;">0.31</td>
 </tr>
 </tbody>
 </table>
-<p><strong>The single most important Phase-9g finding</strong> is Control 3a&rsquo;s tuned-
-baseline numerical superiority at n=1. Combined with Phase-9f&rsquo;s
-iso-tuned n=7 Δ-shrinkage (above), the two converge on a single
-picture: the certified default-config Δ is real at</p></div><p style='margin-top:14px'><a href='https://github.com/dlmastery/nature_inspired_networks/blob/main/paper/FINDINGS.md'>↗ Full FINDINGS.md on GitHub</a></p></section>
+<p><strong>Tuned-baseline n=3 vs winners&rsquo; default-config n=7 (unpaired
+Mann–Whitney U + 20 000-iter bootstrap, rng=20260601):</strong></p>
+<table>
+<thead>
+<tr>
+<th>comparison</th>
+<th style="text-align: right;">Δmean</th>
+<th>95 % unpaired bootstrap CI</th>
+<th style="text-align: right;">Mann–Whitney U</th>
+<th style="text-align: right;">p_two</th>
+<th style="text-align: right;">p_one (tuned &gt; leader)</th>
+<th style="text-align: center;">min(tuned) &gt; max(leader)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>tuned (n=3, 0.6017) − <code>pair_gm_pdw</code> (n=7, 0.5786)</td>
+<td style="text-align: right;"><strong>+2.30 pp</strong></td>
+<td>[+1.99, +2.60] pp</td>
+<td style="text-align: right;">21.0</td>
+<td style="text-align: right;"><strong>0.0167</strong></td>
+<td style="text-align: right;"><strong>0.0083</strong></td>
+<td style="text-align: center;"><strong>YES</strong></td>
+</tr>
+<tr>
+<td>tuned (n=3, 0.6017) − <code>slot_act_sine</code> (n=7, 0.5790)</td>
+<td style="text-align: right;"><strong>+2.27 pp</strong></td>
+<td>[+1.90, +2.64] pp</td>
+<td style="text-align: right;">21.0</td>
+<td style="text-align: right;"><strong>0.0222</strong></td>
+<td style="text-align: right;"><strong>0.0111</strong></td>
+<td style="text-align: center;"><strong>YES</strong></td>
+</tr>
+<tr>
+<td>tuned (n=3, 0.6017) − <code>sg_only_phi_budget</code> (n=7, 0.5736)</td>
+<td style="text-align: right;"><strong>+2.81 pp</strong></td>
+<td>[+2.42, +3.19] pp</td>
+<td style="text-align: right;">21.0</td>
+<td style="text-align: right;"><strong>0.0167</strong></td>
+<td style="text-align: right;"><strong>0.0083</strong></td>
+<td style="text-align: center;"><strong>YES</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Honest reading.</strong> The default-config n=7 cert (banner below) STILL
+STANDS as a <strong>matched-recipe vs matched-recipe</strong> formal claim: at the
+SAME lr=1e-3, wd=5e-4, bs=256, AdamW recipe, the three priors DO
+clear paired Wilcoxon p=0.0078 under Holm-Bonferroni α&rsquo;=0.0167. <strong>But
+at iso-tuned conditions where the baseline gets the same LR-tuning
+love (lr=0.01) that the leaders&rsquo; hill-climbs gave their priors, the
+tuned vanilla baseline OUTPERFORMS all 3 priors by ~+2.3 pp.</strong> All
+three Mann–Whitney one-sided comparisons clear α=0.05; bootstrap CI
+lower bounds exceed +1.9 pp; min(tuned) strictly exceeds max(leader)
+for all three winners — no rank overlap.</p>
+<p><strong>Narrative shift.</strong> The HEADLINE CLAIM of the paper now reads:</p>
+<p>&ldquo;The dual-track audit + Fixer protocol correctly caught H09&rsquo;s
+realised-ratio drift (the load-bearing existence proof). The 3
+default-config-certified priors do NOT robustly outperform a
+properly-LR-tuned baseline; the priors&rsquo; lift is partially
+LR-tuning artifact. The protocol&rsquo;s value is the meta-resea</p></div><p style='margin-top:14px'><a href='https://github.com/dlmastery/nature_inspired_networks/blob/main/paper/FINDINGS.md'>↗ Full FINDINGS.md on GitHub</a></p></section>
 <section class='card' style='--i:4'><h2>Composite-score breakdown</h2><div class='comp-stack'><div class='seg pos' style='width:91.06%' title='top-1 = 0.59840'>top-1 +0.5984</div><div class='seg params' style='width:4.23%' title='-0.05·log10(params_M)'>params +0.02777</div><div class='seg lat' style='width:4.72%' title='-0.05·log10(latency_ms)'>lat −0.03100</div></div><div style='display:flex;justify-content:space-between;font-family:IBM Plex Mono,monospace;font-size:11px;color:var(--paper-dim);margin-top:6px'><span>Σ recomputed: <b style='color:var(--paper)'>0.59517</b></span><span>reported: <b style='color:var(--paper)'>0.59517</b> &nbsp;·&nbsp; Δ +0.000000</span></div><div class='formula-chip' style='margin-top:14px'>composite ≔ <code>top1 - 0.05*log10(params_M) - 0.05*log10(latency_ms)</code></div></section>
 <section class='card' style='--i:5'><h2>Per-epoch training curves</h2><div class='charts'><div><svg viewBox='0 0 460 320' preserveAspectRatio='xMinYMin meet' width='100%' height='auto' xmlns='http://www.w3.org/2000/svg' style='background:#0a0a0d;border:1px solid #1c1c20;display:block;font-family:"IBM Plex Mono",monospace'><text x='46' y='18' fill='#e6e1d6' font-size='14' font-family='Source Serif 4,Georgia,serif' font-weight='600'>Loss</text><line x1='46' y1='292.0' x2='446' y2='292.0' stroke='#1c1c20' stroke-width='1'/><text x='40' y='295.0' fill='#a89e8c' font-size='9' text-anchor='end'>1.655</text><line x1='46' y1='226.5' x2='446' y2='226.5' stroke='#1c1c20' stroke-width='1'/><text x='40' y='229.5' fill='#a89e8c' font-size='9' text-anchor='end'>2.326</text><line x1='46' y1='161.0' x2='446' y2='161.0' stroke='#1c1c20' stroke-width='1'/><text x='40' y='164.0' fill='#a89e8c' font-size='9' text-anchor='end'>2.998</text><line x1='46' y1='95.5' x2='446' y2='95.5' stroke='#1c1c20' stroke-width='1'/><text x='40' y='98.5' fill='#a89e8c' font-size='9' text-anchor='end'>3.670</text><line x1='46' y1='30.0' x2='446' y2='30.0' stroke='#1c1c20' stroke-width='1'/><text x='40' y='33.0' fill='#a89e8c' font-size='9' text-anchor='end'>4.342</text><text x='46.0' y='310' fill='#a89e8c' font-size='9' text-anchor='middle'>0</text><text x='446.0' y='310' fill='#a89e8c' font-size='9' text-anchor='middle'>29</text><text x='246.0' y='310' fill='#a89e8c' font-size='10' font-family='Source Serif 4,Georgia,serif' text-anchor='middle'>epoch →</text><text x='14' y='161.0' fill='#a89e8c' font-size='10' font-family='Source Serif 4,Georgia,serif' text-anchor='middle' transform='rotate(-90 14 161.0)'>loss →</text><polyline points='46.0,44.0 59.8,84.2 73.6,112.5 87.4,136.6 101.2,159.2 115.0,177.8 128.8,192.8 142.6,203.6 156.3,213.2 170.1,220.8 183.9,227.5 197.7,233.3 211.5,238.1 225.3,242.9 239.1,247.1 252.9,251.2 266.7,254.8 280.5,257.6 294.3,260.8 308.1,263.9 321.9,266.1 335.7,268.3 349.4,270.9 363.2,272.4 377.0,273.8 390.8,275.6 404.6,276.5 418.4,277.0 432.2,277.8 446.0,278.0' fill='none' stroke='#f85149' stroke-width='1.8'/><circle cx='446.0' cy='278.0' r='2.6' fill='#f85149'/><rect x='52' y='35' width='10' height='10' fill='#f85149'/><text x='68' y='44' fill='#e6e1d6' font-size='10' font-family='IBM Plex Mono,monospace'>train loss</text></svg></div><div><svg viewBox='0 0 460 320' preserveAspectRatio='xMinYMin meet' width='100%' height='auto' xmlns='http://www.w3.org/2000/svg' style='background:#0a0a0d;border:1px solid #1c1c20;display:block;font-family:"IBM Plex Mono",monospace'><text x='46' y='18' fill='#e6e1d6' font-size='14' font-family='Source Serif 4,Georgia,serif' font-weight='600'>Accuracy</text><line x1='46' y1='292.0' x2='446' y2='292.0' stroke='#1c1c20' stroke-width='1'/><text x='40' y='295.0' fill='#a89e8c' font-size='9' text-anchor='end'>1.9%</text><line x1='46' y1='226.5' x2='446' y2='226.5' stroke='#1c1c20' stroke-width='1'/><text x='40' y='229.5' fill='#a89e8c' font-size='9' text-anchor='end'>24.2%</text><line x1='46' y1='161.0' x2='446' y2='161.0' stroke='#1c1c20' stroke-width='1'/><text x='40' y='164.0' fill='#a89e8c' font-size='9' text-anchor='end'>46.6%</text><line x1='46' y1='95.5' x2='446' y2='95.5' stroke='#1c1c20' stroke-width='1'/><text x='40' y='98.5' fill='#a89e8c' font-size='9' text-anchor='end'>68.9%</text><line x1='46' y1='30.0' x2='446' y2='30.0' stroke='#1c1c20' stroke-width='1'/><text x='40' y='33.0' fill='#a89e8c' font-size='9' text-anchor='end'>91.3%</text><text x='46.0' y='310' fill='#a89e8c' font-size='9' text-anchor='middle'>0</text><text x='446.0' y='310' fill='#a89e8c' font-size='9' text-anchor='middle'>29</text><text x='246.0' y='310' fill='#a89e8c' font-size='10' font-family='Source Serif 4,Georgia,serif' text-anchor='middle'>epoch →</text><text x='14' y='161.0' fill='#a89e8c' font-size='10' font-family='Source Serif 4,Georgia,serif' text-anchor='middle' transform='rotate(-90 14 161.0)'>accuracy →</text><polyline points='46.0,278.0 59.8,255.2 73.6,236.3 87.4,218.2 101.2,201.2 115.0,186.0 128.8,174.1 142.6,164.6 156.3,156.3 170.1,149.4 183.9,143.1 197.7,137.4 211.5,132.9 225.3,128.7 239.1,124.5 252.9,119.9 266.7,117.4 280.5,113.9 294.3,110.4 308.1,107.4 321.9,105.1 335.7,102.3 349.4,100.6 363.2,98.2 377.0,96.8 390.8,94.9 404.6,93.8 418.4,93.2 432.2,92.4 446.0,92.5' fill='none' stroke='#d29922' stroke-width='1.8'/><circle cx='446.0' cy='92.5' r='2.6' fill='#d29922'/><rect x='52' y='35' width='10' height='10' fill='#d29922'/><text x='68' y='44' fill='#e6e1d6' font-size='10' font-family='IBM Plex Mono,monospace'>train top-1</text><polyline points='46.0,266.2 59.8,247.3 73.6,231.1 87.4,218.8 101.2,204.7 115.0,184.1 128.8,185.6 142.6,169.9 156.3,160.0 170.1,159.5 183.9,153.5 197.7,153.2 211.5,146.2 225.3,141.3 239.1,143.3 252.9,139.9 266.7,136.4 280.5,132.6 294.3,130.2 308.1,131.2 321.9,129.9 335.7,125.4 349.4,125.7 363.2,123.8 377.0,125.0 390.8,123.4 404.6,122.1 418.4,122.3 432.2,122.0 446.0,122.1' fill='none' stroke='#58a6ff' stroke-width='1.8'/><circle cx='446.0' cy='122.1' r='2.6' fill='#58a6ff'/><rect x='52' y='51' width='10' height='10' fill='#58a6ff'/><text x='68' y='60' fill='#e6e1d6' font-size='10' font-family='IBM Plex Mono,monospace'>test top-1</text><polyline points='46.0,202.1 59.8,172.9 73.6,146.3 87.4,125.6 101.2,111.3 115.0,90.7 128.8,90.3 142.6,75.6 156.3,71.0 170.1,68.1 183.9,64.3 197.7,65.1 211.5,58.3 225.3,56.2 239.1,55.7 252.9,54.3 266.7,53.5 280.5,51.3 294.3,49.7 308.1,48.6 321.9,47.6 335.7,46.5 349.4,46.6 363.2,45.9 377.0,45.8 390.8,44.8 404.6,44.0 418.4,44.1 432.2,44.2 446.0,44.4' fill='none' stroke='#3fb950' stroke-width='1.8'/><circle cx='446.0' cy='44.4' r='2.6' fill='#3fb950'/><rect x='52' y='67' width='10' height='10' fill='#3fb950'/><text x='68' y='76' fill='#e6e1d6' font-size='10' font-family='IBM Plex Mono,monospace'>test top-5</text></svg></div></div></section>
 <section class='card' style='--i:6'><h2>Deep inspection</h2><p style='color:var(--paper-dim);font-size:0.9em;margin-bottom:6px'>Audit excerpts, reasoning blob, raw configuration, and full metrics JSON — expand sections of interest.</p><details class='deep'><summary>Reasoning blob (reasoning.json)</summary><div class='body'><p class='empty'>No <code>reasoning.json</code> archived for this run directory &mdash; see the <b>Verdict</b> card above for the FINDINGS-derived verdict and the <b>Implementation-critic audit</b> accordion for the code-level diagnosis.</p></div></details><details class='deep'><summary>Configuration dump</summary><div class='body'><p class='mono' style='color:var(--paper-dim);font-size:0.8em;margin-bottom:8px'>inferred from experiment_log.jsonl + metrics.json</p><pre>{
