@@ -1194,6 +1194,108 @@ def section_13_phase9g_controls() -> str:
     return "".join(out)
 
 
+def section_14_phase9h_tuned_baseline() -> str:
+    """Section 14 — Phase-9h tuned-baseline n=3 binding diagnostic (added 2026-06-01 late evening).
+
+    Compares the tuned-baseline n=3 (lr=0.01 wd=5e-4 bs=256 AdamW)
+    against each of the three Phase-8 winners' default-config n=7
+    means. The comparison is necessarily unpaired (different recipes,
+    different sample sizes) so the principled non-parametric tests are
+    Mann-Whitney U + a 20 000-iteration unpaired bootstrap on Δmean.
+
+    The tuned-baseline n=3 mean (0.6017) BEATS all three winners'
+    default-config n=7 means by +2.27 to +2.81 pp, with all comparisons
+    clearing one-sided Mann-Whitney U at α=0.05. The honest reading
+    is that the priors do NOT robustly survive a properly-LR-tuned
+    baseline at NeurIPS-α; R2 BLOCKER #13 is substantively validated.
+    """
+    import json
+    import os
+    import statistics
+
+    def load_top1(path: str):
+        if not os.path.exists(path):
+            return None
+        with open(path) as fh:
+            return json.load(fh).get("top1")
+
+    # Tuned baseline n=3 — seed0 lives at the explicit-tag path; seeds 1/2
+    # live under the hc_lr1em2_wd5em4_bs256_optAdamW tag.
+    tuned_seeds = [
+        load_top1("experiments/cifar100/baseline_resnet20_tuned_lr0.01_wd0.0005_seed0/metrics.json"),
+        load_top1("experiments/cifar100/baseline_resnet20__hc_lr1em2_wd5em4_bs256_optAdamW_seed1/metrics.json"),
+        load_top1("experiments/cifar100/baseline_resnet20__hc_lr1em2_wd5em4_bs256_optAdamW_seed2/metrics.json"),
+    ]
+    tuned_seeds = [v for v in tuned_seeds if v is not None]
+
+    pair_full = [0.5786, 0.5789, 0.5761, 0.5814, 0.5798, 0.5787, 0.5770]
+    sine_full = [0.5796, 0.5784, 0.5766, 0.5828, 0.5828, 0.5803, 0.5725]
+    phib_full = [0.5741, 0.5775, 0.5687, 0.5785, 0.5745, 0.5686, 0.5733]
+
+    tuned_mean = statistics.mean(tuned_seeds)
+    tuned_std_pp = (statistics.stdev(tuned_seeds) if len(tuned_seeds) > 1 else 0.0) * 100.0
+    rng = np.random.default_rng(20260601)
+
+    def unpaired_bootstrap_ci(a: list[float], b: list[float], n_boot: int = 20000) -> tuple[float, float, float]:
+        a_arr = np.asarray(a, dtype=float)
+        b_arr = np.asarray(b, dtype=float)
+        obs = a_arr.mean() - b_arr.mean()
+        diffs = np.empty(n_boot, dtype=float)
+        for i in range(n_boot):
+            ra = rng.choice(a_arr, size=a_arr.size, replace=True)
+            rb = rng.choice(b_arr, size=b_arr.size, replace=True)
+            diffs[i] = ra.mean() - rb.mean()
+        return obs, float(np.quantile(diffs, 0.025)), float(np.quantile(diffs, 0.975))
+
+    def mw(a: list[float], b: list[float]) -> tuple[float, float, float]:
+        u_two = sps.mannwhitneyu(a, b, alternative="two-sided")
+        u_g = sps.mannwhitneyu(a, b, alternative="greater")
+        return float(u_two.statistic), float(u_two.pvalue), float(u_g.pvalue)
+
+    out: list[str] = [
+        "## Section 14 — Phase-9h tuned-baseline n=3 binding diagnostic (added 2026-06-01 late evening)\n\n",
+        "Code-backed parallel to the prose splice in paper/STATISTICAL_TESTS.md §14.\n\n",
+        f"### 14.0 — Tuned baseline n={len(tuned_seeds)} cell\n\n",
+        f"lr=0.01 wd=5e-4 bs=256 AdamW, CIFAR-100 30 ep. Per-seed top1: {tuned_seeds}.\n",
+        f"mean = {tuned_mean:.4f}, std (ddof=1, pp) = {tuned_std_pp:.3f}.\n\n",
+        "### 14.1 — Tuned-baseline (n=3) vs each winner default-config (n=7)\n\n",
+        "| comparison | Δmean (tuned − leader) | 95 % unpaired-bootstrap CI | Mann–Whitney U | p_two | p_one (tuned > leader) | min(tuned) > max(leader) |\n",
+        "|---|---:|---|---:|---:|---:|:---:|\n",
+    ]
+    for name, leader in [
+        ("pair_gm_pdw", pair_full),
+        ("slot_act_sine", sine_full),
+        ("sg_only_phi_budget", phib_full),
+    ]:
+        obs, lo, hi = unpaired_bootstrap_ci(tuned_seeds, leader)
+        u_stat, p_two, p_one_g = mw(tuned_seeds, leader)
+        no_overlap = "YES" if min(tuned_seeds) > max(leader) else "no"
+        out.append(
+            f"| tuned − `{name}` | {obs*100:+.2f} pp | "
+            f"[{lo*100:+.2f}, {hi*100:+.2f}] pp | "
+            f"{u_stat:.1f} | {p_two:.4f} | {p_one_g:.4f} | **{no_overlap}** |\n"
+        )
+
+    out.append(
+        "\nAt n_a=3 vs n_b=7 the Mann–Whitney U two-sided p has a floor of "
+        "2/C(10, 3) = 2/120 = **0.0167**, attained when all 3 tuned seeds are "
+        "strictly above all 7 leader seeds. All three comparisons attain (or "
+        "sit at one-rank-tie above) the floor.\n\n"
+        "### 14.2 — Verdict\n\n"
+        "**At iso-tuned conditions where the baseline receives the same LR-tuning "
+        "love that the leaders' hill-climbs gave their priors, the tuned vanilla "
+        "baseline BEATS all three priors' default-config n=7 means by +2.27 to "
+        "+2.81 pp** (Mann–Whitney one-sided p ∈ {0.0083, 0.0111, 0.0083}; "
+        "bootstrap CI lower bound ≥ +1.90 pp; min(tuned) > max(leader) for all "
+        "three winners — no rank overlap). The default-config n=7 cert STANDS "
+        "as a matched-recipe formal statement; the priors do NOT robustly "
+        "survive a properly-LR-tuned baseline at NeurIPS-α. R2 BLOCKER #13 "
+        "substantively validated. The protocol's headline contribution is the "
+        "meta-research methodology, not the specific priors.\n\n"
+    )
+    return "".join(out)
+
+
 def main() -> None:
     section0 = section_0_promotion_announcement()
     section1, rows = section_1_phase8_winners()
@@ -1208,6 +1310,7 @@ def main() -> None:
     section10 = section_10_iso_tuned()
     section11 = section_11_calibration_extension()
     section13 = section_13_phase9g_controls()
+    section14 = section_14_phase9h_tuned_baseline()
     print(section0)
     print(section1)
     print(section2)
@@ -1221,6 +1324,7 @@ def main() -> None:
     print(section10)
     print(section11)
     print(section13)
+    print(section14)
 
 
 if __name__ == "__main__":

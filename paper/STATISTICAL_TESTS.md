@@ -491,3 +491,50 @@ The four controls, taken together, partially validate the most aggressive review
 
 **What is partially undermined:** the *interpretation* of the priors' lift as "φ-specific" (refuted by Control 1) or "SIREN-specific" (refuted by Control 2). The iso-tuned regime's Δ-shrinkage (Phase-9f §10) is now joined by Control 3a's tuned-baseline numerical superiority at n=1 — both consistent with a single picture: **the cert's signal is real at the default-config slice but does not robustly extend to properly-tuned baselines.** Phase-9h n=3 closure of Control 3a is the binding next diagnostic.
 
+
+## Section 14 — Phase-9h tuned-baseline n=3 binding diagnostic (added 2026-06-01 late evening)
+
+**Scope.** Phase-9h closed the binding diagnostic for Control 3a: a 3-seed (n=3) re-run of `baseline_resnet20_tuned_lr0.01_wd0.0005` at CIFAR-100 30 epochs, AdamW, bs=256, the hill-climb-best tuned-baseline cell from Phase-9g §13.3. The result resolves the n=1 vs n=7 asymmetry that left §13.3 PROVISIONAL.
+
+**Tuned baseline n=3 result (lr=0.01, wd=5e-4, bs=256, AdamW, 30 ep):**
+
+| seed | top1 | source |
+|---:|---:|---|
+| 0 | 0.5984 | `experiments/cifar100/baseline_resnet20_tuned_lr0.01_wd0.0005_seed0/metrics.json` |
+| 1 | 0.6046 | `experiments/cifar100/baseline_resnet20__hc_lr1em2_wd5em4_bs256_optAdamW_seed1/metrics.json` |
+| 2 | 0.6020 | `experiments/cifar100/baseline_resnet20__hc_lr1em2_wd5em4_bs256_optAdamW_seed2/metrics.json` |
+| **mean** | **0.6017** | |
+| median | 0.6020 | |
+| std (ddof=1, pp) | 0.31 pp | |
+
+The tuned baseline n=3 σ (0.31 pp) is even tighter than the default-config baseline σ (0.453 pp at n=7), so the binding diagnostic is **not** noise-bound.
+
+**Comparison to Phase-8 winners' default-config n=7 means (unpaired, asymmetric n=3 vs n=7).** The comparison is necessarily unpaired (different recipes; the tuned cell is a different lr/wd than the winners' default-config cell) and the principled non-parametric tests are (a) **Mann–Whitney U** rank-sum on top1 and (b) a **20 000-iteration unpaired bootstrap** on Δmean = mean(tuned_baseline) − mean(leader_default), rng=20260601, 2.5/97.5 percentile for the 95 % CI.
+
+| comparison | leader n=7 mean | Δmean (tuned − leader) | 95 % unpaired-bootstrap CI on Δmean | Mann–Whitney U | p_two | p_one (tuned > leader) | min(tuned) vs max(leader) |
+|---|---:|---:|---|---:|---:|---:|---|
+| tuned_baseline (n=3) − `pair_gm_pdw` (n=7, 0.5786) | 0.5786 | **+2.30 pp** | [+1.99, +2.60] pp | 21.0 | **0.0167** | **0.0083** | 0.5984 > 0.5814 (NO overlap) |
+| tuned_baseline (n=3) − `slot_act_sine` (n=7, 0.5790) | 0.5790 | **+2.27 pp** | [+1.90, +2.64] pp | 21.0 | **0.0222** | **0.0111** | 0.5984 > 0.5828 (NO overlap) |
+| tuned_baseline (n=3) − `sg_only_phi_budget` (n=7, 0.5736) | 0.5736 | **+2.81 pp** | [+2.42, +3.19] pp | 21.0 | **0.0167** | **0.0083** | 0.5984 > 0.5785 (NO overlap) |
+
+Mann–Whitney U at n_a=3, n_b=7 has minimum two-sided p = 2/C(10, 3) = 2/120 = **0.0167**, achieved when all 3 tuned-baseline seeds are strictly above all 7 leader seeds. **All three comparisons attain (or sit at one rank-tie above) the floor** — every tuned-baseline seed strictly exceeds every winner seed for all three winners (no rank overlap). The one-sided U test (tuned > leader) clears α = 0.05 for all three winners (p_one ∈ {0.0083, 0.0111, 0.0083}).
+
+**Reading.** The Phase-9h binding result is the cleanest piece of empirical evidence the project carries on the iso-tuned-baseline question:
+
+1. The default-config n=7 cert (§§1–6) was a **matched-recipe vs matched-recipe** comparison at lr=1e-3, wd=5e-4, bs=256, AdamW. At that cell, the three winners' Δmean over the matched-recipe baseline (mean=0.5612, σ_default=0.453 pp) was +1.24 / +1.74 / +1.78 pp with paired Wilcoxon p=0.0078 clearing Holm-Bonferroni α'=0.0167. **The default-config n=7 cert still STANDS as a formal statistical statement at that matched cell.**
+2. **At iso-tuned conditions where the baseline receives the same LR-tuning love (lr=0.01) that the leaders' hill-climbs gave their priors, the tuned vanilla baseline n=3 mean (0.6017) BEATS all three winners' default-config n=7 means by +2.27 to +2.81 pp.** All three comparisons clear one-sided Mann–Whitney U at α = 0.05; bootstrap CIs exclude 0 by ≥ 1.9 pp on the lower bound; minimum tuned-baseline seed strictly exceeds maximum leader seed for all three winners.
+3. **The priors do NOT robustly survive a properly-LR-tuned baseline at NeurIPS-α.** The winners' lift in the default-config cert is partially (and at the n=3 / n=7 evidence level we now hold, substantially) **explained by baseline-LR-tuning artifact**. R2 BLOCKER #13 ("priors may be baseline-tuning artifacts") is now **substantively validated** at the n=3 level, jointly with the Phase-9f n=7 iso-tuned Δ-shrinkage (§10).
+
+**Honest framing — what changes and what stands.**
+
+- **What STANDS.** The default-config n=7 cert (Sections 0–6) STANDS as a matched-recipe formal statistical statement. The dual-track audit + Fixer + per-experiment-page protocol (the methodological contribution) STANDS. The H09 phi_budget realised-ratio drift case study STANDS. The Phase-9b n=62 calibration's 22-pp MAJOR/BROKEN excess (§11; Fisher exact two-sided p=1.94e-5) STANDS. The cross-family re-audit (8/10 strict concordant) STANDS. The audit's ~51 % non-PASS rate STANDS.
+- **What CHANGES.** The headline interpretation of the priors. The paper's prose claim shifts from "three Phase-8 candidates pass Holm-Bonferroni at α=0.05 (the priors help)" to **"three candidates pass at α=0.05 default-config — but at iso-tuned conditions a properly-LR-tuned vanilla ResNet-20 (n=3 mean 0.6017) outperforms the three certified priors' default-config n=7 means by +2.27 to +2.81 pp at unpaired Mann–Whitney p ∈ {0.0167, 0.0167, 0.0222}. The priors do NOT robustly survive a properly-tuned baseline. The protocol's value is the meta-research methodology, not the specific priors."**
+
+**Caveats (preserved).**
+
+- The Phase-9h n=3 vs winners-n=7 comparison is *unpaired* and at *different (lr, wd) cells* (tuned baseline at lr=0.01 wd=5e-4 bs=256; winners' default-config at lr=1e-3 wd=5e-4 bs=256). A symmetric iso-tuned comparison — n=7 winners at the same lr=0.01 wd=5e-4 cell, paired against the tuned baseline — is the principled main-track close-out (estimated cost ~5 GPU-h; filed as Phase-9i future work).
+- The tuned baseline n=3 sample is small (n=3). The σ at n=3 is 0.31 pp; a Phase-9i n=7 tuned-baseline extension would tighten the CI and resolve any residual small-sample doubt.
+- The comparison is across (lr, wd) cells, not across (architecture, prior). The honest reading is "at the most permissive single-knob LR-tuning of the baseline, the baseline beats the priors;" we do NOT claim the priors are useless across all hyperparameter regimes — we claim they do not robustly survive a properly-LR-tuned baseline at this compute budget.
+
+**Verdict.** The Phase-9h tuned-baseline n=3 binding diagnostic is the cleanest possible empirical reality the project's protocol could surface: **the protocol caught its own headline interpretation drift**. The headline finding is now the methodology, not the priors. The default-config cert is preserved as a formal matched-recipe statement; the priors are honestly demoted to "screened candidates that do not robustly survive a properly-LR-tuned baseline." The protocol's value as a meta-research contribution is the headline claim of the paper.
+
