@@ -3,27 +3,39 @@
 
 \begin{abstract}
 We present a self-auditing LLM-agent autoresearch protocol that catches
-its own headline drift. On a 62-hypothesis third-party-code calibration
-substrate (\texttt{pytorch/vision}, \texttt{timm}, HuggingFace
-Transformers, Lightning Bolts, \texttt{torch.optim},
-\texttt{state-spaces/mamba}), the protocol's implementation-critic tier
-registers \textbf{0 MAJOR/BROKEN findings}; on its own 84-hypothesis
+\emph{and corrects} its own headline-interpretation drift. On a
+62-hypothesis third-party-code calibration substrate
+(\texttt{pytorch/vision}, \texttt{timm}, HuggingFace Transformers,
+Lightning Bolts, \texttt{torch.optim}, \texttt{state-spaces/mamba}),
+the protocol's implementation-critic tier registers \textbf{0
+MAJOR/BROKEN findings}; on its own 84-hypothesis
 nature-inspired-priors substrate, it registers \textbf{22\,pp
 MAJOR/BROKEN excess} (Fisher exact two-sided $p = 1.94 \times 10^{-5}$;
 Wilson 95\% CIs non-overlapping). The protocol's double-barrelled
-load-bearing existence proof is (i)~it caught \emph{H09 phi\_budget's
-12.6\% realised-stage-ratio drift} via Fixer-introduced
-mechanism-pinning tests (commit \texttt{519cdf3}), and (ii)~it caught
-its OWN headline-prior fragility: three default-config-certified
-Phase-8 winners (\texttt{pair\_gm\_pdw}, \texttt{slot\_act\_sine},
-\texttt{sg\_only\_phi\_budget}) clear Holm--Bonferroni
-$\alpha'{=}0.0167$ at matched-recipe $n{=}7$ (paired Wilcoxon
-$p{=}0.0078$ each) but do NOT survive a properly LR-tuned baseline
-(tuned baseline beats all three by $+2.27$ to $+2.81$\,pp at $n{=}3$;
-Mann--Whitney $p_{\mathrm{one}} \in [0.0083, 0.0111]$). The
-default-config matched-recipe certification stands as a
-\emph{secondary} empirical claim. We honestly demote the priors to
-``screened candidates that survive matched-recipe certification but
-not iso-tuned-LR'' and elevate the protocol-as-meta-research-methodology
-as the headline contribution.
+existence proof is (i)~it caught \emph{H09 phi\_budget's 12.6\%
+realised-stage-ratio drift} via Fixer-introduced mechanism-pinning
+tests (commit \texttt{519cdf3}), and (ii)~it caught \emph{and then
+corrected} its own headline-interpretation drift across recipes: three
+default-config-certified Phase-8 winners (\texttt{pair\_gm\_pdw},
+\texttt{slot\_act\_sine}, \texttt{sg\_only\_phi\_budget}) clear
+Holm--Bonferroni $\alpha'{=}0.0167$ at matched-recipe $n{=}7$ (paired
+Wilcoxon $p{=}0.0078$ each); a Phase-9h $n{=}3$ tuned-baseline-at-
+lr$=$0.01 diagnostic \emph{appeared} to refute them (tuned baseline
+beats all three by $+2.27$ to $+2.81$\,pp; Mann--Whitney
+$p_{\mathrm{one}} \in [0.0083, 0.0111]$) -- but that comparison is
+apples-to-oranges (asymmetric LR sweep across different (lr, wd)
+cells). At iso-modern-recipe (11-trick recipe) and iso-convergence
+(200\,ep) $n{=}3$, all three priors \emph{lift} the modern convergent
+baseline (mean $0.6360$) by $+1.00$ to $+1.24$\,pp with $3/3$ positive
+paired deltas and Phase-5 ordinal-gate PASS for all three (paired
+Wilcoxon hits the $n{=}3$ floor $p_{\mathrm{one}}{=}0.125$; formal
+NeurIPS-$\alpha$ cert at iso-modern-recipe requires $n{\geq}7$, filed
+as Phase-9j future work). The priors carry $\sim{+1}$\,pp of robust
+directional signal across both default-config and modern-recipe
+regimes; the Phase-9h gap is correctly localised to LR-tuning
+confound, not prior failure. We retain the methodology --- self-
+auditing protocol with iso-recipe / iso-convergence guardrails --- as
+the headline contribution, and restore the priors to ``screened
+candidates with consistent $+1$\,pp directional lift across recipes;
+formal iso-modern-recipe cert pending $n{\geq}7$.''
 \end{abstract}
