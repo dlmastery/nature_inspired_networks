@@ -1,0 +1,18 @@
+{
+  "tag": "slot_act_sine",
+  "dataset": "cifar100",
+  "seed": 2,
+  "epochs": 200,
+  "top1": 0.6465,
+  "top5": 0.8958,
+  "params": 267659,
+  "flops": 80816212.0,
+  "latency_ms": 3.789313999004662,
+  "rot_eq_err": 0.4599284480015437,
+  "composite": 0.6461928777323095,
+  "composite_fingerprint": "d65565e9c7b12d14cbce30a801ecc6753aea3eb148074256bfcc051fa61d0893",
+  "epochs_to_target": -1,
+  "train_seconds": 15797.906139700091,
+  "train_top1": 0.4737379807692308,
+  "generalization_gap": 0.0
+}
