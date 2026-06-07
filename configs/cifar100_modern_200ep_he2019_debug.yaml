@@ -1,0 +1,87 @@
+# CIFAR-100 MODERN-RECIPE DEBUG (A4 from SYNTHESIS_100.md).
+#
+# Why this config exists: the Bello-2021/Wightman-2021 11-trick recipe at
+# configs/cifar100_modern_200ep.yaml was ImageNet-tuned and lands baseline
+# ResNet-20 CIFAR-100 at top1=0.635 -- 4.5 pp below the convergence-regime
+# floor of 0.68 in convergence/PLAN.md. R5 (REVIEWER_FIVE_2026-06-06) BLOCKER 2
+# identifies the root cause: RandAugment(N=2, M=14) is too aggressive at
+# 32x32, Random Erasing has near-zero effect at small resolution, and
+# Mixup alpha=0.2 + CutMix alpha=1.0 double-augment.
+#
+# This config adopts the He-2019 / DeepLearningTuningPlaybook CIFAR-specific
+# variant:
+#   * RandAugment N=1 M=9   (instead of N=2 M=14)
+#   * Drop Random Erasing    (instead of p=0.25)
+#   * Mixup alpha=0.1        (instead of 0.2)
+#   * Drop CutMix entirely   (instead of alpha=1.0 / 50% alternation)
+#   * Increase warmup to 10 epochs (instead of 5)
+#
+# Expected pass band:
+#   baseline_resnet20_he2019_debug_seed0 top1 >= 0.68 at 200 ep
+#   target: 0.68-0.72 median over n=3
+#
+# Decision rule (pre-registered in pre-registration/a4_recipe_debug_he2019.md):
+#   * seed 0 top1 >= 0.66:  proceed to seeds 1 + 2 for n=3 baseline
+#   * seed 0 top1 in [0.64, 0.66]: directional improvement but below floor;
+#                                  investigate further before n=3
+#   * seed 0 top1 < 0.64:  recipe still broken; halt and re-investigate
+#
+# Hardware contract:
+#   * RTX 4090 Laptop, 16 GB VRAM, Windows 11
+#   * bf16 AMP, batch 256, num_workers 0
+#   * Rule 26 thread caps: KMP_DUPLICATE_LIB_OK=TRUE, OMP=2, MKL=2
+#   * headline_mode=true (deterministic, no cudnn.benchmark, seed_worker)
+#
+# Wall-clock estimate per seed: ~3.5 GPU h (matches legacy modern recipe).
+#
+# Launch:
+#   $env:KMP_DUPLICATE_LIB_OK="TRUE"; $env:OMP_NUM_THREADS=2; $env:MKL_NUM_THREADS=2
+#   .\.venv\Scripts\python -m nature_inspired_networks.runner `
+#     --config configs\cifar100_modern_200ep_he2019_debug.yaml `
+#     --tag baseline_resnet20_he2019_debug --seed 0 `
+#     --root experiments_modern_debug
+
+dataset: cifar100
+data_root: ./data
+batch_size: 256
+num_workers: 0           # Windows-safe (CLAUDE.md §2)
+epochs: 200
+
+# Base optimisation.
+lr: 1.0e-3
+weight_decay: 5.0e-4
+label_smoothing: 0.1
+warmup_epochs: 10        # increased from 5 (longer warmup helps at He-2019 recipe)
+use_bf16: true
+optimizer: adamw
+scheduler: cosine
+target_top1: 0.68
+
+# Headline-mode reproducibility (D4 from SYNTHESIS_100).
+# Deterministic algorithms, no cudnn.benchmark, worker_init_fn=seed_worker.
+headline_mode: true
+
+# He-2019 / Playbook CIFAR-tuned augmentation.
+mixup_alpha: 0.1         # reduced from 0.2 (less aggressive at 32x32)
+cutmix_alpha: 0.0        # DROPPED entirely (R5 BLOCKER 2 finding)
+mixup_cutmix_prob: 1.0   # always Mixup when active (no alternation needed if CutMix=0)
+randaugment_n: 1         # reduced from 2
+randaugment_m: 9         # reduced from 14 (Müller & Hutter 2021 32x32 recommendation)
+random_erasing_p: 0.0    # DROPPED (no benefit at 32x32 per Müller & Hutter)
+ema_decay: 0.9999
+
+# FLOP-target (synth A3). Baseline must land in band; the new runner pre-flight
+# will refuse to launch if measured FLOPs deviate from baseline.
+flops_target: 41224448
+flops_tolerance: 0.10
+
+# Baseline model.
+model: resnet20
+channel_mode: linear
+flags:
+  hex: false
+  group: false
+  fractal: false
+  toroidal: false
+  cymatic_init: false
+  golden_modulate: false
