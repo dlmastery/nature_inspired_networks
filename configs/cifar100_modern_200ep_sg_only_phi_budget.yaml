@@ -76,7 +76,7 @@ ema_decay: 0.9999
 # budget 270k params.
 model: phi_budget
 phi_model: phi_budget
-phi_budget_total: 270000
+phi_budget_total: 125000   # A1 iso-FLOPs re-calibration 2026-06-07 — was 270000 (80.8M FLOPs); 125k → 43.24M FLOPs (+4.9% inside ±10% of 41.22M baseline). H09 1:φ:φ² preserved within 1.82% (integer-width constraint at nn.Conv2d). See audits/REVIEWER_FIVE_2026-06-06/A1_ISO_FLOPS_CALIBRATION.md.
 phi_budget_n_stages: 3
 phi_budget_mode: phi
 channel_mode: phi
