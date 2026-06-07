@@ -270,7 +270,10 @@ The composite metric (Rule~2) is
 \label{eq:composite}
 \end{equation}
 The source string of Eq.~\ref{eq:composite} is SHA-256-fingerprinted
-to \texttt{d65565e9c7b12d14cbce30a801ecc6753aea3eb148074256bfcc051fa61d0893};
+to \texttt{b73e8bbfa2717c567bda42b7760fefc3b4e68381aee54ea28d7cd8f3d6863649}
+(FLOPs term added 2026-06-06; legacy fingerprint
+\texttt{d65565e9c7b12d14cbce30a801ecc6753aea3eb148074256bfcc051fa61d0893}
+applies to all pre-2026-06-06 archived runs);
 editing it raises a \texttt{CompositeFingerprintError} at runner
 import time. A new branch is required to change it.
 
@@ -428,11 +431,11 @@ diagnostic is not noise-bound. \emph{Caveat (load-bearing):} the
 Phase-9h comparison is apples-to-oranges --- tuned baseline at
 lr$=$0.01 (LR-swept), three priors at lr$=$1e-3 (\emph{not}
 LR-swept), 30~ep, otherwise untuned --- asymmetric LR sweep across
-different (lr, wd) cells. The Phase-9i convergence-regime corrective
-binding below resolves the confound.
+different (lr, wd) cells. The iso-recipe $n{=}3$ diagnostic at
+non-matched FLOPs (provisional) below resolves the confound.
 
-\textbf{Phase-9i convergence-regime $n{=}3$ binding (iso-modern-recipe
-+ iso-convergence; 2026-06-04 morning).} All four arms (baseline + 3
+\textbf{Iso-recipe $n{=}3$ diagnostic at non-matched FLOPs (provisional;
+2026-06-04 morning).} All four arms (baseline + 3
 priors) were re-run at the \emph{shared} modern 11-trick recipe
 (AdamW, cosine LR, label smoothing, RandAugment, MixUp/CutMix, EMA,
 etc.) at 200~ep CIFAR-100 --- the project's first multi-arm
@@ -441,7 +444,7 @@ convergence-regime sweep. Per-seed top-1 read from
 
 \begin{table}[t]
 \small\centering
-\caption{Phase-9i convergence-regime $n{=}3$ binding (modern 11-trick
+\caption{Iso-recipe $n{=}3$ diagnostic at non-matched FLOPs (modern 11-trick
 recipe + 200\,ep CIFAR-100). All three priors LIFT the convergent
 baseline by $+1.00$ to $+1.24$\,pp with 3/3 paired-positive deltas and
 Phase-5 ordinal gate PASS for all three winners. 95\% paired-
@@ -995,7 +998,10 @@ AC       & \#16 verdict-on-wrong-testbed audit          & PARTIAL (H22 downgrade
   \item Live dashboard:
         \url{https://dlmastery.github.io/nature_inspired_networks/}.
   \item Composite-metric fingerprint
+        \texttt{b73e8bbfa2717c567bda42b7760fefc3b4e68381aee54ea28d7cd8f3d6863649}
+        (FLOPs-extended formula 2026-06-06; legacy fingerprint
         \texttt{d65565e9c7b12d14cbce30a801ecc6753aea3eb148074256bfcc051fa61d0893}
+        for pre-2026-06-06 archived runs)
         (Rule~2; \texttt{CompositeFingerprintError} on edit).
   \item Phase-8 sweep raw seeds:
         \texttt{experiments/cifar100/<tag>\_seed\{0..6\}/}.

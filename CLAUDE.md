@@ -335,7 +335,11 @@ cross-pollination but never as authoritative sources:
 
 Composite formula `top1 − 0.05·log10(params_M) − 0.05·log10(latency_ms)`
 is **defined here** (Rule 2) and SHA-256-fingerprinted as
-`d65565e9c7b12d14cbce30a801ecc6753aea3eb148074256bfcc051fa61d0893`.
+`b73e8bbfa2717c567bda42b7760fefc3b4e68381aee54ea28d7cd8f3d6863649`
+(formula extended 2026-06-06 per SYNTHESIS_100.md A2 to add `−0.05·log10(flops_M)` —
+prior formula fingerprint `d65565e9c7b12d14cbce30a801ecc6753aea3eb148074256bfcc051fa61d0893`
+applies to all archived runs created before 2026-06-06; the FLOPs-extended formula
+governs all runs from 2026-06-06 forward).
 A new branch / repo is required to change it — no parent-repo dependency.
 
 The 29 reusable skills in `skills/` (catalogued in §11) are also

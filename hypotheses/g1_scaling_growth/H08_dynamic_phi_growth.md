@@ -291,3 +291,9 @@ Doc predicts 20-35% cumulative-FLOPs reduction. My prior: any sensible progressi
 
 ### Verdict
 **DERIVATIVE+TESTABLE** — Progressive growth (a real effect) re-labelled as Fibonacci. The composite-formula manipulation is a Rule 2 violation. Worth running as part of a broader growth-schedule study but the φ-content is decorative.
+
+---
+
+## Status journal — 2026-06-06 demotion to FALSIFIED_AT_MECHANISM_TEST
+
+Per the SYNTHESIS_100 audit (`audits/REVIEWER_FIVE_2026-06-06/SYNTHESIS_100.md` B19), H08 is demoted to **FALSIFIED_AT_MECHANISM_TEST**. The Track-B sci-critic addendum (above) concludes DERIVATIVE+TESTABLE: any monotone progressive-growth schedule achieves the headline result; the specific Fibonacci epoch schedule has no biological evidence and the doc's bespoke `(1 - cum_flops/30G)` composite-formula term is a Rule 2 violation. The hypothesis is **not** listed as a Phase-8 winner or contribution in PAPER.md / README.md / FINDINGS.md.

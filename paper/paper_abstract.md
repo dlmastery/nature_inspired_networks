@@ -6,7 +6,7 @@ We present a self-auditing LLM-agent autoresearch protocol that catches its own 
 
 ---
 
-*Composite metric:*
-$$\textsf{composite} = \textsf{top-1} - 0.05\,\log_{10}(\textsf{params}_M) - 0.05\,\log_{10}(\textsf{latency}_{\text{ms}}).$$
+*Composite metric (FLOPs-extended 2026-06-06 per SYNTHESIS_100.md A2):*
+$$\textsf{composite} = \textsf{top-1} - 0.05\,\log_{10}(\textsf{params}_M) - 0.05\,\log_{10}(\textsf{latency}_{\text{ms}}) - 0.05\,\log_{10}(\textsf{flops}_M).$$
 
-*The composite formula is SHA-256-fingerprinted as `d65565e9c7b12d14cbce30a801ecc6753aea3eb148074256bfcc051fa61d0893`; editing it forces a `CompositeFingerprintError` (Rule 2).*
+*The composite formula is SHA-256-fingerprinted as `b73e8bbfa2717c567bda42b7760fefc3b4e68381aee54ea28d7cd8f3d6863649` (legacy fingerprint `d65565e9c7b12d14cbce30a801ecc6753aea3eb148074256bfcc051fa61d0893` for pre-2026-06-06 archived runs); editing it forces a `CompositeFingerprintError` (Rule 2).*

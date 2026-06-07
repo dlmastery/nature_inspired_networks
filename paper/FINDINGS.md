@@ -1,13 +1,14 @@
 ﻿# FINDINGS — nature_inspired_networks curated CIFAR-10 sweep (seed 0, 12 epochs)
 
-> ## 🟢 2026-06-04 MORNING — Phase-9i CONVERGENCE-REGIME n=3 BINDING — protocol catches AND corrects its own headline-drift; priors LIFT +1.00 to +1.24 pp at iso-modern-recipe + iso-convergence (200ep)
+> ## 🟡 2026-06-04 MORNING — iso-recipe n=3 diagnostic at non-matched FLOPs (provisional); priors at ~2× baseline FLOPs return +1.00 to +1.24 pp sign-consistent lifts; iso-FLOPs n≥7 confirmation pending
 >
-> Phase-9i closed the iso-recipe + iso-convergence corrective binding
-> for the Phase-9h diagnostic below. All three Phase-8 priors and the
-> baseline were re-run at the **modern 11-trick recipe** (AdamW,
-> cosine, label smoothing, RandAugment, MixUp/CutMix, EMA, etc.) at
-> **200 ep CIFAR-100** — the project's first multi-arm
-> convergence-regime sweep. Per-seed top1 read from
+> All three matched-recipe priors and the baseline were re-run at the
+> **modern 11-trick recipe** (AdamW, cosine, label smoothing,
+> RandAugment, MixUp/CutMix, EMA, etc.) at **200 ep CIFAR-100** — the
+> project's first multi-arm convergence-regime sweep. **The diagnostic
+> is provisional**: the three priors run at ~2× the baseline FLOPs
+> (`flops_M` ≈ 80.8 vs baseline 41.2), so the +1 pp lift is confounded
+> with compute. Per-seed top1 read from
 > `experiments_modern/cifar100/<tag>_seed<s>/metrics.json`.
 >
 > | Tag | Seeds (top1) | Mean | σ (pp) | Δmean vs convergent baseline | Phase-5 ordinal gate |
@@ -17,80 +18,55 @@
 > | `pair_gm_pdw` | 0.6457 / 0.6468 / 0.6456 | **0.6460** | 0.067 | **+1.00 pp** | **PASS** (min L 0.6456 > max B 0.6383) |
 > | `slot_act_sine` | 0.6461 / 0.6458 / 0.6465 | **0.6461** | 0.035 | **+1.01 pp** | **PASS** (min L 0.6458 > max B 0.6383) |
 >
-> **All three priors LIFT the convergent modern-recipe baseline; all
-> three pass the Phase-5 ordinal gate; all three deliver 3/3 positive
-> paired deltas.** Paired Wilcoxon at n=3 hits its theoretical floor
-> p_one = (1/2)³ = **0.125** for all three (cannot clear
-> Holm-Bonferroni α'=0.0167 at this sample size). Paired-t p_one ∈
-> {0.0028, 0.0070, 0.0082}. 95 % paired-bootstrap CIs (10 000 iter,
-> rng=20260604) per winner:
+> **All three priors LIFT the convergent modern-recipe baseline at
+> non-iso-FLOPs; all three pass the Phase-5 ordinal gate; all three
+> deliver 3/3 positive paired deltas.** Paired Wilcoxon at n=3 hits
+> its theoretical floor p_one = (1/2)³ = **0.125** for all three.
+> Paired-t p_one ∈ {0.0028, 0.0070, 0.0082}. 95 % paired-bootstrap
+> CIs (10 000 iter, rng=20260604):
 >
-> | winner | Δmean | 95 % paired-bootstrap CI |
-> |---|---:|---|
-> | `sg_only_phi_budget` | +1.24 pp | [+0.95, +1.43] pp |
-> | `pair_gm_pdw` | +1.00 pp | [+0.85, +1.08] pp |
-> | `slot_act_sine` | +1.01 pp | [+0.75, +1.17] pp |
+> | candidate | Δmean | 95 % paired-bootstrap CI | iso-FLOPs? |
+> |---|---:|---|:---:|
+> | `sg_only_phi_budget` | +1.24 pp | [+0.95, +1.43] pp | NO (~2× FLOPs) |
+> | `pair_gm_pdw` | +1.00 pp | [+0.85, +1.08] pp | NO (~2× FLOPs) |
+> | `slot_act_sine` | +1.01 pp | [+0.75, +1.17] pp | NO (~2× FLOPs) |
 >
 > **All three CIs exclude 0 by a margin of ≥ +0.75 pp on the lower
-> bound.** `pair_gm_pdw` and `slot_act_sine` σ (0.067 and 0.035 pp)
-> are remarkably tight — far below σ_default = 0.453 pp at default-
-> config n=7.
+> bound** — at non-matched FLOPs. The +1 pp lift cannot be attributed
+> to the prior in isolation from compute.
 >
-> **Phase-9h is correctly attributed to LR-tuning confound, not prior
-> failure.** The Phase-9h apparent refutation (tuned baseline beats
-> all three priors' default-config n=7 means by +2.27 to +2.81 pp at
-> lr=0.01) was *apples-to-oranges*: the baseline received an LR sweep,
-> the priors did not; the comparison crossed (lr, wd) cells, and the
-> priors were never re-tuned for the lr=0.01 cell. The Phase-9i
-> iso-modern + iso-convergence binding resolves the confound: at
-> *matched* modern recipe (11 tricks) and *matched* convergence (200
-> ep), the priors carry the *same* +1 pp directional lift they carry
-> at default-config (Δ +1.24 / +1.74 / +1.78 pp at lr=1e-3 30 ep →
-> Δ +1.24 / +1.00 / +1.01 pp at modern 200 ep). The cross-regime
-> synthesis is **mutually consistent**: the priors carry ~+1 pp of
-> robust directional signal that survives across recipes and
-> convergence regimes.
+> **The earlier tuned-baseline-at-lr=0.01 diagnostic is correctly
+> attributed to LR-tuning confound, not prior failure.** That apparent
+> refutation (tuned baseline beats all three by +2.27 to +2.81 pp at
+> lr=0.01) was *apples-to-oranges*: the baseline received an LR
+> sweep, the priors did not; the comparison crossed (lr, wd) cells.
 >
-> **Narrative restoration.** The HEADLINE CLAIM of the paper now
-> reads:
+> **Narrative — the priors are screened candidates pending iso-FLOPs
+> n≥7.** The three matched-recipe candidates carry sign-consistent
+> +1 pp directional lift across the default-config n=7 cell (30 ep,
+> non-iso-FLOPs) and the iso-recipe n=3 diagnostic at non-matched
+> FLOPs (200 ep, ~2× baseline FLOPs). **No reported cell is
+> iso-FLOPs.** The principled-evaluation path is iso-FLOPs n≥7
+> confirmation at the modern recipe plus a
+> [RegNetX-200MF (Radosavovic et al. CVPR 2020,
+> arXiv:2003.13678)](https://arxiv.org/abs/2003.13678) comparator at
+> the same FLOP envelope; filed as future work. **The protocol catch
+> IS the value-add**: the protocol surfaced (Control 2) that
+> `slot_act_sine` is a [SIREN (Sitzmann et al. NeurIPS 2020,
+> arXiv:2006.09661)](https://arxiv.org/abs/2006.09661) replication
+> mis-attributed to nature-inspired priors, and (Control 1) that
+> `pair_gm_pdw` is a 3-axis regularizer stack of which ~61% is
+> non-φ-attributable.
 >
-> > "The dual-track audit + Fixer protocol correctly caught H09's
-> > realised-ratio drift (catch a). The protocol's iso-recipe +
-> > iso-convergence guardrails correctly caught its own headline-
-> > interpretation drift across recipes (catch b is two-sided: Phase-
-> > 9h surfaces the apparent refutation; Phase-9i corrects the
-> > apples-to-oranges confound). The priors carry ~+1 pp of robust
-> > directional signal across default-config and modern-recipe
-> > regimes; the formal NeurIPS-α cert at iso-modern-recipe is
-> > pending n≥7 (Wilcoxon floor at n=3 is 0.125). The protocol's
-> > value is the self-falsification + self-correction cycle, not
-> > just the catches."
+> Caveat (preserved): the n=3 paired-Wilcoxon p_one is at the
+> theoretical floor 0.125; Mann-Whitney U at n_a=3 n_b=3 has
+> minimum p_two = 2/C(6,3) = 0.10. An iso-FLOPs n≥7 extension at the
+> modern 200-ep cell is the principled-evaluation path (~39
+> additional GPU-h on the 4090 Laptop after a FLOP-budget pinning
+> of the priors); filed as future work.
 >
-> The three Phase-8 winners are **honestly restored** from "screened
-> candidates that do not robustly survive a properly-LR-tuned
-> baseline" to **"screened candidates with consistent +1 pp
-> directional lift across default-config (30 ep) and modern-recipe
-> (200 ep) regimes; iso-modern-recipe formal NeurIPS-α cert pending
-> n≥7."** The default-config cert (Phase-9 n=7 Wilcoxon p=0.0078)
-> stands as a formally-correct matched-recipe statement; the Phase-9i
-> iso-modern n=3 binding stands as a qualitatively-binding cross-
-> recipe consistency check; the Phase-9h tuned-baseline diagnostic
-> stands as a load-bearing methodology demonstration (the protocol
-> can catch "priors help" drift, then a second-order check can catch
-> "tuned baseline beats" over-correction).
->
-> Caveat (preserved): the Phase-9i n=3 paired-Wilcoxon p_one is at
-> the theoretical floor 0.125; Mann-Whitney U at n_a=3 n_b=3 has
-> minimum p_two = 2/C(6,3) = 0.10. Formal NeurIPS-α cert under
-> Holm-Bonferroni α'=0.0167 at iso-modern-recipe requires n≥7 (per
-> Section 3 sample-size design). A Phase-9j n≥7 extension at the
-> modern 200-ep cell is the principled formal-cert path (~39
-> additional GPU-h on the 4090 Laptop); filed as future work.
->
-> Full numbers + Wilcoxon + paired-t + 95 % bootstrap CIs + verdict:
+> Full numbers + Wilcoxon + paired-t + 95 % bootstrap CIs:
 > [`paper/STATISTICAL_TESTS.md`](STATISTICAL_TESTS.md) §15.
-> Splice in PAPER.md: §5.3 + abstract + §6.5 cross-regime synthesis
-> + §9 conclusion + §7 limitations.
 
 > ## 🔬 2026-06-01 LATE EVENING — Phase-9h TUNED-BASELINE BINDING — protocol catches its own headline drift; priors honestly demoted to screened candidates
 >
@@ -154,8 +130,8 @@
 > correctly attributed to LR-tuning confound (apples-to-oranges:
 > baseline got LR sweep, priors did not), not to prior failure. The
 > priors are RESTORED to "screened candidates with consistent +1 pp
-> directional lift across default-config and modern-recipe regimes;
-> iso-modern-recipe formal NeurIPS-α cert pending n≥7." The Phase-9h
+> directional lift across default-config and modern-recipe regimes
+> (both non-iso-FLOPs); iso-FLOPs n≥7 confirmation pending." The Phase-9h
 > block below is preserved as a load-bearing methodology
 > demonstration (the protocol surfaces an apparent refutation; the
 > Phase-9i second-order check corrects the confound).
@@ -179,7 +155,7 @@
 > conclusion + §1.1 contributions framing.
 > Pipeline-close marker: [`audits/PIPELINE_COMPLETE_2026-06-01.md`](../audits/PIPELINE_COMPLETE_2026-06-01.md).
 
-> ## 🏆 2026-05-29 PM PROMOTION — Phase-8 winners → EVALUATION tier (CERTIFIED at α=0.05 Holm-Bonferroni, n=7) — preserved with Phase-9h honest demotion above
+> ## 🟡 2026-05-29 PM — Phase-8 candidates clear Holm-Bonferroni at the default-config n=7 cell (non-iso-FLOPs; screened candidates pending iso-FLOPs n≥7 confirmation)
 >
 > **2026-06-01 LATE EVENING NOTE.** The block immediately below
 > certifies the three Phase-8 winners at α=0.05 under Holm-Bonferroni
@@ -209,10 +185,12 @@
 > | `sg_only_phi_budget` (H09 post-fix) | **0.5736** | **+1.24 pp** | [+0.84, +1.67] pp | 0.0078 | **YES** |
 > | `baseline_resnet20` (rail, n=7) | 0.5612 | — | — | — | — |
 >
-> Per CLAUDE.md [Rule 28](../CLAUDE.md#rule-28), the three winners are
-> **PROMOTED from SCREENING to EVALUATION tier** on 2026-05-29 PM. These
-> are the project's **first formally-certified empirical claims at
-> NeurIPS-standard α=0.05**.
+> Per CLAUDE.md [Rule 28](../CLAUDE.md#rule-28), the three candidates
+> clear paired Wilcoxon at Holm-Bonferroni α'=0.0167 in the
+> default-config cell at non-iso-FLOPs (priors run at ~2× baseline
+> FLOPs). They are screened candidates pending iso-FLOPs n≥7
+> confirmation at the modern recipe plus a RegNetX-200MF comparator
+> at the same FLOP envelope.
 >
 > **Honest caveat (preserved):** 12-ep CIFAR-10 and 30-ep CIFAR-100 are
 > still NOT the convergence regime. The certification holds AT THIS
@@ -432,8 +410,9 @@
 > ratio happened to land a fortuitously-high seed-0 number. The corrected
 > mechanism gives a more modest but statistically robust lead. *The
 > 2026-05-29 PM n=7 extension subsequently elevates this from
-> "screening-gate pass" to "formally certified at α=0.05 Holm-Bonferroni"
-> — see the PROMOTION block above.*
+> "screening-gate pass" to "Holm-Bonferroni-cleared at the default-config
+> non-iso-FLOPs cell" — see the cell block above. Iso-FLOPs n≥7
+> confirmation pending.*
 >
 > **The dual-track audit RATIFIED, not destroyed, the project**:
 > - the audit caught a headline produced by broken code BEFORE publication

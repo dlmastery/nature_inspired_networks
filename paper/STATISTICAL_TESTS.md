@@ -14,13 +14,15 @@ three winners CLEAR Holm-Bonferroni**, and by step-down monotonicity
 Phase-5 ordinal gate at n=7: min(leader_s) > max(baseline_s) holds
 for all three winners (verified below in Section 1).
 
-**Verdict promotion:** the three Phase-8 winners move from
-*candidate, formally uncertified at n=3* to **CERTIFIED at α=0.05
-under Holm-Bonferroni after n=7 extension**, dated 2026-05-29 PM.
-These are the project's first formally-certified empirical claims at
-NeurIPS-standard α. The honest caveat (preserved): 12-ep CIFAR-10
-and 30-ep CIFAR-100 are not the convergence regime; certification
-holds AT THIS BUDGET.
+**Verdict:** the three Phase-8 candidates clear Holm-Bonferroni
+α'=0.0167 at the **default-config n=7 cell at non-iso-FLOPs**,
+dated 2026-05-29 PM. They are screened candidates pending iso-FLOPs
+n≥7 confirmation at the modern recipe plus a
+[RegNetX-200MF (Radosavovic et al. CVPR 2020,
+arXiv:2003.13678)](https://arxiv.org/abs/2003.13678) comparator at
+the same FLOP envelope. The honest caveats (preserved): 12-ep CIFAR-10
+and 30-ep CIFAR-100 are not the convergence regime; the result holds
+AT THIS BUDGET at non-iso-FLOPs only.
 
 ---
 
@@ -536,14 +538,12 @@ Mann–Whitney U at n_a=3, n_b=7 has minimum two-sided p = 2/C(10, 3) = 2/120 = 
 - The tuned baseline n=3 sample is small (n=3). The σ at n=3 is 0.31 pp; a Phase-9i n=7 tuned-baseline extension would tighten the CI and resolve any residual small-sample doubt.
 - The comparison is across (lr, wd) cells, not across (architecture, prior). The honest reading is "at the most permissive single-knob LR-tuning of the baseline, the baseline beats the priors;" we do NOT claim the priors are useless across all hyperparameter regimes — we claim they do not robustly survive a properly-LR-tuned baseline at this compute budget.
 
-**Verdict.** The Phase-9h tuned-baseline n=3 binding diagnostic is the cleanest possible empirical reality the project's protocol could surface: **the protocol caught its own headline interpretation drift**. The headline finding is now the methodology, not the priors. The default-config cert is preserved as a formal matched-recipe statement; the priors are honestly demoted to "screened candidates that do not robustly survive a properly-LR-tuned baseline." The protocol's value as a meta-research contribution is the headline claim of the paper.
-
-**2026-06-04 SUPERSESSION NOTE.** The Phase-9i iso-modern-recipe + iso-convergence (200 ep) n=3 binding (Section 15 below) CORRECTS the Phase-9h interpretation: at iso-recipe + iso-convergence the priors LIFT the convergent baseline by +1.00 to +1.24 pp with 3/3 paired-positive + Phase-5 PASS for all three. The Phase-9h gap is correctly localised to LR-tuning confound (apples-to-oranges: baseline received an LR sweep, priors did not), not to prior failure. Section 14 is preserved as the load-bearing first-order self-falsification surface; Section 15 is the load-bearing second-order self-correction surface. The protocol's value is the *cycle*, not just the surfacing.
+**Verdict.** The tuned-baseline n=3 diagnostic surfaced an apples-to-oranges asymmetric-LR-sweep gap that was initially misread as a refutation; Section 15 correctly attributes the gap to LR-tuning confound (the baseline received an LR sweep, the priors did not), not to prior failure. The default-config cell is preserved as a formal statement at non-iso-FLOPs; the matched-recipe candidates remain screened pending iso-FLOPs n≥7 confirmation.
 
 
-## Section 15 — Phase-9i convergence-regime n=3 binding (added 2026-06-04 morning)
+## Section 15 — Iso-recipe n=3 diagnostic at non-matched FLOPs (provisional; added 2026-06-04 morning)
 
-**Scope.** Phase-9i closes the iso-recipe + iso-convergence corrective binding for the Phase-9h diagnostic (§14). All four arms (`baseline_resnet20`, `sg_only_phi_budget`, `pair_gm_pdw`, `slot_act_sine`) were re-run at the **modern 11-trick recipe** (AdamW, cosine LR, label smoothing, RandAugment, MixUp/CutMix, EMA, etc.) at **200 ep CIFAR-100** — the project's first multi-arm convergence-regime sweep. Per-seed top1 read from `experiments_modern/cifar100/<tag>_seed<s>/metrics.json`.
+**Scope.** All four arms (`baseline_resnet20`, `sg_only_phi_budget`, `pair_gm_pdw`, `slot_act_sine`) were re-run at the **modern 11-trick recipe** (AdamW, cosine LR, label smoothing, RandAugment, MixUp/CutMix, EMA, etc.) at **200 ep CIFAR-100** — the project's first multi-arm convergence-regime sweep. **Important caveat: the three priors run at ~2× baseline FLOPs in this cell** (`flops_M` ≈ 80.8 vs baseline 41.2). The composite metric penalises params and latency but not FLOPs, so the +1 pp lift below is confounded with compute. This section is reported as a screened-candidate result pending iso-FLOPs n≥7 confirmation, not as an evaluation-grade claim. Per-seed top1 read from `experiments_modern/cifar100/<tag>_seed<s>/metrics.json`.
 
 ### 15.0 — Convergent baseline cell
 
@@ -582,11 +582,13 @@ Per-seed-paired diagnostic: **9/9 paired deltas across the three winners are str
 
 **All three priors LIFT the convergent modern-recipe baseline; all three pass the Phase-5 ordinal gate; all three deliver 3/3 positive paired deltas.** `pair_gm_pdw` and `slot_act_sine` σ (0.067 and 0.035 pp) are remarkably tight, well below σ_default = 0.453 pp at default-config n=7. All three 95 % paired-bootstrap CIs exclude 0 by a margin of ≥ +0.75 pp on the lower bound. Paired-t (df=2) one-sided p-values sit in {0.0028, 0.0070, 0.0082}.
 
-**Phase-9h gap correctly localised to LR-tuning confound.** The Phase-9h apparent refutation (§14: tuned baseline beats all three priors by +2.27 to +2.81 pp at lr=0.01) was apples-to-oranges — the baseline got an LR sweep, the priors did not, and the comparison crossed (lr, wd) cells. The Phase-9i iso-modern + iso-convergence binding resolves the confound: at *matched* modern recipe and *matched* convergence the priors carry the *same* +1 pp directional lift they carry at default-config (Δ +1.24 / +1.74 / +1.78 pp at lr=1e-3 30 ep → Δ +1.24 / +1.00 / +1.01 pp at modern 200 ep). Cross-regime synthesis is mutually consistent.
+**Earlier tuned-baseline gap correctly localised to LR-tuning confound.** The §14 apparent refutation (tuned baseline beats all three priors by +2.27 to +2.81 pp at lr=0.01) was apples-to-oranges — the baseline got an LR sweep, the priors did not, and the comparison crossed (lr, wd) cells.
 
-**What this section is NOT: a formal NeurIPS-α cert at iso-modern-recipe.** At n=3 the paired-Wilcoxon p_one floor is (1/2)³ = 0.125, well above Holm-Bonferroni α'=0.0167; Mann–Whitney U at n_a=3 n_b=3 has minimum p_two = 2/C(6,3) = 0.10. A Phase-9j n≥7 extension at the modern 200-ep cell is the principled formal-cert path. The per-arm 200-ep runtime is ~3.5 h on the 4090 Laptop; 4 arms × 4 additional seeds = ~56 GPU-h to extend to n=7, or ~39 GPU-h to extend just the three winner arms (the convergent baseline only needs to match the maximum n of the leaders for the Phase-5 ordinal gate). Filed as future work.
+**FLOP gap.** The three priors run at `flops_M` ≈ 80.8 vs baseline 41.2 — a factor of ~1.96. The composite metric `top1 − 0.05·log10(params_M) − 0.05·log10(latency_ms)` does NOT penalise FLOPs. Consequently the +1 pp lift cannot be attributed to the prior in isolation from compute; it is confounded with the doubled FLOP budget. The principled-evaluation path is **iso-FLOPs n≥7 confirmation at the modern recipe plus a [RegNetX-200MF (Radosavovic et al. CVPR 2020, arXiv:2003.13678)](https://arxiv.org/abs/2003.13678) comparator** at the same FLOP envelope: pin each prior's FLOPs to within ±5% of the baseline (e.g., reduce `phi_budget_total`), re-run at n=7, and compare to a tuned RegNetX-200MF at the same FLOPs. If the lift survives, real result; if it collapses, the +1 pp was a compute lift.
+
+**What this section is NOT: an iso-FLOPs comparison or an evaluation-grade claim.** At n=3 the paired-Wilcoxon p_one floor is (1/2)³ = 0.125, well above Holm-Bonferroni α'=0.0167; Mann–Whitney U at n_a=3 n_b=3 has minimum p_two = 2/C(6,3) = 0.10. An n≥7 iso-FLOPs extension at the modern 200-ep cell is the principled-evaluation path. The per-arm 200-ep runtime is ~3.5 h on the 4090 Laptop; ~39 GPU-h to extend just the three priors (after pinning FLOPs) at n=7. Filed as future work.
 
 ### 15.5 — Verdict
 
-The Phase-9i convergence-regime n=3 binding is the second-order corrective check the protocol applies after Phase-9h surfaced an apparent refutation. **The qualitative-but-honest reading: the priors carry ~+1 pp of robust directional signal across both default-config and modern-recipe regimes; the Phase-9h gap is correctly attributed to LR-tuning confound, not prior failure.** Priors are RESTORED to **"screened candidates with consistent +1 pp directional lift across default-config and modern-recipe regimes; iso-modern-recipe formal NeurIPS-α cert pending n≥7."** The protocol's value is the self-falsification + self-correction *cycle* (Phase-9h surfaces; Phase-9i corrects); the methodology is the headline contribution.
+This section is an iso-recipe n=3 diagnostic at non-matched FLOPs (provisional). **The qualitative reading: the priors carry a +1 pp directional lift that is sign-consistent with the default-config cell, but at ~2× baseline FLOPs.** The matched-recipe candidates are framed as **screened candidates pending iso-FLOPs n≥7 confirmation at the modern recipe + RegNetX-200MF comparator**, not as evaluation-grade winners. The protocol's value is the iso-recipe / iso-FLOPs guardrail discipline that surfaces this confound before any external claim ships.
 

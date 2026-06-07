@@ -2,30 +2,32 @@
 
 [![public](https://img.shields.io/badge/repo-public-brightgreen)](https://github.com/dlmastery/nature_inspired_networks)
 [![pages](https://img.shields.io/badge/GitHub_Pages-live-blue)](https://dlmastery.github.io/nature_inspired_networks/)
-[![hypotheses](https://img.shields.io/badge/hypotheses-84_docs_(74_impl)-orange)](hypotheses/INDEX.md)
+[![hypotheses](https://img.shields.io/badge/hypotheses-10_deep_%2B_74_enum-orange)](hypotheses/INDEX.md)
 [![tests](https://img.shields.io/badge/unit_tests-780%2B_green-green)](tests/)
 [![smoke](https://img.shields.io/badge/CIFAR--10_smoke-35_tags_passed-success)](paper/FINDINGS.md)
 [![checkpoint-cadence](https://img.shields.io/badge/checkpoint-≤15min-success)](CLAUDE.md)
-[![dual-track-audit](https://img.shields.io/badge/dual--track_audit-pass-brightgreen)](paper/AUDIT_SUMMARY.md)
-[![acceptance](https://img.shields.io/badge/status-submission_candidate-yellow)](PAPER.md)
+[![status](https://img.shields.io/badge/status-submission_candidate-yellow)](PAPER.md)
 [![license](https://img.shields.io/badge/license-MIT-lightgrey)](pyproject.toml)
 
-> **Elevator pitch (for the area chair).** This repository is a fully
-> protocol-gated, audit-traced empirical study of *nature-inspired
-> inductive biases* — hexagonal lattices, Platonic / icosahedral
-> equivariance, fractal self-similarity, toroidal closure, φ /
-> Fibonacci scaling, Chladni cymatic initialisation, golden-angle
-> modulation — implemented as drop-in residual / attention blocks for
-> CIFAR-scale image classification. We pre-register **84 hypotheses
-> across 8 thematic groups** with committee-grade design docs, ship
-> 780+ unit tests and a SHA-256-fingerprinted composite metric, run a
-> 35-tag CIFAR-10 screening sweep, and submit every kept claim to a
-> two-stage adversarial audit (implementation-critic + research-critic).
-> Negative results are reported at equal prominence to positives. The
-> live dashboard regenerates on every commit:
-> **https://dlmastery.github.io/nature_inspired_networks/**.
+> **Elevator pitch (for the area chair).** A self-auditing LLM-agent
+> autoresearch protocol that catches its own headline drift, applied
+> to *nature-inspired inductive biases* — hexagonal lattices, Platonic
+> / icosahedral equivariance, fractal self-similarity, toroidal
+> closure, φ / Fibonacci scaling, Chladni cymatic initialisation,
+> golden-angle modulation. The load-bearing existence proof is the
+> H09 `phi_budget` catch: a Fixer-introduced mechanism-pinning test
+> revealed a 12.6% realised-stage-ratio drift before any external
+> claim shipped. A protocol-positive secondary finding: the
+> `slot_act_sine` candidate was surfaced as a
+> [SIREN (Sitzmann et al. 2020)](https://arxiv.org/abs/2006.09661)
+> replication mis-attributed to nature-inspired priors — the protocol
+> catch IS the value-add. The substrate is **10 hypotheses defended in
+> depth + 74 design-space enumeration entries** with committee-grade
+> design docs; 780+ unit tests; a SHA-256-fingerprinted composite
+> metric. Submission-candidate; external review pending. Live
+> dashboard: **https://dlmastery.github.io/nature_inspired_networks/**.
 
-**Quick links:** [PAPER](PAPER.md) · [FINDINGS](paper/FINDINGS.md) · [AUDIT_SUMMARY](paper/AUDIT_SUMMARY.md) · [REVIEWER_CHECKLIST](paper/REVIEWER_CHECKLIST.md) · [NEURIPS_CHECKLIST](paper/NEURIPS_CHECKLIST.md) · [LIMITATIONS](paper/LIMITATIONS.md) · [ETHICS_STATEMENT](paper/ETHICS_STATEMENT.md) · [MINDMAP](docs/MINDMAP.md) · [MANIFESTO](paper/MANIFESTO.md) · [84 hypotheses](hypotheses/INDEX.md) · [SOTA comparison](paper/SOTA_COMPARISON.md)
+**Quick links:** [PAPER](PAPER.md) · [FINDINGS](paper/FINDINGS.md) · [AUDIT_SUMMARY](paper/AUDIT_SUMMARY.md) · [REVIEWER_CHECKLIST](paper/REVIEWER_CHECKLIST.md) · [NEURIPS_CHECKLIST](paper/NEURIPS_CHECKLIST.md) · [LIMITATIONS](paper/LIMITATIONS.md) · [ETHICS_STATEMENT](paper/ETHICS_STATEMENT.md) · [MINDMAP](docs/MINDMAP.md) · [MANIFESTO](paper/MANIFESTO.md) · [hypothesis index](hypotheses/INDEX.md) · [SOTA comparison](paper/SOTA_COMPARISON.md)
 
 ---
 
@@ -38,7 +40,7 @@
    (mathematical foundations · neuroscience grounding · 2024–2026
    GDL/TDL literature · cross-paradigm landscape) plus a curated
    awesome-list of arXiv papers, repos, demos, datasets, blogs,
-   talks, and community hubs that motivate the 84-hypothesis design
+   talks, and community hubs that motivate the design
    space in this repo. **This is the document to read if you want to
    understand WHY any of the priors in this repo were chosen.**
 2. **[PAPER.md](PAPER.md)** — the draft submission, abstract to
@@ -89,8 +91,9 @@ academic name (CLAUDE.md Rule 16).
 The core artifact is **`NaturePriorBlock`** — a residual / attention
 block whose inductive biases are each Boolean-toggleable, so a clean
 ablation matrix isolates each prior's marginal effect on a
-ResNet-20-shaped CIFAR scaffold. The design space is **84
-hypotheses across 8 thematic groups** ([`IDEA_TABLE.md`](hypotheses/IDEA_TABLE.md)).
+ResNet-20-shaped CIFAR scaffold. The design space comprises
+**10 hypotheses defended in depth + 74 design-space enumeration entries
+across 8 thematic groups** ([`IDEA_TABLE.md`](hypotheses/IDEA_TABLE.md)).
 **74 are implemented** with code + tests; **35 have been
 smoke-trained** on CIFAR-10; **3 graduate to deeper evaluation**
 ([§4](#4-headline-claims-post-fix)). Every run passes a
@@ -153,8 +156,8 @@ the 80 % band, STOP and diagnose your environment per
 | [`paper/STATISTICAL_TESTS.md`](paper/STATISTICAL_TESTS.md) | Wilcoxon W/p + bootstrap CI + Holm-Bonferroni gate (n=3 → n=7 in flight). |
 | [`paper/SOTA_COMPARISON.md`](paper/SOTA_COMPARISON.md) | Honest map from our numbers to the published literature. |
 | [`paper/PARADIGM_COMPARISON.md`](paper/PARADIGM_COMPARISON.md) | Liquid / JEPA / KAN / Transformer / GNN synthesis. |
-| [`hypotheses/IDEA_TABLE.md`](hypotheses/IDEA_TABLE.md) | Single source of truth for the 84-hypothesis design space (G1–G8). |
-| [`hypotheses/INDEX.md`](hypotheses/INDEX.md) | Per-group index into the 84 design docs. |
+| [`hypotheses/IDEA_TABLE.md`](hypotheses/IDEA_TABLE.md) | Single source of truth for the design space — 10 hypotheses defended in depth + 74 enumeration entries (G1–G8). |
+| [`hypotheses/INDEX.md`](hypotheses/INDEX.md) | Per-group index into the design docs. |
 | [`experiments/EXPERIMENT_LOG.md`](experiments/EXPERIMENT_LOG.md) | Master long-list (Tiers 0–6) of every planned and executed run. |
 | [`experiments/EXPERIMENT_LEDGER.md`](experiments/EXPERIMENT_LEDGER.md) | Chunk-by-chunk audit of source documents (CLAUDE.md Rule 17). |
 | [`experiments/RESULTS.md`](experiments/RESULTS.md) | Auto-generated per-run narratives from `experiment_log.jsonl`. |
@@ -189,11 +192,11 @@ nature_inspired_networks/
     └── dashboard/           ← byte-identical mirror of dashboard/ for live Pages
 ```
 
-## 4. Headline claims — **2026-06-01 reframe: audit-calibration leads; priors are secondary**
+## 4. Headline claims — audit-calibration leads; priors are secondary
 
 ### 4.1 · PRIMARY headline — audit-calibration on 62 third-party hypotheses (Fisher p = 1.94×10⁻⁵)
 
-**The strongest empirical claim of this project is that the protocol's audit doctrine is statistically distinguishable from a clean-code floor by ≈ 2500× past α=0.05.** Same Track-A doctrine applied to 62 hypotheses drawn from production-quality third-party codebases (`pytorch/vision` n=15 + `timm` n=19 + HuggingFace Transformers n=15 + Lightning Bolts/fastai n=6 + `torch.optim` extra n=4 + `state-spaces/mamba` n=3) returns **0/62 MAJOR/BROKEN**; the project's 84-hypothesis substrate returns **18/83 MAJOR/BROKEN** — a **22-pp tier-separated excess**.
+**The strongest empirical claim of this project is that the protocol's audit doctrine is statistically distinguishable from a clean-code floor by ≈ 2500× past α=0.05.** Same Track-A doctrine applied to 62 hypotheses drawn from production-quality third-party codebases (`pytorch/vision` n=15 + `timm` n=19 + HuggingFace Transformers n=15 + Lightning Bolts/fastai n=6 + `torch.optim` extra n=4 + `state-spaces/mamba` n=3) returns **0/62 MAJOR/BROKEN**; the project's substrate (10 hypotheses defended in depth + 74 design-space enumeration entries) returns **18/83 MAJOR/BROKEN** — a **22-pp tier-separated excess**.
 
 | metric | project (n=83) | third-party calibration (n=62) |
 |---|---:|---:|
@@ -205,51 +208,54 @@ nature_inspired_networks/
 
 Full audit: [`audits/AUDIT_CALIBRATION_THIRD_PARTY.md`](audits/AUDIT_CALIBRATION_THIRD_PARTY.md) Appendix A; statistical derivation: [`paper/STATISTICAL_TESTS.md`](paper/STATISTICAL_TESTS.md) §11; commit `e6f1f18`. Cross-family methodologically-diverse re-audit (Closure B; commit `8f0f431`) on 10 of 18 MAJOR/BROKEN findings: **8/10 strict CONCORDANT, 10/10 defect-existence CONCORDANT**.
 
-### 4.2 · METHODOLOGICAL headline — self-falsification + self-correction cycle
+### 4.2 · METHODOLOGICAL headline — load-bearing existence proof + protocol-positive secondary catches
 
-The protocol catches its **own** bullshit *and corrects its own catches*. Double-barrelled, two-sided load-bearing existence proof:
+The protocol catches its **own** at-risk-of-publication framing before any external claim ships.
 
-**Catch (a) — H09 phi_budget's 12.6% realised-stage-ratio drift.** An unaudited pipeline would have published H09's CIFAR-100 +1.53 pp lift, produced by a network whose realised stage-parameter ratio was **1:1.41:2.45**, not the doc-claimed **1:φ:φ² = 1:1.618:2.618**. Fixer-PhiScaling (commit `519cdf3`) corrected this and added a mechanism-pinning test that would have caught the bug if written first.
+**Catch (a) — H09 `phi_budget`'s 12.6% realised-stage-ratio drift.** An unaudited pipeline would have published H09's CIFAR-100 +1.53 pp lift, produced by a network whose realised stage-parameter ratio was **1:1.41:2.45**, not the doc-claimed **1:φ:φ² = 1:1.618:2.618**. Fixer-PhiScaling (commit `519cdf3`) corrected this and added a mechanism-pinning test that would have caught the bug if written first. This is the load-bearing existence proof.
 
-**Catch (b) — the protocol surfaces an apparent refutation, then corrects it.** A 3-seed re-run of `baseline_resnet20_tuned_lr0.01_wd0.0005` at CIFAR-100 30 ep (Phase-9h, the hill-climb-best tuned-baseline cell) returned mean = **0.6017 (n=3, σ = 0.31 pp)**, beating all three default-config-certified priors' n=7 means by +2.27 to +2.81 pp (Mann–Whitney p_one ∈ [0.0083, 0.0111]). At face value this *appeared* to refute the priors. **The protocol then ran the Phase-9i iso-modern-recipe + iso-convergence (200 ep) n=3 binding** — all four arms at the *same* modern 11-trick recipe and the *same* 200-ep convergence cell — and the priors LIFT the convergent baseline (mean 0.6360) by **+1.00 to +1.24 pp** with **3/3 positive paired deltas and Phase-5 ordinal-gate PASS for all three winners**:
+**Catch (b) — `slot_act_sine` is a SIREN replication mis-attributed to nature-inspired priors.** Control 2 surfaced that `slot_act_tanh` *beats* `slot_act_sine` by +0.48 pp paired (3/3 positive at n=3 floor). The SIREN-specific story (a known activation-engineering technique from [Sitzmann et al. NeurIPS 2020, arXiv:2006.09661](https://arxiv.org/abs/2006.09661)) is the literature anchor; the framing as a "nature-inspired winner" was incorrect. **The protocol catch IS the value-add.**
 
-| comparison (Phase-9i iso-modern + iso-200ep) | Δmean | 95 % paired-bootstrap CI | Wilcoxon p_one (n=3 floor) | Phase-5 ordinal gate |
+**Catch (c) — `pair_gm_pdw` is a 3-axis regularizer stack, not a φ-prior.** Control 1 surfaced that ~61% of the +1.74 pp lift is reproduced by a non-φ 3-axis stack (`pair_nonphi_3axis`); the φ-specific residual (+0.61 pp paired, n=3) sits at the n=3 paired-Wilcoxon floor. The honest framing is "orthogonal-axis regularizer stack of which 39% is φ-attributable", not "φ-prior."
+
+**An iso-recipe n=3 diagnostic at non-matched FLOPs (provisional)** on the modern 11-trick recipe at 200 ep returns sign-consistent +1.00 to +1.24 pp directional lifts at the n=3 Wilcoxon floor, **but the priors run at ~2× baseline FLOPs in this cell** (`flops_M` ≈ 80.8 vs baseline 41.2). The +1 pp lift is therefore confounded with compute and is reported as a screened-candidate result pending iso-FLOPs n≥7 confirmation at the modern recipe + a [RegNetX-200MF (Radosavovic et al. CVPR 2020, arXiv:2003.13678)](https://arxiv.org/abs/2003.13678) comparator. The earlier tuned-baseline-at-lr=0.01 diagnostic apparent refutation (+2.27 to +2.81 pp) is correctly attributed to an asymmetric LR sweep across (lr, wd) cells, not to prior failure.
+
+| iso-recipe n=3 diagnostic at 200 ep (non-iso-FLOPs) | Δmean | 95 % paired-bootstrap CI | Wilcoxon p_one (n=3 floor) | iso-FLOPs? |
 |---|---:|---|---:|:---:|
-| `sg_only_phi_budget` (n=3, 0.6485) − baseline (n=3, 0.6360) | **+1.24 pp** | [+0.95, +1.43] pp | 0.125 (floor) | **PASS** |
-| `pair_gm_pdw` (n=3, 0.6460) − baseline (n=3, 0.6360) | **+1.00 pp** | [+0.85, +1.08] pp | 0.125 (floor) | **PASS** |
-| `slot_act_sine` (n=3, 0.6461) − baseline (n=3, 0.6360) | **+1.01 pp** | [+0.75, +1.17] pp | 0.125 (floor) | **PASS** |
+| `sg_only_phi_budget` (n=3, 0.6485) − baseline (n=3, 0.6360) | **+1.24 pp** | [+0.95, +1.43] pp | 0.125 (floor) | **NO** (~2× FLOPs) |
+| `pair_gm_pdw` (n=3, 0.6460) − baseline (n=3, 0.6360) | **+1.00 pp** | [+0.85, +1.08] pp | 0.125 (floor) | **NO** (~2× FLOPs) |
+| `slot_act_sine` (n=3, 0.6461) − baseline (n=3, 0.6360) | **+1.01 pp** | [+0.75, +1.17] pp | 0.125 (floor) | **NO** (~2× FLOPs) |
 
-**The Phase-9h gap is correctly attributed to LR-tuning confound (apples-to-oranges: the baseline got an LR sweep, the priors did not), not to prior failure.** The priors carry ~+1 pp of robust directional signal across both default-config (Δ +1.24/+1.74/+1.78 pp at lr=1e-3 30 ep) AND modern-recipe (Δ +1.24/+1.00/+1.01 pp at modern 200 ep) regimes. Formal NeurIPS-α cert at iso-modern-recipe under Holm-Bonferroni α'=0.0167 requires n≥7 (paired Wilcoxon n=3 floor is p_one=0.125); a Phase-9j n≥7 extension at the modern 200-ep cell is filed as future work (~39 GPU-h on the 4090 Laptop). Full numbers: [`paper/STATISTICAL_TESTS.md`](paper/STATISTICAL_TESTS.md) §14 (Phase-9h surfacing) + §15 (Phase-9i correction); pipeline-close marker: [`audits/PIPELINE_COMPLETE_2026-06-01.md`](audits/PIPELINE_COMPLETE_2026-06-01.md). **The protocol's value is the cycle — it catches "priors help" drift AND it catches "tuned baseline beats" over-correction, converging to the iso-recipe truth.**
+Full numbers: [`paper/STATISTICAL_TESTS.md`](paper/STATISTICAL_TESTS.md) §14 + §15. Iso-FLOPs n≥7 confirmation at the modern recipe + RegNetX-200MF comparator is the principled-evaluation path filed as future work.
 
-### 4.3 · SECONDARY claims — matched-recipe certifications and cross-recipe consistency
+### 4.3 · SECONDARY claims — matched-recipe sweep results across cells (all non-iso-FLOPs)
 
-The Phase-8 winners now carry **two** mutually-consistent matched-recipe binding tables: the default-config n=7 cert (formally certified at α=0.05 under Holm-Bonferroni) and the Phase-9i iso-modern + iso-convergence n=3 binding (qualitatively binding via 3/3 paired-positive + Phase-5 PASS for all three; not formally NeurIPS-α-certified at n=3 — see Phase-9j filed as future work). Both lift the priors by ~+1 pp over their respective convergent baselines.
+The three candidates (`pair_gm_pdw`, `slot_act_sine`, `sg_only_phi_budget`) clear paired Wilcoxon at Holm-Bonferroni α'=0.0167 across a k=3 confirmatory family in the default-config n=7 cell — a formally-correct matched-recipe statement at **non-iso-FLOPs**. The iso-recipe n=3 diagnostic at non-matched FLOPs on the modern 200 ep cell returns sign-consistent +1.00 to +1.24 pp lifts at the n=3 Wilcoxon floor. **No reported cell is iso-FLOPs**: the priors run at ~2× baseline FLOPs in the modern-recipe cell, so the +1 pp magnitudes are confounded with compute. The honest framing is "screened candidates pending iso-FLOPs n≥7 confirmation at the modern recipe + RegNetX-200MF comparator."
 
-#### 4.3.1 · Default-config n=7 cert (matched-recipe; STILL STANDS as a formal statistical statement)[^iso-tuned]
+#### 4.3.1 · Default-config n=7 cell (non-iso-FLOPs)[^iso-tuned]
 
-[^iso-tuned]: **iso-tuned n=7 (Phase-9f, 2026-06-01)** shows Δ-shrinkage; **Phase-9h tuned-baseline n=3 (2026-06-01 late evening)** surfaced an apparent refutation; **Phase-9i iso-modern + iso-convergence n=3 (2026-06-04 morning)** corrects the Phase-9h attribution to LR-tuning confound and RESTORES priors' lift at iso-recipe. Concretely, at the Phase-9f iso-tuned cell (lr=3e-3, wd=5e-4, bs=128, AdamW for baseline / `pair_gm_pdw` / `sg_only_phi_budget`; wd=2e-3 for `slot_act_sine`) the paired Δmean shrinks to +0.79 / +0.66 / +0.25 pp (vs default-config +1.74 / +1.24 / +1.78 pp), paired Wilcoxon p_one ∈ {0.0781, 0.1094, 0.3750} — none clears α=0.05 — and the Phase-5 ordinal gate FAILS at iso-tuned n=7. At the Phase-9h tuned-baseline cell (lr=0.01, wd=5e-4, bs=256, AdamW, 30 ep) the tuned baseline n=3 mean = 0.6017 BEATS all three winners' default-config n=7 means by +2.27 to +2.81 pp (Mann–Whitney p_one ∈ {0.0083, 0.0111, 0.0083}) — **but this comparison is apples-to-oranges (asymmetric LR sweep across different (lr, wd) cells)**. At the **Phase-9i iso-modern-recipe + iso-convergence cell** (modern 11-trick recipe, 200 ep, n=3 all four arms), the priors LIFT the convergent baseline (mean 0.6360) by +1.24 / +1.00 / +1.01 pp with 3/3 paired-positive deltas + Phase-5 PASS for all three winners (95 % paired-bootstrap CIs [+0.95, +1.43] / [+0.85, +1.08] / [+0.75, +1.17] pp; all exclude 0 by ≥ +0.75 pp on the lower bound). Cross-regime synthesis is mutually consistent: priors carry ~+1 pp of robust directional signal across default-config and modern-recipe regimes; Phase-9h gap is correctly attributed to LR-tuning confound, not prior failure. Formal NeurIPS-α cert at iso-modern-recipe pending Phase-9j n≥7 (Wilcoxon floor at n=3 is 0.125). Full closeout: [`paper/STATISTICAL_TESTS.md`](paper/STATISTICAL_TESTS.md) §10 (iso-tuned) + §14 (Phase-9h surfacing) + §15 (Phase-9i correction).
+[^iso-tuned]: **iso-tuned n=7** shows Δ-shrinkage; **tuned-baseline-at-lr=0.01 n=3** surfaced an apparent refutation; **iso-recipe n=3 at non-matched FLOPs (modern 200 ep)** is sign-consistent with default-config but at ~2× baseline FLOPs. Concretely, at the iso-tuned cell (lr=3e-3, wd=5e-4, bs=128, AdamW for baseline / `pair_gm_pdw` / `sg_only_phi_budget`; wd=2e-3 for `slot_act_sine`) the paired Δmean shrinks to +0.79 / +0.66 / +0.25 pp (vs default-config +1.74 / +1.24 / +1.78 pp), paired Wilcoxon p_one ∈ {0.0781, 0.1094, 0.3750} — none clears α=0.05 — and the Phase-5 ordinal gate FAILS at iso-tuned n=7. At the tuned-baseline cell (lr=0.01, wd=5e-4, bs=256, AdamW, 30 ep) the tuned baseline n=3 mean = 0.6017 BEATS all three candidates' default-config n=7 means by +2.27 to +2.81 pp (Mann–Whitney p_one ∈ {0.0083, 0.0111, 0.0083}) — **but this comparison is apples-to-oranges (asymmetric LR sweep across different (lr, wd) cells)**. At the **modern 11-trick recipe + 200 ep n=3 cell** the priors lift the convergent baseline (mean 0.6360) by +1.24 / +1.00 / +1.01 pp with 3/3 paired-positive deltas (95 % paired-bootstrap CIs [+0.95, +1.43] / [+0.85, +1.08] / [+0.75, +1.17] pp), **at ~2× baseline FLOPs**. Iso-FLOPs n≥7 confirmation at the modern recipe + RegNetX-200MF comparator is the principled-evaluation path filed as future work. Full closeout: [`paper/STATISTICAL_TESTS.md`](paper/STATISTICAL_TESTS.md) §10 + §14 + §15.
 
 After the Fixer campaign (CLAUDE.md Rule 21), dual-track audit
-(CLAUDE.md Rule 22), the 2026-05-29 PM **n=7 CIFAR-100 extension**,
-and the 2026-05-30 PM **Phase-9a per-hypothesis hill-climb**, the
-three Phase-8 winners produce a positive lift in BOTH tuning regimes —
-default-config (formally certified at α=0.05 under Holm-Bonferroni)
-AND hill-climbed best-config (additive robustness check, n=3). The
-priors survive hill-climbing, qualitatively refuting BLOCKER #13's
-"any tuned baseline would close the gap" concern.
+(CLAUDE.md Rule 22), the n=7 CIFAR-100 extension, and the Phase-9a
+per-hypothesis hill-climb, the three candidates produce a positive
+lift in BOTH tuning regimes — default-config (α=0.05 under Holm-
+Bonferroni at non-iso-FLOPs) AND hill-climbed best-config (additive
+robustness check, n=3) — but the iso-tuned cell at n=7 fails to
+re-clear α=0.05, and no cell is iso-FLOPs.
 
-**Row 1 — Default-config n=7 certification (Sections 0–6 of STATISTICAL_TESTS):**
+**Row 1 — Default-config n=7 cell (Sections 0–6 of STATISTICAL_TESTS, non-iso-FLOPs):**
 paired Wilcoxon W=0, exact one-sided p=(1/2)^7 = **0.0078** <
-α'_Holm=0.0167 for each winner across the k=3 family; see
+α'_Holm=0.0167 for each candidate across the k=3 family; see
 [`paper/STATISTICAL_TESTS.md`](paper/STATISTICAL_TESTS.md) §0. Per
-CLAUDE.md Rule 28 these are PROMOTED from SCREENING to EVALUATION
-tier — the project's **first formally-certified empirical claims**.
+CLAUDE.md Rule 28 these are screened candidates pending iso-FLOPs
+n≥7 confirmation at the modern recipe + RegNetX-200MF comparator.
 
-| Rank | Hypothesis (tag) | CIFAR-100 Δmean (n=7) | 95% bootstrap CI | Wilcoxon p | Holm-cleared? |
+| Rank | Hypothesis (tag) | CIFAR-100 Δmean (n=7) | 95% bootstrap CI | Wilcoxon p | iso-FLOPs? |
 |---|---|---:|---|---:|:---:|
-| 1 | **H81 `slot_act_sine`** (SIREN single prior) | **+1.78 pp** | [+1.38, +2.18] pp | **0.0078** | YES |
-| 2 | **`pair_gm_pdw`** (H09+H48+H44 orthogonal 3-axis stack) | **+1.74 pp** | [+1.42, +2.09] pp | **0.0078** | YES |
-| 3 | **H09 `sg_only_phi_budget`** (post-fix 1:1.623:2.629) | **+1.24 pp** | [+0.84, +1.67] pp | **0.0078** | YES |
+| 1 | **H81 `slot_act_sine`** (SIREN replication, not nature-inspired) | **+1.78 pp** | [+1.38, +2.18] pp | **0.0078** | NO |
+| 2 | **`pair_gm_pdw`** (3-axis regularizer stack; ~61% non-φ per Control 1) | **+1.74 pp** | [+1.42, +2.09] pp | **0.0078** | NO |
+| 3 | **H09 `sg_only_phi_budget`** (post-fix 1:1.623:2.629) | **+1.24 pp** | [+0.84, +1.67] pp | **0.0078** | NO |
 
 CIFAR-100 baseline reference (n=7): `baseline_resnet20` mean=0.5612, σ=0.451 pp.
 
@@ -272,21 +278,26 @@ Sources: `ideas/00_baseline_resnet20/hillclimb_results.json`,
 `ideas/92_slot_act_sine/...`. Full Section-7 stat tests:
 [`paper/STATISTICAL_TESTS.md`](paper/STATISTICAL_TESTS.md) §7.
 
-CIFAR-10 12-ep screening composites (all use the SHA-256-fingerprinted
-formula `top1 − 0.05·log10(params_M) − 0.05·log10(latency_ms)`,
-fingerprint `d65565e9c7b12d14cbce30a801ecc6753aea3eb148074256bfcc051fa61d0893`)
+CIFAR-10 12-ep screening composites (legacy formula
+`top1 − 0.05·log10(params_M) − 0.05·log10(latency_ms)`,
+legacy fingerprint `d65565e9c7b12d14cbce30a801ecc6753aea3eb148074256bfcc051fa61d0893`;
+new formula effective 2026-06-06 extends with `− 0.05·log10(flops_M)`, new fingerprint
+`b73e8bbfa2717c567bda42b7760fefc3b4e68381aee54ea28d7cd8f3d6863649`)
 for the same tags: `sg_only_phi_budget` 85.54 % top-1 / 0.8429
 composite; `pair_gm_pdw` 85.85 % top-1 (post-fix combo ladder winner);
 `slot_act_sine` 84.30 % top-1.
 
-**Honest caveat (preserved):** the n=7 certification holds at the
-12-ep CIFAR-10 + 30-ep CIFAR-100 screening compute budget. The
-hill-climbed n=3 robustness check is ADDITIVE, not a re-certification
-(n=3 paired-Wilcoxon floor (1/2)^3=0.125 cannot clear Holm-Bonferroni
-α'=0.0167). An n=7 hill-climbed extension (Phase-9c) + converged
-164-ep training + tuned RegNetX-200MF baseline (`PAPER.md` §7.4-4)
-remain open. The φ-content vs any-three-orthogonal-axes attribution
-question (the non-φ control in §5.5.1) is also open.
+**Honest caveat (preserved):** the n=7 default-config result is at
+non-iso-FLOPs and holds at the 12-ep CIFAR-10 + 30-ep CIFAR-100
+screening compute budget. The hill-climbed n=3 robustness check is
+ADDITIVE, not a re-certification (n=3 paired-Wilcoxon floor
+(1/2)^3=0.125 cannot clear Holm-Bonferroni α'=0.0167). An iso-FLOPs
+n≥7 extension at the modern recipe + a [RegNetX-200MF
+(Radosavovic et al. CVPR 2020,
+arXiv:2003.13678)](https://arxiv.org/abs/2003.13678) comparator at the
+same FLOP envelope remain open. The φ-content vs any-three-
+orthogonal-axes attribution question (Control 1 in §5.5.1) is open:
+Control 1 shows ~61% of the `pair_gm_pdw` lift is non-φ.
 
 (The H41 `golden_adam` β-only requalification — clarified from
 −33 pp single-config to −1 pp under Reddi-2018 testing — remains a
@@ -319,7 +330,7 @@ hypotheses earn the expensive deep dive (CLAUDE.md Rule 19, Phase 2
   before any external claim. A Phase-9 hill-climb is planned to
   retire the residual single-config dependency.
 - **No multiplicity correction** has been applied across the
-  84-hypothesis design space — this is acknowledged in
+  full design space — this is acknowledged in
   [`LIMITATIONS.md`](paper/LIMITATIONS.md) and is the headline reason the
   paper frames itself as a *methodology + screening* contribution.
 - The composite metric is a project-specific aggregation; raw top-1
@@ -480,8 +491,8 @@ review** (see [`ETHICS_STATEMENT.md`](paper/ETHICS_STATEMENT.md)).
 ```bibtex
 @misc{dlmastery_nature_inspired_networks_2026,
   author = {dlmastery},
-  title  = {nature\_inspired\_networks: NaturePriorBlock and the
-            84-hypothesis autoresearch ablation},
+  title  = {nature\_inspired\_networks: NaturePriorBlock and a
+            self-auditing LLM-agent autoresearch ablation},
   year   = {2026},
   howpublished = {\url{https://github.com/dlmastery/nature_inspired_networks}},
   note   = {Live dashboard: \url{https://dlmastery.github.io/nature_inspired_networks/}}

@@ -397,3 +397,9 @@ This hypothesis is *unfalsifiable in the practical sense* — even a clear negat
 
 ### Verdict
 **UNFALSIFIABLE** — Attribution is impossible at this scale of composition; even a clear negative cannot tell us what to do next. The doc should explicitly predict worse-than-baseline as the SCIENCE (as the prompt instructs), but instead predicts Pareto-dominance — directly contradicting the program's own empirical record.
+
+---
+
+## Status journal — 2026-06-06 demotion to FALSIFIED_AT_MECHANISM_TEST
+
+Per the SYNTHESIS_100 audit (`audits/REVIEWER_FIVE_2026-06-06/SYNTHESIS_100.md` B19), H67 is demoted to **FALSIFIED_AT_MECHANISM_TEST**. The G7 implementation-critic audit (BROKEN finding) found `from .golden_rope import GoldenRoPE` raised ImportError; MetatronGraphLayer constructor signature was wrong; `which_priors_active` was hardcoded `True` for 4 priors; LiquidCFC collapsed to affine + nonlinearity. The Track-B sci-critic addendum (above) verdict UNFALSIFIABLE: attribution at 10 simultaneously-changing variables is impossible. The hypothesis is **not** listed as a Phase-8 winner or contribution in PAPER.md / README.md / FINDINGS.md; the Fixer-G7 (`2e7ee45`) repair restored compileability but the underlying attribution-impossibility verdict stands.

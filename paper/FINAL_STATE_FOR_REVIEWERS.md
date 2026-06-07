@@ -14,7 +14,7 @@ Read time: ~10 minutes
 
 ---
 
-## TL;DR (~200 words) — **2026-06-04 MORNING honest update (audit-calibration-centric reframe + Phase-9i convergence-regime corrective binding)**
+## TL;DR — submission-candidate; external review pending (audit-calibration-centric framing; iso-recipe n=3 diagnostic at non-matched FLOPs as provisional)
 
 We submit a **methodological contribution**: a self-auditing LLM-agent
 autoresearch protocol that catches **and corrects** its own headline-
@@ -48,11 +48,15 @@ on all three). **The Phase-9h gap is correctly attributed to LR-tuning
 confound (apples-to-oranges asymmetric LR sweep), not prior failure.**
 
 **The protocol-as-meta-research-methodology IS the headline.** The
-priors are restored to **screened candidates with consistent +1 pp
-directional lift across default-config and modern-recipe regimes;
-iso-modern-recipe formal NeurIPS-α cert pending n≥7** (Phase-9j
-filed as future work, ~39 GPU-h). The cycle is two-sided: it catches
-"priors help" drift AND "tuned baseline beats" over-correction.
+priors are framed as **screened candidates with consistent +1 pp
+sign-direction lift across default-config and modern-recipe regimes;
+both cells are at non-iso-FLOPs (priors at ~2× baseline FLOPs in the
+modern-recipe cell)**. The principled-evaluation path is iso-FLOPs
+n≥7 confirmation at the modern recipe plus a [RegNetX-200MF
+(Radosavovic et al. CVPR 2020,
+arXiv:2003.13678)](https://arxiv.org/abs/2003.13678) comparator at
+the same FLOP envelope (~39 GPU-h after FLOP-budget pinning); filed
+as future work.
 
 ---
 
@@ -349,7 +353,7 @@ falsifiers + GPU costs in `audits/COMBINATIONS_RESEARCH/D_new_hypotheses.md`.
 | Wave-1 launch script | `.launch_phase9e_wave1.ps1` | `0dc587b` |
 | Phase-9f launch script | `.launch_phase9f.ps1` | latest HEAD |
 | H09 Fixer commit (the signature catch) | `src/nature_inspired_networks/phi_scaling.py` | `519cdf3` |
-| Composite-formula fingerprint | `src/nature_inspired_networks/eval.py:COMPOSITE_FORMULA` SHA-256 `d65565e9c7b12d14cbce30a801ecc6753aea3eb148074256bfcc051fa61d0893` | (Rule 2) |
+| Composite-formula fingerprint | `src/nature_inspired_networks/eval.py:COMPOSITE_FORMULA` SHA-256 `b73e8bbfa2717c567bda42b7760fefc3b4e68381aee54ea28d7cd8f3d6863649` (FLOPs-extended formula 2026-06-06; legacy fingerprint `d65565e9c7b12d14cbce30a801ecc6753aea3eb148074256bfcc051fa61d0893` for pre-2026-06-06 archived runs) | (Rule 2) |
 | Live dashboard | https://dlmastery.github.io/nature_inspired_networks/ | latest |
 
 ## 12. Frequently asked questions (FAQ for area chairs)

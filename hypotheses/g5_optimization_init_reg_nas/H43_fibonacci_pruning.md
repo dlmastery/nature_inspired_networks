@@ -303,3 +303,9 @@ Run 5-iteration IMP with prune-rate sequence `{F_k/F_{k+1}}_{k=1..5} = {0.5, 0.6
 
 ### Verdict
 DERIVATIVE+TESTABLE — IMP is well-grounded but Fib-anchoring of the prune schedule converges too fast to 1/φ to be empirically distinguishable from constant-0.618 pruning beyond iteration 4; recommend recasting the hypothesis as "IMP at φ-asymptote prune-rate" and dropping the Fibonacci-sequence framing entirely.
+
+---
+
+## Status journal — 2026-06-06 demotion to FALSIFIED_AT_MECHANISM_TEST
+
+Per the SYNTHESIS_100 audit (`audits/REVIEWER_FIVE_2026-06-06/SYNTHESIS_100.md` B19), H43 is demoted to **FALSIFIED_AT_MECHANISM_TEST**. The Track-B sci-critic addendum (above) shows the Fibonacci-anchored prune-rate schedule converges to constant 1/φ ≈ 0.618 after k=4, so it is operationally indistinguishable from constant-0.618 IMP (Han 2015; Frankle & Carbin 2018; Zhu & Gupta 2017; Blalock 2020). The mechanism-pinning test that would distinguish Fib from constant-0.618 is not present. The hypothesis is **not** listed as a Phase-8 winner or contribution in PAPER.md / README.md / FINDINGS.md.

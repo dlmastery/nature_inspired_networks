@@ -452,3 +452,9 @@ Param compression: 18-30% is plausible (the math is correct). Perplexity Δ at i
 
 ### Verdict
 **DERIVATIVE+TESTABLE** — Aggressive cross-role weight tying with a decorative basis name; the math is sound but the 13-vertex Metatron-ness has no derived advantage over random 13-rank tying.
+
+---
+
+## Status journal — 2026-06-06 demotion to FALSIFIED_AT_MECHANISM_TEST
+
+Per the SYNTHESIS_100 audit (`audits/REVIEWER_FIVE_2026-06-06/SYNTHESIS_100.md` B19), H74 is demoted to **FALSIFIED_AT_MECHANISM_TEST**. The G7 implementation-critic audit (BROKEN finding) found MetatronTiedConv2d's 13 alphas Σ-summed to a single scalar gate: `F.conv2d(x, W · Σα_c)` collapsed the 13 alphas to one. The Track-B sci-critic addendum (above) verdict DERIVATIVE+TESTABLE: the 13-vertex Metatron-basis is decorative on top of a low-rank tied factorisation à la LoRA shared-base (Hu et al. 2022); no published precedent supports QKV-FFN cross-role tying through any specific 13-vertex basis. The Fixer-G7 repair (with H40's 13 spatially-distinct circle masks) restored mechanism-functional code, but the underlying DERIVATIVE verdict + the absence of an iso-rank-13 random-basis comparator stand. The hypothesis is **not** listed as a Phase-8 winner or contribution in PAPER.md / README.md / FINDINGS.md.

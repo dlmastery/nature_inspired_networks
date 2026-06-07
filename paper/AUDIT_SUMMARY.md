@@ -205,7 +205,7 @@ The "open work" items above are now resolved as follows. The empirical-rigor row
 | Empirical-rigor row of reviewer-pass status table | MAJOR (open) | **RESOLVED** |
 | Promotion under CLAUDE.md Rule 28 | n/a (still SCREENING) | **SCREENING → EVALUATION** for all three winners |
 
-Per [`paper/STATISTICAL_TESTS.md`](STATISTICAL_TESTS.md) §0 (promotion banner) and §1 (per-claim CERTIFIED rows): the three Phase-8 winners are the project's first formally-certified empirical claims at NeurIPS-standard α. The remaining open items (Phase-9a hill-climb at converged budget, tuned-RegNet head-to-head, non-φ 3-axis control) remain open and do not block the n=7 certification at the screening compute budget.
+Per [`paper/STATISTICAL_TESTS.md`](STATISTICAL_TESTS.md) §0 and §1: the three matched-recipe candidates clear paired Wilcoxon at Holm-Bonferroni α'=0.0167 in the default-config n=7 cell **at non-iso-FLOPs**. They are screened candidates pending iso-FLOPs n≥7 confirmation at the modern recipe plus a [RegNetX-200MF (Radosavovic et al. CVPR 2020, arXiv:2003.13678)](https://arxiv.org/abs/2003.13678) comparator at the same FLOP envelope; the hill-climb, tuned-RegNet head-to-head, and non-φ 3-axis Control 1 (~61% non-φ) remain open work.
 
 ---
 
@@ -230,7 +230,7 @@ Per CLAUDE.md [Rule 28](../CLAUDE.md#rule-28) (screening-vs-evaluation disciplin
 
 Cross-references: [`paper/STATISTICAL_TESTS.md`](STATISTICAL_TESTS.md) §1 (n=7 certification, unchanged) and §7 (n=3 hill-climb addendum), [`paper/FINDINGS.md`](FINDINGS.md) §"2026-05-30 PM hill-climb" block, [`paper/REVIEWER_CHECKLIST.md`](REVIEWER_CHECKLIST.md) Section H1–H5 (now Done).
 
-**Net effect on headline framing.** The n=7 EVALUATION-tier certification (Sections 0–6 of STATISTICAL_TESTS) is preserved and remains the formal external claim. The hill-climb evidence (Section 7 / this appendix) demonstrates the certified winners *also* lift over baseline at the converged hyperparameter point, but at n=3 the Wilcoxon cannot clear α=0.05 (this is a sample-size floor, not a failure of the priors). The cross-dataset claim that was "suspended pending post-fix re-run" in the pre-2026-05-29 body of this document is therefore **fully resolved at the screening-compute budget and partially resolved at the converged-budget regime** — the converged-budget n=7 certification is the remaining open work and is tracked under the ICML 2027 rebuttal at `audits/ICML_REVIEWS_2026-05-30/REBUTTAL.md`.
+**Net effect on headline framing.** The n=7 default-config result at non-iso-FLOPs (Sections 0–6 of STATISTICAL_TESTS) is preserved as a formally-correct statement in that cell. The hill-climb evidence (Section 7 / this appendix) demonstrates the candidates also lift over baseline at the hill-climbed hyperparameter point, but at n=3 the Wilcoxon cannot clear α=0.05 (sample-size floor). The principled-evaluation gate is iso-FLOPs n≥7 confirmation at the modern recipe + a RegNetX-200MF comparator at the same FLOP envelope; tracked as future work.
 
 *Appendix added 2026-05-30 PM. Original audit-summary body above is preserved verbatim for archival completeness.*
 
