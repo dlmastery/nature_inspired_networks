@@ -1,0 +1,106 @@
+# CIFAR-100 modern-recipe convergence-regime config (200 epochs) —
+# pair_gm_pdw (H88) overlay.
+#
+# Provenance / cold-clone reproducibility (SYNTHESIS_100.md item A5):
+#   The checked-in run `experiments_modern/cifar100/pair_gm_pdw_seed{0,1,2}/`
+#   was produced from `configs/cifar100_modern_200ep.yaml` + the
+#   `pair_gm_pdw` overrides in `scripts/run_sweep.py:441-443`. That overlay
+#   was NEVER committed as a standalone YAML — reviewers (R5 BLOCKER 5)
+#   could not reproduce from a cold clone. This file is the missing artefact.
+#
+# Iso-FLOPs guard (SYNTHESIS_100.md items A1 + A3 / R5 BLOCKER 1):
+#   The checked-in runs measured `flops=80_816_212` vs baseline
+#   `flops=41_224_448` — a factor 1.96 over the iso-FLOPs budget. The
+#   composite metric does not penalise FLOPs, so the +1 pp "lift"
+#   reported in PAPER.md is a compute artifact. The `flops_target` +
+#   `flops_tolerance` fields below cause Agent B's runner pre-flight
+#   check to REFUSE this config until the prior is re-pinned to the
+#   baseline FLOPs envelope (e.g., by reducing channel width or
+#   stage depth). That refusal is the point — this YAML is the honest
+#   reproducibility artifact; the actual iso-FLOPs re-runs are Week-1
+#   work (Block A item A1).
+#
+# Hypothesis under test (H88 — pair_gm_pdw):
+#   A 2-axis stack of orthogonal regularizers on the `phi_budget` base:
+#     1. momentum_schedule = "golden" (golden-ratio-modulated Nesterov
+#        momentum, axis = optimizer)
+#     2. phi_decay_wd = true (layer-graded phi-decay weight decay,
+#        axis = regulariser)
+#   Control 1 (PAPER.md §13.1) shows ~61% of the +1.74 pp claimed lift
+#   is non-phi-attributable; the phi-residual at the n=3 Wilcoxon floor
+#   is +0.61 pp. See SYNTHESIS_100.md item E5 (reframe pair_gm_pdw as a
+#   3-axis stack with ~39% phi-specific residual) and item E6 (2^3
+#   factorial decomposition to isolate which axis carries the phi signal).
+#
+# Hardware contract (CLAUDE.md §2):
+#   * RTX 4090 Laptop, 16 GB VRAM, Windows 11
+#   * bf16 AMP, batch 256, num_workers 0
+#   * OMP/MKL caps applied at launch (Rule 26)
+
+# ---- Iso-FLOPs guard (runner pre-flight check) ----
+# Baseline ResNet-20 CIFAR-100 measured FLOPs = 41_224_448.
+# A 10% tolerance lets honest variants live in [37.1M, 45.3M].
+# Current pair_gm_pdw at ~80.8 M will be REFUSED until re-pinned.
+flops_target: 41224448
+flops_tolerance: 0.10
+
+# ---- Inherit everything from cifar100_modern_200ep.yaml ----
+dataset: cifar100
+data_root: ./data
+batch_size: 256
+num_workers: 0
+epochs: 200
+
+lr: 1.0e-3
+weight_decay: 5.0e-4
+label_smoothing: 0.1
+warmup_epochs: 5
+use_bf16: true
+optimizer: adamw
+scheduler: cosine
+target_top1: 0.68
+
+mixup_alpha: 0.2
+cutmix_alpha: 1.0
+mixup_cutmix_prob: 0.5
+randaugment_n: 2
+randaugment_m: 14
+random_erasing_p: 0.25
+ema_decay: 0.9999
+
+# ---- pair_gm_pdw delta vs the modern baseline ----
+# Base = the H09 phi_budget verified-winner architecture (PB in
+# scripts/run_sweep.py:315-317).
+model: phi_budget
+phi_model: phi_budget
+phi_budget_total: 270000
+phi_budget_n_stages: 3
+phi_budget_mode: phi
+channel_mode: phi
+
+# Axis 1 — golden-ratio momentum schedule (optimizer axis).
+momentum_schedule: golden
+
+# Axis 2 — phi-decay layer-graded weight decay (regulariser axis).
+phi_decay_wd: true
+phi_decay_base: 5.0e-4
+
+flags:
+  hex: false
+  group: false
+  fractal: false
+  toroidal: false
+  cymatic_init: false
+  golden_modulate: false
+
+# Launch (per seed, single tag at a time):
+#   .\.venv\Scripts\python -m nature_inspired_networks.runner `
+#     --config configs\cifar100_modern_200ep_pair_gm_pdw.yaml `
+#     --tag pair_gm_pdw_modern_200ep --seed 0 `
+#     --root experiments_modern
+#
+# Expected behaviour as of 2026-06-06:
+#   Runner pre-flight measures FLOPs via fvcore at model-build time;
+#   measured ~80.8 M > 41.22 M * 1.10 = 45.3 M => REFUSE.
+#   Fix: reduce phi_budget_total until measured FLOPs land in band,
+#   re-pre-register, then re-launch under Block A item A1.

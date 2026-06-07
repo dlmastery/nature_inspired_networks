@@ -1,0 +1,102 @@
+# CIFAR-100 modern-recipe convergence-regime config (200 epochs) —
+# sg_only_phi_budget (H09) overlay.
+#
+# Provenance / cold-clone reproducibility (SYNTHESIS_100.md item A5):
+#   The checked-in run `experiments_modern/cifar100/sg_only_phi_budget_seed{0,1,2}/`
+#   was produced from `configs/cifar100_modern_200ep.yaml` + the
+#   `sg_only_phi_budget` overrides in `scripts/run_sweep.py:108-113`.
+#   That overlay was NEVER committed as a standalone YAML — reviewers
+#   (R5 BLOCKER 5) could not reproduce from a cold clone. This file is
+#   the missing artefact.
+#
+# Iso-FLOPs guard (SYNTHESIS_100.md items A1 + A3 / R5 BLOCKER 1):
+#   The checked-in sg_only_phi_budget runs measured `flops=80_816_212`
+#   vs baseline `41_224_448` — factor 1.96 over the iso-FLOPs envelope.
+#   The composite metric `top1 - 0.05*log10(params_M) - 0.05*log10(latency_ms)`
+#   does NOT penalise FLOPs, so the reported lift is partly a depth /
+#   compute artifact. The `flops_target` + `flops_tolerance` fields cause
+#   Agent B's runner pre-flight check to REFUSE this config until
+#   re-pinned. That refusal is the point.
+#
+# Hypothesis under test (H09 — Golden Proportion Parameter Budget):
+#   Allocate total parameter budget across stages in the ratio
+#   1 : phi : phi^2 (phi = 1.618). PAPER.md and sci-critic addendum
+#   acknowledge H09 is DERIVATIVE of Radosavovic 2020 RegNet (Pareto
+#   region around w_m ~ 2.5-2.9; phi sits inside). The honest claim
+#   is "exact phi-ratio vs free Pareto-search" — SYNTHESIS_100.md
+#   item B12 specifies the comparison: iso-FLOPs paired Wilcoxon vs
+#   RegNetX-200MF (literature anchor) at n=5 on Imagenette / Tiny-ImageNet /
+#   CIFAR-100. The current single-dataset n=3 number does not test the
+#   phi-specificity claim.
+#
+# Reproducibility note (SYNTHESIS_100.md item D12):
+#   When this config launches under iso-FLOPs, the runner is required
+#   to record `realised_widths` and `realised_phi_ratios` in metrics.json
+#   so reviewers can verify the phi-prior is actually implemented (not
+#   degenerated to a uniform allocation by the integer search).
+#
+# Hardware contract (CLAUDE.md §2):
+#   * RTX 4090 Laptop, 16 GB VRAM, Windows 11
+#   * bf16 AMP, batch 256, num_workers 0
+#   * OMP/MKL caps applied at launch (Rule 26)
+
+# ---- Iso-FLOPs guard (runner pre-flight check) ----
+# Baseline ResNet-20 CIFAR-100 measured FLOPs = 41_224_448.
+# A 10% tolerance lets honest variants live in [37.1M, 45.3M].
+# Current sg_only_phi_budget at ~80.8 M will be REFUSED until re-pinned.
+flops_target: 41224448
+flops_tolerance: 0.10
+
+# ---- Inherit everything from cifar100_modern_200ep.yaml ----
+dataset: cifar100
+data_root: ./data
+batch_size: 256
+num_workers: 0
+epochs: 200
+
+lr: 1.0e-3
+weight_decay: 5.0e-4
+label_smoothing: 0.1
+warmup_epochs: 5
+use_bf16: true
+optimizer: adamw
+scheduler: cosine
+target_top1: 0.68
+
+mixup_alpha: 0.2
+cutmix_alpha: 1.0
+mixup_cutmix_prob: 0.5
+randaugment_n: 2
+randaugment_m: 14
+random_erasing_p: 0.25
+ema_decay: 0.9999
+
+# ---- sg_only_phi_budget delta vs the modern baseline ----
+# H09 verified-winner architecture: 3-stage phi-allocation, total
+# budget 270k params.
+model: phi_budget
+phi_model: phi_budget
+phi_budget_total: 270000
+phi_budget_n_stages: 3
+phi_budget_mode: phi
+channel_mode: phi
+
+flags:
+  hex: false
+  group: false
+  fractal: false
+  toroidal: false
+  cymatic_init: false
+  golden_modulate: false
+
+# Launch (per seed, single tag at a time):
+#   .\.venv\Scripts\python -m nature_inspired_networks.runner `
+#     --config configs\cifar100_modern_200ep_sg_only_phi_budget.yaml `
+#     --tag sg_only_phi_budget_modern_200ep --seed 0 `
+#     --root experiments_modern
+#
+# Expected behaviour as of 2026-06-06:
+#   Runner pre-flight measures FLOPs via fvcore; measured ~80.8 M
+#   > 41.22 M * 1.10 = 45.3 M => REFUSE. Fix: reduce phi_budget_total
+#   until measured FLOPs land in band, re-pre-register, then re-launch
+#   under Block A item A1.

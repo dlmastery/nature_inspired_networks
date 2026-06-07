@@ -1,0 +1,100 @@
+# CIFAR-100 modern-recipe convergence-regime config (200 epochs) —
+# slot_act_sine overlay.
+#
+# Provenance / cold-clone reproducibility (SYNTHESIS_100.md item A5):
+#   The checked-in run `experiments_modern/cifar100/slot_act_sine_seed{0,1,2}/`
+#   was produced from `configs/cifar100_modern_200ep.yaml` + the
+#   `slot_act_sine` overrides in `scripts/run_sweep.py:467-469`. That
+#   overlay was NEVER committed as a standalone YAML — reviewers
+#   (R5 BLOCKER 5) could not reproduce from a cold clone. This file is
+#   the missing artefact.
+#
+# Iso-FLOPs guard (SYNTHESIS_100.md items A1 + A3 / R5 BLOCKER 1):
+#   The checked-in slot_act_sine runs measured `flops=80_816_212` vs
+#   baseline `41_224_448` — factor 1.96 over the iso-FLOPs budget.
+#   The `flops_target` + `flags_tolerance` fields below cause Agent B's
+#   runner pre-flight check to REFUSE this config until re-pinned.
+#
+# Hypothesis under test (slot_act_sine — SIREN replication):
+#   Replace the default ReLU activation in the phi_budget base with a
+#   sine activation (omega_init=1.0) per Sitzmann 2020 SIREN
+#   (arXiv:2006.09661). PAPER.md §13.2 Control 2 shows `slot_act_tanh`
+#   beats `slot_act_sine` by +0.48 pp at n=3 — sine is NOT nature-inspired
+#   over tanh; it is a known SIREN-family activation with a sinusoidal
+#   spectral bias (Rahaman 2019 arXiv:1806.08734).
+#
+# Honesty disclosure (SYNTHESIS_100.md items B7, E4, F10):
+#   This row's headline framing in the abstract is incorrect; it is a
+#   SIREN replication, not a nature-inspired prior. The protocol-positive
+#   finding is the protocol catch in §5 (Control 2 demoted this row from
+#   the abstract triple). Wave-4 (H71 IcosaRoPE3D Spherical MNIST) or
+#   B6 (hex AID) replaces it as the third headline if either lifts.
+#
+# Hardware contract (CLAUDE.md §2):
+#   * RTX 4090 Laptop, 16 GB VRAM, Windows 11
+#   * bf16 AMP, batch 256, num_workers 0
+#   * OMP/MKL caps applied at launch (Rule 26)
+
+# ---- Iso-FLOPs guard (runner pre-flight check) ----
+# Baseline ResNet-20 CIFAR-100 measured FLOPs = 41_224_448.
+# A 10% tolerance lets honest variants live in [37.1M, 45.3M].
+# Current slot_act_sine at ~80.8 M will be REFUSED until re-pinned.
+flops_target: 41224448
+flops_tolerance: 0.10
+
+# ---- Inherit everything from cifar100_modern_200ep.yaml ----
+dataset: cifar100
+data_root: ./data
+batch_size: 256
+num_workers: 0
+epochs: 200
+
+lr: 1.0e-3
+weight_decay: 5.0e-4
+label_smoothing: 0.1
+warmup_epochs: 5
+use_bf16: true
+optimizer: adamw
+scheduler: cosine
+target_top1: 0.68
+
+mixup_alpha: 0.2
+cutmix_alpha: 1.0
+mixup_cutmix_prob: 0.5
+randaugment_n: 2
+randaugment_m: 14
+random_erasing_p: 0.25
+ema_decay: 0.9999
+
+# ---- slot_act_sine delta vs the modern baseline ----
+# Base = the H09 phi_budget verified-winner architecture (PB in
+# scripts/run_sweep.py:315-317).
+model: phi_budget
+phi_model: phi_budget
+phi_budget_total: 270000
+phi_budget_n_stages: 3
+phi_budget_mode: phi
+channel_mode: phi
+
+# The single delta vs the phi_budget base: sine activation (SIREN-family).
+sine_activation: true
+omega_init: 1.0
+
+flags:
+  hex: false
+  group: false
+  fractal: false
+  toroidal: false
+  cymatic_init: false
+  golden_modulate: false
+
+# Launch (per seed, single tag at a time):
+#   .\.venv\Scripts\python -m nature_inspired_networks.runner `
+#     --config configs\cifar100_modern_200ep_slot_act_sine.yaml `
+#     --tag slot_act_sine_modern_200ep --seed 0 `
+#     --root experiments_modern
+#
+# Expected behaviour as of 2026-06-06:
+#   Runner pre-flight measures FLOPs via fvcore; measured ~80.8 M
+#   > 41.22 M * 1.10 = 45.3 M => REFUSE. Fix is to re-pin the phi_budget
+#   base under iso-FLOPs before applying the activation swap.
