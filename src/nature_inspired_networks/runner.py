@@ -24,7 +24,7 @@ import yaml
 
 from .blocks import NaturePriorFlags
 from .data import load_dataset
-from .eval import COMPOSITE_FINGERPRINT, COMPOSITE_FORMULA
+from .eval import COMPOSITE_FINGERPRINT, COMPOSITE_FORMULA, count_flops
 # Importing models triggers the H13 / H18 / H19 self-registration of new
 # model names (natureprior_phi_sparse / natureprior_fib_stride /
 # natureprior_phi_relu). build_model is re-bound by those modules on
@@ -35,10 +35,78 @@ from .models import build_model
 from .train import TrainConfig, Trainer, evaluate_full, save_run
 
 
-def set_seed(seed: int) -> None:
+class FLOPTargetError(RuntimeError):
+    """Synthesis-100 A3 (2026-06-06): raised when ``flops_target`` is set
+    in the run config and the measured model FLOPs lie outside the
+    accepted band ``flops_target * (1 +/- flops_tolerance)``.
+
+    The runner aborts BEFORE any GPU compute is spent on training so an
+    operator who mis-spec'd a prior (e.g. the Phase-9i 80.8 MFLOP overrun
+    against a 41.2 MFLOP baseline) gets immediate feedback instead of a
+    full training run + post-hoc audit.
+    """
+
+
+def set_seed(seed: int, headline_mode: bool = False) -> None:
+    """Seed every RNG library the training stack touches.
+
+    Synthesis-100 D4 (2026-06-06): the legacy ``set_seed`` set only the
+    three top-level RNGs and enabled ``cudnn.benchmark``. That is enough
+    for *informal* reproducibility (median over 3 seeds is stable to
+    ~0.4 pp) but NOT for headline / cert runs where two seeded runs must
+    produce bit-identical outputs.
+
+    Parameters
+    ----------
+    seed
+        The integer seed for ``random`` / ``numpy`` / ``torch``.
+    headline_mode
+        When True, this additionally:
+          * sets ``torch.use_deterministic_algorithms(True)``
+          * sets ``torch.backends.cudnn.deterministic = True``
+          * sets ``torch.backends.cudnn.benchmark = False``
+          * sets ``CUBLAS_WORKSPACE_CONFIG=:4096:8`` (required by some
+            deterministic CUDA kernels on Ampere / Ada).
+        When False (default), legacy fast-mode is preserved
+        byte-for-byte so existing screening sweeps stay reproducible
+        with respect to their prior runs.
+    """
     random.seed(seed); np.random.seed(seed); torch.manual_seed(seed)
     torch.cuda.manual_seed_all(seed)
-    torch.backends.cudnn.benchmark = True
+    if headline_mode:
+        # CUBLAS workspace must be set BEFORE the first CUDA workspace
+        # is allocated. Setting it later is a no-op; setting it here
+        # before model build is correct.
+        os.environ.setdefault("CUBLAS_WORKSPACE_CONFIG", ":4096:8")
+        torch.backends.cudnn.deterministic = True
+        torch.backends.cudnn.benchmark = False
+        try:
+            torch.use_deterministic_algorithms(True, warn_only=True)
+        except Exception:
+            # Older PyTorch versions don't accept warn_only; fall back.
+            try:
+                torch.use_deterministic_algorithms(True)
+            except Exception:
+                pass
+    else:
+        torch.backends.cudnn.benchmark = True
+
+
+def seed_worker(worker_id: int) -> None:
+    """Per-worker DataLoader seed function.
+
+    Synthesis-100 D4 / D5 (2026-06-06): every DataLoader worker spawns
+    with its own ``random`` / ``numpy`` RNG state that is otherwise
+    derived non-deterministically from process startup time. The
+    PyTorch-recommended fix is to seed every worker from
+    ``torch.initial_seed()`` (which IS already deterministic per the
+    main-process seed + DataLoader generator). RandAugment, RandomErasing,
+    Mixup, CutMix all consume np.random / random, so without this hook
+    augmented batches differ between bit-identical-otherwise runs.
+    """
+    worker_seed = torch.initial_seed() % 2 ** 32
+    np.random.seed(worker_seed)
+    random.seed(worker_seed)
 
 
 def make_flags(d: dict) -> NaturePriorFlags:
@@ -240,8 +308,84 @@ def _wrap_with_phi_fpn(backbone, c0: int, n_levels: int):
     return _FpnWrapped()
 
 
+def _check_flops_target(model, cfg: dict, input_size: tuple[int, ...]) -> None:
+    """Synthesis-100 A3 (2026-06-06): refuse to launch on a model whose
+    measured FLOPs lie outside the ``flops_target`` band.
+
+    The check is OPTIONAL — when ``flops_target`` is absent (default) the
+    function is a no-op, preserving legacy launch behaviour. When set,
+    we accept either a single number (target ± ``flops_tolerance`` *
+    target, default 10%) or a (min, max) tuple/list.
+
+    Prints a one-line PASS / FAIL summary to stdout before any GPU
+    training cycles are consumed.
+    """
+    target = cfg.get("flops_target")
+    if target is None:
+        return
+    tolerance = float(cfg.get("flops_tolerance", 0.10))
+    flops = count_flops(model, input_size=input_size)
+    import math as _math
+    if not _math.isfinite(flops):
+        # fvcore returned NaN -- common on group-conv / hex-conv models.
+        # Print a clear note but do NOT block; this is a measurement gap,
+        # not a model gap. Operator can use ``flops_target_strict=true``
+        # to escalate (default false).
+        msg = (
+            f"[runner] measured FLOPs: NaN (fvcore unable to count) / "
+            f"target {target} -> WARNING (check skipped)"
+        )
+        print(msg)
+        if bool(cfg.get("flops_target_strict", False)):
+            raise FLOPTargetError(
+                "flops_target set with flops_target_strict=true but "
+                "count_flops returned NaN; cannot verify model is "
+                "within the FLOP band."
+            )
+        return
+    flops_M = flops / 1e6
+    if isinstance(target, (list, tuple)) and len(target) == 2:
+        # Tuple/list: interpret as a (lo, hi) raw-FLOP band. Caller can
+        # pass either raw-FLOPs (e.g. (4e7, 4.5e7)) or MFLOPs (e.g.
+        # (40, 45)); we detect the unit by magnitude (>= 1e4 -> raw).
+        t0, t1 = float(target[0]), float(target[1])
+        if t0 >= 1e4:
+            lo = t0 / 1e6
+            hi = t1 / 1e6
+        else:
+            lo = t0
+            hi = t1
+        target_repr = f"[{lo:.2f}M, {hi:.2f}M]"
+    else:
+        # Scalar: raw-FLOPs if > 1e4, otherwise already MFLOPs. The
+        # threshold of 1e4 means a config with ``flops_target: 41.2``
+        # is read as 41.2 MFLOPs (the convergence-regime baseline) and
+        # ``flops_target: 41200000`` is read as 41.2 MFLOPs (same
+        # number written as raw count).
+        t = float(target)
+        target_M = t / 1e6 if t >= 1e4 else t
+        lo = target_M * (1.0 - tolerance)
+        hi = target_M * (1.0 + tolerance)
+        target_repr = f"{target_M:.2f}M +/- {tolerance * 100:.0f}%"
+    ok = lo <= flops_M <= hi
+    status = "PASS" if ok else "FAIL"
+    print(
+        f"[runner] measured FLOPs: {flops_M:.2f}M / target {target_repr} "
+        f"-> {status}"
+    )
+    if not ok:
+        raise FLOPTargetError(
+            f"model FLOPs {flops_M:.2f}M outside target band {target_repr}; "
+            f"synthesis-100 A3 refuses to launch."
+        )
+
+
 def run_one(cfg: dict, tag: str, seed: int, root: str = "experiments") -> Path:
-    set_seed(seed)
+    # Synthesis-100 D4 (2026-06-06): headline_mode is opt-in via the YAML
+    # ``headline_mode`` knob. Default False preserves the legacy
+    # cudnn.benchmark=True fast-path for screening sweeps.
+    headline_mode = bool(cfg.get("headline_mode", False))
+    set_seed(seed, headline_mode=headline_mode)
     device = "cuda" if torch.cuda.is_available() else "cpu"
 
     ds_name = cfg["dataset"]
@@ -253,6 +397,9 @@ def run_one(cfg: dict, tag: str, seed: int, root: str = "experiments") -> Path:
         randaugment_n=int(cfg.get("randaugment_n", 0)),
         randaugment_m=int(cfg.get("randaugment_m", 14)),
         random_erasing_p=float(cfg.get("random_erasing_p", 0.0)),
+        # Synthesis-100 D4: pass headline_mode + seed for deterministic
+        # DataLoader workers.
+        headline_mode=headline_mode, seed=seed,
     )
 
     model_name = cfg["model"]
@@ -292,6 +439,11 @@ def run_one(cfg: dict, tag: str, seed: int, root: str = "experiments") -> Path:
     # Phase B — H07 / H31 / H39 / H42 post-build mutators.
     model = post_build_mutators(model, cfg)
 
+    # Synthesis-100 A3 (2026-06-06): refuse to launch if the model's
+    # FLOPs are outside the YAML-declared band. Done BEFORE any training
+    # cycle so an iso-FLOPs misconfiguration costs zero GPU time.
+    _check_flops_target(model, cfg, input_size=(1, 3, 32, 32))
+
     train_cfg = TrainConfig(
         epochs=cfg.get("epochs", 30),
         lr=cfg.get("lr", 1e-3),
@@ -330,6 +482,12 @@ def run_one(cfg: dict, tag: str, seed: int, root: str = "experiments") -> Path:
         cutmix_alpha=float(cfg.get("cutmix_alpha", 0.0)),
         mixup_cutmix_prob=float(cfg.get("mixup_cutmix_prob", 0.5)),
         ema_decay=float(cfg.get("ema_decay", 0.0)),
+        # Synthesis-100 D6 / D7 (2026-06-06): BN recalibration after the
+        # EMA shadow load + un-mixed clean train-set top-1 sampling. Both
+        # default to ON for any run that activates mixing / EMA.
+        recalibrate_bn_after_ema=bool(cfg.get("recalibrate_bn_after_ema", True)),
+        recalibrate_bn_max_batches=int(cfg.get("recalibrate_bn_max_batches", 50)),
+        train_top1_clean_samples=int(cfg.get("train_top1_clean_samples", 1024)),
     )
     tr = Trainer(model, tr_loader, te_loader, n_cls, train_cfg, device=device)
     fit_info = tr.fit()

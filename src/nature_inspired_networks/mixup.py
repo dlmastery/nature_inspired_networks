@@ -68,10 +68,24 @@ def mixup_batch(
     if alpha <= 0.0:
         return x, y, y, 1.0
     lam = float(np.random.beta(alpha, alpha))
-    # Force lam to the "majority" side so the dominant image is x (purely
-    # cosmetic — symmetric in expectation).
+    # Synthesis-100 D1 (2026-06-06): IMPORTANT — this is NOT symmetric in
+    # expectation. The fold ``lam = 1 - lam if lam < 0.5`` reflects every
+    # below-0.5 sample to its above-0.5 mirror, producing a *folded*
+    # Beta(alpha, alpha) on [0.5, 1.0]. Consequences:
+    #   * The marginal distribution of lam is no longer Beta(alpha, alpha)
+    #     -- the variance is approximately halved at alpha->0 and the
+    #     mean shifts from 0.5 to ((mean of folded distribution)).
+    #   * The label ``y_a`` always carries the dominant mix weight, which
+    #     is the timm convention; ``y_b`` always carries the minority.
+    #   * At alpha -> 0 the folded mean converges to (0.5 + 1.0)/2 = 0.75.
+    # Callers (e.g. the trainer's ``train_top1`` computation) MUST treat
+    # ``y_a`` as the dominant label. Removing the fold would restore the
+    # raw Beta(alpha, alpha) distribution at the cost of breaking the
+    # ``y_a == dominant`` invariant relied upon by ``train_top1`` and the
+    # Synthesis-100 D7 generalization-gap fix.
     if lam < 0.5:
         lam = 1.0 - lam
+    assert lam >= 0.5, "mixup.py: post-flip lam must be >= 0.5"
     perm = torch.randperm(x.size(0), device=x.device)
     x_mix = lam * x + (1.0 - lam) * x[perm]
     return x_mix, y, y[perm], lam

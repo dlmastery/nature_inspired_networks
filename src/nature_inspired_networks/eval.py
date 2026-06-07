@@ -120,16 +120,52 @@ def linear_cka(X: torch.Tensor, Y: torch.Tensor) -> float:
 # ---------------------------------------------------------------------------
 # Composite metric with SHA-256 Goodhart fingerprint (autoresearch protocol)
 # ---------------------------------------------------------------------------
+# Synthesis-100 A2 (2026-06-06): the Phase-9i confound (priors ran at 1.96x
+# baseline FLOPs but the composite penalised only params+latency) proved
+# the original two-axis penalty insufficient. The third axis ``flops_M``
+# is added so any prior that buys top1 with extra compute pays a measurable
+# penalty in the headline number. The SHA-256 fingerprint changes; the
+# runner refuses to launch under an unrecognised fingerprint (Rule 2).
 COMPOSITE_FORMULA = (
     "composite = top1 - 0.05 * log10(params_M) - 0.05 * log10(latency_ms)"
+    " - 0.05 * log10(flops_M)"
 )
 COMPOSITE_FINGERPRINT = hashlib.sha256(COMPOSITE_FORMULA.encode()).hexdigest()
 
 
-def composite_score(top1: float, params: int, latency_ms: float) -> float:
-    params_M = max(0.001, params / 1e6)
+def composite_score(
+    top1: float,
+    params: int,
+    latency_ms: float,
+    flops: float | None = None,
+) -> float:
+    """Compute the composite penalty-adjusted top-1.
+
+    Synthesis-100 A2 extension: ``flops`` (MACs) is now a third penalty
+    axis with the same weight 0.05. The argument is OPTIONAL so existing
+    callers that have not yet been migrated keep working in legacy
+    two-axis mode (params + latency only). When ``flops`` is provided the
+    third term is added.
+
+    Synthesis-100 D9 (R5 BUG 12): the prior implementation floored
+    ``params_M`` at 0.001 (1000 params). A model with <1000 params is
+    untracked-degenerate; the floor silently masked the degeneracy and
+    let the composite remain finite. We now raise ``ValueError`` so the
+    runner halts loudly. Tests / callers that legitimately need a small
+    surrogate must construct a >=1000-parameter dummy.
+    """
+    if params < 1000:
+        raise ValueError(
+            f"composite_score: params={params} < 1000 is degenerate; "
+            "refusing to floor silently (synthesis-100 D9 / R5 BUG 12)."
+        )
+    params_M = params / 1e6
     lat = max(0.01, latency_ms)
-    return top1 - 0.05 * math.log10(params_M) - 0.05 * math.log10(lat)
+    out = top1 - 0.05 * math.log10(params_M) - 0.05 * math.log10(lat)
+    if flops is not None and math.isfinite(float(flops)) and float(flops) > 0:
+        flops_M = max(0.001, float(flops) / 1e6)
+        out = out - 0.05 * math.log10(flops_M)
+    return out
 
 
 @dataclass
@@ -150,6 +186,13 @@ class RunMetrics:
     train_seconds: float = 0.0
     train_top1: float = 0.0
     generalization_gap: float = 0.0
+    # Synthesis-100 D7 (2026-06-06): under Mixup/CutMix, ``train_top1``
+    # measured at the mixed batch caps at ~λ which floors the
+    # ``generalization_gap`` at 0. ``train_top1_clean`` is the un-mixed
+    # eval-mode train-set accuracy (a sampled subset, configurable in
+    # the trainer). Default None preserves backward-compat with older
+    # metrics.json files that don't have the field.
+    train_top1_clean: float | None = None
 
     def to_dict(self) -> dict:
         return asdict(self)

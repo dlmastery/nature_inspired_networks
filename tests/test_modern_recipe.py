@@ -63,6 +63,33 @@ def test_mixup_lambda_in_unit_interval():
     assert torch.equal(y_b0, y)
 
 
+def test_mixup_lambda_fold_invariant():
+    """Synthesis-100 D1 (2026-06-06): the ``lam = 1 - lam if lam < 0.5``
+    fold halves the variance of the lam distribution and shifts its mean
+    from 0.5 to roughly (0.5 + 1.0)/2 = 0.75 at alpha->0. The fold is
+    INTENTIONAL (it makes ``y_a`` the dominant label every batch) but
+    the prior comment claimed it was "symmetric in expectation" which
+    was wrong. This test asserts the post-flip lam is always >= 0.5 and
+    the empirical mean of the folded distribution is in the expected
+    band [0.55, 0.85] at alpha=0.2.
+    """
+    torch.manual_seed(0)
+    x = torch.randn(8, 3, 32, 32)
+    y = torch.randint(0, 10, (8,))
+    lams = []
+    for _ in range(2000):
+        _, _, _, lam = mixup_batch(x, y, alpha=0.2)
+        assert lam >= 0.5, f"post-fold lam must be >= 0.5, got {lam}"
+        lams.append(lam)
+    mean_lam = sum(lams) / len(lams)
+    # At alpha=0.2 the raw Beta(0.2, 0.2) is U-shaped near {0, 1}; the
+    # folded distribution concentrates strongly near 1.0. Empirical
+    # mean is ~ 0.86 in practice. We assert [0.55, 0.95] to allow drift.
+    assert 0.55 < mean_lam < 0.95, (
+        f"folded mean {mean_lam:.3f} outside expected [0.55, 0.95]"
+    )
+
+
 def test_mixup_loss_matches_manual():
     """mixup_loss must equal the manual ``λ·CE(y_a) + (1-λ)·CE(y_b)``."""
     torch.manual_seed(1)

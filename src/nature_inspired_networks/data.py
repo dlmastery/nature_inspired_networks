@@ -54,7 +54,8 @@ def _cifar_tfs(mean, std, train: bool,
 def cifar_loaders(root: str = "./data", batch_size: int = 256, num_workers: int = 4,
                   variant: str = "cifar10",
                   randaugment_n: int = 0, randaugment_m: int = 14,
-                  random_erasing_p: float = 0.0):
+                  random_erasing_p: float = 0.0,
+                  headline_mode: bool = False, seed: int = 0):
     root = Path(root)
     if variant == "cifar10":
         Ds = CIFAR10
@@ -73,9 +74,25 @@ def cifar_loaders(root: str = "./data", batch_size: int = 256, num_workers: int 
                                  random_erasing_p=random_erasing_p))
     te = Ds(root=str(root), train=False, download=True,
             transform=_cifar_tfs(mean, std, train=False))
-    tr_loader = DataLoader(tr, batch_size=batch_size, shuffle=True,
-                           num_workers=num_workers, pin_memory=True,
-                           drop_last=True, persistent_workers=num_workers > 0)
+    # Synthesis-100 D4 / D5 (2026-06-06): in headline_mode wire a
+    # per-loader generator + ``worker_init_fn`` so DataLoader workers
+    # use a deterministic RNG seeded by the per-run ``seed``. Without
+    # this, RandAugment / RandomErasing produce non-reproducible
+    # augmentations even though every other RNG is seeded. ``seed_worker``
+    # lives in ``runner`` to avoid a circular import here we resolve it
+    # lazily.
+    train_kwargs: dict = dict(
+        batch_size=batch_size, shuffle=True, num_workers=num_workers,
+        pin_memory=True, drop_last=True,
+        persistent_workers=num_workers > 0,
+    )
+    if headline_mode:
+        from .runner import seed_worker
+        gen = torch.Generator()
+        gen.manual_seed(int(seed))
+        train_kwargs["generator"] = gen
+        train_kwargs["worker_init_fn"] = seed_worker
+    tr_loader = DataLoader(tr, **train_kwargs)
     te_loader = DataLoader(te, batch_size=batch_size, shuffle=False,
                            num_workers=num_workers, pin_memory=True,
                            persistent_workers=num_workers > 0)
@@ -227,14 +244,16 @@ def load_rotated_cifar10(root: str = "./data", batch_size: int = 256,
 def load_dataset(name: str, root: str = "./data", batch_size: int = 256,
                  num_workers: int = 4,
                  randaugment_n: int = 0, randaugment_m: int = 14,
-                 random_erasing_p: float = 0.0):
+                 random_erasing_p: float = 0.0,
+                 headline_mode: bool = False, seed: int = 0):
     name = name.lower()
     if name in {"cifar10", "cifar100"}:
         return cifar_loaders(root=root, batch_size=batch_size,
                              num_workers=num_workers, variant=name,
                              randaugment_n=randaugment_n,
                              randaugment_m=randaugment_m,
-                             random_erasing_p=random_erasing_p)
+                             random_erasing_p=random_erasing_p,
+                             headline_mode=headline_mode, seed=seed)
     if name in {"rotated_cifar10", "rotcifar10"}:
         return rotated_cifar_loaders(
             root=root, batch_size=batch_size,

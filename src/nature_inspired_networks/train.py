@@ -98,6 +98,23 @@ class TrainConfig:
     mixup_cutmix_prob: float = 0.5
     # EMA decay (0 -> EMA disabled). Bello 2021 default: 0.9999.
     ema_decay: float = 0.0
+    # Synthesis-100 D6 (2026-06-06): after EMA shadow weights are loaded
+    # into the live model the BN running statistics belong to the LIVE
+    # trajectory, not the EMA-weighted parameters. timm's standard fix is
+    # to run a brief BN-recalibration pass (BN momentum -> None for
+    # cumulative average, eval-mode forward over a handful of batches).
+    # Default ON for headline runs; the runner exposes the flag.
+    recalibrate_bn_after_ema: bool = True
+    # Number of training batches to run during BN recalibration. 50 is
+    # the timm default and is sufficient for the cumulative running mean
+    # to converge on a single-4090 CIFAR pipeline.
+    recalibrate_bn_max_batches: int = 50
+    # Synthesis-100 D7 (2026-06-06): un-mixed clean train-set accuracy
+    # used to compute the truthful generalization gap. ``train_top1_mixed``
+    # caps at ~lam under Mixup; ``train_top1_clean`` is sampled over a
+    # fixed subset of the train set in eval-mode at the end of every epoch.
+    # 0 disables the clean pass (legacy behaviour).
+    train_top1_clean_samples: int = 1024
 
 
 def _build_scheduler(opt: torch.optim.Optimizer, cfg: "TrainConfig"):
@@ -300,6 +317,75 @@ class Trainer:
         return AdamW(model.parameters(), lr=cfg.lr,
                      weight_decay=cfg.weight_decay)
 
+    @torch.no_grad()
+    def _train_top1_clean(self, max_samples: int = 1024) -> float:
+        """Synthesis-100 D7 (2026-06-06): un-mixed eval-mode top-1 on a
+        sampled subset of the train set.
+
+        Under Mixup/CutMix the per-step ``train_top1`` measured against
+        the dominant label caps at ~lam and the gap calculation
+        ``train - test`` floors at 0. The clean pass cycles ``max_samples``
+        train images through the model in eval-mode against the true (un-
+        mixed) labels and returns the un-confounded accuracy.
+
+        Returns ``float('nan')`` when the train loader is empty.
+        """
+        self.model.eval()
+        correct = 0
+        seen = 0
+        for x, y in self.train_loader:
+            x = x.to(self.device, non_blocking=True)
+            y = y.to(self.device, non_blocking=True)
+            if y.ndim == 2 and y.shape[1] == 1:
+                y = y.squeeze(1)
+            logits = self.model(x)
+            correct += int((logits.argmax(1) == y).sum().item())
+            seen += int(y.shape[0])
+            if seen >= max_samples:
+                break
+        self.model.train()
+        if seen == 0:
+            return float("nan")
+        return correct / seen
+
+    @torch.no_grad()
+    def _recalibrate_bn(self, max_batches: int = 50) -> None:
+        """Synthesis-100 D6 (2026-06-06): recalibrate BatchNorm running
+        statistics after the EMA shadow has been loaded onto the live
+        model.
+
+        Standard timm-pattern: switch BN modules to "train" but force
+        ``momentum = None`` (cumulative running average), then run
+        ``max_batches`` eval-mode-but-BN-tracking forward passes on the
+        train loader. Restore the original ``momentum`` afterwards.
+
+        Idempotent — calling it twice does not break anything.
+        """
+        bn_mods: list[tuple[nn.modules.batchnorm._BatchNorm, float | None]] = []
+        for m in self.model.modules():
+            if isinstance(m, nn.modules.batchnorm._BatchNorm):
+                bn_mods.append((m, m.momentum))
+                m.momentum = None  # cumulative running average
+                m.reset_running_stats()
+                m.train()  # BN must be in train-mode to UPDATE running stats
+        # Run the rest of the model in eval-mode (no dropout side-effects).
+        # We can't easily flip just the non-BN modules, so we just iterate
+        # through batches; BN modules above are already train-mode.
+        try:
+            count = 0
+            for x, _ in self.train_loader:
+                x = x.to(self.device, non_blocking=True)
+                _ = self.model(x)
+                count += 1
+                if count >= max_batches:
+                    break
+        finally:
+            # Restore the original BN momentum so downstream training
+            # (if any) is byte-for-byte preserved. Module-mode is left
+            # in train; callers normally switch to eval before metrics.
+            for m, mom in bn_mods:
+                m.momentum = mom
+
     def _extract_penultimate_features(self, x: torch.Tensor) -> torch.Tensor | None:
         """Return the penultimate feature map for the H51 BettiLoss.
 
@@ -399,6 +485,7 @@ class Trainer:
         epochs_to_target = -1
         t0 = time.perf_counter()
         train_top1_final = 0.0
+        train_top1_clean_final = None  # synthesis-100 D7
         for epoch in range(self.cfg.epochs):
             self.model.train()
             # H47 — advance every PhiDropout's curriculum to this epoch
@@ -474,6 +561,22 @@ class Trainer:
             row = dict(epoch=epoch, train_loss=tr_loss, train_top1=tr_acc,
                        test_top1=te["top1"], test_top5=te["top5"],
                        lr=self.sched.get_last_lr()[0])
+            # Synthesis-100 D7 (2026-06-06): under Mixup ``train_top1`` is
+            # the mixed-batch accuracy capped at ~lam. Also record the
+            # un-mixed clean train-set accuracy on a sampled subset so
+            # the generalization-gap is truthful. Only run the extra pass
+            # when mixing is active (otherwise raw == clean).
+            clean_samples = int(getattr(self.cfg, "train_top1_clean_samples", 0))
+            if self._mixing_active and clean_samples > 0:
+                tr_clean = self._train_top1_clean(max_samples=clean_samples)
+                row["train_top1_mixed"] = tr_acc
+                row["train_top1_clean"] = tr_clean
+                train_top1_clean_final = tr_clean
+            elif clean_samples > 0:
+                # No mixing -- clean == mixed within sampling noise. Skip
+                # the extra eval pass to preserve byte-for-byte timing on
+                # legacy configs.
+                train_top1_clean_final = tr_acc
             if self.ema is not None:
                 te_ema = topk_accuracy(self.ema.module, self.test_loader,
                                        device=self.device)
@@ -500,6 +603,20 @@ class Trainer:
                 # Strict mismatch -- non-strict fallback (e.g. pruning
                 # parameterisations have appended weight_orig / weight_mask).
                 self.model.load_state_dict(self.ema.state_dict(), strict=False)
+            # Synthesis-100 D6 (2026-06-06): recalibrate BN running stats
+            # after the EMA shadow is loaded. The shadow's running mean /
+            # variance reflect the LIVE trajectory of BN statistics, not
+            # the EMA-weighted parameters; a brief cumulative-running-
+            # average pass over a handful of train batches fixes this.
+            if bool(getattr(self.cfg, "recalibrate_bn_after_ema", True)):
+                max_b = int(getattr(self.cfg, "recalibrate_bn_max_batches", 50))
+                try:
+                    self._recalibrate_bn(max_batches=max_b)
+                except Exception:
+                    # Defensive: a BN-less model has no work to do; any
+                    # exception inside the recalibration must NOT block the
+                    # rest of the run. We swallow + continue.
+                    pass
 
         # H20 finalisation -- load Fib-weighted averaged weights so the
         # post-fit evaluation runs through the ensemble. Pruning leaves
@@ -519,6 +636,10 @@ class Trainer:
             train_seconds=train_seconds,
             epochs_to_target=epochs_to_target,
             train_top1_final=train_top1_final,
+            # Synthesis-100 D7 (2026-06-06): clean train-set accuracy
+            # for the truthful generalization gap. None when not measured
+            # (legacy / no-mixing path with clean_samples=0).
+            train_top1_clean=train_top1_clean_final,
         )
 
 
@@ -531,8 +652,21 @@ def evaluate_full(model: nn.Module, test_loader, dataset: str, tag: str,
     flops = count_flops(model, input_size=input_size)
     lat = gpu_latency_ms(model, input_size=input_size)
     eq = rotation_equivariance_error(model, test_loader, device=device)
-    comp = composite_score(te["top1"], params, lat)
-    gap = max(0.0, fit_info["train_top1_final"] - te["top1"])
+    # Synthesis-100 A2 (2026-06-06): composite now penalises FLOPs as a
+    # third axis with weight 0.05. ``flops`` may be NaN under fvcore
+    # failure modes; composite_score handles None/non-finite gracefully.
+    comp = composite_score(te["top1"], params, lat, flops=flops)
+    # Synthesis-100 D7 (2026-06-06): under Mixup/CutMix,
+    # ``train_top1_final`` (mixed-batch accuracy) caps at ~lam and the
+    # max-floor at 0 hides the gap. ``train_top1_clean`` is a sampled
+    # un-mixed eval-mode pass on the train set captured by the Trainer.
+    # When present it is the truthful generalization-gap proxy and we
+    # let the value go negative if needed (diagnostic; no floor).
+    train_clean = fit_info.get("train_top1_clean")
+    if train_clean is not None:
+        gap = float(train_clean) - te["top1"]
+    else:
+        gap = max(0.0, fit_info["train_top1_final"] - te["top1"])
     return RunMetrics(
         tag=tag, dataset=dataset, seed=seed, epochs=epochs,
         top1=te["top1"], top5=te["top5"],
@@ -542,6 +676,7 @@ def evaluate_full(model: nn.Module, test_loader, dataset: str, tag: str,
         train_seconds=fit_info["train_seconds"],
         train_top1=fit_info["train_top1_final"],
         generalization_gap=gap,
+        train_top1_clean=train_clean,
     )
 
 

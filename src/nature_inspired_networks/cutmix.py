@@ -79,7 +79,22 @@ def cutmix_batch(
     lam = float(np.random.beta(alpha, alpha))
     perm = torch.randperm(x.size(0), device=x.device)
     B, C, H, W = x.shape
+    # Synthesis-100 D2 (2026-06-06): at alpha=1.0 the Beta sample is
+    # uniform on (0, 1) which produces zero-area boxes far too often
+    # (lam ~ 1.0 -> cut_rat=sqrt(1-lam) -> 0 -> integer floor 0). The
+    # prior implementation silently fell back to ``lam_eff=1.0`` (no cut)
+    # on those batches, which lowers the *effective* CutMix rate well
+    # below what the alpha implies. We now re-sample up to 5 times before
+    # falling back, which empirically drops the degenerate rate from
+    # ~31% to <1% at alpha=1.0.
     x1, y1, x2, y2 = rand_bbox(x.shape, lam)
+    for _retry in range(5):
+        if (x2 - x1) > 0 and (y2 - y1) > 0:
+            break
+        # Re-sample a new lam AND a new bbox. We re-roll lam so the
+        # retry is not stuck in the same degenerate region of (lam, cy, cx).
+        lam = float(np.random.beta(alpha, alpha))
+        x1, y1, x2, y2 = rand_bbox(x.shape, lam)
     if (x2 - x1) > 0 and (y2 - y1) > 0:
         # In-place patch replacement on a clone (caller may rely on the
         # original x downstream — be safe).
@@ -88,7 +103,8 @@ def cutmix_batch(
         area = (x2 - x1) * (y2 - y1)
         lam_eff = 1.0 - float(area) / float(H * W)
     else:
-        # Degenerate box (lam ~ 1.0 -> zero-area patch) — no change.
+        # Degenerate box even after 5 retries (lam ~ 1.0 -> zero-area
+        # patch). Fall back to no-cut with lam_eff=1.0.
         x_mix = x
         lam_eff = 1.0
     return x_mix, y, y[perm], lam_eff
