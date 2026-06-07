@@ -1,5 +1,41 @@
 ﻿# FINDINGS — nature_inspired_networks curated CIFAR-10 sweep (seed 0, 12 epochs)
 
+> ## 🟢 2026-06-07 — A4 recipe-debug seed 0 lands DIRECTIONAL (top1 = 0.6747, +3.97 pp vs legacy modern recipe, 0.5 pp shy of 0.68 PROMOTE floor)
+>
+> First Day-1 GPU result of the SYNTHESIS_100 12-week plan. A4 is the
+> recipe debug per Block A: replace the Bello-2021 11-trick ImageNet-tuned
+> recipe with the He-2019 / DeepLearningTuningPlaybook CIFAR-tuned variant
+> (RandAugment N=1 M=9, drop Random Erasing, Mixup α=0.1, drop CutMix,
+> warmup 10 ep).
+>
+> | Recipe | Seed | top1 | train_top1_clean | gap | composite (FLOPs-extended) | FLOPs check |
+> |---|---:|---:|---:|---:|---:|:---:|
+> | legacy modern 11-trick (2026-06-04) | 0 | 0.6350 | — | — | 0.6342 (legacy fp) | n/a |
+> | A4-v1 He-2019/Playbook (2026-06-07) | 0 | **0.6747** | 0.7773 | 0.103 | 0.5886 (new fp `b73e8bbf…`) | PASS |
+>
+> Δ vs legacy = +3.97 pp at the same architecture (ResNet-20, params=278324,
+> flops=41.22M). Per the binding pre-registration
+> ([a4_recipe_debug_he2019.md](../pre-registration/a4_recipe_debug_he2019.md)),
+> top1 ∈ [0.66, 0.68) is **DIRECTIONAL**, NOT PROMOTE — one further knob
+> must be investigated before n=3 launch. The synthesis pre-committed
+> LR=5e-4 as the first fallback; A4-v2 launched at 2026-06-07T10:34Z.
+>
+> A1 (iso-FLOPs prior re-test at 125k phi_budget_total → 43.24M FLOPs)
+> remains BLOCKED on PROMOTE.
+>
+> All Day-1 structural plumbing verified end-to-end:
+> - `headline_mode=True` ran with deterministic algorithms, no cudnn.benchmark
+> - `flops_target` runner pre-flight check PASSED (41.22M / 41.22M target)
+> - FLOPs-extended composite formula fingerprint `b73e8bbfa2717c…` written to metrics.json
+> - `train_top1_clean` (synth D7) populated — finally diagnostic vs the
+>   pre-fix `train_top1_mixed = 0.4548` that silently floored
+>   `generalization_gap` at 0.0 on the legacy run
+>
+> Per `pre-registration/a4_recipe_debug_v2_lr5em4.md`, A4-v2 decision rule:
+> ≥0.68 → PROMOTE n=3 launch; ≥0.6797 → STRONG DIRECTIONAL, pre-register
+> v3; ∈ [0.6697, 0.6797) → NULL, pivot to optimizer change; <0.6697 →
+> REGRESSION, accept A4-v1 baseline at 0.6747 or pivot to architecture change.
+
 > ## 🟡 2026-06-04 MORNING — iso-recipe n=3 diagnostic at non-matched FLOPs (provisional); priors at ~2× baseline FLOPs return +1.00 to +1.24 pp sign-consistent lifts; iso-FLOPs n≥7 confirmation pending
 >
 > All three matched-recipe priors and the baseline were re-run at the

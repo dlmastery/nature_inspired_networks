@@ -1,0 +1,64 @@
+# CIFAR-100 MODERN-RECIPE DEBUG v2 — single-knob LR halve (A4-v2).
+#
+# Triggering result: A4-v1 seed 0 top1 = 0.6747 (DIRECTIONAL, ∈ [0.66, 0.68)).
+# Pre-registered next step: halve LR per
+# pre-registration/a4_recipe_debug_v2_lr5em4.md.
+#
+# Delta vs configs/cifar100_modern_200ep_he2019_debug.yaml:
+#   lr: 1.0e-3 -> 5.0e-4 (halved)
+#   target_top1: 0.68 (same)
+#   everything else: same
+#
+# Hardware: RTX 4090 Laptop, 16 GB VRAM, bf16 AMP, batch 256, num_workers 0,
+#   headline_mode=true, flops_target check enforced.
+# Wall-clock estimate per seed: ~3.5 h.
+#
+# Launch:
+#   $env:KMP_DUPLICATE_LIB_OK="TRUE"; $env:OMP_NUM_THREADS=2; $env:MKL_NUM_THREADS=2
+#   .\.venv\Scripts\python -m nature_inspired_networks.runner `
+#     --config configs\cifar100_modern_200ep_he2019_debug_v2.yaml `
+#     --tag baseline_resnet20_he2019_debug_v2 --seed 0 `
+#     --root experiments_modern_debug
+
+dataset: cifar100
+data_root: ./data
+batch_size: 256
+num_workers: 0
+epochs: 200
+
+# Base optimisation -- single delta vs v1: lr 1.0e-3 -> 5.0e-4
+lr: 5.0e-4
+weight_decay: 5.0e-4
+label_smoothing: 0.1
+warmup_epochs: 10
+use_bf16: true
+optimizer: adamw
+scheduler: cosine
+target_top1: 0.68
+
+# Headline-mode reproducibility (synth D4).
+headline_mode: true
+
+# He-2019 / Playbook CIFAR-tuned augmentation (same as v1).
+mixup_alpha: 0.1
+cutmix_alpha: 0.0
+mixup_cutmix_prob: 1.0
+randaugment_n: 1
+randaugment_m: 9
+random_erasing_p: 0.0
+ema_decay: 0.9999
+
+# FLOP-target (synth A3).
+flops_target: 41224448
+flops_tolerance: 0.10
+
+# Baseline model.
+model: resnet20
+channel_mode: linear
+flags:
+  hex: false
+  group: false
+  fractal: false
+  toroidal: false
+  cymatic_init: false
+  golden_modulate: false
