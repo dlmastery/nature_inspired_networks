@@ -54,18 +54,25 @@ epochs: 200
 lr: 1.0e-3
 weight_decay: 5.0e-4
 label_smoothing: 0.1
-warmup_epochs: 5
+warmup_epochs: 10        # A4-v1 He-2019/Playbook update (2026-06-07)
 use_bf16: true
 optimizer: adamw
 scheduler: cosine
 target_top1: 0.68
 
-mixup_alpha: 0.2
-cutmix_alpha: 1.0
-mixup_cutmix_prob: 0.5
-randaugment_n: 2
-randaugment_m: 14
-random_erasing_p: 0.25
+# Headline-mode reproducibility (synth D4).
+headline_mode: true
+
+# He-2019/Playbook CIFAR-tuned augmentation. Updated 2026-06-07 from
+# the legacy ImageNet-tuned 11-trick recipe to A4-v1's promoted CIFAR
+# recipe (see paper/FINDINGS.md 2026-06-07 PM block + pre-registration/
+# a4_recipe_debug_he2019.md).
+mixup_alpha: 0.1         # was 0.2
+cutmix_alpha: 0.0        # was 1.0 (DROPPED)
+mixup_cutmix_prob: 1.0   # was 0.5 (no alternation since CutMix=0)
+randaugment_n: 1         # was 2
+randaugment_m: 9         # was 14 (Müller & Hutter 2021)
+random_erasing_p: 0.0    # was 0.25 (DROPPED)
 ema_decay: 0.9999
 
 # ---- pair_gm_pdw delta vs the modern baseline ----

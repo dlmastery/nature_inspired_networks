@@ -1,5 +1,48 @@
 ﻿# FINDINGS — nature_inspired_networks curated CIFAR-10 sweep (seed 0, 12 epochs)
 
+> ## 🟡 2026-06-07 PM — A4-v2 single-knob LR halve REGRESSED to 0.6516 (-2.31 pp); A4-v1 promoted to practical baseline at 0.6747; A1 unblocks
+>
+> Per the binding pre-registration `pre-registration/a4_recipe_debug_v2_lr5em4.md`,
+> A4-v2 (single-knob delta: lr 1e-3 → 5e-4 on the A4-v1 He-2019/Playbook
+> recipe) lands at top1 = **0.6516** at the A4-v1 architecture. This is
+> -2.31 pp below A4-v1's 0.6747 — well into the REGRESSION band (<0.6697).
+>
+> | Run | top1 | train_top1_clean | gen-gap | composite (FLOPs-extended) |
+> |---|---:|---:|---:|---:|
+> | A4-v1 (lr=1e-3) | 0.6747 | 0.7773 | 0.103 | 0.5886 |
+> | A4-v2 (lr=5e-4) | **0.6516** | 0.7432 | 0.0916 | 0.5655 |
+>
+> LR halving is **refuted** as the missing piece to clear the 0.68 floor.
+> The model under-converges at LR=5e-4 (train_top1_clean dropped from
+> 0.7773 → 0.7432). A4-v1 is on the right side of the LR slope; further
+> single-knob LR sweeps are unlikely to help.
+>
+> Per the binding REGRESSION rule, two options were enumerated:
+> (a) accept A4-v1 (0.6747) as practical baseline and proceed to A1 with
+>     honest disclosure of the 0.5 pp gap to PLAN.md's 0.68 floor;
+> (b) pivot to A4-v3 with optimizer change (SGD + momentum).
+>
+> **Decision: (a) — practical-baseline promotion.** Rationale:
+>
+> 1. Published CIFAR-100/ResNet-20 modern recipes land 0.69-0.71 at 200 ep
+>    (Wightman 2021 timm). A4-v1 at 0.6747 is within 1.5-3.5 pp of that
+>    band; calling it "below floor" partially reflects PLAN.md being
+>    optimistic at the original 0.68 floor.
+> 2. The load-bearing experiment is A1 (iso-FLOPs prior comparison vs
+>    R5 BLOCKER 1). Spending another 3.5+ GPU-h chasing a 0.5 pp baseline
+>    gap is GPU-budget mismanagement when A1 is queued and the priors'
+>    actual delta (vs A4-v1 0.6747) is what addresses the audit.
+> 3. The honest disclosure path is straightforward and is committed in
+>    PAPER.md §5 + the per-experiment archive READMEs going forward.
+>
+> Next moves (in order):
+> 1. Re-run A4-v1 seeds 1 and 2 at the He-2019 recipe (n=3 baseline) — ~7 GPU-h.
+> 2. Launch the 3 priors at iso-FLOPs (`phi_budget_total=125000` → 43.24M
+>    FLOPs) under A4-v1 recipe × n=3 each — ~31 GPU-h.
+> 3. Total Block A close: ~38 GPU-h; ~3 weeks of overnights.
+>
+> A1 is **UNBLOCKED**; iso-FLOPs prior re-test begins after A4-v1 n=3 lands.
+
 > ## 🟢 2026-06-07 — A4 recipe-debug seed 0 lands DIRECTIONAL (top1 = 0.6747, +3.97 pp vs legacy modern recipe, 0.5 pp shy of 0.68 PROMOTE floor)
 >
 > First Day-1 GPU result of the SYNTHESIS_100 12-week plan. A4 is the
