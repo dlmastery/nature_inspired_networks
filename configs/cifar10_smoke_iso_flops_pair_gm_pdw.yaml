@@ -1,0 +1,53 @@
+# CIFAR-10 smoke for pair_gm_pdw at iso-FLOPs (phi_budget_total=125000).
+# Pre-CIFAR-100-A1 sanity check.
+#
+# Expected: top-1 >= 0.75 at 12 ep.
+# Hard floor for smoke PASS: top-1 >= 0.70.
+
+dataset: cifar10
+data_root: ./data
+batch_size: 256
+num_workers: 0
+epochs: 12
+
+lr: 1.0e-3
+weight_decay: 5.0e-4
+label_smoothing: 0.1
+warmup_epochs: 2
+use_bf16: true
+optimizer: adamw
+scheduler: cosine
+target_top1: 0.75
+
+headline_mode: true
+
+mixup_alpha: 0.1
+cutmix_alpha: 0.0
+mixup_cutmix_prob: 1.0
+randaugment_n: 1
+randaugment_m: 9
+random_erasing_p: 0.0
+ema_decay: 0.9999
+
+flops_target: 41224448
+flops_tolerance: 0.10
+
+# pair_gm_pdw: H09 phi_budget base + golden momentum + phi_decay_wd.
+model: phi_budget
+phi_model: phi_budget
+phi_budget_total: 125000
+phi_budget_n_stages: 3
+phi_budget_mode: phi
+channel_mode: phi
+
+momentum_schedule: golden
+phi_decay_wd: true
+phi_decay_base: 5.0e-4
+
+flags:
+  hex: false
+  group: false
+  fractal: false
+  toroidal: false
+  cymatic_init: false
+  golden_modulate: false

@@ -2,11 +2,13 @@
 # Block A close campaign — sequential runs to close R5 BLOCKER 1.
 #
 # Sequence:
+#   0. CIFAR-10 12-ep smokes for the 3 priors at iso-FLOPs (~1.5 GPU-h)
+#      -- per user 2026-06-07 directive: smoke before burning CIFAR-100 budget
 #   1. A4-v1 baseline seeds 1, 2  (~7 GPU-h, closes n=3 baseline)
 #   2. 3 priors × seed 0 at iso-FLOPs (~10.5 GPU-h)
 #   3. 3 priors × seed 1 at iso-FLOPs (~10.5 GPU-h)
 #   4. 3 priors × seed 2 at iso-FLOPs (~10.5 GPU-h)
-# Total: ~38 GPU-h ≈ 1.6 calendar days.
+# Total: ~39.5 GPU-h ≈ 1.7 calendar days.
 #
 # Robustness:
 #   * skip-if-exists per run → resumable after any crash
@@ -68,6 +70,30 @@ run_if_missing() {
     done
   fi
 }
+
+# ---- Phase 0: CIFAR-10 12-ep smokes for the 3 priors (R13 + 2026-06-07 user directive) ----
+mkdir -p experiments_smoke_iso_flops_v1
+run_if_missing configs/cifar10_smoke_iso_flops_sg_only_phi_budget.yaml \
+  sg_only_phi_budget_iso_flops_v1_smoke 0 experiments_smoke_iso_flops_v1
+run_if_missing configs/cifar10_smoke_iso_flops_pair_gm_pdw.yaml \
+  pair_gm_pdw_iso_flops_v1_smoke 0 experiments_smoke_iso_flops_v1
+run_if_missing configs/cifar10_smoke_iso_flops_slot_act_sine.yaml \
+  slot_act_sine_iso_flops_v1_smoke 0 experiments_smoke_iso_flops_v1
+
+# Smoke gate: each smoke must land top-1 >= 0.70 on CIFAR-10 to proceed.
+echo "[smoke-gate] checking CIFAR-10 smoke results..." | tee -a "$LOG"
+for tag in sg_only_phi_budget_iso_flops_v1_smoke pair_gm_pdw_iso_flops_v1_smoke slot_act_sine_iso_flops_v1_smoke; do
+  mj="experiments_smoke_iso_flops_v1/cifar10/${tag}_seed0/metrics.json"
+  top1=$(python -c "import json; print(json.load(open(r'$mj'))['top1'])")
+  echo "[smoke-gate] $tag top1=$top1" | tee -a "$LOG"
+  if python -c "import sys, json; sys.exit(0 if json.load(open(r'$mj'))['top1'] >= 0.70 else 1)"; then
+    echo "[smoke-gate] PASS: $tag" | tee -a "$LOG"
+  else
+    echo "[smoke-gate] FAIL: $tag below 0.70 floor; halting campaign for investigation" | tee -a "$LOG"
+    exit 2
+  fi
+done
+echo "[smoke-gate] all 3 priors PASS at CIFAR-10 12-ep; proceeding to CIFAR-100 200-ep" | tee -a "$LOG"
 
 # ---- Phase 1: complete A4-v1 baseline n=3 (seed 0 already exists at 0.6747) ----
 run_if_missing configs/cifar100_modern_200ep_he2019_debug.yaml \

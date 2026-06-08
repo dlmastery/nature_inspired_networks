@@ -1,0 +1,56 @@
+# CIFAR-10 smoke for sg_only_phi_budget at iso-FLOPs (phi_budget_total=125000).
+# Pre-CIFAR-100-A1 sanity check: confirms the prior YAML loads, the FLOPs
+# target check passes, training runs, and the iso-FLOPs prior lands in a
+# sensible CIFAR-10 12-ep band.
+#
+# Expected: top-1 >= 0.75 at 12 ep (baseline lands ~0.80 per Rule 13;
+# iso-FLOPs prior at 142k params may be slightly below).
+# Hard floor for smoke PASS: top-1 >= 0.70 (else investigate before
+# launching CIFAR-100).
+
+dataset: cifar10
+data_root: ./data
+batch_size: 256
+num_workers: 0
+epochs: 12
+
+lr: 1.0e-3
+weight_decay: 5.0e-4
+label_smoothing: 0.1
+warmup_epochs: 2          # shorter warmup for 12-ep smoke (vs 10 for 200ep)
+use_bf16: true
+optimizer: adamw
+scheduler: cosine
+target_top1: 0.75
+
+# Headline-mode reproducibility (synth D4).
+headline_mode: true
+
+# He-2019/Playbook CIFAR-tuned augmentation (A4-v1).
+mixup_alpha: 0.1
+cutmix_alpha: 0.0
+mixup_cutmix_prob: 1.0
+randaugment_n: 1
+randaugment_m: 9
+random_erasing_p: 0.0
+ema_decay: 0.9999
+
+# FLOP-target (iso-FLOPs A1).
+flops_target: 41224448
+flops_tolerance: 0.10
+
+# H09 phi_budget verified-winner architecture, iso-FLOPs at 125k total.
+model: phi_budget
+phi_model: phi_budget
+phi_budget_total: 125000
+phi_budget_n_stages: 3
+phi_budget_mode: phi
+channel_mode: phi
+
+flags:
+  hex: false
+  group: false
+  fractal: false
+  toroidal: false
+  cymatic_init: false
+  golden_modulate: false
