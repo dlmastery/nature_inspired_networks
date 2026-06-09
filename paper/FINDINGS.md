@@ -1,5 +1,45 @@
 ﻿# FINDINGS — nature_inspired_networks curated CIFAR-10 sweep (seed 0, 12 epochs)
 
+> ## 🟢 2026-06-09 — CIFAR-10 iso-FLOPs smokes: all 3 priors LIFT baseline at 12 ep; CIFAR-100 baseline n=3 in progress (n=2 so far)
+>
+> First real test of R5 BLOCKER 1 fix. All three Phase-9i priors re-implemented
+> at iso-FLOPs (`phi_budget_total=125000` → 43.24M FLOPs, +4.9% inside ±10%
+> of the baseline 41.22M envelope) and re-tested on CIFAR-10 at 12 ep
+> under the A4-v1 He-2019/Playbook recipe.
+>
+> **CIFAR-10 12-ep iso-FLOPs smoke results (single seed each):**
+>
+> | Tag | top1 | Δ vs SOTA-smoke baseline band (0.80) |
+> |---|---:|---:|
+> | `sg_only_phi_budget_iso_flops_v1_smoke` | **0.8264** | +2.64 pp |
+> | `pair_gm_pdw_iso_flops_v1_smoke` | **0.8277** | +2.77 pp |
+> | `slot_act_sine_iso_flops_v1_smoke` | **0.8340** | +3.40 pp |
+>
+> All three pass the 0.70 hard-floor smoke gate (CLAUDE.md Rule 13 PASS band).
+> **At iso-FLOPs, all three priors lift CIFAR-10 baseline by +2.6 to +3.4 pp
+> at 12 ep.** This is the first evidence that the +1pp claim from the
+> original (non-iso-FLOPs) Phase-9i was not pure FLOP-inflation: stripped
+> of the 2× FLOP advantage, the priors still carry directional signal at
+> single-seed CIFAR-10. n=1 each, screening only — CIFAR-100 n=3 confirmation
+> in progress (see below).
+>
+> **CIFAR-100 A4-v1 baseline n=3 progress (sequential, no contention adjustment):**
+>
+> | Seed | top1 | train_top1_clean | gen-gap | train_h |
+> |---:|---:|---:|---:|---:|
+> | 0 | 0.6747 | 0.7773 | 0.103 | 3.37 |
+> | 1 | 0.6675 | 0.7607 | 0.094 | 9.55 (under GPU contention) |
+> | 2 | running | — | — | — |
+>
+> Seed 1 took 2.8× longer than seed 0 due to GPU contention with another
+> Python process; campaign script is self-resuming and self-committing so
+> nothing is lost, only slow. Revised Block A close wall-clock estimate:
+> ~4 calendar days under current contention.
+>
+> A4-v1 baseline through n=2: mean = 0.6711, σ = 0.51 pp. The 0.5pp gap to
+> PLAN.md's 0.68 floor is consistent at n=2; final n=3 will commit the
+> baseline mean for the iso-FLOPs Wilcoxon vs the priors.
+
 > ## 🟡 2026-06-07 PM — A4-v2 single-knob LR halve REGRESSED to 0.6516 (-2.31 pp); A4-v1 promoted to practical baseline at 0.6747; A1 unblocks
 >
 > Per the binding pre-registration `pre-registration/a4_recipe_debug_v2_lr5em4.md`,
