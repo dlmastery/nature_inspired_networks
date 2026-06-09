@@ -13,6 +13,22 @@
 > | **sg_only_phi_budget iso-FLOPs v1 seed 0** | **0.6265** | **142,730** | **43.24 M** | **−4.28 pp at iso-FLOPs** |
 > | **pair_gm_pdw original (Phase-9i, June 4)** | 0.6460 mean (n=3) | 267,658 | 80.82 M | **+1.00 pp at ~2× FLOPs** |
 > | **pair_gm_pdw iso-FLOPs v1 seed 0** | **0.6238** | **142,730** | **43.24 M** | **−4.55 pp at iso-FLOPs** |
+> | **slot_act_sine original (Phase-9i, June 4)** | 0.6461 mean (n=3) | 267,659 | 80.82 M | **+1.01 pp at ~2× FLOPs** |
+> | **slot_act_sine iso-FLOPs v1 seed 0** | **0.6250** | **142,731** | **43.24 M** | **−4.43 pp at iso-FLOPs** |
+>
+> **Inversion magnitude is consistent across all three priors (~5.5 pp):**
+>
+> | Prior | original Δ | iso-FLOPs Δ | inversion |
+> |---|---:|---:|---:|
+> | sg_only_phi_budget | +1.24 pp | −4.28 pp | **−5.52 pp** |
+> | pair_gm_pdw | +1.00 pp | −4.55 pp | **−5.55 pp** |
+> | slot_act_sine | +1.01 pp | −4.43 pp | **−5.44 pp** |
+>
+> All three priors show a uniform ~5.5 pp inversion. This rules out a
+> prior-specific signal — at iso-FLOPs on CIFAR-100/ResNet-20 at the
+> A4-v1 modern recipe, the three "Phase-9i winners" all lose to baseline
+> by ~4.5 pp, and they all do so by an almost identical margin. The
+> original ~1pp wins were essentially **all** compute, not prior.
 >
 > Inversion magnitude: from +1.24 pp to −4.82 pp (n=3 baseline mean vs
 > n=1 iso-FLOPs prior, screening tier). Direction flips cleanly. The
