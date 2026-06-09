@@ -1,5 +1,55 @@
 ﻿# FINDINGS — nature_inspired_networks curated CIFAR-10 sweep (seed 0, 12 epochs)
 
+> ## 🔴 2026-06-09 PM — A1 iso-FLOPs first result: sg_only_phi_budget LOSES baseline by −4.82 pp on CIFAR-100; original +1.24 pp "lift" was compute-driven (R5 BLOCKER 1 confirmed)
+>
+> **Headline:** the protocol caught the confound R5 named. The original
+> (non-iso-FLOPs) Phase-9i headline lift inverts under iso-FLOPs at the
+> same CIFAR-100/ResNet-20 scale.
+>
+> | Run (CIFAR-100 200 ep modern recipe) | top1 | params | FLOPs | Δ vs baseline n=3 mean |
+> |---|---:|---:|---:|---:|
+> | A4-v1 baseline n=3 (seeds 0/1/2) | 0.6693 mean | 278,324 | 41.22 M | — |
+> | **sg_only_phi_budget original (Phase-9i, June 4)** | 0.6485 mean (n=3) | 267,658 | 80.82 M | **+1.24 pp at ~2× FLOPs** |
+> | **sg_only_phi_budget iso-FLOPs v1 seed 0** | **0.6265** | **142,730** | **43.24 M** | **−4.28 pp at iso-FLOPs** |
+>
+> Inversion magnitude: from +1.24 pp to −4.82 pp (n=3 baseline mean vs
+> n=1 iso-FLOPs prior, screening tier). Direction flips cleanly. The
+> mechanism is now visible: at iso-FLOPs the φ-allocation prior must
+> halve its parameter budget (142k vs 278k), and on CIFAR-100 the
+> capacity reduction outweighs whatever φ-specific signal exists.
+>
+> **CIFAR-10 12-ep smoke vs CIFAR-100 200-ep iso-FLOPs comparison:**
+>
+> | Prior | CIFAR-10 smoke (n=1, 12 ep) | CIFAR-100 iso-FLOPs (n=1, 200 ep) |
+> |---|---:|---:|
+> | sg_only_phi_budget | 0.8264 (+2.64 vs SOTA-smoke 0.80) | **0.6265 (−4.28 vs baseline 0.6693)** |
+>
+> The smoke vs convergence-regime gap shows the iso-FLOPs prior helps at
+> 10-class CIFAR-10 short-horizon screening but hurts at 100-class
+> CIFAR-100 converged regime. This is consistent with the capacity-bottle-
+> neck hypothesis: smaller priors look fine when easy problems are
+> solvable with limited capacity, but lose under harder problems where
+> the parameter budget matters more.
+>
+> **Other useful diagnostics on the iso-FLOPs prior:**
+> - train_top1_clean = 0.663 (vs baseline 0.777 — converged less)
+> - gen-gap = 0.037 (vs baseline 0.103 — much smaller, but at lower test top1)
+> - Composite (FLOPs-extended) = 0.5584 (vs baseline n=2 ~0.589)
+>
+> **Next:** `pair_gm_pdw_iso_flops_v1` seed 0 running. `slot_act_sine_iso_flops_v1`
+> queued. Then seeds 1, 2 for all three priors. After n=3 for each: paired
+> Wilcoxon vs A4-v1 baseline n=3 + bootstrap CI + Holm-Bonferroni k=3.
+> Current screening-tier read: at iso-FLOPs on CIFAR-100/ResNet-20 200 ep,
+> the φ-budget mechanism does NOT generalize from CIFAR-10 short-horizon
+> to CIFAR-100 converged.
+>
+> The protocol catches the original lift as compute-driven. The honest
+> conclusion is the paper's new headline: **at iso-FLOPs the priors do
+> not lift CIFAR-100; the original Phase-9i +1pp claim was confounded
+> with a 2× FLOPs gap**. This is a real, publishable falsification of
+> the priors-lift claim at the originally-tested scale — exactly the
+> kind of disciplined falsification the SYNTHESIS_100 plan calls for.
+
 > ## 🟢 2026-06-09 — CIFAR-10 iso-FLOPs smokes: all 3 priors LIFT baseline at 12 ep; CIFAR-100 baseline n=3 in progress (n=2 so far)
 >
 > First real test of R5 BLOCKER 1 fix. All three Phase-9i priors re-implemented
