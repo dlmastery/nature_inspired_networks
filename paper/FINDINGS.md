@@ -11,6 +11,8 @@
 > | A4-v1 baseline n=3 (seeds 0/1/2) | 0.6693 mean | 278,324 | 41.22 M | — |
 > | **sg_only_phi_budget original (Phase-9i, June 4)** | 0.6485 mean (n=3) | 267,658 | 80.82 M | **+1.24 pp at ~2× FLOPs** |
 > | **sg_only_phi_budget iso-FLOPs v1 seed 0** | **0.6265** | **142,730** | **43.24 M** | **−4.28 pp at iso-FLOPs** |
+> | **pair_gm_pdw original (Phase-9i, June 4)** | 0.6460 mean (n=3) | 267,658 | 80.82 M | **+1.00 pp at ~2× FLOPs** |
+> | **pair_gm_pdw iso-FLOPs v1 seed 0** | **0.6238** | **142,730** | **43.24 M** | **−4.55 pp at iso-FLOPs** |
 >
 > Inversion magnitude: from +1.24 pp to −4.82 pp (n=3 baseline mean vs
 > n=1 iso-FLOPs prior, screening tier). Direction flips cleanly. The
