@@ -1,0 +1,19 @@
+{
+  "tag": "wave0_imagenette_modern_cifar_tuned",
+  "dataset": "imagenette",
+  "seed": 0,
+  "epochs": 10,
+  "top1": 0.7171974522292993,
+  "top5": 0.9678980891719745,
+  "params": 272474,
+  "flops": 1030451840.0,
+  "latency_ms": 4.924979000352323,
+  "rot_eq_err": 0.4692545148233573,
+  "composite": 0.5601595947555472,
+  "composite_fingerprint": "b73e8bbfa2717c567bda42b7760fefc3b4e68381aee54ea28d7cd8f3d6863649",
+  "epochs_to_target": -1,
+  "train_seconds": 839.205541400006,
+  "train_top1": 0.572880993150685,
+  "generalization_gap": -0.2972755772292993,
+  "train_top1_clean": 0.419921875
+}
