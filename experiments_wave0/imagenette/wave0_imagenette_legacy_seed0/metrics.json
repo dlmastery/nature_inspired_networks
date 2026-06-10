@@ -1,0 +1,19 @@
+{
+  "tag": "wave0_imagenette_legacy",
+  "dataset": "imagenette",
+  "seed": 0,
+  "epochs": 10,
+  "top1": 0.5870063694267516,
+  "top5": 0.9518471337579618,
+  "params": 272474,
+  "flops": 1030451840.0,
+  "latency_ms": 5.6549760000780225,
+  "rot_eq_err": 0.47434975889821845,
+  "composite": 0.42696719280013773,
+  "composite_fingerprint": "b73e8bbfa2717c567bda42b7760fefc3b4e68381aee54ea28d7cd8f3d6863649",
+  "epochs_to_target": -1,
+  "train_seconds": 1134.396484900033,
+  "train_top1": 0.4472388698630137,
+  "generalization_gap": -0.08700636942675155,
+  "train_top1_clean": 0.5
+}
