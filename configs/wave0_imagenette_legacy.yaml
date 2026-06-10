@@ -1,0 +1,77 @@
+# WAVE-0 (Imagenette recipe validation) -- LEGACY 11-trick recipe.
+#
+# Pre-registration: pre-registration/wave0_imagenette_recipe_validation.md
+# Source synthesis item: SYNTHESIS_100.md Block B item B1.
+#
+# This config exercises the LEGACY 11-trick recipe (the Bello-2021 /
+# Wightman-2021 modern recipe AS WRITTEN, with the ImageNet-tuned
+# RandAugment(N=2, M=14), Random Erasing p=0.25, Mixup alpha=0.2,
+# CutMix alpha=1.0 50/50 alternation, warmup 5 ep) BUT without
+# EMA (kept legacy on purpose -- the "modern_naive" recipe adds EMA
+# back to make a Wightman-style timm baseline). The same 11 tricks
+# that landed CIFAR-100 ResNet-20 at 0.6360 -- below the project's
+# pre-registered floor of 0.68.
+#
+# The Wave-0 hypothesis is the recipe transfers to Imagenette (10
+# classes, 160x160, no 32x32 small-resolution confound). If this
+# config lands median top1 >= 0.90 at 10 ep / n=5 then the recipe
+# itself is fine and the CIFAR-100 failure is a small-resolution
+# transfer problem (Mueller & Hutter 2021 TrivialAugment).
+#
+# Hardware contract (CLAUDE.md Sec 2):
+#   * RTX 4090 Laptop, 16 GB VRAM, Windows 11
+#   * bf16 AMP, batch 128 (160x160 is ~25x CIFAR pixel count)
+#   * num_workers 0; Rule 26 thread caps via env
+#
+# Wall-clock estimate per seed: ~20 min on 4090 Laptop. 5 seeds = 1.7 h.
+#
+# Launch (one seed at a time):
+#   .\.venv\Scripts\python -m nature_inspired_networks.runner `
+#     --config configs\wave0_imagenette_legacy.yaml `
+#     --tag wave0_imagenette_legacy --seed 0 `
+#     --root experiments_wave0
+
+dataset: imagenette
+data_root: ./data
+num_classes: 10
+image_size: 160
+batch_size: 128
+num_workers: 0             # Windows-safe (CLAUDE.md Sec 2)
+epochs: 10
+
+# Base optimisation.
+lr: 1.0e-3
+weight_decay: 5.0e-4
+label_smoothing: 0.1       # auto-dropped to 0 when mixup/cutmix is on
+warmup_epochs: 5
+use_bf16: true
+optimizer: adamw
+scheduler: cosine
+target_top1: 0.90          # Imagenette small-model published band
+
+# Synthesis-100 D4: deterministic headline-mode (no cudnn.benchmark,
+# seeded DataLoader workers). Required for Wave-0 reproducibility.
+headline_mode: true
+
+# Legacy ImageNet-tuned 11-trick (the recipe that failed CIFAR-100).
+mixup_alpha: 0.2
+cutmix_alpha: 1.0
+mixup_cutmix_prob: 0.5     # 50/50 Mixup vs CutMix alternation
+randaugment_n: 2
+randaugment_m: 14
+random_erasing_p: 0.25
+ema_decay: 0.0             # legacy variant has NO EMA -- modern_naive adds it
+
+# No FLOPs target: Imagenette at 160x160 has different FLOPs from CIFAR
+# at 32x32 (~25x increase). Wave-0 is recipe validation, not iso-FLOPs.
+
+# Baseline model.
+model: resnet20
+channel_mode: linear
+flags:
+  hex: false
+  group: false
+  fractal: false
+  toroidal: false
+  cymatic_init: false
+  golden_modulate: false

@@ -1,0 +1,79 @@
+# WAVE-0 (Imagenette recipe validation) -- MODERN CIFAR-TUNED (A4-v1).
+#
+# Pre-registration: pre-registration/wave0_imagenette_recipe_validation.md
+# Source synthesis item: SYNTHESIS_100.md Block B item B1 / Block A item A4.
+#
+# This config exercises the A4-v1 He-2019 / DeepLearningTuningPlaybook
+# CIFAR-tuned variant of the modern recipe -- the recipe that lifted
+# CIFAR-100 ResNet-20 by +3.97 pp over the legacy 11-trick to 0.6747.
+# Wave-0 tests whether this CIFAR-targeted retuning still transfers to
+# Imagenette (10 classes, 160x160) or whether the smaller-resolution
+# tuning has been over-fit to 32x32.
+#
+# Key deltas vs ``wave0_imagenette_modern_naive.yaml``:
+#   * RandAugment N=1 M=9        (not N=2 M=14 -- gentler at 160x160 too)
+#   * Random Erasing dropped     (no benefit at 32x32 per Mueller & Hutter;
+#                                 retain the drop at 160x160 for parity
+#                                 with the CIFAR A4-v1 recipe)
+#   * Mixup alpha=0.1            (not 0.2 -- less aggressive)
+#   * CutMix dropped             (not alpha=1.0 -- single-mixing-axis at a time)
+#   * warmup_epochs=10           (not 5 -- longer warmup helps at He-2019)
+#
+# If this recipe lands median top1 >= 0.90 at Imagenette 10 ep / n=5 AND
+# the legacy + modern_naive land below, the A4-v1 retuning is the
+# right modern recipe and is promoted to Wave-1.
+#
+# Hardware contract (CLAUDE.md Sec 2):
+#   * RTX 4090 Laptop, 16 GB VRAM, Windows 11
+#   * bf16 AMP, batch 128, num_workers 0
+#   * Rule 26 thread caps via env
+#
+# Wall-clock estimate per seed: ~20 min on 4090 Laptop. 5 seeds = 1.7 h.
+#
+# Launch:
+#   .\.venv\Scripts\python -m nature_inspired_networks.runner `
+#     --config configs\wave0_imagenette_modern_cifar_tuned.yaml `
+#     --tag wave0_imagenette_modern_cifar_tuned --seed 0 `
+#     --root experiments_wave0
+
+dataset: imagenette
+data_root: ./data
+num_classes: 10
+image_size: 160
+batch_size: 128
+num_workers: 0
+epochs: 10
+
+# Base optimisation.
+lr: 1.0e-3
+weight_decay: 5.0e-4
+label_smoothing: 0.1
+warmup_epochs: 10          # increased from 5 (A4-v1 He-2019 / Playbook)
+use_bf16: true
+optimizer: adamw
+scheduler: cosine
+target_top1: 0.90
+
+# Synthesis-100 D4: deterministic headline-mode.
+headline_mode: true
+
+# A4-v1 / He-2019 / Tuning-Playbook CIFAR-tuned modern recipe.
+mixup_alpha: 0.1           # reduced from 0.2
+cutmix_alpha: 0.0          # DROPPED (was 1.0)
+mixup_cutmix_prob: 1.0     # always Mixup when active (no alternation needed)
+randaugment_n: 1           # reduced from 2
+randaugment_m: 9           # reduced from 14 (Mueller & Hutter 2021)
+random_erasing_p: 0.0      # DROPPED (was 0.25)
+ema_decay: 0.9999
+
+# No FLOPs target; recipe-validation wave.
+
+model: resnet20
+channel_mode: linear
+flags:
+  hex: false
+  group: false
+  fractal: false
+  toroidal: false
+  cymatic_init: false
+  golden_modulate: false

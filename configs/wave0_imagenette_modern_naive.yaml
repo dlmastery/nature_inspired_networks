@@ -1,0 +1,67 @@
+# WAVE-0 (Imagenette recipe validation) -- MODERN-NAIVE recipe.
+#
+# Pre-registration: pre-registration/wave0_imagenette_recipe_validation.md
+# Source synthesis item: SYNTHESIS_100.md Block B item B1.
+#
+# This config exercises the MODERN-NAIVE 11-trick recipe -- the same
+# Wightman-2021 / Bello-2021 ImageNet hyperparameters as
+# ``wave0_imagenette_legacy.yaml`` BUT with EMA decay 0.9999 enabled,
+# producing the full timm-style "ResNet Strikes Back" 11-trick stack
+# at its ImageNet defaults. This is the recipe an ML practitioner
+# would adopt blindly from timm/Wightman without CIFAR-specific
+# retuning.
+#
+# Hardware contract (CLAUDE.md Sec 2):
+#   * RTX 4090 Laptop, 16 GB VRAM, Windows 11
+#   * bf16 AMP, batch 128, num_workers 0
+#   * Rule 26 thread caps via env
+#
+# Wall-clock estimate per seed: ~20 min on 4090 Laptop. 5 seeds = 1.7 h.
+#
+# Launch:
+#   .\.venv\Scripts\python -m nature_inspired_networks.runner `
+#     --config configs\wave0_imagenette_modern_naive.yaml `
+#     --tag wave0_imagenette_modern_naive --seed 0 `
+#     --root experiments_wave0
+
+dataset: imagenette
+data_root: ./data
+num_classes: 10
+image_size: 160
+batch_size: 128
+num_workers: 0
+epochs: 10
+
+# Base optimisation.
+lr: 1.0e-3
+weight_decay: 5.0e-4
+label_smoothing: 0.1
+warmup_epochs: 5
+use_bf16: true
+optimizer: adamw
+scheduler: cosine
+target_top1: 0.90
+
+# Synthesis-100 D4: deterministic headline-mode.
+headline_mode: true
+
+# Full 11-trick timm-style ImageNet recipe (legacy + EMA).
+mixup_alpha: 0.2
+cutmix_alpha: 1.0
+mixup_cutmix_prob: 0.5
+randaugment_n: 2
+randaugment_m: 14
+random_erasing_p: 0.25
+ema_decay: 0.9999          # trick 11 (the bit "legacy" leaves off)
+
+# No FLOPs target; recipe-validation wave.
+
+model: resnet20
+channel_mode: linear
+flags:
+  hex: false
+  group: false
+  fractal: false
+  toroidal: false
+  cymatic_init: false
+  golden_modulate: false

@@ -389,6 +389,12 @@ def run_one(cfg: dict, tag: str, seed: int, root: str = "experiments") -> Path:
     device = "cuda" if torch.cuda.is_available() else "cpu"
 
     ds_name = cfg["dataset"]
+    # Wave-0 (2026-06-08): image_size is forwarded to the dataset loader
+    # for benchmarks where the native resolution is not 32x32. The
+    # CIFAR loaders ignore the kwarg (image_size only matters for
+    # Imagenette / Tiny-ImageNet / ImageNet-100). Default 160 matches
+    # Imagenette v2-160's native short-edge resize.
+    image_size = int(cfg.get("image_size", 160))
     tr_loader, te_loader, n_cls, _ = load_dataset(
         ds_name, root=cfg.get("data_root", "./data"),
         batch_size=cfg.get("batch_size", 256),
@@ -397,10 +403,18 @@ def run_one(cfg: dict, tag: str, seed: int, root: str = "experiments") -> Path:
         randaugment_n=int(cfg.get("randaugment_n", 0)),
         randaugment_m=int(cfg.get("randaugment_m", 14)),
         random_erasing_p=float(cfg.get("random_erasing_p", 0.0)),
+        image_size=image_size,
         # Synthesis-100 D4: pass headline_mode + seed for deterministic
         # DataLoader workers.
         headline_mode=headline_mode, seed=seed,
     )
+    # Wave-0 (2026-06-08): YAML can override the dataset-implied class
+    # count (e.g. Imagenette is 10-class but the future ImageNet-100
+    # task will be 100-class on the same loader stub). When present,
+    # ``num_classes`` overrides the loader-reported count. The model
+    # factory then receives the YAML-declared count, not the loader's.
+    if "num_classes" in cfg:
+        n_cls = int(cfg["num_classes"])
 
     model_name = cfg["model"]
     channel_mode = cfg.get("channel_mode", "fib")
@@ -442,7 +456,17 @@ def run_one(cfg: dict, tag: str, seed: int, root: str = "experiments") -> Path:
     # Synthesis-100 A3 (2026-06-06): refuse to launch if the model's
     # FLOPs are outside the YAML-declared band. Done BEFORE any training
     # cycle so an iso-FLOPs misconfiguration costs zero GPU time.
-    _check_flops_target(model, cfg, input_size=(1, 3, 32, 32))
+    #
+    # Wave-0 (2026-06-08): for non-CIFAR datasets the input is not
+    # 32x32. We derive the eval input side from the YAML ``image_size``
+    # for any dataset whose native side differs from CIFAR's 32, so
+    # the FLOPs measurement / latency reflect the actual evaluation
+    # tensor shape.
+    if str(ds_name).lower() in {"imagenette", "imagenette2", "imagenette2-160"}:
+        eval_input_size = (1, 3, image_size, image_size)
+    else:
+        eval_input_size = (1, 3, 32, 32)
+    _check_flops_target(model, cfg, input_size=eval_input_size)
 
     train_cfg = TrainConfig(
         epochs=cfg.get("epochs", 30),
@@ -494,7 +518,8 @@ def run_one(cfg: dict, tag: str, seed: int, root: str = "experiments") -> Path:
 
     metrics = evaluate_full(model, te_loader, dataset=ds_name, tag=tag,
                             seed=seed, epochs=train_cfg.epochs,
-                            fit_info=fit_info, device=device)
+                            fit_info=fit_info, input_size=eval_input_size,
+                            device=device)
     out_dir = Path(root) / ds_name / f"{tag}_seed{seed}"
     save_run(str(out_dir), metrics, fit_info, model=model)
 

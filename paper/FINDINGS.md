@@ -1,5 +1,48 @@
 ﻿# FINDINGS — nature_inspired_networks curated CIFAR-10 sweep (seed 0, 12 epochs)
 
+> ## 🔵 2026-06-10 PM — ADVISOR-REVIEW DECISION: Option A (large-scale negative-result paper) + Option B (protocol as methods chapter), aligned with empirical Block A close
+>
+> Senior-advisor critique landed 2026-06-10 14:00Z (separate review pass,
+> different from the 5 hostile reviewers). Two key external observations
+> the data has already confirmed:
+>
+> 1. *"Most of the design space was numerology by construction, and the audit
+>    confirmed it. The literature already answers the principled half of
+>    your question; your experiments answer the aesthetic half."* Block A
+>    close empirically confirms this on CIFAR-100/ResNet-20 at iso-FLOPs.
+>
+> 2. *"CIFAR-10 at 12 epochs is the wrong instrument. Inductive biases earn
+>    their keep in low-data, OOD, or symmetry-rich regimes — exactly the
+>    regimes you didn't test."* The synthesis Waves 1-4 already target
+>    those regimes, but they hadn't started yet at the time of advisor
+>    review.
+>
+> **Framing decision (binding):**
+> - **Option A primary headline:** "We implemented 84 nature-inspired priors
+>   under a pre-registered protocol; after controlling for tuning and
+>   FLOPs at the originally-tested scale, none beat a tuned baseline.
+>   Negative result at scale." Target venue: TMLR or NeurIPS "I Can't
+>   Believe It's Not Better" workshop.
+> - **Option B methods chapter:** the self-auditing autoresearch protocol
+>   becomes the methods backbone that makes the negative result trustworthy.
+>   The Fixer-with-mechanism-pinning-test contract is the publishable
+>   technical primitive.
+> - **Symmetry-existence-proof requirement (advisor #3):** add at least one
+>   experiment where a prior *should* win on first principles — H71
+>   IcosaRoPE3D on Spherical MNIST (Wave-4, already planned) +
+>   toroidal padding on genuinely periodic data (new Wave-4.5).
+>
+> **Five concrete actions per advisor (binding):**
+> 1. ✅ Pick framing → Option A primary + Option B methods chapter
+> 2. ⏳ Iso-FLOPs + tuned-baseline + n≥7 → Wave-1 (iso-FLOPs Pareto vs RegNetX/ConvNeXt/ViT), Wave-2 (Tiny-ImageNet n=5/7)
+> 3. ⏳ "Prior should win" probe → Wave-4 H71 Spherical MNIST + new Wave-4.5 toroidal-padding-on-periodic-data
+> 4. ⏳ Repo-surface cleanup → new task (move auto-checkpoint scripts out of root, drop static shields.io for real GitHub Actions badge, collapse `experiments_*` dirs, archive `.claude/` agent artifacts)
+> 5. ⏳ Dashboard rebuild → after Wave-1 lands (need iso-FLOPs Pareto data first); single decisive chart above the fold (priors vs tuned baseline, n≥7, error bars, iso-FLOPs annotation)
+>
+> Next move: Wave-0 (Imagenette recipe validation) launches in this commit
+> chain. This addresses advisor action #2 by establishing the Imagenette
+> recipe before any Wave-1 iso-FLOPs Pareto.
+
 > ## 🔴 2026-06-10 — BLOCK A CLOSE: iso-FLOPs n=3 falsifies all 3 Phase-9i "winners" on CIFAR-100; R5 BLOCKER 1 empirically confirmed
 >
 > The full Block A close campaign completed (exit 0). Final per-arm n=3 at the
