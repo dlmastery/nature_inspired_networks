@@ -1,0 +1,19 @@
+{
+  "tag": "pair_gm_pdw_iso_flops_v1",
+  "dataset": "cifar100",
+  "seed": 2,
+  "epochs": 200,
+  "top1": 0.6257,
+  "top5": 0.8875,
+  "params": 142730,
+  "flops": 43239216.0,
+  "latency_ms": 4.265572999138385,
+  "rot_eq_err": 0.34204544002811116,
+  "composite": 0.5546814772333459,
+  "composite_fingerprint": "b73e8bbfa2717c567bda42b7760fefc3b4e68381aee54ea28d7cd8f3d6863649",
+  "epochs_to_target": -1,
+  "train_seconds": 11183.483738300158,
+  "train_top1": 0.6303084935897436,
+  "generalization_gap": 0.058870312499999966,
+  "train_top1_clean": 0.6845703125
+}
