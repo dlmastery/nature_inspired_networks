@@ -1,5 +1,53 @@
 ﻿# FINDINGS — nature_inspired_networks curated CIFAR-10 sweep (seed 0, 12 epochs)
 
+> ## 🔴 2026-06-10 — BLOCK A CLOSE: iso-FLOPs n=3 falsifies all 3 Phase-9i "winners" on CIFAR-100; R5 BLOCKER 1 empirically confirmed
+>
+> The full Block A close campaign completed (exit 0). Final per-arm n=3 at the
+> A4-v1 He-2019/Playbook recipe, all at iso-FLOPs (43.24 M, +4.9% inside the
+> ±10% band of the baseline 41.22 M envelope):
+>
+> | Arm | top1 seeds 0/1/2 | mean | σ (pp) | Δ vs baseline (pp) | 95% bootstrap CI (pp) | Wilcoxon p_2 | paired-t p_2 (df=2) | Phase-5 |
+> |---|---|---:|---:|---:|---|---:|---:|---|
+> | A4-v1 baseline | 0.6747 / 0.6675 / 0.6657 | **0.6693** | 0.48 | — | — | — | — | — |
+> | sg_only_phi_budget iso-FLOPs | 0.6265 / 0.6295 / 0.6275 | 0.6278 | 0.15 | **−4.15** | [−4.82, −3.80] | 0.25 (floor) | 0.0065 | FAIL |
+> | pair_gm_pdw iso-FLOPs | 0.6238 / 0.6251 / 0.6257 | 0.6249 | 0.10 | **−4.44** | [−5.09, −4.00] | 0.25 (floor) | 0.0055 | FAIL |
+> | slot_act_sine iso-FLOPs | 0.6250 / 0.6292 / 0.6205 | 0.6249 | 0.44 | **−4.44** | [−4.97, −3.83] | 0.25 (floor) | 0.0055 | FAIL |
+>
+> Stats reproduction script: `scripts/_block_a_close_stats.py`. Detailed
+> writeup: `paper/STATISTICAL_TESTS.md` §16 (added 2026-06-10).
+>
+> **Conclusion:** at iso-FLOPs on CIFAR-100/ResNet-20 200 ep with the A4-v1
+> He-2019/Playbook modern recipe, all three Phase-9i "winners" LOSE the
+> baseline by 4-4.5 pp with consistent direction (3/3 priors), tight σ
+> (0.10-0.48 pp), and bootstrap CIs that exclude zero by ≥3.8 pp.
+>
+> Stat rigor caveats:
+> - **Wilcoxon 2-sided p = 0.25 at n=3 is the theoretical floor** (synthesis §C5/C6); the test cannot reject H0 at α=0.05 with n=3 regardless of effect direction. Bootstrap CIs and paired-t are reported but paired-t at df=2 is unreliable (heavy tails); the bootstrap CI is the headline.
+> - **Phase-5 ordinal gate FAILS for all 3 priors in the loss direction**: `max(prior) < min(baseline)` (i.e. every prior seed < every baseline seed). The protocol-defined gate is satisfied for the *falsification* direction; PROMOTION would require the opposite.
+> - **Holm-Bonferroni k=3 with Wilcoxon at floor 0.25 does not clear α=0.05** at any rank; if paired-t df=2 were trusted, the p_2 ∈ {0.0055, 0.0055, 0.0065} would all clear α'_holm = {0.0167, 0.025, 0.05}. Paired-t at df=2 is NOT trusted, so the formal verdict stays SCREENING-tier.
+>
+> **Block A close verdict (SCREENING tier):**
+>
+> The R5 BLOCKER 1 finding is empirically confirmed. At iso-FLOPs at the
+> originally-tested scale, the three Phase-9i priors do NOT lift baseline —
+> they LOSE by ~4.4 pp uniformly. The original Phase-9i +1pp lift was
+> compute-driven, not prior-driven.
+>
+> The honest paper headline is now: **"the protocol catches its own
+> compute-driven false positive: at iso-FLOPs the three original
+> 'winners' lose baseline by ~4.4 pp at n=3 with bootstrap CIs that
+> exclude zero by ≥3.8 pp."** This is exactly the kind of disciplined
+> empirical falsification the SYNTHESIS_100 plan anticipated. The
+> nature-inspired program is NOT abandoned — it advances to Wave-0
+> (Imagenette recipe validation), Wave-1 (iso-FLOPs Pareto vs RegNetX/
+> ConvNeXt/ViT), and Wave-4 (H71 IcosaRoPE3D on Spherical MNIST) where
+> the priors are tested at scales and tasks where their symmetries
+> can carry signal. Sequencing per synthesis §10.
+>
+> **Block A budget:** ~30 GPU-h planned + ~9 GPU-h debug = ~39 GPU-h
+> actual. Total campaign Day-1 through close: 14 GPU runs (3 smokes +
+> 11 200-ep CIFAR-100 runs at ~3.1h each under contention).
+
 > ## 🔴 2026-06-09 PM — A1 iso-FLOPs first result: sg_only_phi_budget LOSES baseline by −4.82 pp on CIFAR-100; original +1.24 pp "lift" was compute-driven (R5 BLOCKER 1 confirmed)
 >
 > **Headline:** the protocol caught the confound R5 named. The original

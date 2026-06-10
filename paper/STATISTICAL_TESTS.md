@@ -592,3 +592,100 @@ Per-seed-paired diagnostic: **9/9 paired deltas across the three winners are str
 
 This section is an iso-recipe n=3 diagnostic at non-matched FLOPs (provisional). **The qualitative reading: the priors carry a +1 pp directional lift that is sign-consistent with the default-config cell, but at ~2× baseline FLOPs.** The matched-recipe candidates are framed as **screened candidates pending iso-FLOPs n≥7 confirmation at the modern recipe + RegNetX-200MF comparator**, not as evaluation-grade winners. The protocol's value is the iso-recipe / iso-FLOPs guardrail discipline that surfaces this confound before any external claim ships.
 
+
+## 16 — Block A close: iso-FLOPs n=3 (2026-06-10)
+
+This section closes the iso-FLOPs requalification anticipated in §15.4. The
+three Phase-9i "winners" are re-implemented at `phi_budget_total=125_000`,
+yielding measured FLOPs 43.24 M (vs baseline 41.22 M, +4.9% inside the
+±10% A1 calibration band; see `audits/REVIEWER_FIVE_2026-06-06/A1_ISO_FLOPS_CALIBRATION.md`).
+The A4-v1 He-2019/Playbook CIFAR-tuned recipe replaces the legacy Bello/Wightman
+modern recipe (FINDINGS 2026-06-07 PM block). Reproduction: `scripts/_block_a_close_stats.py`.
+
+### 16.1 — n=3 raw values
+
+| Arm | seeds 0/1/2 | mean | σ (pp) |
+|---|---|---:|---:|
+| A4-v1 baseline (He-2019/Playbook) | 0.6747 / 0.6675 / 0.6657 | 0.6693 | 0.48 |
+| sg_only_phi_budget iso-FLOPs v1 | 0.6265 / 0.6295 / 0.6275 | 0.6278 | 0.15 |
+| pair_gm_pdw iso-FLOPs v1 | 0.6238 / 0.6251 / 0.6257 | 0.6249 | 0.10 |
+| slot_act_sine iso-FLOPs v1 | 0.6250 / 0.6292 / 0.6205 | 0.6249 | 0.44 |
+
+### 16.2 — Paired analysis vs A4-v1 baseline
+
+| Prior | Δmean | 95% paired-bootstrap CI (10 000 iter) | Wilcoxon 2-sided p | paired-t 2-sided p (df=2) | Phase-5 gate (synth convention) |
+|---|---:|---|---:|---:|---|
+| sg_only_phi_budget | **−4.15 pp** | [−4.82, −3.80] pp | **0.25** (n=3 floor) | 0.0065 | FAIL |
+| pair_gm_pdw | **−4.44 pp** | [−5.09, −4.00] pp | **0.25** (n=3 floor) | 0.0055 | FAIL |
+| slot_act_sine | **−4.44 pp** | [−4.97, −3.83] pp | **0.25** (n=3 floor) | 0.0055 | FAIL |
+
+The Phase-5 ordinal gate ("min(leader) > max(baseline)") FAILS for all three
+priors in the PROMOTION direction. The reverse direction ("max(leader) <
+min(baseline)") holds for ALL three priors: every prior seed sits below
+every baseline seed (no overlap whatsoever in the 3×3 grid).
+
+### 16.3 — Holm-Bonferroni k=3 at α=0.05
+
+Sorted by Wilcoxon 2-sided p (all tied at the n=3 floor 0.25):
+
+| Rank | Prior | p_W | α_holm | Pass? |
+|---:|---|---:|---:|---|
+| 1 | sg_only_phi_budget | 0.25 | 0.0167 | FALSE |
+| 2 | pair_gm_pdw | 0.25 | 0.025 | FALSE |
+| 3 | slot_act_sine | 0.25 | 0.05 | FALSE |
+
+Wilcoxon at n=3 cannot clear Holm-Bonferroni at α=0.05 by construction. The
+paired-t 2-sided p_2 ∈ {0.0055, 0.0055, 0.0065} would all clear α'_holm =
+{0.0167, 0.025, 0.05}, but paired-t at df=2 is unreliable (heavy tails;
+synthesis §C5 explicitly forbids paired-t at n<7 for headline claims). Final
+verdict stays at the SCREENING tier.
+
+### 16.4 — Tier classification and what this section IS vs IS NOT
+
+**This section IS:** a SCREENING-tier paired iso-FLOPs n=3 falsification of
+the three Phase-9i "winners" at the A4-v1 He-2019/Playbook recipe on
+CIFAR-100/ResNet-20 200 ep. Direction consistent (3/3 priors LOSE), magnitude
+consistent (~4.4 pp), bootstrap CIs at 95% confidence robustly exclude zero
+by ≥3.8 pp. No prior seed beats any baseline seed.
+
+**This section is NOT:** an EVALUATION-tier verdict on whether the φ-prior
+or any nature-inspired prior can lift a baseline ANYWHERE. Specifically:
+- It is at iso-FLOPs at CIFAR-100/ResNet-20 200 ep only. Other scales,
+  architectures, and tasks remain untested.
+- It is at n=3; Wilcoxon at the floor cannot clear α=0.05 by construction.
+  n≥7 would give a proper EVALUATION-tier test but is unlikely to flip the
+  direction given the magnitude (>10× σ).
+- The CIFAR-10 12-ep iso-FLOPs smokes returned **+2.6 to +3.4 pp** in the
+  OPPOSITE direction (all 3 priors LIFT CIFAR-10 baseline). The Block A
+  finding is dataset-and-scale-specific: at CIFAR-100/ResNet-20 200 ep,
+  the priors do not lift at iso-FLOPs.
+
+### 16.5 — What the protocol caught
+
+This is exactly the kind of disciplined empirical falsification the
+SYNTHESIS_100 plan anticipated. The original Phase-9i headline (+1 pp lift
+at ~2× baseline FLOPs) was compute-driven, not prior-driven. Stripped of
+the FLOP gap, the priors lose by ~4.4 pp uniformly. R5 BLOCKER 1 is
+empirically confirmed in three independent prior architectures.
+
+The nature-inspired program is NOT abandoned. The Block A negative is
+SCALE-AND-TASK-SPECIFIC: the priors lose at iso-FLOPs at the originally-
+tested scale, but they LIFT on CIFAR-10 short-horizon smokes and have
+not yet been tested at:
+- Imagenette / Tiny-ImageNet / ImageNet-100 (Waves 0/1/2/3)
+- Modern architectures (RegNetX-200MF, ConvNeXt-V2, ViT-Small) at iso-FLOPs (Wave-1)
+- Rotation-equivariance tasks where the symmetry exists (Wave-4 H71 IcosaRoPE3D on Spherical MNIST)
+
+The next-best paper headline becomes: **"the protocol catches its own
+compute-driven false positive at the originally-tested scale, then
+re-tests the nature-inspired program at appropriate scales and tasks
+where the priors carry signal."** Waves 0-4 are the principled-evaluation
+path forward.
+
+### 16.6 — Files
+
+- Raw n=3 metrics.json: `experiments_iso_flops_v1/cifar100/{sg_only_phi_budget,pair_gm_pdw,slot_act_sine}_iso_flops_v1_seed{0,1,2}/metrics.json`
+- A4-v1 baseline n=3: `experiments_modern_debug/cifar100/baseline_resnet20_he2019_debug_seed{0,1,2}/metrics.json`
+- A1 iso-FLOPs calibration: `audits/REVIEWER_FIVE_2026-06-06/A1_ISO_FLOPS_CALIBRATION.md`
+- Stats reproduction script: `scripts/_block_a_close_stats.py`
+- Block A close pre-registration: `pre-registration/a4_recipe_debug_he2019.md` + `a4_recipe_debug_v2_lr5em4.md`
